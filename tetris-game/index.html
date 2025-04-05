@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarot Tetromino</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Tarot Tetromino</h1>
+    <div id="game-container">
+        <div id="left-column">
+            <label for="player-name">Player Name:</label>
+            <input type="text" id="player-name" placeholder="Enter your name">
+            <button id="start-game-button" class="button">Start Game</button>
+            <div id="score">Score: 0</div>
+            <div id="level">Level: 1</div>
+            <div id="game-info">Game Info: Waiting for player...</div>
+            <h2>Tarot Cards</h2>
+            <div id="tarot-container">
+                <!-- Tarot cards will be dynamically added here -->
+            </div>
+        </div>
+        <div id="middle-column">
+            <canvas id="tetris" width="300" height="600"></canvas>
+        </div>
+        <div id="right-column">
+            <h2>Leaderboard</h2>
+            <div id="leaderboard"></div>
+        </div>
+    </div>
+    <noscript>
+        <p style="color: red;">JavaScript is required to play this game. Please enable JavaScript in your browser.</p>
+    </noscript>
+    
+    <script src="src/board.js"></script>
+    <script src="src/piece.js"></script>
+    <script src="src/leaderboard.js"></script>
+    <script src="src/game.js"></script>
+</body>
+</html>

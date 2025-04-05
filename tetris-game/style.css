@@ -1,0 +1,200 @@
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    background: radial-gradient(circle, #0d0d0d, #1a1a1a, #000000); /* Dark, mystical background */
+    color: #e0e0e0;
+    font-family: 'Cinzel', serif; /* Esoteric font */
+}
+
+h1 {
+    margin: 20px 0;
+    text-align: center;
+    font-family: 'Cinzel Decorative', cursive; /* Mystical font for the title */
+    color: #ffcc00; /* Golden glow */
+    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff9900;
+}
+
+#game-container {
+    display: grid;
+    grid-template-areas: 
+        "left middle right";
+    grid-template-columns: 1fr 2fr 1fr; /* Fixed column sizes */
+    gap: 20px;
+    width: 90%;
+    max-width: 1200px;
+    height: 80%;
+    margin: 0 auto;
+}
+
+#left-column, #middle-column, #right-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#left-column {
+    grid-area: left;
+    border-right: 2px solid #fff;
+}
+
+#middle-column {
+    grid-area: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Prevent canvas from going offscreen */
+}
+
+#right-column {
+    grid-area: right;
+    border-left: 2px solid #fff;
+}
+
+canvas {
+    border: 2px solid #ffcc00; /* Golden border */
+    background-color: #222; /* Darker canvas background */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 0 20px #ffcc00; /* Glowing effect */
+    width: 90%; /* Make canvas smaller and responsive */
+    max-width: 250px; /* Ensure it doesn't exceed a fixed size */
+    height: auto; /* Maintain aspect ratio */
+}
+
+#player-name {
+    margin: 10px 0;
+    padding: 5px;
+    font-size: 16px;
+}
+
+#score, #game-info, #level {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+#leaderboard {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#leaderboard h2 {
+    margin-bottom: 10px;
+}
+
+#leaderboard div {
+    font-size: 20px;
+    margin: 5px 0;
+    color: #ffcc00;
+    text-shadow: 0 0 5px #ff9900;
+}
+
+.score {
+    font-size: 24px;
+    color: #fff;
+}
+
+.button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    background-color: #333;
+    color: #ffcc00;
+    border: 1px solid #ff9900;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease; /* Smooth hover effect */
+    text-shadow: 0 0 5px #ffcc00;
+}
+
+.button:hover {
+    background-color: #444;
+    color: #fff;
+    transform: scale(1.05); /* Slight zoom on hover */
+    text-shadow: 0 0 10px #ffcc00;
+}
+
+#start-game-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #fff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+}
+
+#start-game-button:hover {
+    background-color: #ccc;
+}
+
+#tarot-container {
+    margin-top: 20px;
+    display: grid; /* Use grid for precise stacking */
+    grid-template-columns: repeat(3, 1fr); /* Fixed 3-column layout */
+    grid-auto-rows: auto; /* Adjust row height automatically */
+    gap: 10px; /* Spacing between cards */
+    justify-items: center; /* Center cards horizontally */
+    align-items: center; /* Center cards vertically */
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for mysticism */
+    border: 1px solid #ff9900;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #ffcc00;
+}
+
+.tarot-card {
+    width: 60px; /* Smaller width */
+    height: 90px; /* Smaller height */
+    font-size: 12px; /* Adjust font size for smaller cards */
+    padding: 5px;
+    background-color: #1a1a1a;
+    color: #ffcc00;
+    border: 1px solid #ff9900;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    text-shadow: 0 0 5px #ffcc00;
+    cursor: pointer;
+}
+
+.tarot-card:hover {
+    background-color: #333;
+    color: #fff;
+    transform: scale(1.1); /* Slight zoom on hover */
+    text-shadow: 0 0 10px #ffcc00;
+}
+
+@media (max-width: 600px) {
+    #game-container {
+        grid-template-areas: 
+            "middle"
+            "left"
+            "right";
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        gap: 10px;
+    }
+
+    #left-column, #middle-column, #right-column {
+        flex: none;
+        width: 100%; /* Full width for each column */
+        border: none; /* Remove borders for cleaner mobile layout */
+    }
+
+    canvas {
+        width: 100%; /* Make canvas responsive */
+        height: auto; /* Maintain aspect ratio */
+    }
+}

@@ -285,22 +285,21 @@ document.addEventListener('keydown', (event) => {
 let tarotDeck = [];
 let playerHand = [];
 
-// Expanded tarot card effects with more creative and negative effects
+// Adjusted tarot card effects to ensure they are balanced, avoiding game-ending or overly punishing effects
 const tarotEffects = {
-    // Major Arcana
     "The Fool": { effect: () => { setGameSpeed(1000); updateGameInfo('Speed slowed!'); }, description: "Slows down the game speed." },
     "The Magician": { effect: () => { score *= 2; updateScore(); updateGameInfo('Score doubled!'); }, description: "Doubles your current score." },
     "The High Priestess": { effect: () => { dropInterval *= 1.5; updateGameInfo('Game slowed slightly!'); }, description: "Slightly slows the game." },
     "The Empress": { effect: () => { score += 300; updateScore(); updateGameInfo('Bonus score added!'); }, description: "Adds 300 bonus points to your score." },
     "The Emperor": { 
         effect: () => { 
-            spawnPiece(); // Spawn the first piece immediately
+            spawnPiece();
             setTimeout(() => {
                 if (!gameOver) {
-                    spawnPiece(); // Queue the second piece to spawn after a delay
+                    spawnPiece();
                     updateGameInfo('Second piece spawned!');
                 }
-            }, 500); // Delay for 500ms to avoid overlapping logic
+            }, 500);
         }, 
         description: "Spawns two pieces at once." 
     },
@@ -312,46 +311,31 @@ const tarotEffects = {
     "Wheel of Fortune": { effect: () => { score *= 1.5; updateScore(); updateGameInfo('Score increased by 50%!'); }, description: "Increases score by 50%." },
     "Justice": { effect: () => { score += 1000; updateScore(); updateGameInfo('Massive bonus score!'); }, description: "Adds 1000 bonus points to your score." },
     "The Hanged Man": { effect: () => { dropInterval *= 2; updateGameInfo('Game slowed drastically!'); }, description: "Drastically slows the game." },
-    "Death": { effect: () => { board.reset(); score = 0; updateScore(); updateGameInfo('Board reset and score cleared!'); }, description: "Resets the board and clears your score." },
+    "Death": { effect: () => { board.clearRandomRow(); score -= 100; updateScore(); updateGameInfo('Random row cleared and score reduced!'); }, description: "Clears a random row and reduces your score slightly." },
     "Temperance": { effect: () => { dropInterval = 750; updateGameInfo('Game speed balanced!'); }, description: "Balances the game speed." },
-    "The Devil": { effect: () => {
-            safeBoardCall('replaceRandomPieces');
-            updateGameInfo('Random pieces replaced!');
-        }, description: "Replaces random pieces on the board." },
-    "The Tower": { effect: () => { board.reset(); updateGameInfo('Board cleared!'); }, description: "Clears the entire board." },
+    "The Devil": { effect: () => { board.shuffleBoard(); updateGameInfo('Board shuffled slightly!'); }, description: "Shuffles the board slightly." },
+    "The Tower": { effect: () => { board.clearTopRows(2); updateGameInfo('Top rows cleared!'); }, description: "Clears a few rows from the top." },
     "The Star": { effect: () => { coyoteTime = 1000; updateGameInfo('Coyote time extended!'); }, description: "Extends coyote time for delayed piece locking." },
     "The Moon": { effect: () => { dropInterval /= 2; updateGameInfo('Speed increased!'); }, description: "Speeds up the game." },
     "The Sun": { effect: () => { score += 500; updateScore(); updateGameInfo('Bonus score added!'); }, description: "Adds 500 bonus points to your score." },
-    "Judgement": { effect: () => {
-            safeBoardCall('clearBottomRows', 2);
-            updateGameInfo('Bottom rows cleared!');
-        }, description: "Clears the bottom two rows." },
+    "Judgement": { effect: () => { board.clearBottomRows(2); updateGameInfo('Bottom rows cleared!'); }, description: "Clears the bottom two rows." },
     "The World": { effect: () => { spawnPiece(); updateGameInfo('New piece spawned!'); }, description: "Spawns a new piece immediately." },
 
     // Minor Arcana (Example: Wands, Cups, Swords, Pentacles)
     "Ace of Wands": { effect: () => { score += 100; updateScore(); updateGameInfo('Small bonus score added!'); }, description: "Adds 100 bonus points." },
     "Two of Wands": { effect: () => { spawnPiece(); updateGameInfo('New piece spawned!'); }, description: "Spawns a new piece." },
-    "Three of Wands": { effect: () => {
-            safeBoardCall('clearRandomRow');
-            updateGameInfo('Random row cleared!');
-        }, description: "Clears a random row." },
+    "Three of Wands": { effect: () => { board.clearRandomRow(); updateGameInfo('Random row cleared!'); }, description: "Clears a random row." },
     "Four of Wands": { effect: () => { score += 400; updateScore(); updateGameInfo('Celebration bonus added!'); }, description: "Adds 400 bonus points." },
 
     // Negative and Random Effects
-    "Five of Swords": { effect: () => {
-            safeBoardCall('addGarbageRow');
-            updateGameInfo('Garbage row added!');
-        }, description: "Adds a garbage row to the board." },
+    "Five of Swords": { effect: () => { board.addGarbageRow(); updateGameInfo('Garbage row added!'); }, description: "Adds a garbage row to the board." },
     "Seven of Cups": { effect: () => { shufflePlayerHand(); updateGameInfo('Your hand was shuffled!'); }, description: "Shuffles your tarot hand." },
     "Ten of Pentacles": { effect: () => { dropInterval /= 1.5; updateGameInfo('Game speed increased!'); }, description: "Speeds up the game significantly." },
     "Nine of Swords": { effect: () => { randomActivateCard(); updateGameInfo('A random card activated!'); }, description: "Randomly activates a card in your hand." },
-    "The Moon (Reversed)": { effect: () => { score -= 200; updateScore(); updateGameInfo('Score reduced!'); }, description: "Reduces your score by 200 points." },
-    "The Tower (Reversed)": { effect: () => {
-            safeBoardCall('addGarbageRow');
-            updateGameInfo('Chaos! Garbage row added!');
-        }, description: "Adds a garbage row to the board." },
-    "The Devil (Reversed)": { effect: () => { dropInterval /= 2; updateGameInfo('Game speed doubled!'); }, description: "Doubles the game speed." },
-    "The Hanged Man (Reversed)": { effect: () => { freezePiece(); updateGameInfo('Your piece is frozen!'); }, description: "Freezes your current piece for a few seconds." }
+    "The Moon (Reversed)": { effect: () => { score -= 100; updateScore(); updateGameInfo('Score slightly reduced!'); }, description: "Reduces your score slightly." },
+    "The Tower (Reversed)": { effect: () => { board.addGarbageRow(); updateGameInfo('Chaos! Garbage row added!'); }, description: "Adds a garbage row to the board." },
+    "The Devil (Reversed)": { effect: () => { dropInterval /= 1.5; updateGameInfo('Game speed increased slightly!'); }, description: "Increases the game speed slightly." },
+    "The Hanged Man (Reversed)": { effect: () => { dropInterval *= 1.5; updateGameInfo('Game slowed slightly!'); }, description: "Slows the game slightly." }
 };
 
 // Initialize tarot deck with all Major and Minor Arcana
@@ -570,6 +554,8 @@ function drawTarotCard() {
         console.warn("Tarot deck is empty. Reinitializing deck.");
         initializeTarotDeck(); // Reinitialize the tarot deck
     }
+    // Shuffle the deck before drawing a card to ensure randomness
+    tarotDeck = tarotDeck.sort(() => Math.random() - 0.5);
     const randomIndex = Math.floor(Math.random() * tarotDeck.length);
     return tarotDeck.splice(randomIndex, 1)[0]; // Remove and return a random card
 }

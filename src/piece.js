@@ -187,6 +187,8 @@ class Piece {
         );
         if (board.collides(this)) {
             this.shape = originalShape; // Revert rotation if it causes a collision
+        } else if (this.position.x < 0 || this.position.x + this.shape[0].length > board.columns) {
+            this.shape = originalShape; // Revert if rotation goes out of bounds
         }
     }
 

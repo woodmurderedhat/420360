@@ -8,35 +8,37 @@ body {
     color: #f0f0f0; /* Lighter text color */
     font-family: 'Cinzel', serif; /* Esoteric font */
     overflow-y: auto; /* Allow vertical scrolling if content overflows */
-    font-size: 16px; /* Base font size for better scaling */
+    font-size: 1rem; /* Use rem for base font size */
     line-height: 1.5; /* Improved readability */
 }
 
 h1 {
-    margin: 20px 0;
+    margin: 1.25rem 0; /* Use rem for margins */
     text-align: center;
     font-family: 'Cinzel Decorative', cursive; /* Mystical font for the title */
     color: #ffdd57; /* Brighter golden glow */
-    text-shadow: 0 0 12px #ffdd57, 0 0 22px #ffaa00; /* Enhanced text shadow */
+    text-shadow: 0 0 0.75rem #ffdd57, 0 0 1.375rem #ffaa00; /* Use rem for text shadow */
 }
 
+/* Ensure the board is always fully visible and does not resize */
 #game-container {
     display: grid;
     grid-template-areas: 
         "left middle right";
-    grid-template-columns: 1fr 3fr 1fr; /* Adjusted proportions for better balance */
-    gap: 15px; /* Slightly reduced gap for better spacing */
-    width: 95%; /* Wider container */
-    max-width: 1200px;
-    height: 85vh; /* Adjust height relative to viewport */
-    margin: 20px auto; /* Add vertical margin for spacing */
-    border: 1px solid #555; /* Subtle border */
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Enhanced shadow */
-    border-radius: 10px; /* Rounded corners */
-    background: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
-    padding: 15px; /* Increased padding for better spacing */
+    grid-template-columns: 1fr 3fr 1fr;
+    gap: 0.9375rem; /* Use rem for gaps */
+    width: 100%;
+    max-width: 75rem; /* Use rem for max-width */
+    height: 100vh; /* Full viewport height */
+    margin: 0 auto;
+    border: 1px solid #555;
+    box-shadow: 0 0 1.25rem rgba(0, 0, 0, 0.5); /* Use rem for box shadow */
+    border-radius: 0.625rem; /* Use rem for border radius */
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.9375rem; /* Use rem for padding */
     box-sizing: border-box;
-    overflow: hidden; /* Prevent horizontal overflow */
+    overflow: hidden;
+    align-items: center; /* Vertically center the content */
 }
 
 #left-column, #middle-column, #right-column {
@@ -45,7 +47,7 @@ h1 {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 15px; /* Increased padding */
+    padding: 0.9375rem; /* Use rem for padding */
     box-sizing: border-box;
 }
 
@@ -53,7 +55,158 @@ h1 {
     grid-area: left;
     border-right: 1px dashed #777; /* Dashed border */
     background: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
-    border-radius: 8px; /* Rounded corners */
+    border-radius: 0.5rem; /* Use rem for border radius */
+}
+
+/* Adjust middle column to be centered */
+#middle-column {
+    grid-area: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center content vertically */
+    overflow: hidden;
+    height: 100%; /* Ensure the middle column takes full height */
+    padding: 0.625rem; /* Use rem for padding */
+}
+
+#right-column {
+    grid-area: right;
+    border-left: 1px dashed #777; /* Dashed border */
+    background: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
+    border-radius: 0.5rem; /* Use rem for border radius */
+}
+
+canvas {
+    border: 2px solid #ffdd57; /* Golden border */
+    background-color: #222; /* Darker canvas background */
+    border-radius: 0.625rem; /* Use rem for border radius */
+    box-shadow: 0 0 1.5625rem #ffdd57; /* Use rem for box shadow */
+    width: 100%; /* Ensure canvas scales dynamically */
+    height: auto; /* Maintain aspect ratio */
+    max-width: 100%; /* Prevent canvas from exceeding column width */
+    max-height: 100%; /* Prevent canvas from exceeding column height */
+    aspect-ratio: 1 / 2; /* Maintain a 1:2 aspect ratio */
+}
+
+#player-name {
+    margin: 0.625rem 0; /* Use rem for margins */
+    padding: 0.5rem; /* Use rem for padding */
+    font-size: 1rem; /* Use rem for font size */
+    border-radius: 0.3125rem; /* Use rem for border radius */
+    border: 1px solid #777; /* Subtle border */
+    background-color: #333; /* Dark background */
+    color: #eee; /* Light text color */
+}
+
+#score, #game-info, #level {
+    margin: 0.75rem 0; /* Use rem for margins */
+    font-size: 1.125rem; /* Use rem for font size */
+    text-shadow: 0 0 0.5rem #ffaa00; /* Use rem for text shadow */
+}
+
+#leaderboard {
+    margin-top: 1.25rem; /* Use rem for margins */
+    text-align: center;
+}
+
+#leaderboard h2 {
+    margin-bottom: 0.75rem; /* Use rem for margins */
+    color: #ffdd57; /* Golden color */
+    text-shadow: 0 0 0.5rem #ffaa00; /* Use rem for text shadow */
+}
+
+#leaderboard div {
+    font-size: 1.25rem; /* Use rem for font size */
+    margin: 0.375rem 0; /* Use rem for margins */
+    color: #ffdd57; /* Golden color */
+    text-shadow: 0 0 0.375rem #ffaa00; /* Use rem for text shadow */
+}
+
+.score {
+    font-size: 1.5rem; /* Use rem for font size */
+    color: #fff;
+    text-shadow: 0 0 0.625rem #ffaa00; /* Use rem for text shadow */
+}
+
+.button {
+    padding: 0.875rem 1.75rem; /* Use rem for padding */
+    margin-top: 0.75rem; /* Use rem for margins */
+    background: linear-gradient(to bottom, #444, #222); /* Gradient background */
+    color: #ffdd57; /* Golden color */
+    border: 1px solid #ffaa00;
+    cursor: pointer;
+    font-size: 1.125rem; /* Use rem for font size */
+    border-radius: 0.375rem; /* Use rem for border radius */
+    box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.4); /* Use rem for box shadow */
+    transition: all 0.3s ease; /* Smooth hover effect */
+    text-shadow: 0 0 0.375rem #ffaa00; /* Use rem for text shadow */
+}
+
+.button:hover {
+    background: linear-gradient(to bottom, #555, #333); /* Darker gradient on hover */
+    color: #fff;
+    transform: scale(1.05); /* Slight zoom on hover */
+    text-shadow: 0 0 0.75rem #ffdd57; /* Use rem for text shadow */
+}
+
+#start-game-button {
+    margin-top: 0.75rem; /* Use rem for margins */
+    padding: 0.75rem 1.5rem; /* Use rem for padding */
+    font-size: 1rem; /* Use rem for font size */
+    background-color: #fff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    border-radius: 0.375rem; /* Use rem for border radius */
+}
+
+#start-game-button:hover {
+    background-color: #ccc;
+}
+
+/* Redesigned tarot card UI */
+#tarot-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: none; /* Initially hide the tarot cards */
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.8);
+    border-bottom: 2px solid #ffaa00;
+    z-index: 1000;
+}
+
+.game-started #tarot-container {
+    display: flex; /* Show tarot cards when the game starts */
+}
+
+#player-info {
+    margin-top: 5rem; /* Push below tarot container */
+    text-align: center;
+    padding: 1rem;
+}
+
+#game-layout {
+    display: grid;
+    grid-template-areas: 
+        "left middle right";
+    grid-template-columns: 1fr 3fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#left-column {
+    grid-area: left;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 0.5rem;
 }
 
 #middle-column {
@@ -61,146 +214,94 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Prevent canvas from going offscreen */
-    height: 100%; /* Ensure the middle column takes full height */
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 0.5rem;
 }
 
 #right-column {
     grid-area: right;
-    border-left: 1px dashed #777; /* Dashed border */
-    background: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
-    border-radius: 8px; /* Rounded corners */
-}
-
-canvas {
-    border: 2px solid #ffdd57; /* Golden border */
-    background-color: #222; /* Darker canvas background */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 0 25px #ffdd57; /* Glowing effect */
-    width: 100%; /* Ensure canvas scales dynamically */
-    height: 100%; /* Ensure canvas height fits dynamically */
-    max-width: 100%; /* Prevent canvas from exceeding column width */
-    max-height: 100%; /* Prevent canvas from exceeding column height */
-    aspect-ratio: 1 / 2; /* Maintain a 1:2 aspect ratio */
-}
-
-#player-name {
-    margin: 10px 0;
-    padding: 8px; /* Increased padding */
-    font-size: 16px;
-    border-radius: 5px; /* Rounded corners */
-    border: 1px solid #777; /* Subtle border */
-    background-color: #333; /* Dark background */
-    color: #eee; /* Light text color */
-}
-
-#score, #game-info, #level {
-    margin: 12px 0; /* Increased margin */
-    font-size: 18px;
-    text-shadow: 0 0 8px #ffaa00; /* Enhanced text shadow */
-}
-
-#leaderboard {
-    margin-top: 20px;
-    text-align: center;
-}
-
-#leaderboard h2 {
-    margin-bottom: 12px; /* Increased margin */
-    color: #ffdd57; /* Golden color */
-    text-shadow: 0 0 8px #ffaa00; /* Enhanced text shadow */
-}
-
-#leaderboard div {
-    font-size: 20px;
-    margin: 6px 0; /* Increased margin */
-    color: #ffdd57; /* Golden color */
-    text-shadow: 0 0 6px #ffaa00; /* Enhanced text shadow */
-}
-
-.score {
-    font-size: 24px;
-    color: #fff;
-    text-shadow: 0 0 10px #ffaa00; /* Enhanced text shadow */
-}
-
-.button {
-    padding: 14px 28px; /* Increased padding for touch devices */
-    margin-top: 12px; /* Increased margin */
-    background: linear-gradient(to bottom, #444, #222); /* Gradient background */
-    color: #ffdd57; /* Golden color */
-    border: 1px solid #ffaa00;
-    cursor: pointer;
-    font-size: 18px; /* Larger font for better accessibility */
-    border-radius: 6px; /* Rounded corners */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4); /* Enhanced shadow */
-    transition: all 0.3s ease; /* Smooth hover effect */
-    text-shadow: 0 0 6px #ffaa00; /* Enhanced text shadow */
-}
-
-.button:hover {
-    background: linear-gradient(to bottom, #555, #333); /* Darker gradient on hover */
-    color: #fff;
-    transform: scale(1.05); /* Slight zoom on hover */
-    text-shadow: 0 0 12px #ffdd57; /* Enhanced text shadow */
-}
-
-#start-game-button {
-    margin-top: 12px; /* Increased margin */
-    padding: 12px 24px; /* Increased padding */
-    font-size: 16px;
-    background-color: #fff;
-    color: #000;
-    border: none;
-    cursor: pointer;
-}
-
-#start-game-button:hover {
-    background-color: #ccc;
-}
-
-#tarot-container {
-    margin-top: 20px;
-    display: grid; /* Use grid for precise stacking */
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Dynamic card layout */
-    grid-auto-rows: auto; /* Adjust row height automatically */
-    gap: 10px; /* Adjusted spacing for better alignment */
-    justify-items: center; /* Center cards horizontally */
-    align-items: center; /* Center cards vertically */
-    padding: 12px; /* Increased padding */
-    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for mysticism */
-    border: 1px solid #ffaa00;
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 0 12px #ffdd57; /* Enhanced shadow */
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 0.5rem;
 }
 
 .tarot-card {
-    width: 65px; /* Smaller width */
-    height: 95px; /* Smaller height */
-    font-size: 14px; /* Slightly larger font for readability */
-    padding: 8px; /* Adjusted padding for better touch interaction */
-    background-color: #1a1a1a;
-    color: #ffdd57; /* Golden color */
-    border: 1px solid #ffaa00;
-    border-radius: 6px; /* Rounded corners */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4); /* Enhanced shadow */
-    text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    padding: 0.625rem; /* Use rem for padding */
+    background-color: #1a1a1a;
+    color: #ffdd57;
+    border: 1px solid #ffaa00;
+    border-radius: 0.375rem; /* Use rem for border radius */
+    box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.4); /* Use rem for box shadow */
+    text-align: center;
     transition: transform 0.3s ease, background-color 0.3s ease;
-    text-shadow: 0 0 6px #ffaa00; /* Enhanced text shadow */
     cursor: pointer;
 }
 
 .tarot-card:hover {
     background-color: #333;
     color: #fff;
-    transform: scale(1.1); /* Slight zoom on hover */
-    text-shadow: 0 0 12px #ffdd57; /* Enhanced text shadow */
+    transform: scale(1.1);
 }
 
+.tarot-card .description {
+    font-size: 0.75rem; /* Use rem for font size */
+    color: #ccc;
+    margin-top: 0.625rem; /* Use rem for margins */
+    text-align: justify;
+}
+
+/* Add styles for fullscreen toggle button */
+#fullscreen-button {
+    position: fixed;
+    bottom: 1.25rem; /* Use rem for bottom */
+    right: 1.25rem; /* Use rem for right */
+    padding: 0.625rem 1.25rem; /* Use rem for padding */
+    background: linear-gradient(to bottom, #444, #222);
+    color: #ffdd57;
+    border: 1px solid #ffaa00;
+    border-radius: 0.375rem; /* Use rem for border radius */
+    box-shadow: 0 0.1875rem 0.375rem rgba(0, 0, 0, 0.4); /* Use rem for box shadow */
+    cursor: pointer;
+    font-size: 1rem; /* Use rem for font size */
+    text-shadow: 0 0 0.375rem #ffaa00; /* Use rem for text shadow */
+    transition: all 0.3s ease;
+}
+
+#fullscreen-button:hover {
+    background: linear-gradient(to bottom, #555, #333);
+    color: #fff;
+    transform: scale(1.05);
+    text-shadow: 0 0 0.75rem #ffdd57; /* Use rem for text shadow */
+}
+
+/* Style for the hold container */
+#hold-container {
+    display: grid;
+    grid-template-rows: repeat(4, 1.875rem); /* Use rem for grid rows */
+    grid-template-columns: repeat(4, 1.875rem); /* Use rem for grid columns */
+    gap: 0.125rem; /* Use rem for gaps */
+    justify-content: center;
+    align-items: center;
+    width: 7.5rem; /* Use rem for width */
+    height: 7.5rem; /* Use rem for height */
+    border: 2px solid #ffdd57;
+    background-color: #222;
+    border-radius: 0.625rem; /* Use rem for border radius */
+    margin: 0.625rem auto; /* Use rem for margins */
+}
+
+.block {
+    width: 1.875rem; /* Use rem for width */
+    height: 1.875rem; /* Use rem for height */
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Improve small screen responsiveness */
 @media (max-width: 600px) {
     #game-container {
         grid-template-areas: 
@@ -209,8 +310,8 @@ canvas {
             "right";
         grid-template-columns: 1fr;
         grid-template-rows: auto;
-        gap: 10px;
-        padding: 10px; /* Adjusted padding for smaller screens */
+        gap: 0.625rem; /* Use rem for gaps */
+        padding: 0.625rem; /* Use rem for padding */
         height: auto; /* Allow height to adjust dynamically */
     }
 
@@ -218,7 +319,7 @@ canvas {
         flex: none;
         width: 100%; /* Full width for each column */
         border: none; /* Remove borders for cleaner mobile layout */
-        padding: 10px; /* Reduced padding for smaller screens */
+        padding: 0.625rem; /* Use rem for padding */
     }
 
     canvas {
@@ -230,20 +331,20 @@ canvas {
     #mobile-controls {
         display: flex;
         justify-content: space-around;
-        margin-top: 10px;
-        gap: 15px; /* Increased spacing between buttons */
+        margin-top: 0.625rem; /* Use rem for margins */
+        gap: 0.9375rem; /* Use rem for gaps */
     }
 
     .mobile-button {
-        padding: 14px 20px; /* Adjusted padding for better usability */
-        font-size: 20px; /* Larger font for better touch interaction */
+        padding: 0.875rem 1.25rem; /* Use rem for padding */
+        font-size: 1.25rem; /* Use rem for font size */
         background: linear-gradient(to bottom, #222, #111); /* Darker gradient */
         color: #ffdd57; /* Golden color */
         border: 2px solid #ffaa00; /* Slightly thicker border */
-        border-radius: 8px; /* More rounded corners */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Enhanced shadow for depth */
+        border-radius: 0.5rem; /* Use rem for border radius */
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5); /* Use rem for box shadow */
         cursor: pointer;
-        text-shadow: 0 0 8px #ffaa00; /* Enhanced text shadow */
+        text-shadow: 0 0 0.5rem #ffaa00; /* Use rem for text shadow */
         transition: all 0.3s ease; /* Smooth hover effect */
     }
 
@@ -251,33 +352,35 @@ canvas {
         background: linear-gradient(to bottom, #333, #222); /* Slightly lighter gradient on hover */
         color: #fff; /* Change text color to white */
         transform: scale(1.1); /* Slight zoom on hover */
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6); /* Stronger shadow on hover */
+        box-shadow: 0 0.375rem 0.75rem rgba(0, 0, 0, 0.6); /* Use rem for box shadow */
     }
 
     .mobile-button:active {
         transform: scale(1.05); /* Slightly reduce zoom on click */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Reduced shadow on click */
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4); /* Use rem for box shadow */
     }
 
     .tarot-card {
-        font-size: 12px; /* Adjust font size for smaller screens */
+        font-size: 0.75rem; /* Use rem for font size */
     }
 
     .button, .mobile-button {
-        font-size: 16px; /* Adjust font size for smaller screens */
+        font-size: 1rem; /* Use rem for font size */
     }
 }
 
 @media (max-width: 480px) {
     #game-container {
-        gap: 8px; /* Reduced gap for very small screens */
+        gap: 0.3125rem; /* Use rem for gaps */
     }
 
     .tarot-card {
-        font-size: 10px; /* Further adjust font size for very small screens */
+        font-size: 0.625rem; /* Use rem for font size */
+        padding: 0.3125rem; /* Use rem for padding */
     }
 
     .button, .mobile-button {
-        font-size: 14px; /* Further adjust font size for very small screens */
+        font-size: 0.875rem; /* Use rem for font size */
+        padding: 0.625rem 0.9375rem; /* Use rem for padding */
     }
 }

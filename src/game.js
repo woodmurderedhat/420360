@@ -28,6 +28,68 @@ const gameInfoElement = document.getElementById('game-info');
 const startGameButton = document.getElementById('start-game-button');
 const levelElement = document.getElementById('level');
 
+// Add a "hold" feature to save a piece for later use
+let heldPiece = null;
+let canHold = true;
+
+function holdPiece() {
+    if (!canHold) return;
+    if (heldPiece) {
+        const temp = heldPiece;
+        heldPiece = piece;
+        piece = temp;
+        piece.position = { x: 3, y: 0 }; // Reset position
+    } else {
+        heldPiece = piece;
+        spawnPiece();
+    }
+    canHold = false; // Prevent holding multiple times in a row
+    updateHoldUI();
+}
+
+function updateHoldUI() {
+    const holdContainer = document.getElementById('hold-container');
+    if (!holdContainer) {
+        console.warn("Hold container not found.");
+        return;
+    }
+    holdContainer.innerHTML = '';
+    if (heldPiece) {
+        heldPiece.shape.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value) {
+                    const block = document.createElement('div');
+                    block.style.gridRowStart = y + 1;
+                    block.style.gridColumnStart = x + 1;
+                    block.className = 'block';
+                    block.style.backgroundColor = '#ff5722'; // Example color
+                    holdContainer.appendChild(block);
+                }
+            });
+        });
+    }
+}
+
+// Add a "ghost piece" to show where the current piece will land
+function drawGhostPiece(context) {
+    const ghostPiece = new Piece(piece.type);
+    ghostPiece.shape = piece.shape;
+    ghostPiece.position = { ...piece.position };
+
+    while (ghostPiece.canMoveDown(board)) {
+        ghostPiece.moveDown();
+    }
+
+    ghostPiece.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value) {
+                context.fillStyle = 'rgba(255, 255, 255, 0.3)'; // Semi-transparent color
+                context.fillRect((ghostPiece.position.x + x) * 30, (ghostPiece.position.y + y) * 30, 30, 30);
+            }
+        });
+    });
+}
+
 // Function to set the game speed
 function setGameSpeed(speed) {
     dropInterval = speed;
@@ -71,6 +133,7 @@ if (startGameButton) {
             alert('Please enter your name to start the game.');
             return;
         }
+        document.body.classList.add('game-started'); // Ensure tarot cards are shown when the game starts
         leaderboard.displayScores(); // Ensure leaderboard is updated before starting
         startGame();
     });
@@ -118,6 +181,7 @@ function spawnPiece() {
         leaderboard.displayScores(); // Update leaderboard display
         alert(`Game Over! ${playerName}, your score: ${score}`); // Fixed syntax error
     }
+    canHold = true; // Allow holding a piece after spawning a new one
 }
 
 let coyoteTime = 300; // 300ms coyote time
@@ -130,6 +194,7 @@ function update(time = 0) {
     if (deltaTime > dropInterval) {
         context.clearRect(0, 0, canvas.width, canvas.height);
         board.draw(context);
+        drawGhostPiece(context); // Draw the ghost piece
         piece.draw(context);
 
         if (piece.canMoveDown(board)) {
@@ -156,6 +221,7 @@ function update(time = 0) {
         // Ensure the piece is drawn even if it's not time to move down
         context.clearRect(0, 0, canvas.width, canvas.height);
         board.draw(context);
+        drawGhostPiece(context); // Draw the ghost piece
         piece.draw(context);
     }
 
@@ -166,6 +232,9 @@ function update(time = 0) {
 setGameSpeed(1000); // Slower speed (1 second per drop)
 
 document.addEventListener('keydown', (event) => {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        event.preventDefault(); // Prevent scrolling with arrow keys
+    }
     if (gameOver) return;
 
     switch (event.key) {
@@ -192,6 +261,20 @@ document.addEventListener('keydown', (event) => {
             piece.rotate(board);
             if (board.collides(piece)) {
                 piece.undoRotate();
+            }
+            break;
+        case 'Shift': // Added Shift for holding a piece
+            holdPiece();
+            break;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+            const cardIndex = parseInt(event.key, 10) - 1; // Convert key to index (1-6 to 0-5)
+            if (cardIndex >= 0 && cardIndex < playerHand.length) {
+                playTarotCard(cardIndex);
             }
             break;
     }
@@ -378,7 +461,7 @@ function playTarotCard(cardIndex) {
     }
 }
 
-// Update the tarot card UI
+// Update the tarot card UI dynamically
 function updateTarotUI() {
     const tarotContainer = document.getElementById('tarot-container');
     if (!tarotContainer) {
@@ -388,21 +471,24 @@ function updateTarotUI() {
 
     tarotContainer.innerHTML = '';
     playerHand.forEach((card, index) => {
-        const cardElement = document.createElement('button');
-        cardElement.textContent = card;
+        const cardElement = document.createElement('div');
         cardElement.className = 'tarot-card';
-        cardElement.title = tarotEffects[card]?.description || 'No description available';
-        cardElement.setAttribute('role', 'listitem'); // Add ARIA role for accessibility
-        cardElement.setAttribute('aria-label', `${card}: ${tarotEffects[card]?.description || 'No description available'}`);
 
-        // Highlight potentially bad cards in red
-        if (isPotentiallyBadCard(card)) {
-            cardElement.style.color = 'red';
-        }
+        const titleElement = document.createElement('div');
+        titleElement.className = 'title';
+        titleElement.textContent = card;
+
+        const descriptionElement = document.createElement('div');
+        descriptionElement.className = 'description';
+        descriptionElement.textContent = tarotEffects[card]?.description || 'No description available';
+
+        cardElement.appendChild(titleElement);
+        cardElement.appendChild(descriptionElement);
 
         cardElement.addEventListener('click', () => {
             playTarotCard(index);
         });
+
         tarotContainer.appendChild(cardElement);
     });
 }
@@ -533,4 +619,22 @@ if (moveDownButton) {
             updateScore();
         }
     });
+}
+
+// Add event listener for fullscreen toggle
+const fullscreenButton = document.getElementById('fullscreen-button');
+if (fullscreenButton) {
+    fullscreenButton.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable fullscreen mode: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen().catch(err => {
+                console.error(`Error attempting to exit fullscreen mode: ${err.message}`);
+            });
+        }
+    });
+} else {
+    console.warn("Fullscreen button not found.");
 }

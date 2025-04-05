@@ -29,18 +29,28 @@
 </head>
 <body>
     <h1>Tarot Tetromino</h1>
-    <div id="game-container" role="main">
-        <div id="left-column" role="complementary" aria-label="Player Info">
-            <label for="player-name">Player Name:</label>
-            <input type="text" id="player-name" placeholder="Enter your name" aria-label="Enter your name">
-            <button id="start-game-button" class="button" aria-label="Start Game">Start Game</button>
-            <div id="score" aria-live="polite">Score: 0</div>
-            <div id="level" aria-live="polite">Level: 1</div>
+    <div id="tarot-container" role="region" aria-label="Tarot Cards">
+        <!-- Example tarot card structure -->
+        <div class="tarot-card">
+            <div class="title">The Fool</div>
+            <div class="description">Slows down the game speed, giving you more time to think.</div>
+        </div>
+        <div class="tarot-card">
+            <div class="title">The Magician</div>
+            <div class="description">Doubles your current score, boosting your progress.</div>
+        </div>
+        <!-- Additional cards will be dynamically added here -->
+    </div>
+    <div id="player-info" role="region" aria-label="Player Info">
+        <label for="player-name">Player Name:</label>
+        <input type="text" id="player-name" placeholder="Enter your name" aria-label="Enter your name">
+        <button id="start-game-button" class="button" aria-label="Start Game">Start Game</button>
+    </div>
+    <div id="game-layout">
+        <div id="left-column" role="complementary" aria-label="Game Info">
             <div id="game-info" aria-live="polite">Game Info: Waiting for player...</div>
-            <h2>Tarot Cards</h2>
-            <div id="tarot-container" role="list" aria-label="Tarot Cards">
-                <!-- Tarot cards will be dynamically added here -->
-            </div>
+            <div id="level" aria-live="polite">Level: 1</div>
+            <div id="score" aria-live="polite">Score: 0</div>
         </div>
         <div id="middle-column" role="region" aria-label="Game Board">
             <div id="canvas-wrapper" style="display: flex; justify-content: center; align-items: center; height: 100%;">
@@ -58,6 +68,21 @@
             <div id="leaderboard" role="list" aria-label="Top Scores"></div>
         </div>
     </div>
+    <!-- Add fullscreen toggle button -->
+    <button id="fullscreen-button" aria-label="Toggle Fullscreen">Fullscreen</button>
+    
+    <div id="game-controls" role="region" aria-label="Game Controls">
+        <h2>Game Controls</h2>
+        <ul>
+            <li><strong>Arrow Keys:</strong> Move the piece (Left, Right, Down).</li>
+            <li><strong>Arrow Up / W:</strong> Rotate the piece.</li>
+            <li><strong>Shift:</strong> Hold the current piece.</li>
+            <li><strong>Number Keys (1-6):</strong> Activate tarot cards.</li>
+        </ul>
+        <h2>How to Play</h2>
+        <p>The goal of the game is to clear lines by arranging the falling pieces to form complete rows. Use the tarot cards to gain special abilities or overcome challenges. The game speeds up as you progress, so plan your moves carefully!</p>
+    </div>
+    
     <noscript>
         <p style="color: red;">JavaScript is required to play this game. Please enable JavaScript in your browser.</p>
     </noscript>

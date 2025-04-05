@@ -50,6 +50,7 @@ const leaderboard = {
             }
         } catch (error) {
             console.error("Error loading scores from localStorage:", error);
+            this.scores = []; // Reset scores if parsing fails
         }
     },
 

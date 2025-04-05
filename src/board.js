@@ -148,9 +148,17 @@ class Board {
      * Replaces random pieces on the board with other random pieces.
      */
     replaceRandomPieces() {
+        if (!this.grid) {
+            console.warn("Grid is undefined in replaceRandomPieces.");
+            return;
+        }
         for (let row = 0; row < this.rows; row++) {
+            if (!this.grid[row]) {
+                console.warn(`Row ${row} is undefined in replaceRandomPieces.`);
+                continue;
+            }
             for (let col = 0; col < this.columns; col++) {
-                if (Math.random() < 0.1) { // 10% chance to replace a piece
+                if (this.grid[row][col] !== 0 && Math.random() < 0.1) { // Only replace non-empty cells
                     this.grid[row][col] = Math.floor(Math.random() * 7) + 1; // Random piece type
                 }
             }

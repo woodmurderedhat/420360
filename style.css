@@ -216,4 +216,36 @@ canvas {
         width: 100%; /* Make canvas responsive */
         height: auto; /* Maintain aspect ratio */
     }
+
+    #mobile-controls {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 10px;
+        gap: 10px; /* Add spacing between buttons */
+    }
+
+    .mobile-button {
+        padding: 12px 16px; /* Adjust padding for better touch interaction */
+        font-size: 18px; /* Slightly larger font for readability */
+        background: linear-gradient(to bottom, #222, #111); /* Darker gradient */
+        color: #ffdd57; /* Golden color */
+        border: 2px solid #ffaa00; /* Slightly thicker border */
+        border-radius: 8px; /* More rounded corners */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Enhanced shadow for depth */
+        cursor: pointer;
+        text-shadow: 0 0 8px #ffaa00; /* Enhanced text shadow */
+        transition: all 0.3s ease; /* Smooth hover effect */
+    }
+
+    .mobile-button:hover {
+        background: linear-gradient(to bottom, #333, #222); /* Slightly lighter gradient on hover */
+        color: #fff; /* Change text color to white */
+        transform: scale(1.1); /* Slight zoom on hover */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6); /* Stronger shadow on hover */
+    }
+
+    .mobile-button:active {
+        transform: scale(1.05); /* Slightly reduce zoom on click */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Reduced shadow on click */
+    }
 }

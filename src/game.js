@@ -486,3 +486,48 @@ function drawTarotCard() {
 }
 
 initializeTarotDeck();
+
+// Mobile controls
+const moveLeftButton = document.getElementById('move-left');
+const rotateButton = document.getElementById('rotate');
+const moveRightButton = document.getElementById('move-right');
+const moveDownButton = document.getElementById('move-down');
+
+if (moveLeftButton) {
+    moveLeftButton.addEventListener('click', () => {
+        if (!gameOver && piece.canMoveLeft(board)) {
+            piece.moveLeft();
+            updateScore();
+        }
+    });
+}
+
+if (rotateButton) {
+    rotateButton.addEventListener('click', () => {
+        if (!gameOver) {
+            piece.rotate(board);
+            if (board.collides(piece)) {
+                piece.undoRotate();
+            }
+            updateScore();
+        }
+    });
+}
+
+if (moveRightButton) {
+    moveRightButton.addEventListener('click', () => {
+        if (!gameOver && piece.canMoveRight(board)) {
+            piece.moveRight();
+            updateScore();
+        }
+    });
+}
+
+if (moveDownButton) {
+    moveDownButton.addEventListener('click', () => {
+        if (!gameOver && piece.canMoveDown(board)) {
+            piece.moveDown();
+            updateScore();
+        }
+    });
+}

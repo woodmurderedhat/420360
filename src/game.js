@@ -5,10 +5,12 @@ const context = canvas ? canvas.getContext('2d') : null;
 
 if (!canvas) {
     console.error("Canvas element not found!");
+    alert("Error: Canvas element is missing. Please check the HTML structure.");
 }
 
 if (!context) {
     console.error("Failed to get 2D rendering context!");
+    alert("Error: Unable to initialize the game. Please try reloading the page.");
 }
 
 const board = new Board();
@@ -126,6 +128,26 @@ function updateLevel() {
 // Initialize the level display
 updateLevel();
 
+// Improved game initialization
+function initializeGame() {
+    score = 0;
+    level = 1;
+    linesClearedThisLevel = 0;
+    dropInterval = 500;
+    gameOver = false;
+    combo = 0;
+    board.reset();
+    initializeTarotDeck();
+    playerHand = [];
+    spawnPiece();
+    updateScore();
+    updateLevel();
+    updateGameInfo('Game Initialized');
+    updateTarotUI();
+    lastTime = performance.now();
+}
+
+// Enhanced game start logic
 if (startGameButton) {
     startGameButton.addEventListener('click', () => {
         const playerName = playerNameInput.value.trim();
@@ -133,30 +155,66 @@ if (startGameButton) {
             alert('Please enter your name to start the game.');
             return;
         }
-        document.body.classList.add('game-started'); // Ensure tarot cards are shown when the game starts
-        leaderboard.displayScores(); // Ensure leaderboard is updated before starting
-        startGame();
+        document.body.classList.add('game-started');
+        leaderboard.displayScores();
+        initializeGame();
+        requestAnimationFrame(update);
     });
 } else {
     console.warn("Start game button not found.");
 }
 
-function startGame() {
-    score = 0;
-    level = 1;
-    linesClearedThisLevel = 0;
-    dropInterval = 500;
-    updateLevel();
-    gameOver = false;
-    board.reset();
-    initializeTarotDeck(); // Reinitialize the tarot deck at the start of the game
-    playerHand = []; // Clear the player's hand
-    spawnPiece();
-    updateScore();
-    updateGameInfo('Game Started');
-    updateTarotUI(); // Draw tarot cards at the start of the game
-    lastTime = performance.now(); // Ensure lastTime is initialized correctly
-    requestAnimationFrame(update); // Start the game loop
+// Improved game over handling
+function handleGameOver() {
+    gameOver = true;
+    updateGameInfo('Game Over');
+    const playerName = playerNameInput.value.trim() || 'Player';
+    leaderboard.addScore(playerName, score);
+    leaderboard.displayScores();
+    alert(`Game Over! ${playerName}, your score: ${score}`);
+}
+
+// Optimized piece spawning
+function spawnPiece() {
+    piece = new Piece();
+    piece.position = { x: 3, y: 0 };
+    addTarotCardToHand();
+
+    if (board.collides(piece) || board.isBoardFull()) {
+        handleGameOver();
+    }
+    canHold = true;
+}
+
+let coyoteTime = 300; // 300ms coyote time
+let coyoteTimerActive = false;
+
+// Enhanced update loop
+function update(time = 0) {
+    if (gameOver) return;
+
+    const deltaTime = time - lastTime;
+    if (deltaTime > dropInterval) {
+        if (piece.canMoveDown(board)) {
+            piece.moveDown();
+        } else {
+            board.mergePiece(piece);
+            const linesCleared = clearLines();
+            if (linesCleared > 0) {
+                score += calculateScore(linesCleared);
+                updateScore();
+            }
+            spawnPiece();
+        }
+        lastTime = time;
+    }
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    board.draw(context);
+    drawGhostPiece(context);
+    piece.draw(context);
+
+    requestAnimationFrame(update);
 }
 
 function calculateScore(linesCleared) {
@@ -168,175 +226,209 @@ function calculateScore(linesCleared) {
     return linesCleared * pieceScore;
 }
 
-function spawnPiece() {
-    piece = new Piece();
-    piece.position = {x: 3, y: 0}; // Reset position when spawning
-    addTarotCardToHand(); // Draw a new tarot card when a piece spawns
-
-    if (board.collides(piece) || board.isBoardFull()) {
-        gameOver = true;
-        updateGameInfo('Game Over');
-        const playerName = playerNameInput.value.trim() || 'Player';
-        leaderboard.addScore(playerName, score); // Add score to leaderboard
-        leaderboard.displayScores(); // Update leaderboard display
-        alert(`Game Over! ${playerName}, your score: ${score}`); // Fixed syntax error
-    }
-    canHold = true; // Allow holding a piece after spawning a new one
-}
-
-let coyoteTime = 300; // 300ms coyote time
-let coyoteTimerActive = false;
-
-function update(time = 0) {
-    if (gameOver) return;
-
-    const deltaTime = time - lastTime;
-    if (deltaTime > dropInterval) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        board.draw(context);
-        drawGhostPiece(context); // Draw the ghost piece
-        piece.draw(context);
-
-        if (piece.canMoveDown(board)) {
-            piece.moveDown();
-            coyoteTimerActive = false;
-        } else if (!coyoteTimerActive) {
-            coyoteTimerActive = true;
-            setTimeout(() => {
-                if (!piece.canMoveDown(board)) {
-                    board.mergePiece(piece);
-                    const linesCleared = clearLines();
-                    if (linesCleared > 0) {
-                        score += calculateScore(linesCleared);
-                        updateScore();
-                    }
-                    spawnPiece();
-                }
-                coyoteTimerActive = false; // Reset coyoteTimerActive after the timer expires
-            }, coyoteTime);
-        }
-
-        lastTime = time;
-    } else {
-        // Ensure the piece is drawn even if it's not time to move down
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        board.draw(context);
-        drawGhostPiece(context); // Draw the ghost piece
-        piece.draw(context);
-    }
-
-    requestAnimationFrame(update);
-}
-
-// Example: Change speed dynamically
-setGameSpeed(1000); // Slower speed (1 second per drop)
-
-document.addEventListener('keydown', (event) => {
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-        event.preventDefault(); // Prevent scrolling with arrow keys
-    }
-    if (gameOver) return;
-
-    switch (event.key) {
-        case 'ArrowLeft':
-        case 'a': // Added 'a' for left movement
-            if (piece.canMoveLeft(board)) {
-                piece.moveLeft();
-            }
-            break;
-        case 'ArrowRight':
-        case 'd': // Added 'd' for right movement
-            if (piece.canMoveRight(board)) {
-                piece.moveRight();
-            }
-            break;
-        case 'ArrowDown':
-        case 's': // Added 's' for down movement
-            if (piece.canMoveDown(board)) {
-                piece.moveDown();
-            }
-            break;
-        case 'ArrowUp':
-        case 'w': // Added 'w' for rotation
-            piece.rotate(board);
-            if (board.collides(piece)) {
-                piece.undoRotate();
-            }
-            break;
-        case 'Shift': // Added Shift for holding a piece
-            holdPiece();
-            break;
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-            const cardIndex = parseInt(event.key, 10) - 1; // Convert key to index (1-6 to 0-5)
-            if (cardIndex >= 0 && cardIndex < playerHand.length) {
-                playTarotCard(cardIndex);
-            }
-            break;
-    }
-
-    updateScore();
-});
-
 let tarotDeck = [];
 let playerHand = [];
 
 // Adjusted tarot card effects to ensure they are balanced, avoiding game-ending or overly punishing effects
 const tarotEffects = {
-    "The Fool": { effect: () => { setGameSpeed(1000); updateGameInfo('Speed slowed!'); }, description: "Slows down the game speed." },
-    "The Magician": { effect: () => { score *= 2; updateScore(); updateGameInfo('Score doubled!'); }, description: "Doubles your current score." },
-    "The High Priestess": { effect: () => { dropInterval *= 1.5; updateGameInfo('Game slowed slightly!'); }, description: "Slightly slows the game." },
-    "The Empress": { effect: () => { score += 300; updateScore(); updateGameInfo('Bonus score added!'); }, description: "Adds 300 bonus points to your score." },
-    "The Emperor": { 
-        effect: () => { 
-            spawnPiece();
-            setTimeout(() => {
-                if (!gameOver) {
-                    spawnPiece();
-                    updateGameInfo('Second piece spawned!');
-                }
-            }, 500);
-        }, 
-        description: "Spawns two pieces at once." 
+    "The Fool": {
+        effect: () => {
+            setGameSpeed(1000);
+            setTimeout(() => setGameSpeed(500), 10000); // Reset speed after 10 seconds
+            updateGameInfo('The Fool slows time, giving you a moment to breathe.');
+        },
+        description: "Slows down the game speed for 10 seconds."
     },
-    "The Hierophant": { effect: () => { board.reset(); updateGameInfo('Board cleared!'); }, description: "Clears the entire board." },
-    "The Lovers": { effect: () => { score += 200; updateScore(); updateGameInfo('Harmony bonus added!'); }, description: "Adds 200 bonus points." },
-    "The Chariot": { effect: () => { setGameSpeed(500); updateGameInfo('Speed increased!'); }, description: "Speeds up the game." },
-    "Strength": { effect: () => { coyoteTime = 1500; updateGameInfo('Coyote time extended!'); }, description: "Extends coyote time for delayed piece locking." },
-    "The Hermit": { effect: () => { setGameSpeed(2000); updateGameInfo('Game slowed significantly!'); }, description: "Slows the game speed significantly." },
-    "Wheel of Fortune": { effect: () => { score *= 1.5; updateScore(); updateGameInfo('Score increased by 50%!'); }, description: "Increases score by 50%." },
-    "Justice": { effect: () => { score += 1000; updateScore(); updateGameInfo('Massive bonus score!'); }, description: "Adds 1000 bonus points to your score." },
-    "The Hanged Man": { effect: () => { dropInterval *= 2; updateGameInfo('Game slowed drastically!'); }, description: "Drastically slows the game." },
-    "Death": { effect: () => { board.clearRandomRow(); score -= 100; updateScore(); updateGameInfo('Random row cleared and score reduced!'); }, description: "Clears a random row and reduces your score slightly." },
-    "Temperance": { effect: () => { dropInterval = 750; updateGameInfo('Game speed balanced!'); }, description: "Balances the game speed." },
-    "The Devil": { effect: () => { board.shuffleBoard(); updateGameInfo('Board shuffled slightly!'); }, description: "Shuffles the board slightly." },
-    "The Tower": { effect: () => { board.clearTopRows(2); updateGameInfo('Top rows cleared!'); }, description: "Clears a few rows from the top." },
-    "The Star": { effect: () => { coyoteTime = 1000; updateGameInfo('Coyote time extended!'); }, description: "Extends coyote time for delayed piece locking." },
-    "The Moon": { effect: () => { dropInterval /= 2; updateGameInfo('Speed increased!'); }, description: "Speeds up the game." },
-    "The Sun": { effect: () => { score += 500; updateScore(); updateGameInfo('Bonus score added!'); }, description: "Adds 500 bonus points to your score." },
-    "Judgement": { effect: () => { board.clearBottomRows(2); updateGameInfo('Bottom rows cleared!'); }, description: "Clears the bottom two rows." },
-    "The World": { effect: () => { spawnPiece(); updateGameInfo('New piece spawned!'); }, description: "Spawns a new piece immediately." },
-
-    // Minor Arcana (Example: Wands, Cups, Swords, Pentacles)
-    "Ace of Wands": { effect: () => { score += 100; updateScore(); updateGameInfo('Small bonus score added!'); }, description: "Adds 100 bonus points." },
-    "Two of Wands": { effect: () => { spawnPiece(); updateGameInfo('New piece spawned!'); }, description: "Spawns a new piece." },
-    "Three of Wands": { effect: () => { board.clearRandomRow(); updateGameInfo('Random row cleared!'); }, description: "Clears a random row." },
-    "Four of Wands": { effect: () => { score += 400; updateScore(); updateGameInfo('Celebration bonus added!'); }, description: "Adds 400 bonus points." },
-
-    // Negative and Random Effects
-    "Five of Swords": { effect: () => { board.addGarbageRow(); updateGameInfo('Garbage row added!'); }, description: "Adds a garbage row to the board." },
-    "Seven of Cups": { effect: () => { shufflePlayerHand(); updateGameInfo('Your hand was shuffled!'); }, description: "Shuffles your tarot hand." },
-    "Ten of Pentacles": { effect: () => { dropInterval /= 1.5; updateGameInfo('Game speed increased!'); }, description: "Speeds up the game significantly." },
-    "Nine of Swords": { effect: () => { randomActivateCard(); updateGameInfo('A random card activated!'); }, description: "Randomly activates a card in your hand." },
-    "The Moon (Reversed)": { effect: () => { score -= 100; updateScore(); updateGameInfo('Score slightly reduced!'); }, description: "Reduces your score slightly." },
-    "The Tower (Reversed)": { effect: () => { board.addGarbageRow(); updateGameInfo('Chaos! Garbage row added!'); }, description: "Adds a garbage row to the board." },
-    "The Devil (Reversed)": { effect: () => { dropInterval /= 1.5; updateGameInfo('Game speed increased slightly!'); }, description: "Increases the game speed slightly." },
-    "The Hanged Man (Reversed)": { effect: () => { dropInterval *= 1.5; updateGameInfo('Game slowed slightly!'); }, description: "Slows the game slightly." }
+    "The Magician": {
+        effect: () => {
+            score *= 2;
+            updateScore();
+            updateGameInfo('The Magician doubles your score with a wave of magic!');
+        },
+        description: "Doubles your current score."
+    },
+    "The High Priestess": {
+        effect: () => {
+            setGameSpeed(dropInterval * 1.5);
+            setTimeout(() => setGameSpeed(500), 15000); // Reset speed after 15 seconds
+            updateGameInfo('The High Priestess calms the chaos, slowing the game slightly.');
+        },
+        description: "Slightly slows the game speed for 15 seconds."
+    },
+    "The Empress": {
+        effect: () => {
+            score += 500;
+            updateScore();
+            updateGameInfo('The Empress blesses you with 500 bonus points!');
+        },
+        description: "Adds 500 bonus points to your score."
+    },
+    "The Emperor": {
+        effect: () => {
+            if (gameOver) {
+                console.warn('The Emperor card effect skipped because the game is over.');
+                return;
+            }
+            const newPieceType = Piece.getRandomType(); // Get a random piece type
+            piece = new Piece(newPieceType); // Replace the current piece with a new one
+            piece.position = { x: 3, y: 0 }; // Reset position of the new piece
+            updateGameInfo('The Emperor changes your current piece to a new one!');
+        },
+        description: "Changes your current piece to a different one."
+    },
+    "The Hierophant": {
+        effect: () => {
+            board.reset();
+            updateGameInfo('The Hierophant clears the board, offering a fresh start.');
+        },
+        description: "Clears the entire board."
+    },
+    "The Lovers": {
+        effect: () => {
+            score += 300;
+            updateScore();
+            updateGameInfo('The Lovers bring harmony, adding 300 bonus points.');
+        },
+        description: "Adds 300 bonus points."
+    },
+    "The Chariot": {
+        effect: () => {
+            setGameSpeed(300);
+            setTimeout(() => setGameSpeed(500), 10000); // Reset speed after 10 seconds
+            updateGameInfo('The Chariot accelerates the game, testing your reflexes!');
+        },
+        description: "Speeds up the game for 10 seconds."
+    },
+    "Strength": {
+        effect: () => {
+            coyoteTime = 2000;
+            setTimeout(() => coyoteTime = 300, 15000); // Reset coyote time after 15 seconds
+            updateGameInfo('Strength extends your coyote time, giving you more control.');
+        },
+        description: "Extends coyote time for delayed piece locking."
+    },
+    "The Hermit": {
+        effect: () => {
+            setGameSpeed(2000);
+            setTimeout(() => setGameSpeed(500), 15000); // Reset speed after 15 seconds
+            updateGameInfo('The Hermit slows the game significantly, offering solitude.');
+        },
+        description: "Slows the game speed significantly for 15 seconds."
+    },
+    "Wheel of Fortune": {
+        effect: () => {
+            score = Math.floor(score * 1.5);
+            updateScore();
+            updateGameInfo('The Wheel of Fortune spins, increasing your score by 50%!');
+        },
+        description: "Increases score by 50%."
+    },
+    "Justice": {
+        effect: () => {
+            score += 1000;
+            updateScore();
+            updateGameInfo('Justice rewards you with 1000 bonus points!');
+        },
+        description: "Adds 1000 bonus points to your score."
+    },
+    "The Hanged Man": {
+        effect: () => {
+            dropInterval *= 2;
+            setTimeout(() => setGameSpeed(500), 10000); // Reset speed after 10 seconds
+            updateGameInfo('The Hanged Man slows the game drastically, testing your patience.');
+        },
+        description: "Drastically slows the game for 10 seconds."
+    },
+    "Death": {
+        effect: () => {
+            board.clearRandomRow();
+            score = Math.max(0, score - 100); // Prevent negative score
+            updateScore();
+            updateGameInfo('Death clears a random row but takes 100 points.');
+        },
+        description: "Clears a random row and reduces your score slightly."
+    },
+    "Temperance": {
+        effect: () => {
+            setGameSpeed(750);
+            updateGameInfo('Temperance balances the game speed, bringing harmony.');
+        },
+        description: "Balances the game speed."
+    },
+    "The Devil": {
+        effect: () => {
+            if (gameOver) {
+                console.warn('The Devil card effect skipped because the game is over.');
+                return;
+            }
+            const rowsToMoveUp = Math.floor(Math.random() * 3) + 1; // Randomly choose between 1 and 3 rows
+            board.moveRowsUp(rowsToMoveUp);
+            updateGameInfo(`The Devil moves all rows up by ${rowsToMoveUp} row(s), creating chaos!`);
+        },
+        description: "Moves all rows up by 1 to 3 rows."
+    },
+    "The Tower": {
+        effect: () => {
+            board.clearTopRows(2);
+            updateGameInfo('The Tower collapses, clearing the top rows!');
+        },
+        description: "Clears the top two rows."
+    },
+    "The Star": {
+        effect: () => {
+            coyoteTime = 1500;
+            setTimeout(() => coyoteTime = 300, 15000); // Reset coyote time after 15 seconds
+            updateGameInfo('The Star shines brightly, extending your coyote time.');
+        },
+        description: "Extends coyote time for delayed piece locking."
+    },
+    "The Moon": {
+        effect: () => {
+            dropInterval /= 2;
+            setTimeout(() => setGameSpeed(500), 10000); // Reset speed after 10 seconds
+            updateGameInfo('The Moon quickens the pace, challenging your skills!');
+        },
+        description: "Speeds up the game for 10 seconds."
+    },
+    "The Sun": {
+        effect: () => {
+            score += 500;
+            updateScore();
+            updateGameInfo('The Sun shines brightly, adding 500 bonus points!');
+        },
+        description: "Adds 500 bonus points to your score."
+    },
+    "Judgement": {
+        effect: () => {
+            board.clearBottomRows(2);
+            updateGameInfo('Judgement clears the bottom rows, giving you space.');
+        },
+        description: "Clears the bottom two rows."
+    },
+    "The World": {
+        effect: () => {
+            spawnPiece();
+            updateGameInfo('The World brings a new piece into play!');
+        },
+        description: "Spawns a new piece immediately."
+    }
 };
+
+// Safeguard against recursion or game-breaking behavior in tarot card effects
+Object.keys(tarotEffects).forEach(card => {
+    const originalEffect = tarotEffects[card].effect;
+    tarotEffects[card].effect = () => {
+        if (gameOver) {
+            console.warn(`Effect for card "${card}" skipped because the game is over.`);
+            return;
+        }
+        try {
+            originalEffect();
+        } catch (error) {
+            console.error(`Error executing effect for card "${card}":`, error);
+        }
+    };
+});
 
 // Initialize tarot deck with all Major and Minor Arcana
 function initializeTarotDeck() {
@@ -624,3 +716,67 @@ if (fullscreenButton) {
 } else {
     console.warn("Fullscreen button not found.");
 }
+
+// Add event listeners for keyboard controls
+document.addEventListener('keydown', (event) => {
+    if (gameOver) return;
+
+    switch (event.key) {
+        case 'ArrowLeft': // Move left
+        case 'a':
+        case 'A':
+            if (piece.canMoveLeft(board)) {
+                piece.moveLeft();
+            }
+            break;
+        case 'ArrowRight': // Move right
+        case 'd':
+        case 'D':
+            if (piece.canMoveRight(board)) {
+                piece.moveRight();
+            }
+            break;
+        case 'ArrowDown': // Move down
+        case 's':
+        case 'S':
+            if (piece.canMoveDown(board)) {
+                piece.moveDown();
+            }
+            break;
+        case 'ArrowUp': // Rotate
+        case 'w':
+        case 'W':
+            piece.rotate(board);
+            if (board.collides(piece)) {
+                piece.undoRotate();
+            }
+            break;
+        case 'Shift': // Hold piece
+            holdPiece();
+            break;
+        case '1': // Play tarot card 1
+        case '2': // Play tarot card 2
+        case '3': // Play tarot card 3
+        case '4': // Play tarot card 4
+        case '5': // Play tarot card 5
+        case '6': // Play tarot card 6
+            const cardIndex = parseInt(event.key, 10) - 1;
+            playTarotCard(cardIndex);
+            break;
+        default:
+            break;
+    }
+
+    // Redraw the game board and piece after any movement
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    board.draw(context);
+    drawGhostPiece(context);
+    piece.draw(context);
+});
+
+// Prevent arrow keys from scrolling the page
+window.addEventListener('keydown', (event) => {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        event.preventDefault();
+    }
+});

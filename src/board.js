@@ -216,4 +216,67 @@ class Board {
         // Check if the top row has any filled cells
         return this.grid[0].some(cell => cell !== 0);
     }
+
+    /**
+     * Checks if a piece can move down without colliding.
+     * @param {Piece} piece - The piece to check.
+     * @returns {boolean} True if the piece can move down, false otherwise.
+     */
+    canMoveDown(piece) {
+        if (!piece || !piece.getCoordinates) {
+            console.error("Invalid piece object in canMoveDown:", piece);
+            return false;
+        }
+
+        const coordinates = piece.getCoordinates();
+        for (let coord of coordinates) {
+            const newY = coord.y + 1;
+            if (newY >= this.rows || this.grid[newY][coord.x] !== 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if a piece can move left without colliding.
+     * @param {Piece} piece - The piece to check.
+     * @returns {boolean} True if the piece can move left, false otherwise.
+     */
+    canMoveLeft(piece) {
+        if (!piece || !piece.getCoordinates) {
+            console.error("Invalid piece object in canMoveLeft:", piece);
+            return false;
+        }
+
+        const coordinates = piece.getCoordinates();
+        for (let coord of coordinates) {
+            const newX = coord.x - 1;
+            if (newX < 0 || this.grid[coord.y][newX] !== 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if a piece can move right without colliding.
+     * @param {Piece} piece - The piece to check.
+     * @returns {boolean} True if the piece can move right, false otherwise.
+     */
+    canMoveRight(piece) {
+        if (!piece || !piece.getCoordinates) {
+            console.error("Invalid piece object in canMoveRight:", piece);
+            return false;
+        }
+
+        const coordinates = piece.getCoordinates();
+        for (let coord of coordinates) {
+            const newX = coord.x + 1;
+            if (newX >= this.columns || this.grid[coord.y][newX] !== 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

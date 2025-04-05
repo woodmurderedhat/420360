@@ -29,31 +29,33 @@
 </head>
 <body>
     <h1>Tarot Tetromino</h1>
-    <div id="game-container">
-        <div id="left-column">
+    <div id="game-container" role="main">
+        <div id="left-column" role="complementary" aria-label="Player Info">
             <label for="player-name">Player Name:</label>
-            <input type="text" id="player-name" placeholder="Enter your name">
-            <button id="start-game-button" class="button">Start Game</button>
-            <div id="score">Score: 0</div>
-            <div id="level">Level: 1</div>
-            <div id="game-info">Game Info: Waiting for player...</div>
+            <input type="text" id="player-name" placeholder="Enter your name" aria-label="Enter your name">
+            <button id="start-game-button" class="button" aria-label="Start Game">Start Game</button>
+            <div id="score" aria-live="polite">Score: 0</div>
+            <div id="level" aria-live="polite">Level: 1</div>
+            <div id="game-info" aria-live="polite">Game Info: Waiting for player...</div>
             <h2>Tarot Cards</h2>
-            <div id="tarot-container">
+            <div id="tarot-container" role="list" aria-label="Tarot Cards">
                 <!-- Tarot cards will be dynamically added here -->
             </div>
         </div>
-        <div id="middle-column">
-            <canvas id="tetris" width="300" height="600"></canvas>
-            <div id="mobile-controls">
-                <button class="mobile-button" id="move-left">Left</button>
-                <button class="mobile-button" id="rotate">Rotate</button>
-                <button class="mobile-button" id="move-right">Right</button>
-                <button class="mobile-button" id="move-down">Down</button>
+        <div id="middle-column" role="region" aria-label="Game Board">
+            <div id="canvas-wrapper" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <canvas id="tetris" width="300" height="600" aria-label="Tetris Game Board"></canvas>
+            </div>
+            <div id="mobile-controls" role="group" aria-label="Mobile Controls">
+                <button class="mobile-button" id="move-left" aria-label="Move Left">Left</button>
+                <button class="mobile-button" id="rotate" aria-label="Rotate Piece">Rotate</button>
+                <button class="mobile-button" id="move-right" aria-label="Move Right">Right</button>
+                <button class="mobile-button" id="move-down" aria-label="Move Down">Down</button>
             </div>
         </div>
-        <div id="right-column">
+        <div id="right-column" role="complementary" aria-label="Leaderboard">
             <h2>Leaderboard</h2>
-            <div id="leaderboard"></div>
+            <div id="leaderboard" role="list" aria-label="Top Scores"></div>
         </div>
     </div>
     <noscript>

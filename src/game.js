@@ -46,6 +46,7 @@ function updateScore() {
 function updateGameInfo(info) {
     if (gameInfoElement) {
         gameInfoElement.textContent = `Game Info: ${info}`;
+        gameInfoElement.setAttribute('aria-live', 'polite'); // Announce updates for screen readers
     } else {
         console.warn("Game info element not found.");
     }
@@ -391,6 +392,8 @@ function updateTarotUI() {
         cardElement.textContent = card;
         cardElement.className = 'tarot-card';
         cardElement.title = tarotEffects[card]?.description || 'No description available';
+        cardElement.setAttribute('role', 'listitem'); // Add ARIA role for accessibility
+        cardElement.setAttribute('aria-label', `${card}: ${tarotEffects[card]?.description || 'No description available'}`);
 
         // Highlight potentially bad cards in red
         if (isPotentiallyBadCard(card)) {

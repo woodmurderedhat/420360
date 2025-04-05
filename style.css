@@ -3,11 +3,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh; /* Ensure the body takes at least the full viewport height */
     background: radial-gradient(circle, #1a1a1a, #222, #000); /* Subtler mystical background */
     color: #f0f0f0; /* Lighter text color */
     font-family: 'Cinzel', serif; /* Esoteric font */
-    overflow: hidden; /* Hide scrollbars */
+    overflow-y: auto; /* Allow vertical scrolling if content overflows */
+    font-size: 16px; /* Base font size for better scaling */
+    line-height: 1.5; /* Improved readability */
 }
 
 h1 {
@@ -22,18 +24,19 @@ h1 {
     display: grid;
     grid-template-areas: 
         "left middle right";
-    grid-template-columns: 1fr 2fr 1fr; /* Fixed column sizes */
-    gap: 20px;
+    grid-template-columns: 1fr 3fr 1fr; /* Adjusted proportions for better balance */
+    gap: 15px; /* Slightly reduced gap for better spacing */
     width: 95%; /* Wider container */
     max-width: 1200px;
-    height: 85%; /* Taller container */
-    margin: 0 auto;
+    height: 85vh; /* Adjust height relative to viewport */
+    margin: 20px auto; /* Add vertical margin for spacing */
     border: 1px solid #555; /* Subtle border */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Enhanced shadow */
     border-radius: 10px; /* Rounded corners */
     background: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
-    padding: 10px;
+    padding: 15px; /* Increased padding for better spacing */
     box-sizing: border-box;
+    overflow: hidden; /* Prevent horizontal overflow */
 }
 
 #left-column, #middle-column, #right-column {
@@ -59,6 +62,7 @@ h1 {
     justify-content: center;
     align-items: center;
     overflow: hidden; /* Prevent canvas from going offscreen */
+    height: 100%; /* Ensure the middle column takes full height */
 }
 
 #right-column {
@@ -73,9 +77,11 @@ canvas {
     background-color: #222; /* Darker canvas background */
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0 0 25px #ffdd57; /* Glowing effect */
-    width: 95%; /* Make canvas smaller and responsive */
-    max-width: 300px; /* Ensure it doesn't exceed a fixed size */
-    height: auto; /* Maintain aspect ratio */
+    width: 100%; /* Ensure canvas scales dynamically */
+    height: 100%; /* Ensure canvas height fits dynamically */
+    max-width: 100%; /* Prevent canvas from exceeding column width */
+    max-height: 100%; /* Prevent canvas from exceeding column height */
+    aspect-ratio: 1 / 2; /* Maintain a 1:2 aspect ratio */
 }
 
 #player-name {
@@ -119,13 +125,13 @@ canvas {
 }
 
 .button {
-    padding: 12px 24px; /* Increased padding */
+    padding: 14px 28px; /* Increased padding for touch devices */
     margin-top: 12px; /* Increased margin */
     background: linear-gradient(to bottom, #444, #222); /* Gradient background */
     color: #ffdd57; /* Golden color */
     border: 1px solid #ffaa00;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px; /* Larger font for better accessibility */
     border-radius: 6px; /* Rounded corners */
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4); /* Enhanced shadow */
     transition: all 0.3s ease; /* Smooth hover effect */
@@ -156,9 +162,9 @@ canvas {
 #tarot-container {
     margin-top: 20px;
     display: grid; /* Use grid for precise stacking */
-    grid-template-columns: repeat(3, 1fr); /* Fixed 3-column layout */
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Dynamic card layout */
     grid-auto-rows: auto; /* Adjust row height automatically */
-    gap: 12px; /* Spacing between cards */
+    gap: 10px; /* Adjusted spacing for better alignment */
     justify-items: center; /* Center cards horizontally */
     align-items: center; /* Center cards vertically */
     padding: 12px; /* Increased padding */
@@ -171,8 +177,8 @@ canvas {
 .tarot-card {
     width: 65px; /* Smaller width */
     height: 95px; /* Smaller height */
-    font-size: 12px; /* Adjust font size for smaller cards */
-    padding: 6px; /* Increased padding */
+    font-size: 14px; /* Slightly larger font for readability */
+    padding: 8px; /* Adjusted padding for better touch interaction */
     background-color: #1a1a1a;
     color: #ffdd57; /* Golden color */
     border: 1px solid #ffaa00;
@@ -204,29 +210,33 @@ canvas {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
         gap: 10px;
+        padding: 10px; /* Adjusted padding for smaller screens */
+        height: auto; /* Allow height to adjust dynamically */
     }
 
     #left-column, #middle-column, #right-column {
         flex: none;
         width: 100%; /* Full width for each column */
         border: none; /* Remove borders for cleaner mobile layout */
+        padding: 10px; /* Reduced padding for smaller screens */
     }
 
     canvas {
         width: 100%; /* Make canvas responsive */
         height: auto; /* Maintain aspect ratio */
+        max-width: 90%; /* Ensure canvas fits smaller screens */
     }
 
     #mobile-controls {
         display: flex;
         justify-content: space-around;
         margin-top: 10px;
-        gap: 10px; /* Add spacing between buttons */
+        gap: 15px; /* Increased spacing between buttons */
     }
 
     .mobile-button {
-        padding: 12px 16px; /* Adjust padding for better touch interaction */
-        font-size: 18px; /* Slightly larger font for readability */
+        padding: 14px 20px; /* Adjusted padding for better usability */
+        font-size: 20px; /* Larger font for better touch interaction */
         background: linear-gradient(to bottom, #222, #111); /* Darker gradient */
         color: #ffdd57; /* Golden color */
         border: 2px solid #ffaa00; /* Slightly thicker border */
@@ -247,5 +257,27 @@ canvas {
     .mobile-button:active {
         transform: scale(1.05); /* Slightly reduce zoom on click */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Reduced shadow on click */
+    }
+
+    .tarot-card {
+        font-size: 12px; /* Adjust font size for smaller screens */
+    }
+
+    .button, .mobile-button {
+        font-size: 16px; /* Adjust font size for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    #game-container {
+        gap: 8px; /* Reduced gap for very small screens */
+    }
+
+    .tarot-card {
+        font-size: 10px; /* Further adjust font size for very small screens */
+    }
+
+    .button, .mobile-button {
+        font-size: 14px; /* Further adjust font size for very small screens */
     }
 }

@@ -186,7 +186,18 @@ class Piece {
             this.shape.map(row => row[index]).reverse()
         );
         if (board.collides(this)) {
-            this.shape = originalShape; // Revert rotation if it causes a collision
+            // Attempt wall kicks
+            const wallKickOffsets = [-1, 1, -2, 2];
+            let kicked = false;
+            for (let offset of wallKickOffsets) {
+                this.position.x += offset;
+                if (!board.collides(this)) {
+                    kicked = true;
+                    break;
+                }
+                this.position.x -= offset; // Revert if still colliding
+            }
+            if (!kicked) this.shape = originalShape; // Revert if no valid kick
         } else if (this.position.x < 0 || this.position.x + this.shape[0].length > board.columns) {
             this.shape = originalShape; // Revert if rotation goes out of bounds
         }

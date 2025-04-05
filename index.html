@@ -51,6 +51,7 @@
             <div id="game-info" aria-live="polite">Game Info: Waiting for player...</div>
             <div id="level" aria-live="polite">Level: 1</div>
             <div id="score" aria-live="polite">Score: 0</div>
+            <div id="hold-container" aria-live="polite">Hold: None</div>
         </div>
         <div id="middle-column" role="region" aria-label="Game Board">
             <div id="canvas-wrapper" style="display: flex; justify-content: center; align-items: center; height: 100%;">
@@ -87,9 +88,9 @@
         <p style="color: red;">JavaScript is required to play this game. Please enable JavaScript in your browser.</p>
     </noscript>
     
-    <script src="src/board.js"></script>
-    <script src="src/piece.js"></script>
-    <script src="src/leaderboard.js"></script>
-    <script src="src/game.js"></script>
+    <script src="src/board.js" type="module"></script>
+    <script src="src/piece.js" type="module"></script>
+    <script src="src/leaderboard.js" type="module"></script>
+    <script src="src/game.js" type="module"></script>
 </body>
 </html>

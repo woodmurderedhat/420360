@@ -205,6 +205,21 @@ class Board {
     }
 
     /**
+     * Adds a solid row to the bottom of the board.
+     */
+    addSolidRow() {
+        if (!this.grid) {
+            console.warn("Grid is undefined in addSolidRow.");
+            return;
+        }
+        this.grid.shift(); // Remove the top row
+        const solidRow = Array(this.columns).fill(1);
+        const randomGap = Math.floor(Math.random() * this.columns);
+        solidRow[randomGap] = 0; // Create a gap in the solid row
+        this.grid.push(solidRow); // Add the solid row with a gap at the bottom
+    }
+
+    /**
      * Checks if the board is full.
      * @returns {boolean} True if the board is full, false otherwise.
      */

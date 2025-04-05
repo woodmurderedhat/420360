@@ -4,17 +4,18 @@ body {
     flex-direction: column;
     align-items: center;
     height: 100vh;
-    background: radial-gradient(circle, #0d0d0d, #1a1a1a, #000000); /* Dark, mystical background */
-    color: #e0e0e0;
+    background: radial-gradient(circle, #1a1a1a, #222, #000); /* Subtler mystical background */
+    color: #f0f0f0; /* Lighter text color */
     font-family: 'Cinzel', serif; /* Esoteric font */
+    overflow: hidden; /* Hide scrollbars */
 }
 
 h1 {
     margin: 20px 0;
     text-align: center;
     font-family: 'Cinzel Decorative', cursive; /* Mystical font for the title */
-    color: #ffcc00; /* Golden glow */
-    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff9900;
+    color: #ffdd57; /* Brighter golden glow */
+    text-shadow: 0 0 12px #ffdd57, 0 0 22px #ffaa00; /* Enhanced text shadow */
 }
 
 #game-container {
@@ -23,10 +24,16 @@ h1 {
         "left middle right";
     grid-template-columns: 1fr 2fr 1fr; /* Fixed column sizes */
     gap: 20px;
-    width: 90%;
+    width: 95%; /* Wider container */
     max-width: 1200px;
-    height: 80%;
+    height: 85%; /* Taller container */
     margin: 0 auto;
+    border: 1px solid #555; /* Subtle border */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Enhanced shadow */
+    border-radius: 10px; /* Rounded corners */
+    background: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 #left-column, #middle-column, #right-column {
@@ -35,13 +42,15 @@ h1 {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 10px;
+    padding: 15px; /* Increased padding */
     box-sizing: border-box;
 }
 
 #left-column {
     grid-area: left;
-    border-right: 2px solid #fff;
+    border-right: 1px dashed #777; /* Dashed border */
+    background: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
+    border-radius: 8px; /* Rounded corners */
 }
 
 #middle-column {
@@ -54,28 +63,35 @@ h1 {
 
 #right-column {
     grid-area: right;
-    border-left: 2px solid #fff;
+    border-left: 1px dashed #777; /* Dashed border */
+    background: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
+    border-radius: 8px; /* Rounded corners */
 }
 
 canvas {
-    border: 2px solid #ffcc00; /* Golden border */
+    border: 2px solid #ffdd57; /* Golden border */
     background-color: #222; /* Darker canvas background */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 0 20px #ffcc00; /* Glowing effect */
-    width: 90%; /* Make canvas smaller and responsive */
-    max-width: 250px; /* Ensure it doesn't exceed a fixed size */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 25px #ffdd57; /* Glowing effect */
+    width: 95%; /* Make canvas smaller and responsive */
+    max-width: 300px; /* Ensure it doesn't exceed a fixed size */
     height: auto; /* Maintain aspect ratio */
 }
 
 #player-name {
     margin: 10px 0;
-    padding: 5px;
+    padding: 8px; /* Increased padding */
     font-size: 16px;
+    border-radius: 5px; /* Rounded corners */
+    border: 1px solid #777; /* Subtle border */
+    background-color: #333; /* Dark background */
+    color: #eee; /* Light text color */
 }
 
 #score, #game-info, #level {
-    margin: 10px 0;
+    margin: 12px 0; /* Increased margin */
     font-size: 18px;
+    text-shadow: 0 0 8px #ffaa00; /* Enhanced text shadow */
 }
 
 #leaderboard {
@@ -84,45 +100,48 @@ canvas {
 }
 
 #leaderboard h2 {
-    margin-bottom: 10px;
+    margin-bottom: 12px; /* Increased margin */
+    color: #ffdd57; /* Golden color */
+    text-shadow: 0 0 8px #ffaa00; /* Enhanced text shadow */
 }
 
 #leaderboard div {
     font-size: 20px;
-    margin: 5px 0;
-    color: #ffcc00;
-    text-shadow: 0 0 5px #ff9900;
+    margin: 6px 0; /* Increased margin */
+    color: #ffdd57; /* Golden color */
+    text-shadow: 0 0 6px #ffaa00; /* Enhanced text shadow */
 }
 
 .score {
     font-size: 24px;
     color: #fff;
+    text-shadow: 0 0 10px #ffaa00; /* Enhanced text shadow */
 }
 
 .button {
-    padding: 10px 20px;
-    margin-top: 10px;
-    background-color: #333;
-    color: #ffcc00;
-    border: 1px solid #ff9900;
+    padding: 12px 24px; /* Increased padding */
+    margin-top: 12px; /* Increased margin */
+    background: linear-gradient(to bottom, #444, #222); /* Gradient background */
+    color: #ffdd57; /* Golden color */
+    border: 1px solid #ffaa00;
     cursor: pointer;
     font-size: 16px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 6px; /* Rounded corners */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4); /* Enhanced shadow */
     transition: all 0.3s ease; /* Smooth hover effect */
-    text-shadow: 0 0 5px #ffcc00;
+    text-shadow: 0 0 6px #ffaa00; /* Enhanced text shadow */
 }
 
 .button:hover {
-    background-color: #444;
+    background: linear-gradient(to bottom, #555, #333); /* Darker gradient on hover */
     color: #fff;
     transform: scale(1.05); /* Slight zoom on hover */
-    text-shadow: 0 0 10px #ffcc00;
+    text-shadow: 0 0 12px #ffdd57; /* Enhanced text shadow */
 }
 
 #start-game-button {
-    margin-top: 10px;
-    padding: 10px 20px;
+    margin-top: 12px; /* Increased margin */
+    padding: 12px 24px; /* Increased padding */
     font-size: 16px;
     background-color: #fff;
     color: #000;
@@ -139,33 +158,33 @@ canvas {
     display: grid; /* Use grid for precise stacking */
     grid-template-columns: repeat(3, 1fr); /* Fixed 3-column layout */
     grid-auto-rows: auto; /* Adjust row height automatically */
-    gap: 10px; /* Spacing between cards */
+    gap: 12px; /* Spacing between cards */
     justify-items: center; /* Center cards horizontally */
     align-items: center; /* Center cards vertically */
-    padding: 10px;
+    padding: 12px; /* Increased padding */
     background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for mysticism */
-    border: 1px solid #ff9900;
-    border-radius: 8px;
-    box-shadow: 0 0 10px #ffcc00;
+    border: 1px solid #ffaa00;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 12px #ffdd57; /* Enhanced shadow */
 }
 
 .tarot-card {
-    width: 60px; /* Smaller width */
-    height: 90px; /* Smaller height */
+    width: 65px; /* Smaller width */
+    height: 95px; /* Smaller height */
     font-size: 12px; /* Adjust font size for smaller cards */
-    padding: 5px;
+    padding: 6px; /* Increased padding */
     background-color: #1a1a1a;
-    color: #ffcc00;
-    border: 1px solid #ff9900;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    color: #ffdd57; /* Golden color */
+    border: 1px solid #ffaa00;
+    border-radius: 6px; /* Rounded corners */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4); /* Enhanced shadow */
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     transition: transform 0.3s ease, background-color 0.3s ease;
-    text-shadow: 0 0 5px #ffcc00;
+    text-shadow: 0 0 6px #ffaa00; /* Enhanced text shadow */
     cursor: pointer;
 }
 
@@ -173,7 +192,7 @@ canvas {
     background-color: #333;
     color: #fff;
     transform: scale(1.1); /* Slight zoom on hover */
-    text-shadow: 0 0 10px #ffcc00;
+    text-shadow: 0 0 12px #ffdd57; /* Enhanced text shadow */
 }
 
 @media (max-width: 600px) {

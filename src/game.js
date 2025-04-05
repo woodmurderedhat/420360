@@ -119,7 +119,7 @@ function spawnPiece() {
     }
 }
 
-let coyoteTime = 500; // 500ms coyote time
+let coyoteTime = 300; // 300ms coyote time
 let coyoteTimerActive = false;
 
 function update(time = 0) {
@@ -344,11 +344,12 @@ function safeBoardCall(methodName, ...args) {
 
 function addTarotCardToHand() {
     const newCard = drawTarotCard();
-    if (playerHand.length < 9) {
+    if (playerHand.length < 6) {
         playerHand.push(newCard);
         updateTarotUI(); // Update the UI after adding a card
     } else {
         // Automatically play the oldest card if the hand is full
+        updateGameInfo('Warning: Your hand is being played.');
         playTarotCard(0); // Play the first card in the hand
         playerHand.push(newCard); // Add the new card to the hand
         updateTarotUI(); // Update the UI after playing and adding a card
@@ -390,11 +391,23 @@ function updateTarotUI() {
         cardElement.textContent = card;
         cardElement.className = 'tarot-card';
         cardElement.title = tarotEffects[card]?.description || 'No description available';
+
+        // Highlight potentially bad cards in red
+        if (isPotentiallyBadCard(card)) {
+            cardElement.style.color = 'red';
+        }
+
         cardElement.addEventListener('click', () => {
             playTarotCard(index);
         });
         tarotContainer.appendChild(cardElement);
     });
+}
+
+// Helper function to check if a card is potentially bad
+function isPotentiallyBadCard(card) {
+    const badCardIdentifiers = ["Reversed", "Swords", "Devil", "Hanged Man", "Tower", "Five"];
+    return badCardIdentifiers.some(identifier => card.includes(identifier));
 }
 
 // Modify clearLines to redraw tarot cards when a line is cleared

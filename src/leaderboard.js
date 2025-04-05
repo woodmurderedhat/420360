@@ -16,7 +16,7 @@ const leaderboard = {
      * @param {string} name - The name of the player.
      * @param {number} score - The score of the player.
      */
-    addScore: function(name, score) {
+    addScore(name, score) {
         if (typeof name !== 'string' || typeof score !== 'number') {
             console.error("Invalid input: Name must be a string and score must be a number.");
             return;
@@ -31,7 +31,7 @@ const leaderboard = {
     /**
      * Saves the leaderboard scores to local storage as a JSON string.
      */
-    saveScores: function() {
+    saveScores() {
         try {
             localStorage.setItem('tetrisLeaderboard', JSON.stringify(this.scores));
         } catch (error) {
@@ -42,12 +42,10 @@ const leaderboard = {
     /**
      * Loads the leaderboard scores from local storage, parsing the JSON string.
      */
-    loadScores: function() {
+    loadScores() {
         try {
             const savedScores = localStorage.getItem('tetrisLeaderboard');
-            if (savedScores) {
-                this.scores = JSON.parse(savedScores);
-            }
+            this.scores = savedScores ? JSON.parse(savedScores) : [];
         } catch (error) {
             console.error("Error loading scores from localStorage:", error);
             this.scores = []; // Reset scores if parsing fails
@@ -57,20 +55,18 @@ const leaderboard = {
     /**
      * Displays the leaderboard scores in the designated HTML element.
      */
-    displayScores: function() {
+    displayScores() {
         const leaderboardElement = document.getElementById('leaderboard');
         if (!leaderboardElement) {
             console.warn("Leaderboard element not found.");
             return;
         }
-        leaderboardElement.innerHTML = '';
-        this.scores.forEach(score => {
-            const scoreElement = document.createElement('div');
-            scoreElement.textContent = `${score.name}: ${score.score}`;
-            leaderboardElement.appendChild(scoreElement);
-        });
+        leaderboardElement.innerHTML = this.scores
+            .map(({ name, score }) => `<div>${name}: ${score}</div>`)
+            .join('');
     }
 };
 
 leaderboard.loadScores();
 leaderboard.displayScores(); // Ensure leaderboard is displayed on page load
+export default leaderboard;

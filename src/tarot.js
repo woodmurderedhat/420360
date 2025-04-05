@@ -32,10 +32,10 @@ export const tarotEffects = {
         },
         description: "Adds a solid row with a random gap to the bottom of the board."
     }
-    // Add other tarot effects here
 };
 
 export function initializeTarotDeck() {
-    tarotDeck = Object.keys(tarotEffects);
+    const tarotDeck = Object.keys(tarotEffects);
     console.info("Tarot deck initialized with all available cards.");
+    return tarotDeck;
 }

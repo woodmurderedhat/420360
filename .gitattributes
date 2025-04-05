@@ -1,2 +1,19 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Ignore node_modules and dependencies
+node_modules/
+
+# Ignore logs
+*.log
+
+# Ignore build artifacts
+dist/
+
+# Ignore sensitive files
+.env
+secrets.json
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db

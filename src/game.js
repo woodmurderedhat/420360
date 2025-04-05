@@ -5,9 +5,15 @@ import { initializeTarotDeck } from './tarot.js';
 const startGameButton = document.getElementById('start-game-button');
 const playerNameInput = document.getElementById('player-name');
 
+const sanitizeInput = (input) => {
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+};
+
 if (startGameButton) {
     startGameButton.addEventListener('click', () => {
-        const playerName = playerNameInput.value.trim();
+        const playerName = sanitizeInput(playerNameInput.value.trim());
         if (!playerName) {
             alert('Please enter your name to start the game.');
             return;

@@ -74,31 +74,7 @@ class Piece {
      * @returns {boolean} True if the piece can move down, false otherwise.
      */
     canMoveDown(board) {
-         if (!board || !board.grid) {
-            console.error("Invalid board object in canMoveDown:", board);
-            return false;
-        }
-        const newPosition = { x: this.position.x, y: this.position.y + 1 };
-        const coordinates = this.getCoordinates(newPosition);
-
-        for (let coord of coordinates) {
-            if (coord.y >= board.rows || coord.x < 0 || coord.x >= board.columns) {
-                return false;
-            }
-            if (!board.grid[coord.y]) {
-                console.warn(`Row ${coord.y} is undefined.`);
-                return false;
-            }
-            if (board.grid[coord.y][coord.x] === undefined) {
-                console.warn(`Potential out-of-bounds access at y: ${coord.y}, x: ${coord.x}`);
-                return false;
-            }
-            if (board.grid[coord.y][coord.x] !== 0) {
-                return false;
-            }
-        }
-
-        return true;
+        return this._canMove(board, { x: 0, y: 1 });
     }
 
    /**
@@ -107,31 +83,7 @@ class Piece {
     * @returns {boolean} True if the piece can move left, false otherwise.
     */
     canMoveLeft(board) {
-        if (!board || !board.grid) {
-            console.error("Invalid board object in canMoveLeft:", board);
-            return false;
-        }
-        const newPosition = { x: this.position.x - 1, y: this.position.y };
-        const coordinates = this.getCoordinates(newPosition);
-
-        for (let coord of coordinates) {
-            if (coord.x < 0 || coord.y < 0 || coord.y >= board.rows) {
-                return false;
-            }
-             if (!board.grid[coord.y]) {
-                console.warn(`Row ${coord.y} is undefined.`);
-                return false;
-            }
-             if (board.grid[coord.y][coord.x] === undefined) {
-                console.warn(`Potential out-of-bounds access at y: ${coord.y}, x: ${coord.x}`);
-                return false;
-            }
-            if (board.grid[coord.y][coord.x] !== 0) {
-                return false;
-            }
-        }
-
-        return true;
+        return this._canMove(board, { x: -1, y: 0 });
     }
 
     /**
@@ -140,31 +92,26 @@ class Piece {
      * @returns {boolean} True if the piece can move right, false otherwise.
      */
     canMoveRight(board) {
+        return this._canMove(board, { x: 1, y: 0 });
+    }
+
+    /**
+     * Checks if the piece can move in a specified direction without colliding.
+     * @param {Board} board - The game board.
+     * @param {object} direction - The direction to move.
+     * @returns {boolean} True if the piece can move in the specified direction, false otherwise.
+     */
+    _canMove(board, direction) {
         if (!board || !board.grid) {
-            console.error("Invalid board object in canMoveRight:", board);
+            console.error("Invalid board object in _canMove:", board);
             return false;
         }
-        const newPosition = { x: this.position.x + 1, y: this.position.y };
+        const newPosition = { x: this.position.x + direction.x, y: this.position.y + direction.y };
         const coordinates = this.getCoordinates(newPosition);
 
-        for (let coord of coordinates) {
-            if (coord.x >= board.columns || coord.y < 0 || coord.y >= board.rows) {
-                return false;
-            }
-             if (!board.grid[coord.y]) {
-                console.warn(`Row ${coord.y} is undefined.`);
-                return false;
-            }
-             if (board.grid[coord.y][coord.x] === undefined) {
-                console.warn(`Potential out-of-bounds access at y: ${coord.y}, x: ${coord.x}`);
-                return false;
-            }
-            if (board.grid[coord.y][coord.x] !== 0) {
-                return false;
-            }
-        }
-
-        return true;
+        return coordinates.every(({ x, y }) =>
+            y >= 0 && y < board.rows && x >= 0 && x < board.columns && board.grid[y]?.[x] === 0
+        );
     }
 
     /**
@@ -218,15 +165,9 @@ class Piece {
      * @returns {Array<object>} An array of objects with x and y properties representing the coordinates.
      */
     getCoordinates(position = this.position) {
-        const coordinates = [];
-        this.shape.forEach((row, y) => {
-            row.forEach((value, x) => {
-                if (value) {
-                    coordinates.push({ x: position.x + x, y: position.y + y });
-                }
-            });
-        });
-        return coordinates;
+        return this.shape.flatMap((row, y) =>
+            row.map((value, x) => (value ? { x: position.x + x, y: position.y + y } : null)).filter(Boolean)
+        );
     }
 
     /**
@@ -237,3 +178,5 @@ class Piece {
         return this.scoreValue;
     }
 }
+
+export default Piece;

@@ -1,24 +1,23 @@
 body {
     margin: 0;
+    font-family: 'Cinzel', serif;
+    background: linear-gradient(135deg, #1a1a1a, #000);
+    color: #f0f0f0;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    background: radial-gradient(circle, #1a1a1a 0%, #222 60%, #000 100%);
-    color: #f0f0f0;
-    font-family: 'Cinzel', serif;
-    overflow-y: auto;
-    font-size: 1rem;
-    line-height: 1.5;
+}
+
+header {
+    text-align: center;
+    margin: 1rem 0;
 }
 
 h1 {
-    margin: 1.25rem 0;
-    text-align: center;
     font-family: 'Cinzel Decorative', cursive;
     color: #ffdd57;
-    text-shadow: 0 0 0.75rem #ffdd57, 0 0 1.375rem #ffaa00;
-    letter-spacing: 0.1em;
+    text-shadow: 0 0 1rem #ffaa00, 0 0 2rem #ffdd57;
     font-size: 2.5rem;
 }
 
@@ -109,12 +108,12 @@ h1 {
 .tarot-card:hover, .tarot-card:focus {
     background: linear-gradient(135deg, #2d1a3a 60%, #1a1a2a 100%);
     color: #fff;
-    transform: scale(1.08) rotate(-2deg);
+    /* Removed transform to prevent bounce */
     box-shadow: 0 0 2.5rem #ffaa00, 0 0 1.5rem #6e44ffcc;
     z-index: 2;
 }
 .tarot-card:active {
-    transform: scale(0.98) rotate(1deg);
+    /* Removed transform to prevent bounce */
     box-shadow: 0 0 1rem #ffaa00, 0 0 0.5rem #6e44ff88;
 }
 .tarot-card .title {
@@ -136,16 +135,11 @@ h1 {
 
 /* Tarot Card Activation Animation */
 .tarot-card.activated {
-    animation: tarot-activate 0.7s cubic-bezier(.4,2,.6,1);
+    /* Removed animation to prevent bounce */
     box-shadow: 0 0 3rem #ffaa00, 0 0 2rem #6e44ff;
     border-color: #fff;
 }
-@keyframes tarot-activate {
-    0% { transform: scale(1) rotate(0deg); box-shadow: 0 0 1.5rem #ffaa00; }
-    30% { transform: scale(1.15) rotate(-5deg); box-shadow: 0 0 3rem #ffaa00; }
-    60% { transform: scale(0.95) rotate(3deg); }
-    100% { transform: scale(1) rotate(0deg); }
-}
+/* Removed @keyframes tarot-activate to prevent bounce */
 
 /* Responsive Tarot Dock: Sidebar on desktop, scroll on mobile */
 @media (min-width: 1000px) {
@@ -153,7 +147,7 @@ h1 {
         position: fixed;
         top: 0;
         left: 0;
-        width: 18rem;
+        width: 260px;
         height: 100vh;
         display: flex;
         flex-direction: column;
@@ -167,37 +161,38 @@ h1 {
     }
     #tarot-container {
         flex-direction: column;
-        gap: 2rem;
-        padding: 3rem 1.5rem 3rem 1.5rem;
+        gap: 1.2rem;
+        padding: 2rem 0.75rem 2rem 0.75rem;
         background: rgba(20, 10, 40, 0.96);
-        border-radius: 0 2rem 2rem 0;
-        border-right: 3px solid #ffaa00;
+        border-radius: 0 1.2rem 1.2rem 0;
+        border-right: 2px solid #ffaa00;
         border-bottom: none;
-        min-width: 15rem;
-        max-width: 17rem;
+        min-width: 220px;
+        max-width: 240px;
         width: 100%;
         height: auto;
-        max-height: 80vh;
+        max-height: 85vh;
         overflow-y: auto;
         overflow-x: hidden;
-        box-shadow: 0 0.5rem 2rem #000a, 0 0 2rem #6e44ff44;
+        box-shadow: 0 0.25rem 1.2rem #000a, 0 0 1.2rem #6e44ff44;
         pointer-events: auto;
-        margin: 4rem 0 0 0;
+        margin: 3rem 0 0 0;
     }
     .tarot-card {
-        min-width: 12rem;
-        max-width: 15rem;
+        min-width: 180px;
+        max-width: 220px;
         width: 100%;
-        margin-bottom: 2rem;
+        margin-bottom: 1.2rem;
         margin-left: 0;
         margin-right: 0;
-        padding: 1.5rem 1rem;
-        font-size: 1.1rem;
+        padding: 1rem 0.5rem;
+        font-size: 1rem;
+        box-shadow: 0 0 0.8rem #6e44ff88, 0 0 0.3rem #ffaa00;
     }
     #game-layout {
-        margin-left: 20rem;
-        max-width: calc(1200px - 20rem);
-        padding-left: 2.5rem;
+        margin-left: 270px;
+        max-width: calc(1200px - 270px);
+        padding-left: 1.5rem;
     }
     #middle-column, #left-column, #right-column {
         margin-top: 2rem;
@@ -219,21 +214,80 @@ h1 {
 /* Mystical Canvas Border Animation */
 canvas {
     border: 3px solid;
-    border-image: linear-gradient(120deg, #ffaa00 10%, #6e44ff 40%, #222 60%, #ffaa00 90%) 1;
-    background-color: #222;
+    border-image: linear-gradient(120deg, #ffaa00, #6e44ff, #ffaa00) 1;
     border-radius: 0.625rem;
-    box-shadow: 0 0 2.5rem #6e44ff88, 0 0 1.5625rem #ffdd57;
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    aspect-ratio: 1 / 2;
-    animation: border-glow 4s linear infinite;
+    box-shadow: 0 0 2rem #6e44ff88, 0 0 1rem #ffdd57;
+    background-color: #222;
 }
-@keyframes border-glow {
-    0% { box-shadow: 0 0 2.5rem #6e44ff88, 0 0 1.5625rem #ffdd57; }
-    50% { box-shadow: 0 0 3.5rem #ffaa00cc, 0 0 2.5rem #6e44ffcc; }
-    100% { box-shadow: 0 0 2.5rem #6e44ff88, 0 0 1.5625rem #ffdd57; }
+
+#game-layout {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 1200px;
+    padding: 1rem;
+}
+
+#left-column, #right-column {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(30, 20, 40, 0.85);
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 0 1rem #000a, 0 0 1rem #6e44ff44;
+}
+
+#middle-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#mobile-controls {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1rem;
+}
+
+.mobile-button {
+    background: #ffaa00;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.mobile-button:hover {
+    background: #ffdd57;
+}
+
+footer {
+    margin-top: auto;
+    padding: 1rem;
+    text-align: center;
+}
+
+button#fullscreen-button {
+    background: #6e44ff;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button#fullscreen-button:hover {
+    background: #ffaa00;
 }
 
 /* Glassmorphism for overlays and panels */
@@ -314,3 +368,36 @@ canvas {
 }
 
 /* ...rest of the existing CSS for #game-layout, #left-column, #middle-column, #right-column, controls, etc. ... */
+
+/* Player Info Styles */
+#player-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#player-name {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid #ffaa00;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: 200px;
+    text-align: center;
+}
+
+#start-game-button {
+    background: #ffaa00;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#start-game-button:hover {
+    background: #ffdd57;
+}

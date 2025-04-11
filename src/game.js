@@ -801,3 +801,17 @@ window.addEventListener('keydown', (event) => {
         event.preventDefault();
     }
 });
+
+// Dynamically adjust canvas size based on screen size
+function resizeCanvas() {
+    const canvasWrapper = document.getElementById('canvas-wrapper');
+    if (canvasWrapper) {
+        const width = Math.min(window.innerWidth * 0.8, 300);
+        const height = width * 2; // Maintain 1:2 aspect ratio
+        canvas.width = width;
+        canvas.height = height;
+    }
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas(); // Initial resize

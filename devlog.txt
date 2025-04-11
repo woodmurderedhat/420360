@@ -1,33 +1,12 @@
-[2025-04-11] Complete UI Modernization: Dark Mystical Tarot Edition
+[2025-04-11]
+- Fixed the gameboard so it no longer resizes with the screen. The Tetris board is now always 300x600px for consistent gameplay.
+- Redesigned the sidebar (tarot dock) for desktop: it is now a sleek, fixed-width (260px) vertical sidebar with reduced padding, gap, and shadow. Tarot cards are more compact and the sidebar no longer crowds the gameboard.
+- Adjusted #game-layout margin to align with the new sidebar width.
 
-- The entire UI has been redesigned with a modern, dark mystical theme.
-- Tarot cards are now always visible in a floating dock: as a sidebar on desktop and a scrollable bar on mobile.
-- Tarot cards feature glowing, animated effects and a mystical activation animation when played.
-- The game board is visually prioritized with an animated, glowing border and subtle mystical effects.
-- Overlays and panels use glassmorphism (blurred, semi-transparent backgrounds) for an immersive feel.
-- All elements are fully responsive and accessible, with ARIA labels and keyboard navigation.
-- Board effects (glow) are triggered when a tarot card is played.
-- The tarot dock adapts to all screen sizes for easy access to your cards at any time.
-
-Instructions for all users:
-- Tarot cards are always visible at the top (mobile) or left (desktop). Click/tap a card or press 1-6 to activate it.
-- When a tarot card is played, it glows and triggers a mystical board effect.
-- The game board remains central and visually dominant on all devices.
-- Use the "Info" and "Leaderboard" buttons on mobile to open overlays for game info or scores.
-- All controls and overlays remain accessible and visually enhanced.
-
-[2025-04-11] Mobile-Friendly UI Update
-
-- The game UI is now fully mobile responsive.
-- On screens ≤600px wide, the left (Info) and right (Leaderboard) columns are hidden by default.
-- Two new buttons ("Info" and "Leaderboard") appear at the top of the game on mobile devices.
-- Tapping "Info" opens the left column as a slide-in overlay panel.
-- Tapping "Leaderboard" opens the right column as a slide-in overlay panel.
-- The game board (middle column) is always visible and prioritized.
-- Tap outside an overlay or the close (×) button to close the panel and return to the game.
-- On desktop, the UI remains unchanged.
-
-Instructions for mobile users:
-- Use the "Info" and "Leaderboard" buttons to view game info or the leaderboard.
-- Only one panel can be open at a time.
-- The game board remains visible for uninterrupted play.
+How to Play:
+- Arrange falling tetromino pieces to form complete rows and clear lines.
+- Use the arrow keys to move pieces left, right, and down.
+- Use the up arrow or 'W' to rotate pieces.
+- Press Shift to hold the current piece.
+- Use number keys (1-6) to activate tarot cards for special abilities.
+- The game speeds up as you progress. Plan your moves and use tarot cards strategically!

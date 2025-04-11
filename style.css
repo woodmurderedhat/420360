@@ -271,8 +271,85 @@ canvas {
 
 footer {
     margin-top: auto;
-    padding: 1rem;
-    text-align: center;
+    padding: 0;
+    background: none;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2rem;
+    background: rgba(30, 20, 40, 0.85);
+    backdrop-filter: blur(10px) saturate(1.2);
+    border-radius: 1.2rem 1.2rem 0 0;
+    box-shadow: 0 -0.5rem 2rem #000a, 0 0 2rem #6e44ff44;
+    border-top: 2px solid #ffaa00;
+    color: #ffdd57;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    margin: 0 auto;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.footer-link {
+    display: inline-block;
+    background: linear-gradient(90deg, #ffaa00 60%, #6e44ff 100%);
+    color: #222;
+    font-family: 'Cinzel Decorative', cursive;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-decoration: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 0.7rem;
+    box-shadow: 0 0.2rem 1rem #ffaa0033, 0 0.1rem 0.5rem #6e44ff33;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+}
+.footer-link:hover, .footer-link:focus {
+    background: linear-gradient(90deg, #ffdd57 60%, #6e44ff 100%);
+    color: #1a1a1a;
+    box-shadow: 0 0.4rem 1.5rem #ffaa0055, 0 0.2rem 0.7rem #6e44ff55;
+    outline: none;
+}
+
+.footer-faq {
+    flex: 2 1 320px;
+    background: rgba(40, 30, 60, 0.7);
+    border-radius: 1rem;
+    padding: 1rem 1.5rem;
+    color: #f0e6ff;
+    box-shadow: 0 0.2rem 1rem #6e44ff22;
+    margin-bottom: 1rem;
+    min-width: 260px;
+    max-width: 480px;
+    text-align: left;
+}
+.footer-faq h2 {
+    font-family: 'Cinzel Decorative', cursive;
+    color: #ffdd57;
+    font-size: 1.3rem;
+    margin-bottom: 0.7rem;
+    text-shadow: 0 0 0.5rem #ffaa00, 0 0 0.25rem #fff;
+}
+.footer-faq dl {
+    margin: 0;
+    padding: 0;
+}
+.footer-faq dt {
+    font-weight: bold;
+    color: #ffaa00;
+    margin-top: 0.7rem;
+    margin-bottom: 0.2rem;
+    font-size: 1.05rem;
+}
+.footer-faq dd {
+    margin: 0 0 0.5rem 0.7rem;
+    color: #f0e6ff;
+    font-size: 0.98rem;
+    line-height: 1.5;
 }
 
 button#fullscreen-button {
@@ -280,14 +357,43 @@ button#fullscreen-button {
     color: #fff;
     border: none;
     border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+    padding: 0.5rem 1.1rem;
+    font-size: 1.05rem;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background 0.3s, box-shadow 0.3s;
+    margin-top: 0.5rem;
+    margin-left: 1rem;
+    box-shadow: 0 0.1rem 0.5rem #6e44ff55;
+    align-self: flex-start;
 }
 
-button#fullscreen-button:hover {
+button#fullscreen-button:hover, button#fullscreen-button:focus {
     background: #ffaa00;
+    color: #222;
+    box-shadow: 0 0.2rem 1rem #ffaa0055;
+    outline: none;
+}
+
+/* Responsive footer adjustments */
+@media (max-width: 900px) {
+    .footer-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.2rem;
+        padding: 1.2rem 0.7rem 1rem 0.7rem;
+    }
+    .footer-faq {
+        min-width: 0;
+        max-width: 100vw;
+        padding: 1rem 0.7rem;
+    }
+    .footer-link {
+        margin-right: 0;
+    }
+    button#fullscreen-button {
+        margin-left: 0;
+        align-self: flex-start;
+    }
 }
 
 /* Glassmorphism for overlays and panels */

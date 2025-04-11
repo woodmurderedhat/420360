@@ -1,60 +1,12 @@
-[2025-04-11]
-- Added 10 advanced tarot effects as new tarot cards: Morph, Spin, Drift, Fragment, Phase, Echo, Time Warp, Mirror, Weight, Teleport.
-- Refactored tarot effect system: All effects are now modular functions, supporting time-based and piece/board-manipulating logic.
-- Each advanced effect is triggered by playing its tarot card, with robust cleanup and no effect stacking.
-- See below for updated game instructions and a full list of advanced effects.
+[4/11/2025]
+- Added Board.moveRowsUp(count): Moves all rows up by the specified count, removing from the top and adding empty rows at the bottom.
+- Added Board.addRandomGarbageRow(): Adds a random garbage row at the bottom with a single random hole, shifting the board up.
+- Updated "The Devil" tarot effect: Now moves all rows up by 1–3 rows using moveRowsUp for robust behavior.
+- Added "The Devil Reversed" tarot effect: Adds 1–3 random garbage rows at the bottom of the board, each with a random hole.
+- All tarot effects now use robust board methods and are safeguarded against game over.
 
---- ADVANCED TAROT EFFECTS ---
+Instructions for new tarot effects:
+- "The Devil": When played, all rows move up by 1–3 rows, making the board more difficult.
+- "The Devil Reversed": When played, 1–3 random garbage rows (with a single hole each) are added at the bottom, pushing the board up and increasing the challenge.
 
-Morph: The active piece morphs into random shapes for a short time.
-Spin: The active piece spins randomly for a short time.
-Drift: The active piece drifts unpredictably for a short time.
-Fragment: The active piece breaks into fragments, then reforms.
-Phase: The active piece can pass through blocks for a short time.
-Echo: A shadow follows the active piece, trailing its movements.
-Time Warp: The fall speed of the active piece fluctuates wildly.
-Mirror: The board visuals are flipped horizontally for a short time (controls remain normal).
-Weight: The active piece becomes heavy and falls rapidly.
-Teleport: The active piece teleports to random columns for a short time.
-
---- GAME INSTRUCTIONS ---
-
-Tetris Controls:
-- Arrow keys or WASD: Move and rotate the current piece.
-- Shift: Hold the current piece.
-- 1-6: Play the corresponding tarot card from your hand.
-
-Ghost Piece:
-- A semi-transparent "ghost" piece shows where your current piece will land if dropped. It updates in real time as you move or rotate the piece.
-
-Tarot Cards:
-- Tarot cards appear in your hand (max 6).
-- Play a card by pressing 1-6 or clicking it.
-- Each card has a unique effect (e.g., slow time, clear rows, bonus points, or advanced piece/board effects).
-- Advanced tarot cards introduce new gameplay twists: piece morphing, spinning, drifting, fragmenting, phasing, shadow clones, time warps, board mirroring, heavy gravity, and teleportation.
-- Time-based effects (speed/coyoteTime) always restore the previous value after the effect ends, so effects do not stack incorrectly.
-
-For more details on tarot effects, see the in-game card descriptions or src/tarot.js.
-
-[2025-04-11]
-- Fixed ghost piece logic: The ghost piece now copies all relevant properties from the current piece, uses the correct color with transparency, and only draws if not overlapping the current piece. This makes the landing preview accurate and visually consistent.
-- Tarot effects are now robust: All time-based tarot effects (speed/coyoteTime) store and restore the previous value, preventing stacking bugs and ensuring correct effect durations. The Emperor card now works (random piece type logic added).
-- See below for updated game instructions.
-
---- GAME INSTRUCTIONS ---
-
-Tetris Controls:
-- Arrow keys or WASD: Move and rotate the current piece.
-- Shift: Hold the current piece.
-- 1-6: Play the corresponding tarot card from your hand.
-
-Ghost Piece:
-- A semi-transparent "ghost" piece shows where your current piece will land if dropped. It updates in real time as you move or rotate the piece.
-
-Tarot Cards:
-- Tarot cards appear in your hand (max 6).
-- Play a card by pressing 1-6 or clicking it.
-- Each card has a unique effect (e.g., slow time, clear rows, bonus points).
-- Time-based effects (speed/coyoteTime) now always restore the previous value after the effect ends, so effects do not stack incorrectly.
-
-For more details on tarot effects, see the in-game card descriptions or src/tarot.js.
+All tarot effects are now robust and properly integrated. Effects that move lines up or add lines at the bottom work as intended.

@@ -23,6 +23,35 @@ class Board {
     }
 
     /**
+     * Moves all rows up by a given count, removing from the top and adding empty rows at the bottom.
+     * @param {number} count - Number of rows to move up.
+     */
+    moveRowsUp(count) {
+        if (!this.grid) {
+            console.warn("Grid is undefined in moveRowsUp.");
+            return;
+        }
+        for (let i = 0; i < count; i++) {
+            this.grid.shift(); // Remove the top row
+            this.grid.push(Array(this.columns).fill(0)); // Add empty row at the bottom
+        }
+    }
+
+    /**
+     * Adds a random garbage row at the bottom with a single random hole, shifting the board up.
+     */
+    addRandomGarbageRow() {
+        if (!this.grid) {
+            console.warn("Grid is undefined in addRandomGarbageRow.");
+            return;
+        }
+        const hole = Math.floor(Math.random() * this.columns);
+        const garbageRow = Array.from({ length: this.columns }, (_, i) => (i === hole ? 0 : 8)); // 8 = garbage color
+        this.grid.shift(); // Remove the top row
+        this.grid.push(garbageRow); // Add garbage row at the bottom
+    }
+
+    /**
      * Resets the board by creating a new empty grid.
      */
     reset() {

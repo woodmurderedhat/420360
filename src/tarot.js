@@ -182,7 +182,24 @@ function teleportEffect(duration = 4000, interval = 800) {
     updateGameInfo('Teleport: Your piece is jumping around!');
 }
 
-// Tarot card effects and descriptions
+/**
+ * Minor Arcana unlock mapping: card name → tetromino key
+ */
+var minorArcanaUnlocks = {
+    "Ace of Wands": "SIGIL",
+    "Two of Cups": "HEX",
+    "Three of Swords": "YOD",
+    "Four of Pentacles": "CROSS",
+    "Five of Wands": "KEY",
+    "Six of Cups": "EYE",
+    "Seven of Swords": "SERPENT",
+    "Eight of Pentacles": "TREE",
+    "Nine of Wands": "RUNE",
+    "Ten of Cups": "ANKH"
+};
+
+// Add Minor Arcana effects to tarotEffects
+// Each unlocks a special tetromino shape for the rest of the game
 var tarotEffects = {
     "The Fool": {
         effect: function() {
@@ -344,6 +361,21 @@ var tarotEffects = {
         },
         description: "Moves all rows up by 1 to 3 rows."
     },
+
+    "The Devil Reversed": {
+        effect: function() {
+            if (gameOver) {
+                console.warn('The Devil Reversed card effect skipped because the game is over.');
+                return;
+            }
+            var rowsToAdd = Math.floor(Math.random() * 3) + 1;
+            for (var i = 0; i < rowsToAdd; i++) {
+                board.addRandomGarbageRow();
+            }
+            updateGameInfo('The Devil Reversed adds ' + rowsToAdd + ' random garbage row(s) at the bottom!');
+        },
+        description: "Adds 1 to 3 random garbage rows at the bottom of the board."
+    },
     "The Tower": {
         effect: function() {
             board.clearTopRows(2);
@@ -398,49 +430,68 @@ var tarotEffects = {
         description: "Spawns a new piece immediately."
     },
 
-    // --- Advanced Tarot Cards ---
+    // --- Advanced Tarot Cards (with thematic names) ---
 
-    "Morph": {
+    "Wheel of Fortune Reversed": {
         effect: function() { morphEffect(); },
-        description: "The active piece morphs into random shapes for a short time."
+        description: "Fate is fickle: The active piece morphs into random shapes for a short time."
     },
-    "Spin": {
+    "The Hanged Man Reversed": {
         effect: function() { spinEffect(); },
-        description: "The active piece spins randomly for a short time."
+        description: "Perspective shifts: The active piece spins randomly for a short time."
     },
-    "Drift": {
+    "The Star Reversed": {
         effect: function() { driftEffect(); },
-        description: "The active piece drifts unpredictably for a short time."
+        description: "Lost in the void: The active piece drifts unpredictably for a short time."
     },
-    "Fragment": {
+    "The Tower Reversed": {
         effect: function() { fragmentEffect(); },
-        description: "The active piece breaks into fragments, then reforms."
+        description: "Collapse averted: The active piece breaks into fragments, then reforms."
     },
-    "Phase": {
+    "The Moon Reversed": {
         effect: function() { phaseEffect(); },
-        description: "The active piece can pass through blocks for a short time."
+        description: "Illusions fade: The active piece can pass through blocks for a short time."
     },
-    "Echo": {
+    "The High Priestess Reversed": {
         effect: function() { echoEffect(); },
-        description: "A shadow follows the active piece, trailing its movements."
+        description: "Hidden knowledge: A shadow follows the active piece, trailing its movements."
     },
-    "Time Warp": {
+    "Temperance Reversed": {
         effect: function() { timeWarpEffect(); },
-        description: "The fall speed of the active piece fluctuates wildly."
+        description: "Time unbalanced: The fall speed of the active piece fluctuates wildly."
     },
-    "Mirror": {
+    "Justice Reversed": {
         effect: function() { mirrorEffect(); },
-        description: "The board visuals are flipped horizontally for a short time."
+        description: "Reflected fate: The board visuals are flipped horizontally for a short time."
     },
-    "Weight": {
+    "Strength Reversed": {
         effect: function() { weightEffect(); },
-        description: "The active piece becomes heavy and falls rapidly."
+        description: "Gravity shifts: The active piece becomes heavy and falls rapidly."
     },
-    "Teleport": {
+    "The Fool Reversed": {
         effect: function() { teleportEffect(); },
-        description: "The active piece teleports to random columns for a short time."
+        description: "Wild leap: The active piece teleports to random columns for a short time."
     }
 };
+
+/**
+ * Add Minor Arcana unlock effects to tarotEffects
+ */
+Object.keys(minorArcanaUnlocks).forEach(function(card) {
+    var shapeKey = minorArcanaUnlocks[card];
+    tarotEffects[card] = {
+        effect: function() {
+            if (!window.unlockedTetrominoes) window.unlockedTetrominoes = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+            if (window.unlockedTetrominoes.indexOf(shapeKey) === -1) {
+                window.unlockedTetrominoes.push(shapeKey);
+                updateGameInfo(card + " unlocked the " + shapeKey + " tetromino! This shape can now spawn.");
+            } else {
+                updateGameInfo(card + " was played, but the " + shapeKey + " tetromino was already unlocked.");
+            }
+        },
+        description: "Unlocks the special " + shapeKey + " tetromino shape for the rest of the game."
+    };
+});
 
 // Safeguard against recursion or game-breaking behavior in tarot card effects
 Object.keys(tarotEffects).forEach(function(card) {
@@ -459,11 +510,11 @@ Object.keys(tarotEffects).forEach(function(card) {
 });
 
 /**
- * Initialize tarot deck with all Major Arcana and advanced effects.
+ * Initialize tarot deck with all Major Arcana, advanced effects, and Minor Arcana unlocks.
  */
 function initializeTarotDeck() {
     tarotDeck = Object.keys(tarotEffects);
-    console.info("Tarot deck initialized with all available cards.");
+    console.info("Tarot deck initialized with all available cards, including Minor Arcana unlocks.");
 }
 
 // Add helper methods for new effects

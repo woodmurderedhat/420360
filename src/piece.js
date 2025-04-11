@@ -1,37 +1,59 @@
 /**
  * Represents a Tetris piece.
  */
+/**
+ * All possible tetromino definitions (standard + esoteric).
+ */
+window.ALL_TETROMINOES = {
+    I: { shape: [[1, 1, 1, 1]], score: 40 },
+    O: { shape: [[1, 1], [1, 1]], score: 30 },
+    T: { shape: [[0, 1, 0], [1, 1, 1]], score: 50 },
+    S: { shape: [[0, 1, 1], [1, 1, 0]], score: 60 },
+    Z: { shape: [[1, 1, 0], [0, 1, 1]], score: 60 },
+    J: { shape: [[1, 0, 0], [1, 1, 1]], score: 70 },
+    L: { shape: [[0, 0, 1], [1, 1, 1]], score: 70 },
+
+    // Esoteric variants (initially locked)
+    SIGIL: { shape: [[1, 0], [1, 1], [1, 0]], score: 75 },
+    HEX: { shape: [[0, 1, 0], [1, 1, 1], [0, 1, 0]], score: 90 },
+    YOD: { shape: [[0, 1], [1, 1], [0, 1]], score: 85 },
+    CROSS: { shape: [[0, 1, 0], [1, 1, 1], [0, 1, 0]], score: 100 },
+    KEY: { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 1]], score: 95 },
+    EYE: { shape: [[0, 1, 0], [1, 1, 1], [1, 0, 1]], score: 105 },
+    SERPENT: { shape: [[1, 1, 0], [1, 0, 1], [0, 1, 1]], score: 120 },
+    TREE: { shape: [[0, 1, 0], [1, 1, 1], [1, 0, 1]], score: 110 },
+    RUNE: { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 1]], score: 85 },
+    ANKH: { shape: [[0, 1, 0], [1, 1, 1], [0, 1, 0], [0, 1, 0]], score: 130 }
+};
+
+// Start with only the standard 7 tetrominoes unlocked
+if (!window.unlockedTetrominoes) {
+    window.unlockedTetrominoes = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+}
+
 class Piece {
     /**
-     * Returns a random tetromino type.
-     * @returns {string} One of 'I', 'O', 'T', 'S', 'Z', 'J', 'L'
+     * Returns a random tetromino type from the unlocked pool.
+     * @returns {string}
      */
     static getRandomType() {
-        const types = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+        const types = window.unlockedTetrominoes || ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
         return types[Math.floor(Math.random() * types.length)];
     }
 
     /**
      * Constructs a new Piece.
-     * @param {string} [type] - The type of the piece (e.g., 'I', 'O', 'T'). If not provided, a random type is selected.
+     * @param {string} [type] - The type of the piece (e.g., 'I', 'O', 'T', etc.). If not provided, a random unlocked type is selected.
      */
     constructor(type) {
-        const tetrominoes = {
-            I: { shape: [[1, 1, 1, 1]], score: 40 },
-            O: { shape: [[1, 1], [1, 1]], score: 30 },
-            T: { shape: [[0, 1, 0], [1, 1, 1]], score: 50 },
-            S: { shape: [[0, 1, 1], [1, 1, 0]], score: 60 },
-            Z: { shape: [[1, 1, 0], [0, 1, 1]], score: 60 },
-            J: { shape: [[1, 0, 0], [1, 1, 1]], score: 70 },
-            L: { shape: [[0, 0, 1], [1, 1, 1]], score: 70 }
-        };
-
-        const keys = Object.keys(tetrominoes);
+        const tetrominoes = window.ALL_TETROMINOES;
+        const keys = window.unlockedTetrominoes || Object.keys(tetrominoes);
         const randomKey = type || keys[Math.floor(Math.random() * keys.length)];
         this.shape = tetrominoes[randomKey]?.shape || tetrominoes['T'].shape; // Fallback to T shape
         this.scoreValue = tetrominoes[randomKey]?.score || 0;
         this.position = { x: 3, y: 0 }; // Start position
-        this.typeIndex = keys.indexOf(randomKey); // Get the index of the piece type
+        this.typeIndex = Object.keys(window.ALL_TETROMINOES).indexOf(randomKey); // For color
+        this.type = randomKey;
     }
 
     /**

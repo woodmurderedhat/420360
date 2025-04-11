@@ -1,6 +1,7 @@
 import { score, level, dropInterval, resetGameState, heldPiece } from './gameState.js';
 import { updateScore, updateLevel, updateGameInfo } from './gameUI.js';
 import Board from './board.js';
+import Piece from './piece.js';
 
 export let piece;
 export const board = new Board();

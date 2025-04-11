@@ -3,6 +3,15 @@
  */
 class Piece {
     /**
+     * Returns a random tetromino type.
+     * @returns {string} One of 'I', 'O', 'T', 'S', 'Z', 'J', 'L'
+     */
+    static getRandomType() {
+        const types = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+        return types[Math.floor(Math.random() * types.length)];
+    }
+
+    /**
      * Constructs a new Piece.
      * @param {string} [type] - The type of the piece (e.g., 'I', 'O', 'T'). If not provided, a random type is selected.
      */

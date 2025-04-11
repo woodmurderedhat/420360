@@ -2,16 +2,23 @@
 // This file defines the tarot deck, player hand, tarot card effects, and related functions.
 // All functions and variables are global for compatibility with plain <script> loading.
 
-// Tarot deck and player hand
 var tarotDeck = [];
 var playerHand = [];
+
+// Track previous values for time-based effects
+var previousDropInterval = null;
+var previousCoyoteTime = null;
 
 // Tarot card effects and descriptions
 var tarotEffects = {
     "The Fool": {
         effect: function() {
+            if (previousDropInterval === null) previousDropInterval = dropInterval;
             setGameSpeed(1000);
-            setTimeout(function() { setGameSpeed(500); }, 10000);
+            setTimeout(function() { 
+                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                previousDropInterval = null;
+            }, 10000);
             updateGameInfo('The Fool slows time, giving you a moment to breathe.');
         },
         description: "Slows down the game speed for 10 seconds."
@@ -26,8 +33,12 @@ var tarotEffects = {
     },
     "The High Priestess": {
         effect: function() {
+            if (previousDropInterval === null) previousDropInterval = dropInterval;
             setGameSpeed(dropInterval * 1.5);
-            setTimeout(function() { setGameSpeed(500); }, 15000);
+            setTimeout(function() { 
+                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                previousDropInterval = null;
+            }, 15000);
             updateGameInfo('The High Priestess calms the chaos, slowing the game slightly.');
         },
         description: "Slightly slows the game speed for 15 seconds."
@@ -70,24 +81,36 @@ var tarotEffects = {
     },
     "The Chariot": {
         effect: function() {
+            if (previousDropInterval === null) previousDropInterval = dropInterval;
             setGameSpeed(300);
-            setTimeout(function() { setGameSpeed(500); }, 10000);
+            setTimeout(function() { 
+                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                previousDropInterval = null;
+            }, 10000);
             updateGameInfo('The Chariot accelerates the game, testing your reflexes!');
         },
         description: "Speeds up the game for 10 seconds."
     },
     "Strength": {
         effect: function() {
+            if (previousCoyoteTime === null) previousCoyoteTime = coyoteTime;
             coyoteTime = 2000;
-            setTimeout(function() { coyoteTime = 300; }, 15000);
+            setTimeout(function() { 
+                coyoteTime = previousCoyoteTime !== null ? previousCoyoteTime : 300; 
+                previousCoyoteTime = null;
+            }, 15000);
             updateGameInfo('Strength extends your coyote time, giving you more control.');
         },
         description: "Extends coyote time for delayed piece locking."
     },
     "The Hermit": {
         effect: function() {
+            if (previousDropInterval === null) previousDropInterval = dropInterval;
             setGameSpeed(2000);
-            setTimeout(function() { setGameSpeed(500); }, 15000);
+            setTimeout(function() { 
+                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                previousDropInterval = null;
+            }, 15000);
             updateGameInfo('The Hermit slows the game significantly, offering solitude.');
         },
         description: "Slows the game speed significantly for 15 seconds."
@@ -110,8 +133,12 @@ var tarotEffects = {
     },
     "The Hanged Man": {
         effect: function() {
-            dropInterval *= 2;
-            setTimeout(function() { setGameSpeed(500); }, 10000);
+            if (previousDropInterval === null) previousDropInterval = dropInterval;
+            setGameSpeed(dropInterval * 2);
+            setTimeout(function() { 
+                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                previousDropInterval = null;
+            }, 10000);
             updateGameInfo('The Hanged Man slows the game drastically, testing your patience.');
         },
         description: "Drastically slows the game for 10 seconds."
@@ -153,16 +180,24 @@ var tarotEffects = {
     },
     "The Star": {
         effect: function() {
+            if (previousCoyoteTime === null) previousCoyoteTime = coyoteTime;
             coyoteTime = 1500;
-            setTimeout(function() { coyoteTime = 300; }, 15000);
+            setTimeout(function() { 
+                coyoteTime = previousCoyoteTime !== null ? previousCoyoteTime : 300; 
+                previousCoyoteTime = null;
+            }, 15000);
             updateGameInfo('The Star shines brightly, extending your coyote time.');
         },
         description: "Extends coyote time for delayed piece locking."
     },
     "The Moon": {
         effect: function() {
-            dropInterval /= 2;
-            setTimeout(function() { setGameSpeed(500); }, 10000);
+            if (previousDropInterval === null) previousDropInterval = dropInterval;
+            setGameSpeed(dropInterval / 2);
+            setTimeout(function() { 
+                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                previousDropInterval = null;
+            }, 10000);
             updateGameInfo('The Moon quickens the pace, challenging your skills!');
         },
         description: "Speeds up the game for 10 seconds."

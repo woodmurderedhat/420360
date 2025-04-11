@@ -1,14 +1,22 @@
-[2025-04-11] Refactored tarot logic out of src/game.js into src/tarot.js.
+[2025-04-11]
+- Fixed ghost piece logic: The ghost piece now copies all relevant properties from the current piece, uses the correct color with transparency, and only draws if not overlapping the current piece. This makes the landing preview accurate and visually consistent.
+- Tarot effects are now robust: All time-based tarot effects (speed/coyoteTime) store and restore the previous value, preventing stacking bugs and ensuring correct effect durations. The Emperor card now works (random piece type logic added).
+- See below for updated game instructions.
 
-- All tarot deck, hand, effects, and tarot-related functions are now in src/tarot.js.
-- index.html loads src/tarot.js before src/game.js, so all tarot logic is available globally.
-- game.js now references the global tarot functions/variables (e.g., addTarotCardToHand, playTarotCard, updateTarotUI, etc.).
-- No import/export or modules are used, so the game works when opening index.html directly (no server or CORS issues).
+--- GAME INSTRUCTIONS ---
 
-Instructions for tarot logic:
-- Tarot cards are drawn and managed via the global tarotDeck and playerHand.
-- Tarot card effects are defined in the global tarotEffects object.
-- To add new tarot cards or effects, edit src/tarot.js.
-- Tarot UI and card play logic are handled by updateTarotUI and playTarotCard, also in src/tarot.js.
+Tetris Controls:
+- Arrow keys or WASD: Move and rotate the current piece.
+- Shift: Hold the current piece.
+- 1-6: Play the corresponding tarot card from your hand.
 
-This refactor keeps game.js smaller and makes tarot logic easier to maintain.
+Ghost Piece:
+- A semi-transparent "ghost" piece shows where your current piece will land if dropped. It updates in real time as you move or rotate the piece.
+
+Tarot Cards:
+- Tarot cards appear in your hand (max 6).
+- Play a card by pressing 1-6 or clicking it.
+- Each card has a unique effect (e.g., slow time, clear rows, bonus points).
+- Time-based effects (speed/coyoteTime) now always restore the previous value after the effect ends, so effects do not stack incorrectly.
+
+For more details on tarot effects, see the in-game card descriptions or src/tarot.js.

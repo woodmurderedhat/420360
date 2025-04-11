@@ -21,14 +21,6 @@
     <meta property="twitter:description" content="Experience Tetris like never before with tarot cards!">
     <meta property="twitter:image" content="https://i0.wp.com/woodmurderedhat.com/social/wp-content/uploads/2025/03/image-55.jpg?w=1024&ssl=1">
 
-    <!-- Security Meta Tags -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <!--
-      NOTE: Do not use X-Frame-Options as a meta tag; it must be set via HTTP header.
-      To avoid CORS and CSP issues, run this game via a local HTTP server (see devlog.txt for instructions).
-    -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;">
-
     <!-- Favicon -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
@@ -59,7 +51,6 @@
             <div id="game-info" aria-live="polite">Game Info: Waiting for player...</div>
             <div id="level" aria-live="polite">Level: 1</div>
             <div id="score" aria-live="polite">Score: 0</div>
-            <div id="hold-container" aria-live="polite">Hold: None</div>
         </div>
         <div id="middle-column" role="region" aria-label="Game Board">
             <div id="canvas-wrapper" style="display: flex; justify-content: center; align-items: center; height: 100%;">
@@ -96,9 +87,9 @@
         <p style="color: red;">JavaScript is required to play this game. Please enable JavaScript in your browser.</p>
     </noscript>
     
-    <script src="src/board.js" type="module"></script>
-    <script src="src/piece.js" type="module"></script>
-    <script src="src/leaderboard.js" type="module"></script>
-    <script src="src/game.js" type="module"></script>
+    <script src="src/board.js"></script>
+    <script src="src/piece.js"></script>
+    <script src="src/leaderboard.js"></script>
+    <script src="src/game.js"></script>
 </body>
 </html>

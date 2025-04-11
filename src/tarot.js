@@ -9,6 +9,179 @@ var playerHand = [];
 var previousDropInterval = null;
 var previousCoyoteTime = null;
 
+/**
+ * Advanced Tetrimino Effects for Tarot Cards
+ * Each effect is a modular function, time-based where needed.
+ */
+
+// --- Advanced Effect Implementations ---
+
+// Morph: Randomly changes the active piece's shape at intervals for a duration.
+function morphEffect(duration = 5000, interval = 500) {
+    if (!piece) return;
+    let morphing = true;
+    const originalType = piece.typeIndex;
+    const morphInterval = setInterval(() => {
+        if (!morphing || gameOver) return;
+        const newType = Piece.getRandomType();
+        piece.shape = (new Piece(newType)).shape;
+        piece.typeIndex = ['I','O','T','S','Z','J','L'].indexOf(newType);
+    }, interval);
+    setTimeout(() => {
+        morphing = false;
+        clearInterval(morphInterval);
+        // Optionally restore original type (not required)
+    }, duration);
+    updateGameInfo('Morph: Your piece is shifting shapes!');
+}
+
+// Spin: Rotates the piece randomly at intervals for a duration.
+function spinEffect(duration = 5000, interval = 300) {
+    if (!piece) return;
+    let spinning = true;
+    const spinInterval = setInterval(() => {
+        if (!spinning || gameOver) return;
+        const direction = Math.random() < 0.5 ? 1 : 3; // 1 = 90deg, 3 = -90deg
+        for (let i = 0; i < direction; i++) piece.rotate(board);
+    }, interval);
+    setTimeout(() => {
+        spinning = false;
+        clearInterval(spinInterval);
+    }, duration);
+    updateGameInfo('Spin: Your piece is spinning out of control!');
+}
+
+// Drift: Moves the piece randomly at intervals for a duration.
+function driftEffect(duration = 5000, interval = 400) {
+    if (!piece) return;
+    let drifting = true;
+    const driftInterval = setInterval(() => {
+        if (!drifting || gameOver) return;
+        const dx = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
+        const dy = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
+        const newPos = { x: piece.position.x + dx, y: piece.position.y + dy };
+        // Check bounds and collision
+        const testPiece = new Piece();
+        testPiece.shape = piece.shape.map(row => row.slice());
+        testPiece.position = { ...newPos };
+        testPiece.typeIndex = piece.typeIndex;
+        if (!board.collides(testPiece)) {
+            piece.position = newPos;
+        }
+    }, interval);
+    setTimeout(() => {
+        drifting = false;
+        clearInterval(driftInterval);
+    }, duration);
+    updateGameInfo('Drift: Your piece is drifting unpredictably!');
+}
+
+// Fragment: Temporarily splits the piece into blocks with jitter, then reforms.
+function fragmentEffect(duration = 2000) {
+    if (!piece) return;
+    let originalPos = { ...piece.position };
+    let originalShape = piece.shape.map(row => row.slice());
+    let jitter = true;
+    const jitterInterval = setInterval(() => {
+        if (!jitter || gameOver) return;
+        // Apply random pixel offset to each block (visual only)
+        // This requires a change in the draw function to check a global flag
+        window.__fragmentJitter = true;
+    }, 50);
+    setTimeout(() => {
+        jitter = false;
+        clearInterval(jitterInterval);
+        window.__fragmentJitter = false;
+        piece.position = originalPos;
+        piece.shape = originalShape;
+    }, duration);
+    updateGameInfo('Fragment: Your piece is breaking apart!');
+}
+
+// Phase: Allows the piece to pass through blocks for a duration.
+function phaseEffect(duration = 4000) {
+    window.__phaseActive = true;
+    setTimeout(() => {
+        window.__phaseActive = false;
+    }, duration);
+    updateGameInfo('Phase: Your piece can pass through blocks!');
+}
+
+// Echo: Creates a shadow clone that follows the piece with a delay.
+function echoEffect(duration = 5000, delay = 4) {
+    if (!piece) return;
+    window.__echoTrail = [];
+    window.__echoActive = true;
+    const echoInterval = setInterval(() => {
+        if (!window.__echoActive || gameOver) return;
+        window.__echoTrail.push({ 
+            shape: piece.shape.map(row => row.slice()), 
+            position: { ...piece.position }, 
+            typeIndex: piece.typeIndex 
+        });
+        if (window.__echoTrail.length > delay) window.__echoTrail.shift();
+    }, 50);
+    setTimeout(() => {
+        window.__echoActive = false;
+        window.__echoTrail = [];
+        clearInterval(echoInterval);
+    }, duration);
+    updateGameInfo('Echo: A shadow follows your piece!');
+}
+
+// Time Warp: Randomly changes the fall speed of the piece for a duration.
+function timeWarpEffect(duration = 5000, min = 100, max = 1200) {
+    if (previousDropInterval === null) previousDropInterval = dropInterval;
+    let warping = true;
+    const warpInterval = setInterval(() => {
+        if (!warping || gameOver) return;
+        setGameSpeed(Math.floor(Math.random() * (max - min + 1)) + min);
+    }, 400);
+    setTimeout(() => {
+        warping = false;
+        clearInterval(warpInterval);
+        setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
+        previousDropInterval = null;
+    }, duration);
+    updateGameInfo('Time Warp: Gravity is fluctuating!');
+}
+
+// Mirror: Flips the board visuals horizontally for a duration.
+function mirrorEffect(duration = 4000) {
+    window.__mirrorActive = true;
+    setTimeout(() => {
+        window.__mirrorActive = false;
+    }, duration);
+    updateGameInfo('Mirror: The board is flipped!');
+}
+
+// Weight: Increases gravity for the current piece for a duration.
+function weightEffect(duration = 4000, heavy = true) {
+    if (previousDropInterval === null) previousDropInterval = dropInterval;
+    setGameSpeed(heavy ? 100 : 1200);
+    setTimeout(function() { 
+        setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+        previousDropInterval = null;
+    }, duration);
+    updateGameInfo(heavy ? 'Weight: Your piece is heavy and falls fast!' : 'Weight: Your piece is light and floats!');
+}
+
+// Teleport: Randomly moves the piece to a new column at intervals for a duration.
+function teleportEffect(duration = 4000, interval = 800) {
+    if (!piece) return;
+    let teleporting = true;
+    const teleportInterval = setInterval(() => {
+        if (!teleporting || gameOver) return;
+        const newX = Math.floor(Math.random() * (board.columns - piece.shape[0].length + 1));
+        piece.position.x = newX;
+    }, interval);
+    setTimeout(() => {
+        teleporting = false;
+        clearInterval(teleportInterval);
+    }, duration);
+    updateGameInfo('Teleport: Your piece is jumping around!');
+}
+
 // Tarot card effects and descriptions
 var tarotEffects = {
     "The Fool": {
@@ -223,6 +396,49 @@ var tarotEffects = {
             updateGameInfo('The World brings a new piece into play!');
         },
         description: "Spawns a new piece immediately."
+    },
+
+    // --- Advanced Tarot Cards ---
+
+    "Morph": {
+        effect: function() { morphEffect(); },
+        description: "The active piece morphs into random shapes for a short time."
+    },
+    "Spin": {
+        effect: function() { spinEffect(); },
+        description: "The active piece spins randomly for a short time."
+    },
+    "Drift": {
+        effect: function() { driftEffect(); },
+        description: "The active piece drifts unpredictably for a short time."
+    },
+    "Fragment": {
+        effect: function() { fragmentEffect(); },
+        description: "The active piece breaks into fragments, then reforms."
+    },
+    "Phase": {
+        effect: function() { phaseEffect(); },
+        description: "The active piece can pass through blocks for a short time."
+    },
+    "Echo": {
+        effect: function() { echoEffect(); },
+        description: "A shadow follows the active piece, trailing its movements."
+    },
+    "Time Warp": {
+        effect: function() { timeWarpEffect(); },
+        description: "The fall speed of the active piece fluctuates wildly."
+    },
+    "Mirror": {
+        effect: function() { mirrorEffect(); },
+        description: "The board visuals are flipped horizontally for a short time."
+    },
+    "Weight": {
+        effect: function() { weightEffect(); },
+        description: "The active piece becomes heavy and falls rapidly."
+    },
+    "Teleport": {
+        effect: function() { teleportEffect(); },
+        description: "The active piece teleports to random columns for a short time."
     }
 };
 
@@ -242,7 +458,9 @@ Object.keys(tarotEffects).forEach(function(card) {
     };
 });
 
-// Initialize tarot deck with all Major Arcana
+/**
+ * Initialize tarot deck with all Major Arcana and advanced effects.
+ */
 function initializeTarotDeck() {
     tarotDeck = Object.keys(tarotEffects);
     console.info("Tarot deck initialized with all available cards.");

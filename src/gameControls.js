@@ -1,9 +1,26 @@
 import { piece, board, spawnPiece, holdPiece } from './gameLogic.js';
 import { updateScore } from './gameUI.js';
+import { tarotEffects, initializeTarotDeck } from './tarot.js';
+
+// Tarot deck state
+let tarotDeck = initializeTarotDeck();
 
 // Add event listeners for keyboard controls
 document.addEventListener('keydown', (event) => {
-    if (gameOver) return;
+    if (typeof gameOver !== "undefined" && gameOver) return;
+
+    // Tarot card activation: Number keys 1-4 (for available cards)
+    if (/^[1-4]$/.test(event.key)) {
+        const tarotNames = Object.keys(tarotEffects);
+        const idx = parseInt(event.key, 10) - 1;
+        if (tarotNames[idx]) {
+            const tarotName = tarotNames[idx];
+            if (tarotEffects[tarotName] && typeof tarotEffects[tarotName].effect === "function") {
+                tarotEffects[tarotName].effect();
+            }
+        }
+        return;
+    }
 
     switch (event.key) {
         case 'ArrowLeft':

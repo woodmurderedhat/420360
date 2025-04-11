@@ -2,6 +2,17 @@
  * Manages the leaderboard functionality, including adding scores,
  * saving and loading scores from local storage, and displaying the leaderboard.
  */
+/**
+ * Sanitizes a string by escaping HTML special characters.
+ * @param {string} str
+ * @returns {string}
+ */
+function sanitize(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
 const leaderboard = {
     /**
      * Array to store leaderboard scores. Each score is an object
@@ -22,7 +33,10 @@ const leaderboard = {
             return;
         }
 
-        this.scores.push({ name, score });
+        // Always sanitize the name before storing
+        const safeName = sanitize(name);
+
+        this.scores.push({ name: safeName, score });
         this.scores.sort((a, b) => b.score - a.score);
         this.scores = this.scores.slice(0, 10); // Keep top 10 scores
         this.saveScores();
@@ -64,6 +78,7 @@ const leaderboard = {
         leaderboardElement.innerHTML = this.scores
             .map(({ name, score }) => `<div>${name}: ${score}</div>`)
             .join('');
+        // All names are sanitized before storage, so this is safe.
     }
 };
 

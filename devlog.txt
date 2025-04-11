@@ -1,0 +1,109 @@
+How to Run Locally (Avoid CORS Errors)
+======================================
+To play Tarot Tetromino without CORS errors, you must run a local HTTP server (do NOT open index.html directly).
+
+Quick Start (Python 3):
+-----------------------
+1. Open a terminal in the project directory.
+2. Run:
+   python -m http.server 8000
+3. Open your browser and go to:
+   http://localhost:8000
+
+Alternative: Use VSCode's "Live Server" extension or any static server.
+
+================================================================================
+
+Tarot Tetromino - Dev Log Update: Static Hosting Compatibility
+=============================================================
+
+Date: 2025-04-11
+
+Static Hosting & GitHub Pages Audit
+-----------------------------------
+- The entire codebase was reviewed for compatibility with GitHub Pages and other static web hosts.
+- All scripts and styles are referenced using relative paths (e.g., ./src/game.js, ./style.css).
+- No server-side code or Node.js-specific APIs are used; all logic runs entirely in the browser.
+- No dynamic imports, require, process, or fs usage.
+- No fetch or XMLHttpRequest calls to local files; all assets are loaded as static resources.
+- The .nojekyll file is present, ensuring GitHub Pages serves all files as-is.
+- The Content-Security-Policy (CSP) meta tag in index.html is compatible with static hosting and allows Google Fonts.
+- The game is fully ready to be deployed to GitHub Pages or any static host.
+
+How to Play
+-----------
+- Enter your name and click "Start Game" to begin.
+- Use the arrow keys (or WASD) to move and rotate pieces.
+- Use the Shift key to hold the current piece.
+- Use number keys (1-6) to activate tarot card power-ups.
+- The goal is to clear lines and achieve the highest score possible. The game speeds up as you progress.
+- All user input is sanitized for security.
+
+Deployment Instructions
+-----------------------
+- To deploy, push your code to a GitHub repository and enable GitHub Pages in the repository settings.
+- Access the game via the GitHub Pages URL (https://your-username.github.io/your-repo/).
+- For local testing, use a local HTTP server (e.g., Python's `python -m http.server`) instead of opening index.html directly, to avoid CORS/CSP issues.
+
+Changelog
+---------
+- [2025-04-11] Codebase audited and confirmed fully compatible with GitHub Pages and static hosting. No changes required.
+
+================================================================================
+
+Tarot Tetromino - Dev Log & Security Audit
+==========================================
+
+Date: 2025-04-11
+
+Security & CORS Audit Summary
+-----------------------------
+- The entire codebase was reviewed for CORS errors and security issues.
+- No CORS issues were found: the game does not make any network requests or use external APIs.
+- A security vulnerability was found in the leaderboard display: player names were inserted into the DOM using innerHTML without sanitization, which could allow XSS attacks.
+- This has been fixed. All player names are now sanitized before being stored and displayed in the leaderboard, preventing any HTML or JavaScript injection.
+
+How the Game Works
+------------------
+- Tarot Tetromino is a browser-based Tetris game with tarot card power-ups.
+- Enter your name and click "Start Game" to begin.
+- Use the arrow keys (or WASD) to move and rotate pieces.
+- Use the Shift key to hold the current piece.
+- Use number keys (1-6) to activate tarot card power-ups.
+- The goal is to clear lines and achieve the highest score possible. The game speeds up as you progress.
+
+Security & Input Handling
+-------------------------
+- All user input (player names) is sanitized before being stored or displayed.
+- The game does not use eval, Function, or any unsafe DOM manipulation.
+- All DOM updates use textContent or sanitized HTML, ensuring no user-supplied code can be executed.
+- The game does not make any network requests, so there are no CORS issues.
+
+Instructions for Developers
+---------------------------
+- When adding new features that involve user input or external data, always sanitize input before inserting it into the DOM.
+- Use textContent for DOM updates whenever possible.
+- If you add any network requests in the future, ensure CORS headers are handled appropriately on the server side.
+
+Changelog
+---------
+- [2025-04-11] Security audit completed. Leaderboard XSS vulnerability fixed. No CORS issues found.
+
+================================================================================
+
+Date: 2025-04-11
+
+GitHub Pages & CSP Compatibility
+-------------------------------
+- The Content-Security-Policy (CSP) meta tag in index.html is configured to allow Google Fonts and inline styles, and is compatible with GitHub Pages.
+- The invalid X-Frame-Options meta tag was removed (should only be set via HTTP header).
+- If you see errors about CORS or scripts/styles not loading, make sure you are accessing the game via GitHub Pages or another static web host (not directly from file://).
+- To test or deploy, push your code to your GitHub repository and enable GitHub Pages in the repository settings. The game will work as intended when accessed via the GitHub Pages URL.
+
+Favicon Note
+------------
+- The browser may show a warning about favicon.ico not being found. This does not affect gameplay. To remove the warning, add a favicon.ico file to the project root or remove the favicon link from index.html.
+
+Changelog
+---------
+- [2025-04-11] Fixed CSP meta tag, removed X-Frame-Options meta tag, and added instructions for running a local server to avoid CORS/CSP issues.

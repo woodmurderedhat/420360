@@ -27,6 +27,19 @@ export function initializeGame() {
     updateScore();
     updateLevel();
     updateGameInfo('Game Initialized');
+
+    // Draw the board and the first piece immediately
+    const canvas = document.getElementById('game-canvas');
+    if (canvas) {
+        const context = canvas.getContext('2d');
+        if (context) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            board.draw(context);
+            if (piece && piece.draw) {
+                piece.draw(context);
+            }
+        }
+    }
 }
 
 export function holdPiece() {

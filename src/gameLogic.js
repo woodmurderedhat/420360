@@ -29,7 +29,7 @@ export function initializeGame() {
     updateGameInfo('Game Initialized');
 
     // Draw the board and the first piece immediately
-    const canvas = document.getElementById('game-canvas');
+    const canvas = document.getElementById('tetris');
     if (canvas) {
         const context = canvas.getContext('2d');
         if (context) {

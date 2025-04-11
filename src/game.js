@@ -525,6 +525,24 @@ function playTarotCard(cardIndex) {
 
     const card = playerHand[cardIndex];
     if (card && tarotEffects[card]) {
+        // Mystical activation effect
+        const tarotContainer = document.getElementById('tarot-container');
+        if (tarotContainer && tarotContainer.children[cardIndex]) {
+            const cardElem = tarotContainer.children[cardIndex];
+            cardElem.classList.add('activated');
+            setTimeout(() => {
+                cardElem.classList.remove('activated');
+            }, 700);
+        }
+        // Optional: Board glow effect
+        const boardEffects = document.getElementById('board-effects');
+        if (boardEffects) {
+            boardEffects.style.boxShadow = '0 0 3rem 1.5rem #ffaa00, 0 0 6rem 2rem #6e44ff';
+            boardEffects.style.transition = 'box-shadow 0.7s cubic-bezier(.4,2,.6,1)';
+            setTimeout(() => {
+                boardEffects.style.boxShadow = '';
+            }, 700);
+        }
         try {
             tarotEffects[card].effect(); // Execute the card's effect
         } catch (error) {
@@ -567,6 +585,9 @@ function updateTarotUI() {
 
         tarotContainer.appendChild(cardElement);
     });
+
+    // Tarot cards are always visible (no .game-started dependency)
+    tarotContainer.style.display = playerHand.length > 0 ? 'flex' : 'none';
 }
 
 // Helper function to check if a card is potentially bad

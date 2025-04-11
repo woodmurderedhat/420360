@@ -7,44 +7,36 @@
 
     <!-- Meta Tags for SEO and Social Media -->
     <meta name="description" content="A mystical twist on the classic Tetris game, combining strategy with the esoteric power of tarot cards.">
-    
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Tarot Tetromino">
     <meta property="og:description" content="A mystical Tetris game with tarot card influences.">
     <meta property="og:image" content="https://i0.wp.com/woodmurderedhat.com/social/wp-content/uploads/2025/03/image-55.jpg?w=1024&ssl=1">
     <meta property="og:url" content="https://woodmurderedhat.com">
-    
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="Tarot Tetromino">
     <meta property="twitter:description" content="Experience Tetris like never before with tarot cards!">
     <meta property="twitter:image" content="https://i0.wp.com/woodmurderedhat.com/social/wp-content/uploads/2025/03/image-55.jpg?w=1024&ssl=1">
-
-    <!-- Favicon -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <h1>Tarot Tetromino</h1>
-    <div id="tarot-container" role="region" aria-label="Tarot Cards">
-        <!-- Example tarot card structure -->
-        <div class="tarot-card">
-            <div class="title">The Fool</div>
-            <div class="description">Slows down the game speed, giving you more time to think.</div>
+    <!-- Tarot Card Dock: Always visible, responsive layout -->
+    <nav id="tarot-dock" aria-label="Tarot Cards">
+        <div id="tarot-container" role="region" aria-label="Tarot Cards">
+            <!-- Tarot cards will be dynamically rendered here -->
         </div>
-        <div class="tarot-card">
-            <div class="title">The Magician</div>
-            <div class="description">Doubles your current score, boosting your progress.</div>
-        </div>
-        <!-- Additional cards will be dynamically added here -->
-    </div>
+    </nav>
     <div id="player-info" role="region" aria-label="Player Info">
         <label for="player-name">Player Name:</label>
         <input type="text" id="player-name" placeholder="Enter your name" aria-label="Enter your name">
         <button id="start-game-button" class="button" aria-label="Start Game">Start Game</button>
+    </div>
+    <!-- Mobile panel toggle buttons (visible only on small screens) -->
+    <div id="mobile-panel-toggles">
+        <button id="toggle-left-panel" aria-controls="left-panel-overlay" aria-expanded="false">Info</button>
+        <button id="toggle-right-panel" aria-controls="right-panel-overlay" aria-expanded="false">Leaderboard</button>
     </div>
     <div id="game-layout">
         <div id="left-column" role="complementary" aria-label="Game Info">
@@ -53,6 +45,8 @@
             <div id="score" aria-live="polite">Score: 0</div>
         </div>
         <div id="middle-column" role="region" aria-label="Game Board">
+            <!-- Board Effects Overlay -->
+            <div id="board-effects"></div>
             <div id="canvas-wrapper" style="display: flex; justify-content: center; align-items: center; height: 100%;">
                 <canvas id="tetris" width="300" height="600" aria-label="Tetris Game Board"></canvas>
             </div>
@@ -68,9 +62,17 @@
             <div id="leaderboard" role="list" aria-label="Top Scores"></div>
         </div>
     </div>
+    <!-- Overlays for mobile panels -->
+    <div id="left-panel-overlay" class="panel-overlay" aria-modal="true" role="dialog" aria-label="Game Info" tabindex="-1">
+        <button class="close-panel" aria-label="Close Info Panel">&times;</button>
+        <div id="left-panel-content"></div>
+    </div>
+    <div id="right-panel-overlay" class="panel-overlay" aria-modal="true" role="dialog" aria-label="Leaderboard" tabindex="-1">
+        <button class="close-panel" aria-label="Close Leaderboard Panel">&times;</button>
+        <div id="right-panel-content"></div>
+    </div>
     <!-- Add fullscreen toggle button -->
     <button id="fullscreen-button" aria-label="Toggle Fullscreen">Fullscreen</button>
-    
     <div id="game-controls" role="region" aria-label="Game Controls">
         <h2>Game Controls</h2>
         <ul>
@@ -82,14 +84,80 @@
         <h2>How to Play</h2>
         <p>The goal of the game is to clear lines by arranging the falling pieces to form complete rows. Use the tarot cards to gain special abilities or overcome challenges. The game speeds up as you progress, so plan your moves carefully!</p>
     </div>
-    
     <noscript>
         <p style="color: red;">JavaScript is required to play this game. Please enable JavaScript in your browser.</p>
     </noscript>
-    
     <script src="src/board.js"></script>
     <script src="src/piece.js"></script>
     <script src="src/leaderboard.js"></script>
     <script src="src/game.js"></script>
+    <script>
+    // Mobile panel overlay logic
+    function isMobile() {
+        return window.matchMedia('(max-width: 600px)').matches;
+    }
+    function copyPanelContent(panelId, contentId) {
+        const src = document.getElementById(panelId);
+        const dest = document.getElementById(contentId);
+        if (src && dest) dest.innerHTML = src.innerHTML;
+    }
+    function openPanel(panel, btn) {
+        panel.style.display = 'block';
+        panel.setAttribute('aria-hidden', 'false');
+        btn.setAttribute('aria-expanded', 'true');
+        panel.focus();
+        document.body.style.overflow = 'hidden';
+    }
+    function closePanel(panel, btn) {
+        panel.style.display = 'none';
+        panel.setAttribute('aria-hidden', 'true');
+        btn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const leftBtn = document.getElementById('toggle-left-panel');
+        const rightBtn = document.getElementById('toggle-right-panel');
+        const leftOverlay = document.getElementById('left-panel-overlay');
+        const rightOverlay = document.getElementById('right-panel-overlay');
+        const leftClose = leftOverlay.querySelector('.close-panel');
+        const rightClose = rightOverlay.querySelector('.close-panel');
+        // Copy content on open for live updates
+        leftBtn.addEventListener('click', function() {
+            copyPanelContent('left-column', 'left-panel-content');
+            openPanel(leftOverlay, leftBtn);
+        });
+        rightBtn.addEventListener('click', function() {
+            copyPanelContent('right-column', 'right-panel-content');
+            openPanel(rightOverlay, rightBtn);
+        });
+        leftClose.addEventListener('click', function() {
+            closePanel(leftOverlay, leftBtn);
+        });
+        rightClose.addEventListener('click', function() {
+            closePanel(rightOverlay, rightBtn);
+        });
+        // Close on outside click
+        [leftOverlay, rightOverlay].forEach(function(panel) {
+            panel.addEventListener('click', function(e) {
+                if (e.target === panel) {
+                    closePanel(panel, panel === leftOverlay ? leftBtn : rightBtn);
+                }
+            });
+        });
+        // Hide overlays and toggles on desktop
+        function handleResize() {
+            if (!isMobile()) {
+                leftOverlay.style.display = 'none';
+                rightOverlay.style.display = 'none';
+                document.getElementById('mobile-panel-toggles').style.display = 'none';
+                document.body.style.overflow = '';
+            } else {
+                document.getElementById('mobile-panel-toggles').style.display = 'flex';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    });
+    </script>
 </body>
 </html>

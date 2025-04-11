@@ -210,6 +210,11 @@ var tarotEffects = {
                 previousDropInterval = null;
             }, 10000);
             updateGameInfo('The Fool slows time, giving you a moment to breathe.');
+            // Visual: CRT scanlines + blue glow
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('scanlines', 1000, { color: '#6e44ff' });
+                addTarotVisualEffect('neon-glow', 1000, { color: '#6e44ff' });
+            }
         },
         description: "Slows down the game speed for 10 seconds."
     },
@@ -218,6 +223,11 @@ var tarotEffects = {
             score *= 2;
             updateScore();
             updateGameInfo('The Magician doubles your score with a wave of magic!');
+            // Visual: Neon rainbow border + particle burst
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('neon-glow', 900, { color: '#ffdd57' });
+                addTarotVisualEffect('particle-burst', 900, { color: '#ffdd57' });
+            }
         },
         description: "Doubles your current score."
     },
@@ -238,6 +248,11 @@ var tarotEffects = {
             score += 500;
             updateScore();
             updateGameInfo('The Empress blesses you with 500 bonus points!');
+            // Visual: Gold coin burst
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('particle-burst', 900, { color: '#ffaa00' });
+                addTarotVisualEffect('flash', 400, { color: '#ffaa00' });
+            }
         },
         description: "Adds 500 bonus points to your score."
     },
@@ -433,11 +448,25 @@ var tarotEffects = {
     // --- Advanced Tarot Cards (with thematic names) ---
 
     "Wheel of Fortune Reversed": {
-        effect: function() { morphEffect(); },
+        effect: function() { 
+            morphEffect();
+            // Visual: Glitch + RGB split
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('flash', 400, { color: '#6e44ff' });
+                addTarotVisualEffect('scanlines', 1000, { color: '#6e44ff' });
+            }
+        },
         description: "Fate is fickle: The active piece morphs into random shapes for a short time."
     },
     "The Hanged Man Reversed": {
-        effect: function() { spinEffect(); },
+        effect: function() { 
+            spinEffect();
+            // Visual: Spiral background + motion blur
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('screen-shake', 800, { color: '#ffeb3b' });
+                addTarotVisualEffect('neon-glow', 800, { color: '#ffeb3b' });
+            }
+        },
         description: "Perspective shifts: The active piece spins randomly for a short time."
     },
     "The Star Reversed": {
@@ -445,31 +474,75 @@ var tarotEffects = {
         description: "Lost in the void: The active piece drifts unpredictably for a short time."
     },
     "The Tower Reversed": {
-        effect: function() { fragmentEffect(); },
+        effect: function() { 
+            fragmentEffect();
+            // Visual: Piece shatters, pixel dust
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('particle-burst', 1000, { color: '#fff' });
+                addTarotVisualEffect('flash', 400, { color: '#fff' });
+            }
+        },
         description: "Collapse averted: The active piece breaks into fragments, then reforms."
     },
     "The Moon Reversed": {
-        effect: function() { phaseEffect(); },
+        effect: function() { 
+            phaseEffect();
+            // Visual: Blue ghost glow
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('neon-glow', 1000, { color: '#00bcd4' });
+            }
+        },
         description: "Illusions fade: The active piece can pass through blocks for a short time."
     },
     "The High Priestess Reversed": {
-        effect: function() { echoEffect(); },
+        effect: function() { 
+            echoEffect();
+            // Visual: Afterimage trail
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('scanlines', 1000, { color: '#fff' });
+            }
+        },
         description: "Hidden knowledge: A shadow follows the active piece, trailing its movements."
     },
     "Temperance Reversed": {
-        effect: function() { timeWarpEffect(); },
+        effect: function() { 
+            timeWarpEffect();
+            // Visual: Wavy time distortion
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('flash', 400, { color: '#9c27b0' });
+                addTarotVisualEffect('scanlines', 1000, { color: '#9c27b0' });
+            }
+        },
         description: "Time unbalanced: The fall speed of the active piece fluctuates wildly."
     },
     "Justice Reversed": {
-        effect: function() { mirrorEffect(); },
+        effect: function() { 
+            mirrorEffect();
+            // Visual: Mirror ripple
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('flash', 400, { color: '#fff' });
+            }
+        },
         description: "Reflected fate: The board visuals are flipped horizontally for a short time."
     },
     "Strength Reversed": {
-        effect: function() { weightEffect(); },
+        effect: function() { 
+            weightEffect();
+            // Visual: Heavy impact, screen shake
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('screen-shake', 700, { color: '#ffaa00' });
+            }
+        },
         description: "Gravity shifts: The active piece becomes heavy and falls rapidly."
     },
     "The Fool Reversed": {
-        effect: function() { teleportEffect(); },
+        effect: function() { 
+            teleportEffect();
+            // Visual: Pixel dissolve + reappear
+            if (typeof addTarotVisualEffect === "function") {
+                addTarotVisualEffect('flash', 400, { color: '#6e44ff' });
+            }
+        },
         description: "Wild leap: The active piece teleports to random columns for a short time."
     }
 };

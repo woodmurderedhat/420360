@@ -6,53 +6,81 @@
     <title>Tarot Tetromino</title>
     <meta name="description" content="A mystical twist on the classic Tetris game with tarot card influences.">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cinzel+Decorative:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>Tarot Tetromino</h1>
-        <div id="player-info" role="region" aria-label="Player Info">
+    <!-- Arcade Banner Header -->
+    <header class="arcade-header metal-frame neon-glow">
+        <h1 class="arcade-title metal-text">Tarot Tetromino</h1>
+        <div id="player-info" class="metal-panel neon-glow" role="region" aria-label="Player Info">
             <label for="player-name">Player Name:</label>
             <input type="text" id="player-name" placeholder="Enter your name" aria-label="Enter your name">
-            <button id="start-game-button" class="button" aria-label="Start Game">Start Game</button>
+            <button id="start-game-button" class="button neon-btn" aria-label="Start Game">Start Game</button>
         </div>
-        <nav id="tarot-dock" aria-label="Tarot Cards">
-            <div id="tarot-container" role="region" aria-label="Tarot Cards"></div>
-        </nav>
     </header>
-    <main id="game-layout">
-        <section id="left-column" role="complementary" aria-label="Game Info">
-            <div id="game-info" aria-live="polite">Game Info: Waiting for player...</div>
-            <div id="level" aria-live="polite">Level: 1</div>
-            <div id="score" aria-live="polite">Score: 0</div>
-        </section>
-        <section id="middle-column" role="region" aria-label="Game Board">
+
+    <!-- Tarot Dock Sidebar / Topbar -->
+    <nav id="tarot-dock" class="metal-frame neon-glow" aria-label="Tarot Cards">
+        <div id="tarot-container" class="tarot-metal-panel" role="region" aria-label="Tarot Cards"></div>
+    </nav>
+
+    <!-- Main Game Layout -->
+    <main id="game-layout" class="arcade-layout">
+        <!-- Info Panel (Left) -->
+        <aside id="left-column" class="metal-panel neon-glow" role="complementary" aria-label="Game Info">
+            <div id="game-info" aria-live="polite" class="info-text">Game Info: Waiting for player...</div>
+            <div id="level" aria-live="polite" class="level-text">Level: 1</div>
+            <div id="score" aria-live="polite" class="score-text">Score: 0</div>
+            <div id="hold-panel" class="hold-metal-panel">
+                <h3>Hold</h3>
+                <div id="hold-container"></div>
+            </div>
+        </aside>
+
+        <!-- Game Board (Center) -->
+        <section id="middle-column" class="arcade-board metal-frame neon-glow" role="region" aria-label="Game Board">
             <div id="board-effects"></div>
-            <canvas id="tetris" width="300" height="600" aria-label="Tetris Game Board"></canvas>
-            <div id="mobile-controls" role="group" aria-label="Mobile Controls">
-                <button class="mobile-button" id="move-left" aria-label="Move Left">Left</button>
-                <button class="mobile-button" id="rotate" aria-label="Rotate Piece">Rotate</button>
-                <button class="mobile-button" id="move-right" aria-label="Move Right">Right</button>
-                <button class="mobile-button" id="move-down" aria-label="Move Down">Down</button>
+            <div id="canvas-wrapper" class="canvas-metal-frame">
+                <canvas id="tetris" width="300" height="600" aria-label="Tetris Game Board"></canvas>
+            </div>
+            <div id="mobile-controls" class="mobile-controls-metal" role="group" aria-label="Mobile Controls">
+                <button class="mobile-button neon-btn" id="move-left" aria-label="Move Left">Left</button>
+                <button class="mobile-button neon-btn" id="rotate" aria-label="Rotate Piece">Rotate</button>
+                <button class="mobile-button neon-btn" id="move-down" aria-label="Move Down">Down</button>
+                <button class="mobile-button neon-btn" id="move-right" aria-label="Move Right">Right</button>
             </div>
         </section>
-        <section id="right-column" role="complementary" aria-label="Leaderboard">
-            <h2>Leaderboard</h2>
-            <div id="leaderboard" role="list" aria-label="Top Scores"></div>
-        </section>
+
+        <!-- Leaderboard (Right) -->
+        <!-- Leaderboard moved to footer. Right column removed. -->
     </main>
-    <footer>
+
+    <!-- Arcade Footer with Leaderboard and Ads -->
+    <footer class="arcade-footer metal-frame neon-glow">
         <div class="footer-content">
             <a 
                 href="https://woodmurderedhat.com" 
-                class="footer-link" 
+                class="footer-link neon-link" 
                 target="_blank" 
                 rel="noopener"
                 aria-label="Visit woodmurderedhat.com"
             >
                 woodmurderedhat.com
             </a>
-            <section class="footer-faq" aria-label="Game FAQ">
+
+            <!-- Leaderboard in Footer -->
+            <section id="footer-leaderboard" class="metal-panel neon-glow pixel-font" aria-label="Leaderboard">
+                <h2 class="leaderboard-title metal-text">Leaderboard</h2>
+                <div id="leaderboard" class="leaderboard-list" role="list" aria-label="Top Scores"></div>
+            </section>
+
+            <!-- Dynamic Arcade/Metal Ads (injected by JS) -->
+            <!-- Sidebar ad container (for tarot dock/side) -->
+            <div id="sidebar-ad-container" aria-label="Sidebar Ads"></div>
+            <!-- Below gameboard ad container -->
+            <div id="below-board-ad-container" aria-label="Below Gameboard Ads"></div>
+
+            <section class="footer-faq metal-panel" aria-label="Game FAQ">
                 <h2>How to Play</h2>
                 <dl>
                     <dt><strong>How do I play?</strong></dt>
@@ -65,13 +93,16 @@
                     <dd>Use tarot cards wisely for powerful combos.</dd>
                 </dl>
             </section>
-            <button id="fullscreen-button" aria-label="Toggle Fullscreen">Fullscreen</button>
+            <button id="fullscreen-button" class="neon-btn" aria-label="Toggle Fullscreen">Fullscreen</button>
         </div>
     </footer>
+
+    <!-- Scripts -->
     <script src="src/board.js"></script>
     <script src="src/piece.js"></script>
     <script src="src/leaderboard.js"></script>
     <script src="src/tarot.js"></script>
+    <script src="src/arcadeads.js"></script>
     <script src="src/game.js"></script>
 </body>
 </html>

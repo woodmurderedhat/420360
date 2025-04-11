@@ -1,0 +1,62 @@
+/* --- Arcade Tarot Visual Effects (for future DOM overlays) --- */
+.crt-scanlines {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.12) 0px,
+        rgba(0,0,0,0.12) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    mix-blend-mode: multiply;
+    animation: crt-flicker 1.2s infinite linear;
+}
+@keyframes crt-flicker {
+    0%, 100% { opacity: 0.18; }
+    50% { opacity: 0.28; }
+}
+
+.neon-glow {
+    box-shadow: 0 0 2.5rem #ffaa00, 0 0 1.5rem #6e44ffcc, 0 0 0.5rem #fff4;
+    border-color: #ffdd57 !important;
+    animation: neon-pulse 0.7s infinite alternate;
+}
+@keyframes neon-pulse {
+    0% { box-shadow: 0 0 1rem #ffaa00, 0 0 0.5rem #6e44ff88; }
+    100% { box-shadow: 0 0 3rem #ffaa00, 0 0 2rem #6e44ff; }
+}
+
+.screen-shake {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes shake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-8px); }
+    40%, 60% { transform: translateX(8px); }
+}
+
+.particle-burst {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 120;
+    /* For future: use JS to animate particles */
+}
+
+.flash-effect {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 200;
+    background: rgba(255,255,255,0.5);
+    animation: flash-fade 0.5s linear forwards;
+}
+@keyframes flash-fade {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+/* --- End Arcade Tarot Visual Effects --- */

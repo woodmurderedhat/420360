@@ -1,0 +1,256 @@
+/* Tarot Dock - Arcade Metal/Neon Style */
+#tarot-dock {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    z-index: 1100;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    pointer-events: none;
+    background: transparent;
+    transition: background 0.3s;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#tarot-container, .tarot-metal-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding: 1.5rem 0.5rem 1.5rem 0.5rem;
+    background: var(--arcade-panel-bg);
+    border-radius: 1.5rem 0 0 1.5rem;
+    border-right: 3px solid var(--neon-yellow);
+    box-shadow: 0 0.5rem 2rem #000a, 0 0 2rem var(--neon-blue) inset, 0 0 1.2rem var(--neon-yellow);
+    pointer-events: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-width: 260px;
+    min-width: 180px;
+    width: 100%;
+    height: 90vh;
+    margin: 2vh 0 2vh 1vw;
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-yellow) #222;
+}
+
+#tarot-container::-webkit-scrollbar {
+    width: 0.6rem;
+    background: #222;
+}
+#tarot-container::-webkit-scrollbar-thumb {
+    background: var(--arcade-gradient);
+    border-radius: 0.7rem;
+    min-height: 2rem;
+    box-shadow: 0 0 0.5rem var(--neon-yellow);
+}
+
+/* Tarot Card - Arcade Neon/Metal */
+.tarot-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 9rem;
+    max-width: 12rem;
+    padding: 1.2rem 1.2rem 1.1rem 1.2rem;
+    background: linear-gradient(135deg, var(--metal-dark) 60%, var(--metal-blue) 100%);
+    color: #fffbe7;
+    border: 3px solid var(--neon-yellow);
+    border-radius: 1.2rem;
+    box-shadow: 0 0 2.2rem var(--neon-blue), 0 0 1.2rem var(--neon-yellow), 0 0 0.5rem #fff4;
+    text-align: center;
+    font-family: var(--arcade-font);
+    font-size: 1.08rem;
+    cursor: pointer;
+    transition: 
+        box-shadow 0.25s,
+        background 0.25s,
+        color 0.25s;
+    position: relative;
+    overflow: hidden;
+    outline: none;
+    backdrop-filter: blur(2.5px) saturate(1.2);
+    background-blend-mode: lighten;
+}
+.tarot-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 1.2rem;
+    pointer-events: none;
+    background: 
+        radial-gradient(circle at 60% 20%, #fff9 0%, var(--neon-yellow) 60%, transparent 100%),
+        repeating-linear-gradient(135deg, #fff2 0 2px, transparent 2px 8px);
+    opacity: 0.18;
+    z-index: 0;
+    animation: tarot-shimmer 3s infinite linear;
+    filter: blur(0.5px);
+}
+@keyframes tarot-shimmer {
+    0% { opacity: 0.12; }
+    50% { opacity: 0.22; }
+    100% { opacity: 0.12; }
+}
+.tarot-card:hover, .tarot-card:focus {
+    background: linear-gradient(135deg, var(--metal-blue) 60%, var(--neon-pink) 100%);
+    color: #fff;
+    box-shadow: 0 0 2.5rem var(--neon-yellow), 0 0 1.5rem var(--neon-blue);
+    z-index: 2;
+}
+.tarot-card:active {
+    box-shadow: 0 0 1rem var(--neon-yellow), 0 0 0.5rem var(--neon-blue);
+}
+.tarot-card .title {
+    font-family: var(--arcade-text);
+    font-size: 1.25rem;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 0.7rem var(--neon-yellow), 0 0 0.25rem #fff, 0 0 0.1rem var(--neon-blue);
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.07em;
+    z-index: 1;
+    line-height: 1.2;
+    filter: drop-shadow(0 0 2px #fff8);
+}
+.tarot-card .description {
+    font-size: 1.01rem;
+    color: #fffbe7;
+    margin-top: 0.7rem;
+    margin-bottom: 0.1rem;
+    text-align: left;
+    z-index: 1;
+    line-height: 1.45;
+    text-shadow: 0 0 0.3rem #1a1a2a, 0 0 0.1rem var(--neon-yellow);
+    background: rgba(30,20,40,0.18);
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.5rem 0.2rem 0.5rem;
+    box-shadow: 0 0 0.3rem var(--neon-yellow);
+    font-family: var(--arcade-font);
+    letter-spacing: 0.01em;
+}
+
+/* Tarot Card Activation Animation */
+.tarot-card.activated {
+    box-shadow: 0 0 3rem var(--neon-yellow), 0 0 2rem var(--neon-blue);
+    border-color: #fff;
+}
+
+/* Responsive Tarot Dock: Sidebar on desktop, scroll on mobile */
+@media (min-width: 1000px) {
+    #tarot-dock {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        background: none;
+        pointer-events: none;
+        z-index: 1200;
+        padding: 0;
+        margin: 0;
+    }
+    #tarot-container, .tarot-metal-panel {
+        flex-direction: column;
+        gap: 1.2rem;
+        padding: 2rem 0.75rem 2rem 0.75rem;
+        background: var(--arcade-panel-bg);
+        border-radius: 0 1.2rem 1.2rem 0;
+        border-right: 3px solid var(--neon-yellow);
+        border-bottom: none;
+        min-width: 220px;
+        max-width: 240px;
+        width: 100%;
+        height: auto;
+        max-height: 85vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        box-shadow: 0 0.25rem 1.2rem #000a, 0 0 1.2rem var(--neon-blue) inset;
+        pointer-events: auto;
+        margin: 3rem 0 0 0;
+    }
+    .tarot-card {
+        min-width: 180px;
+        max-width: 220px;
+        width: 100%;
+        margin-bottom: 1.2rem;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 1rem 0.5rem;
+        font-size: 1rem;
+        box-shadow: 0 0 0.8rem var(--neon-blue), 0 0 0.3rem var(--neon-yellow);
+    }
+}
+
+/* Responsive adjustments for tarot dock and cards */
+@media (max-width: 900px) {
+    #tarot-dock {
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: auto;
+        flex-direction: row;
+        align-items: flex-start;
+        background: none;
+    }
+    #tarot-container, .tarot-metal-panel {
+        flex-direction: row;
+        gap: 0.75rem;
+        padding: 1rem 1rem 0.5rem 1rem;
+        border-radius: 0 0 1.5rem 1.5rem;
+        border-right: none;
+        border-bottom: 3px solid var(--neon-yellow);
+        min-width: 0;
+        max-width: 95vw;
+        max-height: 12rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    .tarot-card {
+        min-width: 7rem;
+        max-width: 9rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 600px) {
+    #tarot-dock {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        z-index: 1100;
+        border-radius: 0 0 1.2rem 1.2rem;
+        background: rgba(20, 20, 30, 0.97);
+        box-shadow: 0 2px 16px var(--neon-blue);
+        padding: 0.5rem 0.2rem 0.7rem 0.2rem;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+    body {
+        padding-top: 5.5rem; /* Prevent overlap with tarot dock */
+    }
+    #tarot-container, .tarot-metal-panel {
+        flex-direction: row;
+        gap: 0.5rem;
+        padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+        border-radius: 0 0 1rem 1rem;
+        min-width: 0;
+        max-width: 100vw;
+        max-height: 8rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    .tarot-card {
+        min-width: 5.5rem;
+        max-width: 7rem;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.5rem;
+    }
+}

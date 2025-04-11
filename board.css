@@ -1,0 +1,262 @@
+/* Board Effects Overlay */
+#board-effects {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 10;
+    border-radius: var(--arcade-radius);
+}
+
+/* Arcade Metal Canvas Frame */
+.canvas-metal-frame {
+    background: var(--arcade-metal);
+    border-radius: var(--arcade-radius);
+    box-shadow: 0 0 2.5rem var(--neon-blue) inset, 0 0 1.5rem var(--neon-yellow);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+canvas {
+    border: 4px solid var(--neon-yellow);
+    border-radius: var(--arcade-radius);
+    box-shadow: 0 0 2.5rem var(--neon-blue), 0 0 1.5rem var(--neon-yellow), 0 0 0.5rem #fff4;
+    background-color: #222;
+    background-image: repeating-linear-gradient(135deg, #444 0 2px, #222 2px 8px);
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    aspect-ratio: 1/2;
+    transition: box-shadow 0.3s;
+}
+
+#game-layout, .arcade-layout {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1400px;
+    padding: 1.5rem 0.5rem;
+    margin: 0 auto;
+}
+
+#left-column, #right-column {
+    flex: 1 1 260px;
+    min-width: 180px;
+    max-width: 340px;
+    background: var(--arcade-panel-bg);
+    border-radius: var(--arcade-radius);
+    padding: 1.5rem 1.2rem;
+    box-shadow: var(--arcade-panel-glow);
+    margin: 0.5rem 0.5rem;
+    backdrop-filter: blur(8px) saturate(1.1);
+    border: 2.5px solid var(--metal-light);
+    color: var(--neon-yellow);
+    position: relative;
+    overflow: hidden;
+}
+
+#middle-column, .arcade-board {
+    flex: 2 1 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-width: 260px;
+    max-width: 700px;
+    background: var(--arcade-panel-bg);
+    border-radius: var(--arcade-radius);
+    padding: 2rem 1.5rem;
+    box-shadow: 0 0 2rem var(--neon-blue) inset, 0 0 2rem var(--neon-yellow);
+    margin: 0.5rem 0.5rem;
+    backdrop-filter: blur(8px) saturate(1.1);
+    border: 2.5px solid var(--metal-light);
+    color: var(--neon-yellow);
+    overflow: visible;
+}
+
+#mobile-controls, .mobile-controls-metal {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1.2rem;
+    width: 100%;
+    gap: 0.7rem;
+}
+
+.mobile-button, .mobile-controls-metal .mobile-button {
+    background: var(--arcade-gradient);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    font-size: 1.1rem;
+    font-family: var(--arcade-font);
+    cursor: pointer;
+    box-shadow: 0 0 1rem var(--neon-yellow), 0 0 0.5rem var(--neon-blue);
+    transition: background 0.3s, box-shadow 0.3s, color 0.2s;
+    outline: none;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+}
+.mobile-button:hover {
+    background: var(--neon-pink);
+    color: #fff;
+    box-shadow: 0 0 2rem var(--neon-pink), 0 0 1rem var(--neon-yellow);
+}
+
+/* Player Info Styles */
+#player-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#player-name {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid var(--neon-yellow);
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: 200px;
+    text-align: center;
+    background: #181818;
+    color: var(--neon-yellow);
+    box-shadow: 0 0 0.5rem var(--neon-yellow) inset;
+}
+
+#start-game-button {
+    background: var(--arcade-gradient);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+    box-shadow: 0 0 1rem var(--neon-yellow), 0 0 0.5rem var(--neon-blue);
+}
+#start-game-button:hover {
+    background: var(--neon-pink);
+    color: #fff;
+    box-shadow: 0 0 2rem var(--neon-pink), 0 0 1rem var(--neon-yellow);
+}
+
+/* Hold Panel */
+#hold-panel, .hold-metal-panel {
+    background: var(--arcade-metal);
+    border: 2px solid var(--metal-light);
+    border-radius: 0.7rem;
+    box-shadow: 0 0 1rem var(--neon-blue) inset;
+    margin-top: 1.2rem;
+    padding: 0.7rem 0.5rem;
+    color: var(--neon-yellow);
+    text-align: center;
+}
+#hold-panel h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: var(--neon-cyan);
+    letter-spacing: 0.04em;
+}
+
+#hold-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0.15rem;
+    min-height: 2.5rem;
+    min-width: 4.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Info/Score/Level Text */
+.info-text, .level-text, .score-text {
+    font-size: 1.1rem;
+    margin-bottom: 0.7rem;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 0.5rem var(--neon-yellow);
+    letter-spacing: 0.03em;
+}
+
+/* Responsive board layout for desktop */
+@media (min-width: 1000px) {
+    #game-layout, .arcade-layout {
+        margin-left: 270px;
+        max-width: calc(1400px - 270px);
+        padding-left: 1.5rem;
+    }
+    #middle-column, #left-column, #right-column, .arcade-board {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        padding: 2rem 2rem;
+        border-radius: 1.5rem;
+    }
+    .canvas-metal-frame {
+        max-width: 380px;
+    }
+}
+
+@media (max-width: 900px) {
+    #game-layout, .arcade-layout {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 0.7rem 0.2rem;
+    }
+    #middle-column, .arcade-board {
+        max-width: 100vw;
+        padding: 1.2rem 0.5rem;
+    }
+    .canvas-metal-frame {
+        max-width: 98vw;
+    }
+}
+
+@media (max-width: 600px) {
+    #game-layout, .arcade-layout {
+        padding: 0.2rem 0.1rem;
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+    #middle-column, .arcade-board {
+        padding: 0.7rem 0.1rem;
+        flex: 1 1 auto;
+        min-height: 60vh;
+        justify-content: flex-start;
+    }
+    .canvas-metal-frame {
+        padding: 0.2rem;
+        width: 100vw;
+        max-width: 100vw;
+        min-height: 60vh;
+        box-sizing: border-box;
+    }
+    #mobile-controls, .mobile-controls-metal {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100vw;
+        z-index: 1000;
+        background: rgba(20, 20, 30, 0.95);
+        padding: 0.5rem 0.2rem 1.2rem 0.2rem;
+        box-shadow: 0 -2px 16px var(--neon-blue);
+        border-top-left-radius: 1.2rem;
+        border-top-right-radius: 1.2rem;
+        justify-content: space-around;
+        gap: 0.7rem;
+    }
+    #mobile-controls .mobile-button:last-child {
+        margin-left: 1.5rem;
+    }
+    body {
+        padding-bottom: 5.5rem; /* Prevent overlap with controls */
+    }
+}

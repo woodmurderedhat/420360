@@ -1,12 +1,19 @@
-[4/11/2025]
-- Added Board.moveRowsUp(count): Moves all rows up by the specified count, removing from the top and adding empty rows at the bottom.
-- Added Board.addRandomGarbageRow(): Adds a random garbage row at the bottom with a single random hole, shifting the board up.
-- Updated "The Devil" tarot effect: Now moves all rows up by 1–3 rows using moveRowsUp for robust behavior.
-- Added "The Devil Reversed" tarot effect: Adds 1–3 random garbage rows at the bottom of the board, each with a random hole.
-- All tarot effects now use robust board methods and are safeguarded against game over.
+[2025-04-11] Mobile Controls & Layout Update
 
-Instructions for new tarot effects:
-- "The Devil": When played, all rows move up by 1–3 rows, making the board more difficult.
-- "The Devil Reversed": When played, 1–3 random garbage rows (with a single hole each) are added at the bottom, pushing the board up and increasing the challenge.
+- Moved the "Down" button next to the "Rotate" button in the mobile controls.
+- Moved the "Right" button to the far right, with extra spacing for clarity.
+- On mobile (≤600px wide):
+    - The control buttons now float at the bottom of the screen, always visible.
+    - The gameboard fills the available screen space.
+    - The tarot cards float at the very top of the screen, always visible.
+    - Extra padding is added to prevent overlap between controls, tarot dock, and the gameboard.
+- Improved responsive layout for a more immersive mobile experience.
 
-All tarot effects are now robust and properly integrated. Effects that move lines up or add lines at the bottom work as intended.
+**Mobile Controls Instructions:**
+- Use the on-screen buttons at the bottom to move and rotate pieces:
+    - Left: Move piece left
+    - Rotate: Rotate piece
+    - Down: Soft drop (move piece down)
+    - Right: Move piece right (spaced further right for easier thumb access)
+- Tarot cards are always accessible at the top of the screen.
+- The gameboard fills the screen for optimal play.

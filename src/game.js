@@ -300,6 +300,28 @@ function spawnPiece() {
     canHold = true;
 }
 
+/**
+ * Instantly drops the current piece to the bottom, merges it, clears lines, updates score, and spawns a new piece.
+ */
+function hardDropPiece() {
+    if (gameOver || !piece) return;
+    let dropDistance = 0;
+    while (piece.canMoveDown(board)) {
+        piece.moveDown();
+        dropDistance++;
+    }
+    board.mergePiece(piece);
+    const linesCleared = clearLines();
+    if (linesCleared > 0) {
+        score += calculateScore(linesCleared);
+        updateScore();
+    }
+    spawnPiece();
+    // Optionally, you could add a score bonus for hard drop distance:
+    // score += dropDistance * 2;
+    // updateScore();
+}
+
 let coyoteTime = 300; // 300ms coyote time
 let coyoteTimerActive = false;
 
@@ -389,134 +411,11 @@ function calculateScore(linesCleared) {
 }
 
 
-// Mobile controls
-const moveLeftButton = document.getElementById('move-left');
-const rotateButton = document.getElementById('rotate');
-const moveRightButton = document.getElementById('move-right');
-const moveDownButton = document.getElementById('move-down');
 
-if (moveLeftButton) {
-    moveLeftButton.addEventListener('click', () => {
-        if (!gameOver && piece.canMoveLeft(board)) {
-            piece.moveLeft();
-            updateScore();
-        }
-    });
-}
 
-if (rotateButton) {
-    rotateButton.addEventListener('click', () => {
-        if (!gameOver) {
-            piece.rotate(board);
-            if (board.collides(piece)) {
-                piece.undoRotate();
-            }
-            updateScore();
-        }
-    });
-}
 
-if (moveRightButton) {
-    moveRightButton.addEventListener('click', () => {
-        if (!gameOver && piece.canMoveRight(board)) {
-            piece.moveRight();
-            updateScore();
-        }
-    });
-}
 
-if (moveDownButton) {
-    moveDownButton.addEventListener('click', () => {
-        if (!gameOver && piece.canMoveDown(board)) {
-            piece.moveDown();
-            updateScore();
-        }
-    });
-}
 
-// Add event listener for fullscreen toggle
-const fullscreenButton = document.getElementById('fullscreen-button');
-if (fullscreenButton) {
-    fullscreenButton.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.error(`Error attempting to enable fullscreen mode: ${err.message}`);
-            });
-        } else {
-            document.exitFullscreen().catch(err => {
-                console.error(`Error attempting to exit fullscreen mode: ${err.message}`);
-            });
-        }
-    });
-} else {
-    console.warn("Fullscreen button not found.");
-}
-
-// Add event listeners for keyboard controls
-document.addEventListener('keydown', (event) => {
-    if (gameOver) return;
-
-    switch (event.key) {
-        case 'ArrowLeft': // Move left
-        case 'a':
-        case 'A':
-            if (piece.canMoveLeft(board)) {
-                piece.moveLeft();
-            }
-            break;
-        case 'ArrowRight': // Move right
-        case 'd':
-        case 'D':
-            if (piece.canMoveRight(board)) {
-                piece.moveRight();
-            }
-            break;
-        case 'ArrowDown': // Move down
-        case 's':
-        case 'S':
-            if (piece.canMoveDown(board)) {
-                piece.moveDown();
-            }
-            break;
-        case 'ArrowUp': // Rotate
-        case 'w':
-        case 'W':
-            piece.rotate(board);
-            if (board.collides(piece)) {
-                piece.undoRotate();
-            }
-            break;
-        case 'Shift': // Hold piece
-            holdPiece();
-            break;
-        case '1': // Play tarot card 1
-        case '2': // Play tarot card 2
-        case '3': // Play tarot card 3
-        case '4': // Play tarot card 4
-        case '5': // Play tarot card 5
-        case '6': // Play tarot card 6
-            const cardIndex = parseInt(event.key, 10) - 1;
-            playTarotCard(cardIndex);
-            break;
-        default:
-            break;
-    }
-
-    // Redraw the game board and piece after any movement
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    board.draw(context);
-    drawGhostPiece(context);
-    if (piece) {
-        piece.draw(context);
-    }
-});
-
-// Prevent arrow keys from scrolling the page
-window.addEventListener('keydown', (event) => {
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-        event.preventDefault();
-    }
-});
 
 // Dynamically adjust canvas size based on screen size
 function resizeCanvas() {

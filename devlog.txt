@@ -1,13 +1,23 @@
-[2025-04-11] Sidebar (Tarot Cards) Visibility Update:
-- The tarot sidebar (#tarot-dock) is now hidden by default and only becomes visible after the game is started.
-- When the game is over or before it starts, the sidebar remains hidden.
-- This is managed by toggling the "hidden" class on #tarot-dock in src/game.js:
-    - On game start: the "hidden" class is removed, showing the sidebar.
-    - On game over: the "hidden" class is added, hiding the sidebar.
-- The .hidden class is defined in style.css as "display: none !important;".
-- In index.html, #tarot-dock starts with class="hidden" so it is not visible until the game begins.
+[2025-04-11] Refactored controls logic out of src/game.js into src/gameControls.js for better maintainability.
+- All keyboard, mobile, and fullscreen controls are now handled in src/gameControls.js.
+- This change is fully compatible with file:// loading—no server or CORS issues.
+- index.html now loads src/gameControls.js before src/game.js.
 
-Instructions:
-- The sidebar with tarot cards will only be visible during active gameplay.
-- Players will not see the tarot sidebar until they enter their name and start the game.
-- When the game ends, the sidebar is hidden again.
+Controls Instructions:
+----------------------
+Keyboard Controls:
+- Move Left: ArrowLeft, A
+- Move Right: ArrowRight, D
+- Soft Drop: ArrowDown, S
+- Hard Drop: Shift + ArrowDown
+- Rotate: ArrowUp, W
+- Hold Piece: Shift (not combined with ArrowDown)
+- Play Tarot Card: 1-6 (number keys, if you have cards in hand)
+
+Mobile Controls:
+- Use the on-screen buttons below the game board for Left, Right, Down (hard drop), and Rotate.
+
+Other:
+- Fullscreen: Click the "Fullscreen" button in the footer.
+- Arrow keys are prevented from scrolling the page.
+- All controls work without needing to run a server.

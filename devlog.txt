@@ -1,19 +1,13 @@
-[2025-04-11] Mobile Controls & Layout Update
+[2025-04-11] Sidebar (Tarot Cards) Visibility Update:
+- The tarot sidebar (#tarot-dock) is now hidden by default and only becomes visible after the game is started.
+- When the game is over or before it starts, the sidebar remains hidden.
+- This is managed by toggling the "hidden" class on #tarot-dock in src/game.js:
+    - On game start: the "hidden" class is removed, showing the sidebar.
+    - On game over: the "hidden" class is added, hiding the sidebar.
+- The .hidden class is defined in style.css as "display: none !important;".
+- In index.html, #tarot-dock starts with class="hidden" so it is not visible until the game begins.
 
-- Moved the "Down" button next to the "Rotate" button in the mobile controls.
-- Moved the "Right" button to the far right, with extra spacing for clarity.
-- On mobile (≤600px wide):
-    - The control buttons now float at the bottom of the screen, always visible.
-    - The gameboard fills the available screen space.
-    - The tarot cards float at the very top of the screen, always visible.
-    - Extra padding is added to prevent overlap between controls, tarot dock, and the gameboard.
-- Improved responsive layout for a more immersive mobile experience.
-
-**Mobile Controls Instructions:**
-- Use the on-screen buttons at the bottom to move and rotate pieces:
-    - Left: Move piece left
-    - Rotate: Rotate piece
-    - Down: Soft drop (move piece down)
-    - Right: Move piece right (spaced further right for easier thumb access)
-- Tarot cards are always accessible at the top of the screen.
-- The gameboard fills the screen for optimal play.
+Instructions:
+- The sidebar with tarot cards will only be visible during active gameplay.
+- Players will not see the tarot sidebar until they enter their name and start the game.
+- When the game ends, the sidebar is hidden again.

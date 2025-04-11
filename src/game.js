@@ -260,6 +260,11 @@ if (startGameButton) {
             return;
         }
         document.body.classList.add('game-started');
+        // Show tarot sidebar
+        const tarotDock = document.getElementById('tarot-dock');
+        if (tarotDock) {
+            tarotDock.classList.remove('hidden');
+        }
         leaderboard.displayScores();
         initializeGame();
         requestAnimationFrame(update);
@@ -272,6 +277,11 @@ if (startGameButton) {
 function handleGameOver() {
     gameOver = true;
     updateGameInfo('Game Over');
+    // Hide tarot sidebar
+    const tarotDock = document.getElementById('tarot-dock');
+    if (tarotDock) {
+        tarotDock.classList.add('hidden');
+    }
     const playerName = playerNameInput.value.trim() || 'Player';
     leaderboard.addScore(playerName, score);
     leaderboard.displayScores();

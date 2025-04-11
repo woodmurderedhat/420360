@@ -4,3 +4,7 @@
 @import url("footer.css");
 @import url("panel.css");
 @import url("effects.css");
+
+.hidden {
+  display: none !important;
+}

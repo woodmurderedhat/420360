@@ -90,7 +90,7 @@ canvas {
 }
 
 .mobile-button, .mobile-controls-metal .mobile-button {
-    background: var(--arcade-gradient);
+    background: rgba(255, 0, 255, 0.3);
     color: #fff;
     border: none;
     border-radius: 0.5rem;
@@ -105,7 +105,7 @@ canvas {
     letter-spacing: 0.04em;
 }
 .mobile-button:hover {
-    background: var(--neon-pink);
+    background: rgba(255, 0, 255, 0.5);
     color: #fff;
     box-shadow: 0 0 2rem var(--neon-pink), 0 0 1rem var(--neon-yellow);
 }

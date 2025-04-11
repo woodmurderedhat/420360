@@ -1,12 +1,14 @@
-[2025-04-11]
-- Fixed the gameboard so it no longer resizes with the screen. The Tetris board is now always 300x600px for consistent gameplay.
-- Redesigned the sidebar (tarot dock) for desktop: it is now a sleek, fixed-width (260px) vertical sidebar with reduced padding, gap, and shadow. Tarot cards are more compact and the sidebar no longer crowds the gameboard.
-- Adjusted #game-layout margin to align with the new sidebar width.
+[2025-04-11] Refactored tarot logic out of src/game.js into src/tarot.js.
 
-How to Play:
-- Arrange falling tetromino pieces to form complete rows and clear lines.
-- Use the arrow keys to move pieces left, right, and down.
-- Use the up arrow or 'W' to rotate pieces.
-- Press Shift to hold the current piece.
-- Use number keys (1-6) to activate tarot cards for special abilities.
-- The game speeds up as you progress. Plan your moves and use tarot cards strategically!
+- All tarot deck, hand, effects, and tarot-related functions are now in src/tarot.js.
+- index.html loads src/tarot.js before src/game.js, so all tarot logic is available globally.
+- game.js now references the global tarot functions/variables (e.g., addTarotCardToHand, playTarotCard, updateTarotUI, etc.).
+- No import/export or modules are used, so the game works when opening index.html directly (no server or CORS issues).
+
+Instructions for tarot logic:
+- Tarot cards are drawn and managed via the global tarotDeck and playerHand.
+- Tarot card effects are defined in the global tarotEffects object.
+- To add new tarot cards or effects, edit src/tarot.js.
+- Tarot UI and card play logic are handled by updateTarotUI and playTarotCard, also in src/tarot.js.
+
+This refactor keeps game.js smaller and makes tarot logic easier to maintain.

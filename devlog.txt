@@ -1,3 +1,14 @@
+[2025-04-11] FIX: New games now always start with the default 7 tetriminoes.
+- When starting a new game, any extra tetriminoes unlocked by tarot effects in the previous game are cleared.
+- Only the standard 7 pieces (I, O, T, S, Z, J, L) are available at the start of each new game.
+- Tarot effects that unlock extra pieces will only affect the current game session.
+
+Tetrimino Unlock System:
+------------------------
+- By default, only the 7 classic tetriminoes are available.
+- Some tarot cards can unlock special tetrimino shapes for the rest of the current game.
+- When you start a new game, the unlocks are reset and only the default 7 are available again.
+
 [2025-04-11] Refactored controls logic out of src/game.js into src/gameControls.js for better maintainability.
 - All keyboard, mobile, and fullscreen controls are now handled in src/gameControls.js.
 - This change is fully compatible with file:// loading—no server or CORS issues.

@@ -234,6 +234,8 @@ updateLevel();
 
 // Improved game initialization
 function initializeGame() {
+    // Always reset unlocked tetriminoes to default at the start of a new game
+    window.unlockedTetrominoes = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
     score = 0;
     level = 1;
     linesClearedThisLevel = 0;

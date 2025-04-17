@@ -24,8 +24,7 @@ canvas {
     border: 4px solid var(--neon-yellow);
     border-radius: var(--arcade-radius);
     box-shadow: 0 0 2.5rem var(--neon-blue), 0 0 1.5rem var(--neon-yellow), 0 0 0.5rem #fff4;
-    background-color: #222;
-    background-image: repeating-linear-gradient(135deg, #444 0 2px, #222 2px 8px);
+    background-color: #000;
     width: 100%;
     max-width: 340px;
     height: auto;
@@ -83,69 +82,147 @@ canvas {
 
 #mobile-controls, .mobile-controls-metal {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     margin-top: 1.2rem;
     width: 100%;
     gap: 0.7rem;
+    padding: 0.8rem 0.5rem;
+    border-radius: 1rem;
+    background: rgba(35, 39, 43, 0.85);
+    backdrop-filter: blur(8px);
+}
+
+.mobile-controls-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 0.7rem;
+    margin-bottom: 0.5rem;
 }
 
 .mobile-button, .mobile-controls-metal .mobile-button {
-    background: rgba(255, 0, 255, 0.3);
+    background: rgba(110, 68, 255, 0.25);
     color: #fff;
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.7rem 1.2rem;
+    border: 2px solid var(--neon-yellow);
+    border-radius: 0.8rem;
+    padding: 0.8rem 0;
+    min-width: 3.5rem;
+    min-height: 3.5rem;
     font-size: 1.1rem;
     font-family: var(--arcade-font);
     cursor: pointer;
-    box-shadow: 0 0 1rem var(--neon-yellow), 0 0 0.5rem var(--neon-blue);
-    transition: background 0.3s, box-shadow 0.3s, color 0.2s;
+    box-shadow: 0 0 0.8rem var(--neon-blue), 0 0 0.4rem var(--neon-yellow);
+    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
     outline: none;
     font-weight: bold;
     letter-spacing: 0.04em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
 }
-.mobile-button:hover {
-    background: rgba(255, 0, 255, 0.5);
-    color: #fff;
-    box-shadow: 0 0 2rem var(--neon-pink), 0 0 1rem var(--neon-yellow);
+
+.mobile-button .icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+    text-shadow: 0 0 0.5rem var(--neon-yellow);
+}
+
+.mobile-button .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.mobile-button:active {
+    background: rgba(255, 46, 154, 0.5);
+    transform: scale(0.95);
+    box-shadow: 0 0 1.5rem var(--neon-pink), 0 0 0.8rem var(--neon-yellow);
+}
+
+.mobile-button::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+}
+
+.mobile-button:active::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.mobile-menu-row {
+    margin-top: 0.5rem;
+}
+
+.menu-button {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 0.8rem var(--neon-cyan), 0 0 0.4rem var(--neon-blue);
+}
+
+.menu-button:active {
+    background: rgba(0, 255, 247, 0.3);
+    box-shadow: 0 0 1.5rem var(--neon-cyan), 0 0 0.8rem var(--neon-blue);
+}
+
+/* Swipe overlay for touch gestures */
+.swipe-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: auto; /* Enable touch events */
+    background-color: transparent; /* Transparent background */
 }
 
 /* Player Info Styles */
 #player-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
     margin-bottom: 1rem;
+    padding: 0.8rem 1.2rem;
 }
 
-#player-name {
-    padding: 0.5rem;
-    font-size: 1rem;
-    border: 2px solid var(--neon-yellow);
-    border-radius: 0.5rem;
-    margin-bottom: 0.5rem;
-    width: 200px;
-    text-align: center;
-    background: #181818;
-    color: var(--neon-yellow);
-    box-shadow: 0 0 0.5rem var(--neon-yellow) inset;
-}
-
-#start-game-button {
+#restart-game-button {
     background: var(--arcade-gradient);
     color: #fff;
     border: none;
     border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
     box-shadow: 0 0 1rem var(--neon-yellow), 0 0 0.5rem var(--neon-blue);
+    font-weight: bold;
+    letter-spacing: 0.05em;
 }
-#start-game-button:hover {
+
+#restart-game-button:hover {
     background: var(--neon-pink);
     color: #fff;
     box-shadow: 0 0 2rem var(--neon-pink), 0 0 1rem var(--neon-yellow);
+    transform: translateY(-2px);
+}
+
+#restart-game-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 1rem var(--neon-pink), 0 0 0.5rem var(--neon-yellow);
 }
 
 /* Hold Panel */
@@ -246,17 +323,69 @@ canvas {
         width: 100vw;
         z-index: 1000;
         background: rgba(20, 20, 30, 0.95);
-        padding: 0.5rem 0.2rem 1.2rem 0.2rem;
+        backdrop-filter: blur(10px);
+        padding: 0.8rem 0.5rem 1.5rem 0.5rem;
         box-shadow: 0 -2px 16px var(--neon-blue);
-        border-top-left-radius: 1.2rem;
-        border-top-right-radius: 1.2rem;
-        justify-content: space-around;
+        border-top-left-radius: 1.5rem;
+        border-top-right-radius: 1.5rem;
         gap: 0.7rem;
     }
-    #mobile-controls .mobile-button:last-child {
-        margin-left: 1.5rem;
+    .mobile-controls-row {
+        justify-content: space-around;
+    }
+    .mobile-button, .mobile-controls-metal .mobile-button {
+        min-width: 3.2rem;
+        min-height: 3.2rem;
+    }
+    .mobile-button .icon {
+        font-size: 1.3rem;
+    }
+    .mobile-button .label {
+        font-size: 0.7rem;
     }
     body {
-        padding-bottom: 5.5rem; /* Prevent overlap with controls */
+        padding-bottom: 12rem; /* Prevent overlap with controls */
+    }
+
+    /* Adjust tarot dock for mobile */
+    #tarot-dock {
+        top: auto;
+        bottom: 12rem; /* Position above mobile controls */
+        height: auto;
+        max-height: 30vh;
+    }
+    #tarot-container, .tarot-metal-panel {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        max-height: 9rem;
+        padding: 0.5rem;
+    }
+    .tarot-card {
+        min-width: 6rem;
+        max-width: 7rem;
+        height: 8rem;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    .tarot-card .title {
+        font-size: 0.9rem;
+    }
+    .tarot-card .description {
+        font-size: 0.7rem;
+    }
+
+    /* Adjust objectives panel for mobile */
+    .objectives-panel {
+        top: auto;
+        bottom: 12rem; /* Position above mobile controls */
+        right: -250px;
+        width: 240px;
+        max-height: 30vh;
+        overflow-y: auto;
+    }
+    .toggle-objectives-btn {
+        top: auto;
+        bottom: 12rem; /* Position above mobile controls */
     }
 }

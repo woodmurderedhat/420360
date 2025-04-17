@@ -29,7 +29,7 @@ let lastTime = 0;
 const playerNameInput = document.getElementById('player-name');
 const scoreElement = document.getElementById('score');
 const gameInfoElement = document.getElementById('game-info');
-const startGameButton = document.getElementById('start-game-button');
+const restartGameButton = document.getElementById('restart-game-button');
 const levelElement = document.getElementById('level');
 
 // Hold feature
@@ -39,74 +39,228 @@ let canHold = true;
 // Initialize level display
 TarotTetris.updateLevel(levelElement);
 
-// Improved game initialization
+// Improved game initialization with modern UI
 function initializeGame() {
     // Always reset unlocked tetriminoes to default at the start of a new game
     window.unlockedTetrominoes = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
     TarotTetris.score = 0;
     TarotTetris.level = 1;
     TarotTetris.linesClearedThisLevel = 0;
+    TarotTetris.linesToLevelUp = 10;
     TarotTetris.dropInterval = 500;
     gameOver = false;
     TarotTetris.combo = 0;
     board.reset();
     initializeTarotDeck();
     playerHand = [];
+
+    // Reset hold piece
+    heldPiece = null;
+    canHold = true;
+    if (typeof TarotTetris.updateHoldUI === 'function') {
+        TarotTetris.updateHoldUI(null);
+    }
+
     spawnPiece();
     TarotTetris.updateScore(scoreElement);
     TarotTetris.updateLevel(levelElement);
     TarotTetris.updateGameInfo(gameInfoElement, 'Game Initialized');
     updateTarotUI();
     lastTime = performance.now();
+
+    // Hide any active overlays
+    if (typeof hideAllOverlays === 'function') {
+        hideAllOverlays();
+    }
+
+    // Initialize or update objectives panel
+    if (typeof createObjectivesPanel === 'function') {
+        createObjectivesPanel();
+    } else if (typeof updateObjectivesPanel === 'function') {
+        updateObjectivesPanel();
+    }
+
+    // Show game info message
+    TarotTetris.updateGameInfo(gameInfoElement, 'Game Started! Clear lines to level up.');
 }
 
-// Enhanced game start logic
-if (startGameButton) {
-    startGameButton.addEventListener('click', () => {
-        const playerName = playerNameInput.value.trim();
-        if (!playerName) {
-            alert('Please enter your name to start the game.');
-            return;
+// Enhanced game restart logic
+if (restartGameButton) {
+    restartGameButton.addEventListener('click', () => {
+        // Show confirmation dialog
+        if (confirm('Are you sure you want to restart the game? Your current progress will be lost.')) {
+            // Reset game state
+            gameOver = false;
+
+            // Show intro overlay again
+            if (typeof showIntroOverlay === 'function') {
+                showIntroOverlay();
+            } else {
+                // Reset game and start animation
+                initializeGame();
+                // Make sure the game is in started state
+                document.body.classList.add('game-started');
+                // Start animation loop
+                requestAnimationFrame(update);
+            }
         }
-        document.body.classList.add('game-started');
-        // Show tarot sidebar
-        const tarotDock = document.getElementById('tarot-dock');
-        if (tarotDock) {
-            tarotDock.classList.remove('hidden');
-        }
-        leaderboard.displayScores();
-        initializeGame();
-        requestAnimationFrame(update);
     });
 } else {
-    console.warn("Start game button not found.");
+    console.warn("Restart game button not found.");
 }
 
-// Improved game over handling
+// Hard drop function for mobile controls
+function hardDropPiece() {
+    if (typeof gameOver !== 'undefined' && gameOver) return;
+    if (typeof gamePaused !== 'undefined' && gamePaused) return;
+    if (typeof piece === 'undefined' || !piece) return;
+
+    // Drop the piece all the way down
+    while (piece.canMoveDown(board)) {
+        piece.moveDown();
+    }
+
+    // Lock the piece in place
+    board.mergePiece(piece);
+
+    // Clear lines and update score
+    const linesCleared = clearLines();
+    if (linesCleared > 0) {
+        TarotTetris.score += calculateScore(linesCleared);
+        TarotTetris.updateScore(scoreElement);
+
+        // Update objectives panel if it exists
+        if (typeof updateObjectivesPanel === 'function') {
+            updateObjectivesPanel();
+        }
+
+        // Check for level up
+        TarotTetris.linesClearedThisLevel += linesCleared;
+        if (TarotTetris.linesClearedThisLevel >= TarotTetris.linesToLevelUp) {
+            increaseLevel();
+        }
+    }
+
+    // Spawn a new piece
+    spawnPiece();
+}
+
+// Initialize game on first load
+document.addEventListener('DOMContentLoaded', () => {
+    // Show intro overlay on first load
+    if (typeof showIntroOverlay === 'function') {
+        showIntroOverlay();
+    } else {
+        // If intro overlay function is not available, prompt for player name
+        const playerName = prompt('Enter your name:', 'Player');
+        if (playerName && playerNameInput) {
+            playerNameInput.value = playerName.trim() || 'Player';
+        }
+        // Start the game
+        initializeGame();
+        requestAnimationFrame(update);
+    }
+
+    // Display leaderboard
+    if (typeof leaderboard !== 'undefined' && typeof leaderboard.displayScores === 'function') {
+        leaderboard.displayScores();
+    }
+
+    // Initialize touch controls if not already initialized
+    if (typeof initTouchControls === 'function') {
+        initTouchControls();
+    }
+
+    // Create objectives panel if available
+    if (typeof createObjectivesPanel === 'function') {
+        createObjectivesPanel();
+    }
+});
+
+// Start game function (called after countdown)
+function startGame() {
+    document.body.classList.add('game-started');
+    // Show tarot sidebar
+    const tarotDock = document.getElementById('tarot-dock');
+    if (tarotDock) {
+        tarotDock.classList.remove('hidden');
+    }
+
+    initializeGame();
+    requestAnimationFrame(update);
+}
+
+// Improved game over handling with modern overlay
 function handleGameOver() {
     gameOver = true;
     TarotTetris.updateGameInfo(gameInfoElement, 'Game Over');
+
     // Hide tarot sidebar
     const tarotDock = document.getElementById('tarot-dock');
     if (tarotDock) {
         tarotDock.classList.add('hidden');
     }
+
+    // Game is over
+
+    // Get player name from the hidden input (set during intro)
     const playerName = playerNameInput.value.trim() || 'Player';
-    leaderboard.addScore(playerName, TarotTetris.score);
-    leaderboard.displayScores();
-    alert(`Game Over! ${playerName}, your score: ${TarotTetris.score}`);
+
+    // Make sure the score is recorded to the leaderboard
+    if (typeof leaderboard !== 'undefined' && typeof leaderboard.addScore === 'function') {
+        leaderboard.addScore(playerName, TarotTetris.score);
+        // Update the displayed leaderboard
+        leaderboard.saveScores();
+        leaderboard.displayScores();
+        console.log(`Score recorded: ${playerName} - ${TarotTetris.score}`);
+    } else {
+        console.error('Leaderboard functionality not available');
+    }
+
+    // Show game over overlay instead of alert
+    if (typeof showGameOverOverlay === 'function') {
+        showGameOverOverlay(playerName, TarotTetris.score, TarotTetris.level);
+    } else {
+        alert(`Game Over! ${playerName}, your score: ${TarotTetris.score}`);
+    }
 }
 
 // Optimized piece spawning
 function spawnPiece() {
     piece = new TarotTetris.Piece();
     piece.position = { x: 3, y: 0 };
-    addTarotCardToHand();
+
+    // Add tarot card to hand if the function exists
+    if (typeof addTarotCardToHand === 'function') {
+        addTarotCardToHand();
+    }
 
     if (board.collides(piece) || board.isBoardFull()) {
         handleGameOver();
     }
     canHold = true;
+
+    // Make the hold piece function available globally
+    window.holdPiece = function() {
+        if (!canHold) return;
+
+        if (heldPiece) {
+            const temp = heldPiece;
+            heldPiece = piece;
+            piece = temp;
+            piece.position = { x: 3, y: 0 }; // Reset position
+        } else {
+            heldPiece = piece;
+            spawnPiece();
+        }
+
+        canHold = false; // Prevent holding multiple times in a row
+
+        // Update hold UI
+        if (typeof TarotTetris.updateHoldUI === 'function') {
+            TarotTetris.updateHoldUI(heldPiece);
+        }
+    };
 }
 
 /**
@@ -134,9 +288,18 @@ function hardDropPiece() {
 let coyoteTime = 300; // 300ms coyote time
 let coyoteTimerActive = false;
 
-// Enhanced update loop
+// Enhanced update loop with modern UI updates
 function update(time = 0) {
+    // Make update function available globally for restart functionality
+    window.update = update;
+    // Only return if gameOver is true and we're not in the process of restarting
     if (gameOver) return;
+
+    // Skip game logic if paused, but continue animation frame
+    if (typeof gamePaused !== 'undefined' && gamePaused) {
+        requestAnimationFrame(update);
+        return;
+    }
 
     const deltaTime = time - lastTime;
     if (deltaTime > TarotTetris.dropInterval) {
@@ -148,6 +311,17 @@ function update(time = 0) {
             if (linesCleared > 0) {
                 TarotTetris.score += calculateScore(linesCleared);
                 TarotTetris.updateScore(scoreElement);
+
+                // Update objectives panel if it exists
+                if (typeof updateObjectivesPanel === 'function') {
+                    updateObjectivesPanel();
+                }
+
+                // Check for level up
+                TarotTetris.linesClearedThisLevel += linesCleared;
+                if (TarotTetris.linesClearedThisLevel >= TarotTetris.linesToLevelUp) {
+                    increaseLevel();
+                }
             }
             spawnPiece();
         }
@@ -184,7 +358,9 @@ function update(time = 0) {
     }
 
     // --- Render tarot visual effects overlay ---
-    TarotTetris.renderTarotEffects(context);
+    if (typeof TarotTetris.renderTarotEffects === 'function') {
+        TarotTetris.renderTarotEffects(context);
+    }
 
     requestAnimationFrame(update);
 }
@@ -228,9 +404,28 @@ function increaseLevel() {
     TarotTetris.level++;
     TarotTetris.updateLevel(levelElement);
     TarotTetris.linesClearedThisLevel = 0;
+
+    // Increase lines needed for next level up (optional difficulty scaling)
+    TarotTetris.linesToLevelUp = Math.min(20, 10 + Math.floor(TarotTetris.level / 2));
+
     // Increase game speed (reduce drop interval)
     TarotTetris.dropInterval = Math.max(100, TarotTetris.dropInterval - 50);
     TarotTetris.updateGameInfo(gameInfoElement, `Level Up! New level: ${TarotTetris.level}`);
+
+    // Show level up overlay
+    if (typeof showLevelUpOverlay === 'function') {
+        showLevelUpOverlay(TarotTetris.level);
+    }
+
+    // Update objectives panel
+    if (typeof updateObjectivesPanel === 'function') {
+        updateObjectivesPanel();
+    }
+
+    // Add a bonus tarot card as a reward
+    if (typeof addTarotCardToHand === 'function') {
+        addTarotCardToHand();
+    }
 }
 
 function calculateScore(linesCleared) {

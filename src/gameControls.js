@@ -3,8 +3,42 @@
  * This file is safe for file:// loading (no import/export).
  */
 
-// --- Hard drop lockout for Shift+Down ---
+// --- Game control state variables ---
 let hardDropLocked = false;
+let gamePaused = false;
+
+// Pause/resume game function
+function togglePause() {
+    if (typeof gameOver !== "undefined" && gameOver) return;
+
+    gamePaused = !gamePaused;
+
+    if (gamePaused) {
+        // Show pause overlay if available
+        if (typeof showPauseOverlay === "function") {
+            showPauseOverlay();
+        }
+    } else {
+        // Hide pause overlay if available
+        if (typeof hideOverlay === "function") {
+            const pauseOverlay = document.getElementById('game-pause-overlay');
+            if (pauseOverlay) {
+                hideOverlay(pauseOverlay);
+            }
+        }
+    }
+
+    return gamePaused;
+}
+
+// Resume game function
+function resumeGame() {
+    if (gamePaused) {
+        gamePaused = false;
+        return true;
+    }
+    return false;
+}
 
 // Keyboard controls
 document.addEventListener('keydown', (event) => {
@@ -57,8 +91,24 @@ document.addEventListener('keydown', (event) => {
             }
             break;
         case 'Shift': // Hold piece (only if not combined with ArrowDown)
-            if (event.key === 'Shift' && !event.getModifierState('ArrowDown') && typeof holdPiece === "function") {
-                holdPiece();
+            if (event.key === 'Shift' && !event.getModifierState('ArrowDown') && typeof TarotTetris.holdPiece === "function") {
+                // Create state object for holdPiece
+                const holdState = {
+                    heldPiece: window.heldPiece,
+                    piece: window.piece,
+                    canHold: window.canHold,
+                    spawnPiece: window.spawnPiece,
+                    updateHoldUI: function() {
+                        if (typeof TarotTetris.updateHoldUI === "function") {
+                            TarotTetris.updateHoldUI(window.heldPiece);
+                        }
+                    }
+                };
+                TarotTetris.holdPiece(holdState);
+                // Update global variables
+                window.heldPiece = holdState.heldPiece;
+                window.piece = holdState.piece;
+                window.canHold = holdState.canHold;
             }
             break;
         case '1': case '2': case '3': case '4': case '5': case '6':
@@ -67,15 +117,53 @@ document.addEventListener('keydown', (event) => {
                 playTarotCard(cardIndex);
             }
             break;
+        case ' ': // Space bar for hard drop
+        case 'Space': // Some browsers use 'Space' instead of ' '
+            if (typeof hardDropPiece === "function") {
+                event.preventDefault(); // Prevent page scrolling
+                hardDropPiece();
+            }
+            break;
+        case 'p': case 'P': // Pause game
+            togglePause();
+            break;
+        case 'o': case 'O': // Show objectives
+            if (typeof showObjectivesOverlay === "function") {
+                showObjectivesOverlay();
+            }
+            break;
+        case 'c': case 'C': // Hold piece
+            if (typeof TarotTetris.holdPiece === "function") {
+                // Create state object for holdPiece
+                const holdState = {
+                    heldPiece: window.heldPiece,
+                    piece: window.piece,
+                    canHold: window.canHold,
+                    spawnPiece: window.spawnPiece,
+                    updateHoldUI: function() {
+                        if (typeof TarotTetris.updateHoldUI === "function") {
+                            TarotTetris.updateHoldUI(window.heldPiece);
+                        }
+                    }
+                };
+                TarotTetris.holdPiece(holdState);
+                // Update global variables
+                window.heldPiece = holdState.heldPiece;
+                window.piece = holdState.piece;
+                window.canHold = holdState.canHold;
+            }
+            break;
         default:
             break;
     }
 
     // Redraw the game board and piece after any movement
-    if (typeof context !== "undefined" && typeof board !== "undefined" && typeof drawGhostPiece === "function") {
+    if (typeof context !== "undefined" && typeof board !== "undefined") {
         context.clearRect(0, 0, canvas.width, canvas.height);
         board.draw(context);
-        drawGhostPiece(context);
+        if (typeof TarotTetris.drawGhostPiece === "function" && typeof piece !== "undefined") {
+            TarotTetris.drawGhostPiece(context, piece, board);
+        }
         if (typeof piece !== "undefined" && piece.draw) {
             piece.draw(context);
         }
@@ -93,10 +181,14 @@ document.addEventListener('keyup', (event) => {
     }
 });
 
-// Prevent arrow keys from scrolling the page
+// Prevent arrow keys and space bar from scrolling the page only during gameplay
 window.addEventListener('keydown', (event) => {
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-        event.preventDefault();
+    // Only prevent default if the game is active (not game over and not paused)
+    if (typeof gameOver !== "undefined" && !gameOver && typeof gamePaused !== "undefined" && !gamePaused) {
+        // Only prevent default for game control keys
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Space'].includes(event.key)) {
+            event.preventDefault();
+        }
     }
 });
 

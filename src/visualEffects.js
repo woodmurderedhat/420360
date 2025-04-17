@@ -81,7 +81,9 @@
                 case 'flash':
                     // Full screen flash
                     ctx.save();
-                    ctx.globalAlpha = 0.5 * (1 - t);
+                    // Slower fade out with easing
+                    const fadeAlpha = 0.5 * Math.pow(1 - t, 1.5); // Slower fade with power easing
+                    ctx.globalAlpha = fadeAlpha;
                     ctx.fillStyle = effect.options.color || '#fff';
                     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
                     ctx.globalAlpha = 1.0;

@@ -6,6 +6,9 @@
     <title>Tarot Tetromino</title>
     <meta name="description" content="A mystical twist on the classic Tetris game with tarot card influences.">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="overlays.css">
+    <link rel="stylesheet" href="objectives-panel.css">
+    <link rel="stylesheet" href="modern-tarot.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cinzel+Decorative:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -13,9 +16,7 @@
     <header class="arcade-header metal-frame neon-glow">
         <h1 class="arcade-title metal-text">Tarot Tetromino</h1>
         <div id="player-info" class="metal-panel neon-glow" role="region" aria-label="Player Info">
-            <label for="player-name">Player Name:</label>
-            <input type="text" id="player-name" placeholder="Enter your name" aria-label="Enter your name">
-            <button id="start-game-button" class="button neon-btn" aria-label="Start Game">Start Game</button>
+            <input type="hidden" id="player-name" value="Player">
         </div>
     </header>
 
@@ -44,11 +45,41 @@
                 <canvas id="tetris" width="300" height="600" aria-label="Tetris Game Board"></canvas>
             </div>
             <div id="mobile-controls" class="mobile-controls-metal" role="group" aria-label="Mobile Controls">
-                <button class="mobile-button neon-btn" id="move-left" aria-label="Move Left">Left</button>
-                <button class="mobile-button neon-btn" id="rotate" aria-label="Rotate Piece">Rotate</button>
-                <button class="mobile-button neon-btn" id="move-down" aria-label="Move Down">Down</button>
-                <button class="mobile-button neon-btn" id="move-right" aria-label="Move Right">Right</button>
+                <div class="mobile-controls-row">
+                    <button class="mobile-button neon-btn" id="hold-piece" aria-label="Hold Piece">
+                        <span class="icon">🔄</span>
+                        <span class="label">Hold</span>
+                    </button>
+                    <button class="mobile-button neon-btn" id="rotate" aria-label="Rotate Piece">
+                        <span class="icon">↻</span>
+                        <span class="label">Rotate</span>
+                    </button>
+                    <button class="mobile-button neon-btn" id="hard-drop" aria-label="Hard Drop">
+                        <span class="icon">⤓</span>
+                        <span class="label">Drop</span>
+                    </button>
+                </div>
+                <div class="mobile-controls-row">
+                    <button class="mobile-button neon-btn" id="move-left" aria-label="Move Left">
+                        <span class="icon">←</span>
+                    </button>
+                    <button class="mobile-button neon-btn" id="move-down" aria-label="Move Down">
+                        <span class="icon">↓</span>
+                    </button>
+                    <button class="mobile-button neon-btn" id="move-right" aria-label="Move Right">
+                        <span class="icon">→</span>
+                    </button>
+                </div>
+                <div class="mobile-controls-row mobile-menu-row">
+                    <button class="mobile-button menu-button" id="mobile-pause" aria-label="Pause Game">
+                        <span class="icon">⏸️</span>
+                    </button>
+                    <button class="mobile-button menu-button" id="mobile-objectives" aria-label="Show Objectives">
+                        <span class="icon">📋</span>
+                    </button>
+                </div>
             </div>
+            <div id="swipe-overlay" class="swipe-overlay" aria-hidden="true"></div>
         </section>
 
         <!-- Leaderboard (Right) -->
@@ -58,10 +89,10 @@
     <!-- Arcade Footer with Leaderboard and Ads -->
     <footer class="arcade-footer metal-frame neon-glow">
         <div class="footer-content">
-            <a 
-                href="https://woodmurderedhat.com" 
-                class="footer-link neon-link" 
-                target="_blank" 
+            <a
+                href="https://woodmurderedhat.com"
+                class="footer-link neon-link"
+                target="_blank"
                 rel="noopener"
                 aria-label="Visit woodmurderedhat.com"
             >
@@ -101,6 +132,8 @@
     <script src="src/board.js"></script>
     <script src="src/piece.js"></script>
     <script src="src/leaderboard.js"></script>
+    <script src="src/gameOverlays.js"></script>
+    <script src="src/objectivesPanel.js"></script>
     <script src="src/tarot.js"></script>
     <script src="src/arcadeads.js"></script>
     <script src="src/gameControls.js"></script>
@@ -108,6 +141,9 @@
     <script src="src/hold.js"></script>
     <script src="src/ghostPiece.js"></script>
     <script src="src/gameState.js"></script>
+    <script src="src/touchControls.js"></script>
     <script src="src/game.js"></script>
+
+    <!-- Game initialization is handled in game.js -->
 </body>
 </html>

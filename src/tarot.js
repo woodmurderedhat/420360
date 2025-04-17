@@ -114,10 +114,10 @@ function echoEffect(duration = 5000, delay = 4) {
     window.__echoActive = true;
     const echoInterval = setInterval(() => {
         if (!window.__echoActive || gameOver) return;
-        window.__echoTrail.push({ 
-            shape: piece.shape.map(row => row.slice()), 
-            position: { ...piece.position }, 
-            typeIndex: piece.typeIndex 
+        window.__echoTrail.push({
+            shape: piece.shape.map(row => row.slice()),
+            position: { ...piece.position },
+            typeIndex: piece.typeIndex
         });
         if (window.__echoTrail.length > delay) window.__echoTrail.shift();
     }, 50);
@@ -159,8 +159,8 @@ function mirrorEffect(duration = 4000) {
 function weightEffect(duration = 4000, heavy = true) {
     if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
     TarotTetris.setGameSpeed(heavy ? 100 : 1200);
-    setTimeout(function() { 
-        TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+    setTimeout(function() {
+        TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
         previousDropInterval = null;
     }, duration);
     updateGameInfo(heavy ? 'Weight: Your piece is heavy and falls fast!' : 'Weight: Your piece is light and floats!');
@@ -205,8 +205,8 @@ var tarotEffects = {
         effect: function() {
             if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
             TarotTetris.setGameSpeed(1000);
-            setTimeout(function() { 
-                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+            setTimeout(function() {
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
                 previousDropInterval = null;
             }, 10000);
             updateGameInfo('The Fool slows time, giving you a moment to breathe.');
@@ -235,8 +235,8 @@ var tarotEffects = {
         effect: function() {
             if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
             TarotTetris.setGameSpeed(TarotTetris.dropInterval / 2);
-            setTimeout(function() { 
-                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+            setTimeout(function() {
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
                 previousDropInterval = null;
             }, 10000);
             updateGameInfo('The High Priestess speeds up time, testing your reflexes.');
@@ -252,7 +252,7 @@ var tarotEffects = {
             // Visual: Gold coin burst
             if (typeof addTarotVisualEffect === "function") {
                 addTarotVisualEffect('particle-burst', 900, { color: '#ffaa00' });
-                addTarotVisualEffect('flash', 400, { color: '#ffaa00' });
+                addTarotVisualEffect('flash', 2000, { color: '#ffaa00' });
             }
         },
         description: "Adds 500 bonus points to your score."
@@ -289,8 +289,8 @@ var tarotEffects = {
         effect: function() {
             if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
             TarotTetris.setGameSpeed(TarotTetris.dropInterval / 3);
-            setTimeout(function() { 
-                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+            setTimeout(function() {
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
                 previousDropInterval = null;
             }, 5000);
             updateGameInfo('The Chariot races forward, greatly increasing speed for 5 seconds!');
@@ -302,8 +302,8 @@ var tarotEffects = {
         effect: function() {
             if (previousCoyoteTime === null) previousCoyoteTime = coyoteTime;
             coyoteTime = 2000;
-            setTimeout(function() { 
-                coyoteTime = previousCoyoteTime !== null ? previousCoyoteTime : 300; 
+            setTimeout(function() {
+                coyoteTime = previousCoyoteTime !== null ? previousCoyoteTime : 300;
                 previousCoyoteTime = null;
             }, 15000);
             updateGameInfo('Strength extends your coyote time, giving you more control.');
@@ -314,8 +314,8 @@ var tarotEffects = {
         effect: function() {
             if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
             TarotTetris.setGameSpeed(2000);
-            setTimeout(function() { 
-                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+            setTimeout(function() {
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
                 previousDropInterval = null;
             }, 15000);
             updateGameInfo('The Hermit slows the game significantly, offering solitude.');
@@ -342,8 +342,8 @@ var tarotEffects = {
         effect: function() {
             if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
             TarotTetris.setGameSpeed(TarotTetris.dropInterval * 2);
-            setTimeout(function() { 
-                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+            setTimeout(function() {
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
                 previousDropInterval = null;
             }, 10000);
             updateGameInfo('The Hanged Man slows the game drastically, testing your patience.');
@@ -404,8 +404,8 @@ var tarotEffects = {
         effect: function() {
             if (previousCoyoteTime === null) previousCoyoteTime = coyoteTime;
             coyoteTime = 1500;
-            setTimeout(function() { 
-                coyoteTime = previousCoyoteTime !== null ? previousCoyoteTime : 300; 
+            setTimeout(function() {
+                coyoteTime = previousCoyoteTime !== null ? previousCoyoteTime : 300;
                 previousCoyoteTime = null;
             }, 15000);
             updateGameInfo('The Star shines brightly, extending your coyote time.');
@@ -416,8 +416,8 @@ var tarotEffects = {
         effect: function() {
             if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
             TarotTetris.setGameSpeed(TarotTetris.dropInterval * 0.5);
-            setTimeout(function() { 
-                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+            setTimeout(function() {
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
                 previousDropInterval = null;
             }, 10000);
             updateGameInfo('The Moon slows time, giving you a moment to breathe.');
@@ -443,7 +443,7 @@ var tarotEffects = {
         effect: function() {
             // Add a flag to prevent recursive spawning
             if (window.__preventRecursiveSpawn) return;
-            
+
             window.__preventRecursiveSpawn = true;
             spawnPiece();
             setTimeout(function() {
@@ -457,18 +457,18 @@ var tarotEffects = {
     // --- Advanced Tarot Cards (with thematic names) ---
 
     "Wheel of Fortune Reversed": {
-        effect: function() { 
+        effect: function() {
             morphEffect();
             // Visual: Glitch + RGB split
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('flash', 400, { color: '#6e44ff' });
+                addTarotVisualEffect('flash', 2000, { color: '#6e44ff' });
                 addTarotVisualEffect('scanlines', 1000, { color: '#6e44ff' });
             }
         },
         description: "Fate is fickle: The active piece morphs into random shapes for a short time."
     },
     "The Hanged Man Reversed": {
-        effect: function() { 
+        effect: function() {
             spinEffect();
             // Visual: Spiral background + motion blur
             if (typeof addTarotVisualEffect === "function") {
@@ -483,18 +483,18 @@ var tarotEffects = {
         description: "Lost in the void: The active piece drifts unpredictably for a short time."
     },
     "The Tower Reversed": {
-        effect: function() { 
+        effect: function() {
             fragmentEffect();
             // Visual: Piece shatters, pixel dust
             if (typeof addTarotVisualEffect === "function") {
                 addTarotVisualEffect('particle-burst', 1000, { color: '#fff' });
-                addTarotVisualEffect('flash', 400, { color: '#fff' });
+                addTarotVisualEffect('flash', 2000, { color: '#fff' });
             }
         },
         description: "Collapse averted: The active piece breaks into fragments, then reforms."
     },
     "The Moon Reversed": {
-        effect: function() { 
+        effect: function() {
             phaseEffect();
             // Visual: Blue ghost glow
             if (typeof addTarotVisualEffect === "function") {
@@ -504,7 +504,7 @@ var tarotEffects = {
         description: "Illusions fade: The active piece can pass through blocks for a short time."
     },
     "The High Priestess Reversed": {
-        effect: function() { 
+        effect: function() {
             echoEffect();
             // Visual: Afterimage trail
             if (typeof addTarotVisualEffect === "function") {
@@ -514,28 +514,28 @@ var tarotEffects = {
         description: "Hidden knowledge: A shadow follows the active piece, trailing its movements."
     },
     "Temperance Reversed": {
-        effect: function() { 
+        effect: function() {
             timeWarpEffect();
             // Visual: Wavy time distortion
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('flash', 400, { color: '#9c27b0' });
+                addTarotVisualEffect('flash', 2000, { color: '#9c27b0' });
                 addTarotVisualEffect('scanlines', 1000, { color: '#9c27b0' });
             }
         },
         description: "Time unbalanced: The fall speed of the active piece fluctuates wildly."
     },
     "Justice Reversed": {
-        effect: function() { 
+        effect: function() {
             mirrorEffect();
             // Visual: Mirror ripple
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('flash', 400, { color: '#fff' });
+                addTarotVisualEffect('flash', 2000, { color: '#fff' });
             }
         },
         description: "Reflected fate: The board visuals are flipped horizontally for a short time."
     },
     "Strength Reversed": {
-        effect: function() { 
+        effect: function() {
             weightEffect();
             // Visual: Heavy impact, screen shake
             if (typeof addTarotVisualEffect === "function") {
@@ -545,11 +545,11 @@ var tarotEffects = {
         description: "Gravity shifts: The active piece becomes heavy and falls rapidly."
     },
     "The Fool Reversed": {
-        effect: function() { 
+        effect: function() {
             teleportEffect();
             // Visual: Pixel dissolve + reappear
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('flash', 400, { color: '#6e44ff' });
+                addTarotVisualEffect('flash', 2000, { color: '#6e44ff' });
             }
         },
         description: "Wild leap: The active piece teleports to random columns for a short time."
@@ -668,10 +668,10 @@ function safeBoardCall(methodName) {
 function addTarotCardToHand() {
     // Prevent recursive calls if we're already in the process of adding a card
     if (window.__addingTarotCard) return;
-    
+
     window.__addingTarotCard = true;
     var newCard = drawTarotCard();
-    
+
     if (playerHand.length < 6) {
         playerHand.push(newCard);
         updateTarotUI();
@@ -681,11 +681,11 @@ function addTarotCardToHand() {
         playerHand.push(newCard);
         updateTarotUI();
     }
-    
+
     window.__addingTarotCard = false;
 }
 
-// Play a tarot card
+// Play a tarot card with enhanced visual feedback
 function playTarotCard(cardIndex) {
     if (cardIndex < 0 || cardIndex >= playerHand.length) {
         console.warn("Invalid card index: " + cardIndex);
@@ -694,35 +694,100 @@ function playTarotCard(cardIndex) {
 
     var card = playerHand[cardIndex];
     if (card && tarotEffects[card]) {
+        // Find the card element
         var tarotContainer = document.getElementById('tarot-container');
-        if (tarotContainer && tarotContainer.children[cardIndex]) {
-            var cardElem = tarotContainer.children[cardIndex];
+        var cardElements = tarotContainer ? tarotContainer.querySelectorAll('.tarot-card') : [];
+        var cardElem = cardElements[cardIndex];
+
+        if (cardElem) {
+            // Create a clone for the animation
+            var cardClone = cardElem.cloneNode(true);
+            cardClone.style.position = 'fixed';
+            cardClone.style.zIndex = '2000';
+
+            // Get the position of the original card
+            var rect = cardElem.getBoundingClientRect();
+            cardClone.style.top = rect.top + 'px';
+            cardClone.style.left = rect.left + 'px';
+            cardClone.style.width = rect.width + 'px';
+            cardClone.style.height = rect.height + 'px';
+
+            // Add to body for animation
+            document.body.appendChild(cardClone);
+
+            // Add activated class for glow effect
             cardElem.classList.add('activated');
+            cardClone.classList.add('activated');
+
+            // Animate the clone to the center of the board
+            var boardRect = document.getElementById('tetris').getBoundingClientRect();
+            var boardCenterX = boardRect.left + boardRect.width / 2 - rect.width / 2;
+            var boardCenterY = boardRect.top + boardRect.height / 2 - rect.height / 2;
+
+            // Set transition and move
+            cardClone.style.transition = 'all 0.5s cubic-bezier(0.19, 1, 0.22, 1)';
             setTimeout(function() {
+                cardClone.style.transform = 'translate(' + (boardCenterX - rect.left) + 'px, ' + (boardCenterY - rect.top) + 'px) scale(1.2)';
+                cardClone.style.opacity = '0.9';
+            }, 10);
+
+            // Remove clone after animation
+            setTimeout(function() {
+                cardClone.style.opacity = '0';
+                cardClone.style.transform += ' scale(0.5)';
+            }, 600);
+
+            setTimeout(function() {
+                if (cardClone.parentNode) {
+                    cardClone.parentNode.removeChild(cardClone);
+                }
                 cardElem.classList.remove('activated');
-            }, 700);
+            }, 1000);
         }
+
+        // Add board effects
         var boardEffects = document.getElementById('board-effects');
         if (boardEffects) {
             boardEffects.style.boxShadow = '0 0 3rem 1.5rem #ffaa00, 0 0 6rem 2rem #6e44ff';
             boardEffects.style.transition = 'box-shadow 0.7s cubic-bezier(.4,2,.6,1)';
+
+            // Create a flash effect
+            var flashEffect = document.createElement('div');
+            flashEffect.className = 'flash-effect';
+            boardEffects.appendChild(flashEffect);
+
             setTimeout(function() {
                 boardEffects.style.boxShadow = '';
-            }, 700);
+                if (flashEffect.parentNode) {
+                    flashEffect.parentNode.removeChild(flashEffect);
+                }
+            }, 2000);
         }
+
+        // Show card name in game info
+        updateGameInfo('Activating: ' + card);
+
+        // Execute card effect
         try {
             tarotEffects[card].effect();
         } catch (error) {
             console.error('Error executing effect for card "' + card + '":', error);
         }
+
+        // Remove card from hand and update UI
         playerHand.splice(cardIndex, 1);
         updateTarotUI();
+
+        // Update objectives panel if it exists
+        if (typeof updateObjectivesPanel === 'function') {
+            updateObjectivesPanel();
+        }
     } else {
         console.warn('Card "' + card + '" has no defined effect.');
     }
 }
 
-// Update the tarot card UI dynamically
+// Update the tarot card UI dynamically with modern enhancements
 function updateTarotUI() {
     var tarotContainer = document.getElementById('tarot-container');
     if (!tarotContainer) {
@@ -730,10 +795,79 @@ function updateTarotUI() {
         return;
     }
 
-    tarotContainer.innerHTML = '';
+    // Add header if it doesn't exist
+    if (!document.querySelector('.tarot-dock-header')) {
+        var headerElement = document.createElement('div');
+        headerElement.className = 'tarot-dock-header';
+        headerElement.innerHTML = `
+            <h3>Tarot Cards</h3>
+            <button class="tarot-dock-toggle" aria-label="Close Tarot Dock">×</button>
+        `;
+        tarotContainer.appendChild(headerElement);
+
+        // Add event listener to toggle button
+        var toggleButton = headerElement.querySelector('.tarot-dock-toggle');
+        if (toggleButton) {
+            toggleButton.addEventListener('click', function() {
+                var tarotDock = document.getElementById('tarot-dock');
+                if (tarotDock) {
+                    tarotDock.classList.add('hidden');
+                }
+            });
+        }
+
+        // Add floating toggle button for mobile
+        if (!document.querySelector('.tarot-toggle-btn')) {
+            var toggleBtn = document.createElement('button');
+            toggleBtn.className = 'tarot-toggle-btn';
+            toggleBtn.setAttribute('aria-label', 'Toggle Tarot Cards');
+            toggleBtn.innerHTML = '<span class="icon">🃏</span>';
+            document.body.appendChild(toggleBtn);
+
+            // Add event listener to floating toggle button
+            toggleBtn.addEventListener('click', function() {
+                var tarotDock = document.getElementById('tarot-dock');
+                if (tarotDock) {
+                    tarotDock.classList.toggle('hidden');
+                }
+            });
+        }
+
+        // Add counter element
+        var counterElement = document.createElement('div');
+        counterElement.className = 'tarot-counter';
+        counterElement.innerHTML = `
+            <span>Cards in Hand: <span id="card-count">0</span></span>
+            <span>Deck: <span id="deck-count">0</span></span>
+        `;
+        tarotContainer.appendChild(counterElement);
+    }
+
+    // Update counter
+    var cardCountElement = document.getElementById('card-count');
+    var deckCountElement = document.getElementById('deck-count');
+    if (cardCountElement) cardCountElement.textContent = playerHand.length;
+    if (deckCountElement) deckCountElement.textContent = tarotDeck.length;
+
+    // Remove existing cards
+    var existingCards = tarotContainer.querySelectorAll('.tarot-card');
+    existingCards.forEach(function(card) {
+        tarotContainer.removeChild(card);
+    });
+
+    // Add cards
     playerHand.forEach(function(card, index) {
         var cardElement = document.createElement('div');
         cardElement.className = 'tarot-card';
+
+        // Add card type class
+        if (card.indexOf('Reversed') !== -1) {
+            cardElement.classList.add('reversed');
+        } else if (Object.keys(minorArcanaUnlocks).includes(card)) {
+            cardElement.classList.add('minor-arcana');
+        } else {
+            cardElement.classList.add('major-arcana');
+        }
 
         var titleElement = document.createElement('div');
         titleElement.className = 'title';
@@ -743,8 +877,14 @@ function updateTarotUI() {
         descriptionElement.className = 'description';
         descriptionElement.textContent = tarotEffects[card] && tarotEffects[card].description ? tarotEffects[card].description : 'No description available';
 
+        // Add tooltip for more information
+        var tooltipElement = document.createElement('div');
+        tooltipElement.className = 'tooltip';
+        tooltipElement.textContent = 'Click to activate this card\'s effect';
+
         cardElement.appendChild(titleElement);
         cardElement.appendChild(descriptionElement);
+        cardElement.appendChild(tooltipElement);
 
         cardElement.addEventListener('click', function() {
             playTarotCard(index);
@@ -753,7 +893,15 @@ function updateTarotUI() {
         tarotContainer.appendChild(cardElement);
     });
 
-    tarotContainer.style.display = playerHand.length > 0 ? 'flex' : 'none';
+    // Show/hide tarot dock based on card count
+    var tarotDock = document.getElementById('tarot-dock');
+    if (tarotDock) {
+        if (playerHand.length > 0) {
+            tarotDock.classList.remove('hidden');
+        } else {
+            tarotDock.classList.add('hidden');
+        }
+    }
 }
 
 // Helper function to check if a card is potentially bad
@@ -787,14 +935,14 @@ function drawTarotCard() {
         console.warn("Tarot deck is empty. Reinitializing deck.");
         initializeTarotDeck();
     }
-    
+
     // Create a copy of the deck before sorting to avoid modifying the original
     var deckCopy = [...tarotDeck];
     deckCopy.sort(function() { return Math.random() - 0.5; });
-    
+
     var randomIndex = Math.floor(Math.random() * tarotDeck.length);
     var card = tarotDeck.splice(randomIndex, 1)[0];
-    
+
     // If we're down to 25% of cards, reinitialize the deck
     if (tarotDeck.length < Object.keys(tarotEffects).length * 0.25) {
         console.info("Tarot deck running low. Reinitializing.");
@@ -802,7 +950,7 @@ function drawTarotCard() {
         // Remove the card we just drew to prevent duplicates
         tarotDeck = tarotDeck.filter(c => c !== card);
     }
-    
+
     return card;
 }
 

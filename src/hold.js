@@ -27,6 +27,7 @@
         }
         holdContainer.innerHTML = '';
         if (heldPiece) {
+            const colors = ['#ff5722', '#4caf50', '#2196f3', '#ffeb3b', '#9c27b0', '#00bcd4', '#e91e63']; // Color palette
             heldPiece.shape.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value) {
@@ -34,7 +35,7 @@
                         block.style.gridRowStart = y + 1;
                         block.style.gridColumnStart = x + 1;
                         block.className = 'block';
-                        block.style.backgroundColor = '#ff5722'; // Example color
+                        block.style.backgroundColor = colors[heldPiece.typeIndex % colors.length];
                         holdContainer.appendChild(block);
                     }
                 });

@@ -1,34 +1,11 @@
-[2025-04-11] FIX: New games now always start with the default 7 tetriminoes.
-- When starting a new game, any extra tetriminoes unlocked by tarot effects in the previous game are cleared.
-- Only the standard 7 pieces (I, O, T, S, Z, J, L) are available at the start of each new game.
-- Tarot effects that unlock extra pieces will only affect the current game session.
+[2025-04-12] Fixed ReferenceError in "The Hanged Man" tarot card effect.
+- The effect now uses TarotTetris.dropInterval and TarotTetris.setGameSpeed to adjust game speed, matching the rest of the codebase.
+- This prevents errors when playing "The Hanged Man" card.
 
-Tetrimino Unlock System:
-------------------------
-- By default, only the 7 classic tetriminoes are available.
-- Some tarot cards can unlock special tetrimino shapes for the rest of the current game.
-- When you start a new game, the unlocks are reset and only the default 7 are available again.
+How "The Hanged Man" tarot card works:
+- When played, the game speed (piece drop interval) is drastically slowed for 10 seconds, making pieces fall much slower.
+- After 10 seconds, the game speed returns to its previous value.
 
-[2025-04-11] Refactored controls logic out of src/game.js into src/gameControls.js for better maintainability.
-- All keyboard, mobile, and fullscreen controls are now handled in src/gameControls.js.
-- This change is fully compatible with file:// loading—no server or CORS issues.
-- index.html now loads src/gameControls.js before src/game.js.
-
-Controls Instructions:
-----------------------
-Keyboard Controls:
-- Move Left: ArrowLeft, A
-- Move Right: ArrowRight, D
-- Soft Drop: ArrowDown, S
-- Hard Drop: Shift + ArrowDown
-- Rotate: ArrowUp, W
-- Hold Piece: Shift (not combined with ArrowDown)
-- Play Tarot Card: 1-6 (number keys, if you have cards in hand)
-
-Mobile Controls:
-- Use the on-screen buttons below the game board for Left, Right, Down (hard drop), and Rotate.
-
-Other:
-- Fullscreen: Click the "Fullscreen" button in the footer.
-- Arrow keys are prevented from scrolling the page.
-- All controls work without needing to run a server.
+To play a tarot card:
+- Click a tarot card in your hand (displayed at the bottom of the game UI).
+- The card's effect will activate immediately and be logged in the game info panel.

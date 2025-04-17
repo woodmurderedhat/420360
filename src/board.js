@@ -1,3 +1,4 @@
+(function(exports) {
 class Board {
     /**
      * Constructs a new Board instance.
@@ -69,8 +70,12 @@ class Board {
             return true; // Treat as collision to prevent further errors
         }
 
+        // If phase effect is active, pieces can pass through blocks (but not boundaries)
+        const phaseActive = window.__phaseActive === true;
+
         const coordinates = piece.getCoordinates();
         for (let coord of coordinates) {
+            // Always check boundaries, even with phase effect
             if (coord.x < 0 || coord.x >= this.columns || coord.y >= this.rows || coord.y < 0) {
                 return true;
             }
@@ -82,7 +87,8 @@ class Board {
                 console.warn(`Potential out-of-bounds access at y: ${coord.y}, x: ${coord.x}`);
                 return true; // Treat as collision to prevent errors
             }
-            if (this.grid[coord.y][coord.x] !== 0) {
+            // Skip block collision check if phase effect is active
+            if (!phaseActive && this.grid[coord.y][coord.x] !== 0) {
                 return true;
             }
         }
@@ -99,6 +105,17 @@ class Board {
             return;
         }
         const colors = ['#ff5722', '#4caf50', '#2196f3', '#ffeb3b', '#9c27b0', '#00bcd4', '#e91e63']; // Color palette
+
+        // Check if mirror effect is active
+        const mirrorActive = window.__mirrorActive === true;
+
+        // If mirror effect is active, save the canvas state and apply a horizontal flip
+        if (mirrorActive) {
+            ctx.save();
+            ctx.translate(this.columns * 30, 0);
+            ctx.scale(-1, 1);
+        }
+
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.columns; col++) {
                 const cellValue = this.grid[row][col];
@@ -107,6 +124,11 @@ class Board {
                 ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
                 ctx.strokeRect(col * 30, row * 30, 30, 30);
             }
+        }
+
+        // Restore the canvas state if mirror effect was applied
+        if (mirrorActive) {
+            ctx.restore();
         }
     }
 
@@ -210,6 +232,21 @@ class Board {
     }
 
     /**
+     * Clears a specified number of rows from the top of the board.
+     * @param {number} count - The number of rows to clear.
+     */
+    clearTopRows(count) {
+        if (!this.grid) {
+            console.warn("Grid is undefined in clearTopRows.");
+            return;
+        }
+        for (let i = 0; i < count; i++) {
+            this.grid.shift();
+            this.grid.push(Array(this.columns).fill(0));
+        }
+    }
+
+    /**
      * Clears a random row on the board.
      */
     clearRandomRow() {
@@ -257,10 +294,18 @@ class Board {
             return false;
         }
 
+        // If phase effect is active, pieces can pass through blocks (but not boundaries)
+        const phaseActive = window.__phaseActive === true;
+
         const coordinates = piece.getCoordinates();
         for (let coord of coordinates) {
             const newY = coord.y + 1;
-            if (newY >= this.rows || this.grid[newY][coord.x] !== 0) {
+            // Always check boundaries
+            if (newY >= this.rows) {
+                return false;
+            }
+            // Skip block collision check if phase effect is active
+            if (!phaseActive && this.grid[newY][coord.x] !== 0) {
                 return false;
             }
         }
@@ -278,10 +323,18 @@ class Board {
             return false;
         }
 
+        // If phase effect is active, pieces can pass through blocks (but not boundaries)
+        const phaseActive = window.__phaseActive === true;
+
         const coordinates = piece.getCoordinates();
         for (let coord of coordinates) {
             const newX = coord.x - 1;
-            if (newX < 0 || this.grid[coord.y][newX] !== 0) {
+            // Always check boundaries
+            if (newX < 0) {
+                return false;
+            }
+            // Skip block collision check if phase effect is active
+            if (!phaseActive && this.grid[coord.y][newX] !== 0) {
                 return false;
             }
         }
@@ -299,13 +352,25 @@ class Board {
             return false;
         }
 
+        // If phase effect is active, pieces can pass through blocks (but not boundaries)
+        const phaseActive = window.__phaseActive === true;
+
         const coordinates = piece.getCoordinates();
         for (let coord of coordinates) {
             const newX = coord.x + 1;
-            if (newX >= this.columns || this.grid[coord.y][newX] !== 0) {
+            // Always check boundaries
+            if (newX >= this.columns) {
+                return false;
+            }
+            // Skip block collision check if phase effect is active
+            if (!phaseActive && this.grid[coord.y][newX] !== 0) {
                 return false;
             }
         }
         return true;
     }
 }
+
+// Export Board to the TarotTetris namespace
+exports.Board = Board;
+})(window.TarotTetris = window.TarotTetris || {});

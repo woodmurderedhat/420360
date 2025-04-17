@@ -1,10 +1,8 @@
-/**
- * Represents a Tetris piece.
- */
+(function(exports) {
 /**
  * All possible tetromino definitions (standard + esoteric).
  */
-window.ALL_TETROMINOES = {
+exports.ALL_TETROMINOES = {
     I: { shape: [[1, 1, 1, 1]], score: 40 },
     O: { shape: [[1, 1], [1, 1]], score: 30 },
     T: { shape: [[0, 1, 0], [1, 1, 1]], score: 50 },
@@ -46,13 +44,13 @@ class Piece {
      * @param {string} [type] - The type of the piece (e.g., 'I', 'O', 'T', etc.). If not provided, a random unlocked type is selected.
      */
     constructor(type) {
-        const tetrominoes = window.ALL_TETROMINOES;
+        const tetrominoes = exports.ALL_TETROMINOES;
         const keys = window.unlockedTetrominoes || Object.keys(tetrominoes);
         const randomKey = type || keys[Math.floor(Math.random() * keys.length)];
         this.shape = tetrominoes[randomKey]?.shape || tetrominoes['T'].shape; // Fallback to T shape
         this.scoreValue = tetrominoes[randomKey]?.score || 0;
         this.position = { x: 3, y: 0 }; // Start position
-        this.typeIndex = Object.keys(window.ALL_TETROMINOES).indexOf(randomKey); // For color
+        this.typeIndex = Object.keys(exports.ALL_TETROMINOES).indexOf(randomKey); // For color
         this.type = randomKey;
     }
 
@@ -66,13 +64,38 @@ class Piece {
             return;
         }
         const colors = ['#ff5722', '#4caf50', '#2196f3', '#ffeb3b', '#9c27b0', '#00bcd4', '#e91e63']; // Color palette
+
+        // Check if fragment jitter effect is active
+        const fragmentJitter = window.__fragmentJitter === true;
+
         this.shape.forEach((row, y) => {
             row.forEach((value, x) => {
                 if (value) {
                     context.fillStyle = colors[this.typeIndex % colors.length];
-                    context.fillRect((this.position.x + x) * 30, (this.position.y + y) * 30, 30, 30);
-                    context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-                    context.strokeRect((this.position.x + x) * 30, (this.position.y + y) * 30, 30, 30);
+
+                    // Apply random jitter offset if fragment effect is active
+                    if (fragmentJitter) {
+                        const jitterX = Math.floor(Math.random() * 7) - 3; // Random offset between -3 and 3
+                        const jitterY = Math.floor(Math.random() * 7) - 3;
+                        context.fillRect(
+                            (this.position.x + x) * 30 + jitterX,
+                            (this.position.y + y) * 30 + jitterY,
+                            30,
+                            30
+                        );
+                        context.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                        context.strokeRect(
+                            (this.position.x + x) * 30 + jitterX,
+                            (this.position.y + y) * 30 + jitterY,
+                            30,
+                            30
+                        );
+                    } else {
+                        // Normal rendering without jitter
+                        context.fillRect((this.position.x + x) * 30, (this.position.y + y) * 30, 30, 30);
+                        context.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+                        context.strokeRect((this.position.x + x) * 30, (this.position.y + y) * 30, 30, 30);
+                    }
                 }
             });
         });
@@ -257,3 +280,7 @@ class Piece {
         return this.scoreValue;
     }
 }
+
+// Export Piece to the TarotTetris namespace
+exports.Piece = Piece;
+})(window.TarotTetris = window.TarotTetris || {});

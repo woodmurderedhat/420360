@@ -127,8 +127,15 @@
             const _originalAddTarotCardToHand = getAddTarotCardToHand();
             if (typeof _originalAddTarotCardToHand === "function") {
                 window.addTarotCardToHand = function () {
+                    // Prevent recursive calls
+                    if (window.__addingTarotCard) return;
+                    
                     _originalAddTarotCardToHand.apply(this, arguments);
-                    spawnAdsRandomly(awardScoreBonus, updateScore);
+                    
+                    // Only spawn ads if we're not in a recursive call
+                    if (!window.__preventRecursiveSpawn && !window.__addingTarotCard) {
+                        spawnAdsRandomly(awardScoreBonus, updateScore);
+                    }
                 };
             }
         }

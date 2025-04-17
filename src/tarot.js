@@ -23,8 +23,8 @@ function morphEffect(duration = 5000, interval = 500) {
     const originalType = piece.typeIndex;
     const morphInterval = setInterval(() => {
         if (!morphing || gameOver) return;
-        const newType = Piece.getRandomType();
-        piece.shape = (new Piece(newType)).shape;
+        const newType = TarotTetris.Piece.getRandomType();
+        piece.shape = (new TarotTetris.Piece(newType)).shape;
         piece.typeIndex = ['I','O','T','S','Z','J','L'].indexOf(newType);
     }, interval);
     setTimeout(() => {
@@ -32,7 +32,7 @@ function morphEffect(duration = 5000, interval = 500) {
         clearInterval(morphInterval);
         // Optionally restore original type (not required)
     }, duration);
-    updateGameInfo('Morph: Your piece is shifting shapes!');
+    window.updateGameInfo('Morph: Your piece is shifting shapes!');
 }
 
 // Spin: Rotates the piece randomly at intervals for a duration.
@@ -48,7 +48,7 @@ function spinEffect(duration = 5000, interval = 300) {
         spinning = false;
         clearInterval(spinInterval);
     }, duration);
-    updateGameInfo('Spin: Your piece is spinning out of control!');
+    window.updateGameInfo('Spin: Your piece is spinning out of control!');
 }
 
 // Drift: Moves the piece randomly at intervals for a duration.
@@ -61,7 +61,7 @@ function driftEffect(duration = 5000, interval = 400) {
         const dy = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
         const newPos = { x: piece.position.x + dx, y: piece.position.y + dy };
         // Check bounds and collision
-        const testPiece = new Piece();
+        const testPiece = new TarotTetris.Piece();
         testPiece.shape = piece.shape.map(row => row.slice());
         testPiece.position = { ...newPos };
         testPiece.typeIndex = piece.typeIndex;
@@ -73,7 +73,7 @@ function driftEffect(duration = 5000, interval = 400) {
         drifting = false;
         clearInterval(driftInterval);
     }, duration);
-    updateGameInfo('Drift: Your piece is drifting unpredictably!');
+    window.updateGameInfo('Drift: Your piece is drifting unpredictably!');
 }
 
 // Fragment: Temporarily splits the piece into blocks with jitter, then reforms.
@@ -95,7 +95,7 @@ function fragmentEffect(duration = 2000) {
         piece.position = originalPos;
         piece.shape = originalShape;
     }, duration);
-    updateGameInfo('Fragment: Your piece is breaking apart!');
+    window.updateGameInfo('Fragment: Your piece is breaking apart!');
 }
 
 // Phase: Allows the piece to pass through blocks for a duration.
@@ -104,7 +104,7 @@ function phaseEffect(duration = 4000) {
     setTimeout(() => {
         window.__phaseActive = false;
     }, duration);
-    updateGameInfo('Phase: Your piece can pass through blocks!');
+    window.updateGameInfo('Phase: Your piece can pass through blocks!');
 }
 
 // Echo: Creates a shadow clone that follows the piece with a delay.
@@ -131,16 +131,16 @@ function echoEffect(duration = 5000, delay = 4) {
 
 // Time Warp: Randomly changes the fall speed of the piece for a duration.
 function timeWarpEffect(duration = 5000, min = 100, max = 1200) {
-    if (previousDropInterval === null) previousDropInterval = dropInterval;
+    if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
     let warping = true;
     const warpInterval = setInterval(() => {
         if (!warping || gameOver) return;
-        setGameSpeed(Math.floor(Math.random() * (max - min + 1)) + min);
+        TarotTetris.setGameSpeed(Math.floor(Math.random() * (max - min + 1)) + min);
     }, 400);
     setTimeout(() => {
         warping = false;
         clearInterval(warpInterval);
-        setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
+        TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500);
         previousDropInterval = null;
     }, duration);
     updateGameInfo('Time Warp: Gravity is fluctuating!');
@@ -157,10 +157,10 @@ function mirrorEffect(duration = 4000) {
 
 // Weight: Increases gravity for the current piece for a duration.
 function weightEffect(duration = 4000, heavy = true) {
-    if (previousDropInterval === null) previousDropInterval = dropInterval;
-    setGameSpeed(heavy ? 100 : 1200);
+    if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
+    TarotTetris.setGameSpeed(heavy ? 100 : 1200);
     setTimeout(function() { 
-        setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+        TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
         previousDropInterval = null;
     }, duration);
     updateGameInfo(heavy ? 'Weight: Your piece is heavy and falls fast!' : 'Weight: Your piece is light and floats!');
@@ -203,10 +203,10 @@ var minorArcanaUnlocks = {
 var tarotEffects = {
     "The Fool": {
         effect: function() {
-            if (previousDropInterval === null) previousDropInterval = dropInterval;
-            setGameSpeed(1000);
+            if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
+            TarotTetris.setGameSpeed(1000);
             setTimeout(function() { 
-                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
                 previousDropInterval = null;
             }, 10000);
             updateGameInfo('The Fool slows time, giving you a moment to breathe.');
@@ -233,15 +233,16 @@ var tarotEffects = {
     },
     "The High Priestess": {
         effect: function() {
-            if (previousDropInterval === null) previousDropInterval = dropInterval;
-            setGameSpeed(dropInterval * 1.5);
+            if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
+            TarotTetris.setGameSpeed(TarotTetris.dropInterval / 2);
             setTimeout(function() { 
-                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
                 previousDropInterval = null;
-            }, 15000);
-            updateGameInfo('The High Priestess calms the chaos, slowing the game slightly.');
+            }, 10000);
+            updateGameInfo('The High Priestess speeds up time, testing your reflexes.');
+            // Visual effects here
         },
-        description: "Slightly slows the game speed for 15 seconds."
+        description: "Speeds up the game for 10 seconds."
     },
     "The Empress": {
         effect: function() {
@@ -262,8 +263,8 @@ var tarotEffects = {
                 console.warn('The Emperor card effect skipped because the game is over.');
                 return;
             }
-            var newPieceType = Piece.getRandomType();
-            piece = new Piece(newPieceType);
+            var newPieceType = TarotTetris.Piece.getRandomType();
+            piece = new TarotTetris.Piece(newPieceType);
             piece.position = { x: 3, y: 0 };
             updateGameInfo('The Emperor changes your current piece to a new one!');
         },
@@ -286,15 +287,16 @@ var tarotEffects = {
     },
     "The Chariot": {
         effect: function() {
-            if (previousDropInterval === null) previousDropInterval = dropInterval;
-            setGameSpeed(300);
+            if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
+            TarotTetris.setGameSpeed(TarotTetris.dropInterval / 3);
             setTimeout(function() { 
-                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
                 previousDropInterval = null;
-            }, 10000);
-            updateGameInfo('The Chariot accelerates the game, testing your reflexes!');
+            }, 5000);
+            updateGameInfo('The Chariot races forward, greatly increasing speed for 5 seconds!');
+            // Visual effects here
         },
-        description: "Speeds up the game for 10 seconds."
+        description: "Greatly increases game speed for 5 seconds."
     },
     "Strength": {
         effect: function() {
@@ -310,10 +312,10 @@ var tarotEffects = {
     },
     "The Hermit": {
         effect: function() {
-            if (previousDropInterval === null) previousDropInterval = dropInterval;
-            setGameSpeed(2000);
+            if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
+            TarotTetris.setGameSpeed(2000);
             setTimeout(function() { 
-                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
                 previousDropInterval = null;
             }, 15000);
             updateGameInfo('The Hermit slows the game significantly, offering solitude.');
@@ -338,10 +340,10 @@ var tarotEffects = {
     },
     "The Hanged Man": {
         effect: function() {
-            if (previousDropInterval === null) previousDropInterval = dropInterval;
-            setGameSpeed(dropInterval * 2);
+            if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
+            TarotTetris.setGameSpeed(TarotTetris.dropInterval * 2);
             setTimeout(function() { 
-                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
                 previousDropInterval = null;
             }, 10000);
             updateGameInfo('The Hanged Man slows the game drastically, testing your patience.');
@@ -359,7 +361,7 @@ var tarotEffects = {
     },
     "Temperance": {
         effect: function() {
-            setGameSpeed(750);
+            TarotTetris.setGameSpeed(750);
             updateGameInfo('Temperance balances the game speed, bringing harmony.');
         },
         description: "Balances the game speed."
@@ -412,15 +414,15 @@ var tarotEffects = {
     },
     "The Moon": {
         effect: function() {
-            if (previousDropInterval === null) previousDropInterval = dropInterval;
-            setGameSpeed(dropInterval / 2);
+            if (previousDropInterval === null) previousDropInterval = TarotTetris.dropInterval;
+            TarotTetris.setGameSpeed(TarotTetris.dropInterval * 0.5);
             setTimeout(function() { 
-                setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
+                TarotTetris.setGameSpeed(previousDropInterval !== null ? previousDropInterval : 500); 
                 previousDropInterval = null;
             }, 10000);
-            updateGameInfo('The Moon quickens the pace, challenging your skills!');
+            updateGameInfo('The Moon slows time, giving you a moment to breathe.');
         },
-        description: "Speeds up the game for 10 seconds."
+        description: "Slows down the game speed for 10 seconds."
     },
     "The Sun": {
         effect: function() {
@@ -439,7 +441,14 @@ var tarotEffects = {
     },
     "The World": {
         effect: function() {
+            // Add a flag to prevent recursive spawning
+            if (window.__preventRecursiveSpawn) return;
+            
+            window.__preventRecursiveSpawn = true;
             spawnPiece();
+            setTimeout(function() {
+                window.__preventRecursiveSpawn = false;
+            }, 100);
             updateGameInfo('The World brings a new piece into play!');
         },
         description: "Spawns a new piece immediately."
@@ -591,7 +600,7 @@ function initializeTarotDeck() {
 }
 
 // Add helper methods for new effects
-Board.prototype.replaceRandomPieces = function() {
+TarotTetris.Board.prototype.replaceRandomPieces = function() {
     if (!this.grid) {
         console.warn("Grid is undefined in replaceRandomPieces.");
         return;
@@ -609,7 +618,7 @@ Board.prototype.replaceRandomPieces = function() {
     }
 };
 
-Board.prototype.clearBottomRows = function(count) {
+TarotTetris.Board.prototype.clearBottomRows = function(count) {
     if (!this.grid) {
         console.warn("Grid is undefined in clearBottomRows.");
         return;
@@ -625,7 +634,7 @@ Board.prototype.clearBottomRows = function(count) {
     }
 };
 
-Board.prototype.clearRandomRow = function() {
+TarotTetris.Board.prototype.clearRandomRow = function() {
     if (!this.grid) {
         console.warn("Grid is undefined in clearRandomRow.");
         return;
@@ -638,7 +647,7 @@ Board.prototype.clearRandomRow = function() {
     }
 };
 
-Board.prototype.addGarbageRow = function() {
+TarotTetris.Board.prototype.addGarbageRow = function() {
     if (!this.grid) {
         console.warn("Grid is undefined in addGarbageRow.");
         return;
@@ -657,7 +666,12 @@ function safeBoardCall(methodName) {
 }
 
 function addTarotCardToHand() {
+    // Prevent recursive calls if we're already in the process of adding a card
+    if (window.__addingTarotCard) return;
+    
+    window.__addingTarotCard = true;
     var newCard = drawTarotCard();
+    
     if (playerHand.length < 6) {
         playerHand.push(newCard);
         updateTarotUI();
@@ -667,6 +681,8 @@ function addTarotCardToHand() {
         playerHand.push(newCard);
         updateTarotUI();
     }
+    
+    window.__addingTarotCard = false;
 }
 
 // Play a tarot card
@@ -771,9 +787,23 @@ function drawTarotCard() {
         console.warn("Tarot deck is empty. Reinitializing deck.");
         initializeTarotDeck();
     }
-    tarotDeck = tarotDeck.sort(function() { return Math.random() - 0.5; });
+    
+    // Create a copy of the deck before sorting to avoid modifying the original
+    var deckCopy = [...tarotDeck];
+    deckCopy.sort(function() { return Math.random() - 0.5; });
+    
     var randomIndex = Math.floor(Math.random() * tarotDeck.length);
-    return tarotDeck.splice(randomIndex, 1)[0];
+    var card = tarotDeck.splice(randomIndex, 1)[0];
+    
+    // If we're down to 25% of cards, reinitialize the deck
+    if (tarotDeck.length < Object.keys(tarotEffects).length * 0.25) {
+        console.info("Tarot deck running low. Reinitializing.");
+        initializeTarotDeck();
+        // Remove the card we just drew to prevent duplicates
+        tarotDeck = tarotDeck.filter(c => c !== card);
+    }
+    
+    return card;
 }
 
 // Initialize tarot deck on load

@@ -275,10 +275,174 @@
 }
 
 /* Pause Overlay Styles */
+
+/* Tabs Navigation */
+.pause-tabs {
+    display: flex;
+    border-bottom: 2px solid var(--neon-gold);
+    margin-bottom: 1.5rem;
+}
+
+.pause-tab {
+    background: var(--arcade-panel-bg);
+    color: var(--neon-yellow);
+    border: none;
+    padding: 0.8rem 1.2rem;
+    font-family: var(--arcade-font);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex: 1;
+    text-align: center;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.pause-tab:hover {
+    background: rgba(255, 215, 0, 0.2);
+    color: var(--neon-gold);
+}
+
+.pause-tab.active {
+    color: var(--neon-gold);
+    border-bottom: 2px solid var(--neon-gold);
+    box-shadow: 0 0 10px var(--neon-gold);
+}
+
+/* Tab Content */
+.pause-tab-content {
+    min-height: 300px;
+}
+
+/* Shop Sub-tabs */
+.shop-subtabs {
+    display: flex;
+    justify-content: center;
+    margin: 0.5rem 0 1.5rem;
+    border-bottom: 1px solid var(--neon-cyan);
+    padding-bottom: 0.5rem;
+}
+
+.shop-subtab {
+    background: var(--arcade-panel-bg);
+    color: var(--neon-cyan);
+    border: none;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    font-family: var(--arcade-font);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 0.3rem;
+}
+
+.shop-subtab:hover {
+    background: rgba(0, 255, 255, 0.1);
+}
+
+.shop-subtab.active {
+    color: #fff;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 0.8rem var(--neon-cyan);
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+    animation: fade-in 0.3s ease-in-out;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Gold value styling */
+.gold-value {
+    color: var(--neon-gold);
+    text-shadow: 0 0 0.8rem var(--neon-gold);
+}
+
+/* Game Stats Tab */
+.game-stats {
+    margin: 1rem 0;
+}
+
+.game-stats h3 {
+    color: var(--neon-cyan);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.5rem;
+}
+
+.stat-name {
+    color: var(--neon-cyan);
+}
+
+/* Pause Stats */
 .pause-stats {
     display: flex;
     justify-content: space-around;
     margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+/* Gold Info Section */
+.gold-info-section {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0.8rem;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border: 1px solid var(--neon-gold);
+}
+
+.gold-info-section h3 {
+    color: var(--neon-gold);
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 0.8rem var(--neon-gold);
+}
+
+.gold-info-section p {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.gold-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.gold-rate {
+    color: var(--neon-cyan);
+    font-size: 0.9rem;
+}
+
+.gold-tip {
+    color: var(--neon-green);
+    text-shadow: 0 0 0.5rem var(--neon-green);
+    font-weight: bold;
+    margin-top: 1rem;
 }
 
 .stat-item {
@@ -455,6 +619,32 @@
     .pause-stats, .final-stats {
         flex-direction: column;
         gap: 1.5rem;
+    }
+
+    /* Responsive tabs */
+    .pause-tabs {
+        flex-wrap: wrap;
+    }
+
+    .pause-tab {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+        flex: 1 0 40%;
+    }
+
+    /* Ensure shop container is scrollable on mobile */
+    .shop-container {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    /* Adjust stats grid for mobile */
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-row {
+        padding: 0.8rem;
     }
 
     .objective-icons {

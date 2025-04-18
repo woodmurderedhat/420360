@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="overlays.css">
     <link rel="stylesheet" href="objectives-panel.css">
     <link rel="stylesheet" href="modern-tarot.css">
+    <link rel="stylesheet" href="shop.css">
+    <link rel="stylesheet" href="css/sound-settings.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cinzel+Decorative:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -32,9 +34,14 @@
             <div id="game-info" aria-live="polite" class="info-text">Game Info: Waiting for player...</div>
             <div id="level" aria-live="polite" class="level-text">Level: 1</div>
             <div id="score" aria-live="polite" class="score-text">Score: 0</div>
+            <div id="gold" aria-live="polite" class="gold-text">Gold: 0</div>
             <div id="hold-panel" class="hold-metal-panel">
                 <h3>Hold</h3>
                 <div id="hold-container"></div>
+            </div>
+            <div id="next-panel" class="next-metal-panel">
+                <h3>Next</h3>
+                <div id="next-container"></div>
             </div>
         </aside>
 
@@ -129,6 +136,10 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="src/eventSystem.js"></script>
+    <script src="src/soundSystem.js"></script>
+    <script src="src/wallKick.js"></script>
+    <script src="src/tSpinDetection.js"></script>
     <script src="src/board.js"></script>
     <script src="src/piece.js"></script>
     <script src="src/leaderboard.js"></script>
@@ -142,6 +153,7 @@
     <script src="src/ghostPiece.js"></script>
     <script src="src/gameState.js"></script>
     <script src="src/touchControls.js"></script>
+    <script src="src/shop.js"></script>
     <script src="src/game.js"></script>
 
     <!-- Game initialization is handled in game.js -->

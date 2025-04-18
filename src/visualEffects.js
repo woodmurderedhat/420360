@@ -81,8 +81,8 @@
                 case 'flash':
                     // Full screen flash
                     ctx.save();
-                    // Slower fade out with easing
-                    const fadeAlpha = 0.5 * Math.pow(1 - t, 1.5); // Slower fade with power easing
+                    // Even slower fade out with easing
+                    const fadeAlpha = 0.5 * Math.pow(1 - t, 2.5); // Much slower fade with power easing
                     ctx.globalAlpha = fadeAlpha;
                     ctx.fillStyle = effect.options.color || '#fff';
                     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -96,4 +96,7 @@
 
     exports.addTarotVisualEffect = addTarotVisualEffect;
     exports.renderTarotEffects = renderTarotEffects;
+
+    // Expose to global scope for tarot.js
+    window.addTarotVisualEffect = addTarotVisualEffect;
 })(window.TarotTetris = window.TarotTetris || {});

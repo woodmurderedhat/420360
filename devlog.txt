@@ -9,3 +9,119 @@ How "The Hanged Man" tarot card works:
 To play a tarot card:
 - Click a tarot card in your hand (displayed at the bottom of the game UI).
 - The card's effect will activate immediately and be logged in the game info panel.
+
+
+[2025-04-15] Roguelike Update: Added Gold, Shop, and Tabbed Pause Menu
+
+## Overview
+This update transforms Tarot Tetris into a roguelike experience by adding persistent gold, a shop system, and a restructured pause menu with tabs. Players can now earn gold from clearing lines, which persists between game sessions, and use it to upgrade tetriminos or unlock special ones.
+
+## Changes Made
+
+### 1. Persistent Gold System
+- Added gold as a persistent currency using localStorage
+- Modified the scoring system to convert cleared lines into gold based on tetrimino values
+- Added visual feedback when earning gold
+- Created gold display in the game UI with custom styling
+
+### 2. Tetrimino Scoring for Gold
+- Each tetrimino now has a base score value that contributes to gold earnings
+- When lines are cleared, the player earns gold based on the tetrimino's value and number of lines cleared
+- Gold persists between game sessions, creating a progression system
+
+### 3. Shop System
+- Created a new shop.js file with functionality for:
+  - Upgrading existing tetriminos to increase their score values
+  - Unlocking special tetriminos with unique shapes and higher base scores
+- Added shop UI with tetrimino previews, stats, and upgrade/unlock buttons
+- Implemented persistent tracking of tetrimino upgrade levels
+
+### 4. Tabbed Pause Menu
+- Restructured the pause menu to include four tabs:
+  - Player Stats: Shows score, level, gold, and lines to level up
+  - Shop: Allows players to spend gold on upgrades and unlocks
+  - Controls: Displays keyboard shortcuts and game controls
+  - Game Stats: Shows additional game statistics
+- Added tab switching functionality with smooth transitions
+- Styled the tabs to match the game's arcade aesthetic
+
+### 5. UI Improvements
+- Added gold display to the main game UI
+- Created highlight animations for gold changes
+- Styled the shop interface with the game's neon/arcade theme
+- Made the pause menu and shop responsive for different screen sizes
+
+
+[2025-04-20] Score and Gold System Update
+
+## Overview
+This update enhances the scoring and gold systems, separating them completely and adding a score-to-gold conversion mechanic. Players now earn score based on the tetromino pieces in cleared lines and must manually convert score to gold in the pause menu to upgrade tetriminos in the shop.
+
+## Changes Made
+
+### 1. Separated Score and Gold Systems
+- Modified the game to have separate score and gold systems
+- Players now earn score based on the tetromino pieces in cleared lines
+- Gold is no longer earned automatically when clearing lines
+- Added a score-to-gold conversion system in the pause menu
+- Default exchange rate: 10 score = 1 gold
+
+### 2. Enhanced Tetromino Scoring System
+- Each tetromino piece now contributes its individual score value to line clears
+- When a line is cleared, the score is calculated by adding up the values of all tetromino pieces in that line
+- Modified the board.js to track which tetromino type is in each cell of the grid
+- Updated the clearLines function to calculate scores based on the tetromino pieces in each line
+
+### 3. Pause Menu Score-to-Gold Conversion
+- Added a new section in the pause menu's Stats tab for score-to-gold conversion
+- Players can now input how much score they want to convert to gold
+- Added visual feedback for successful and failed conversions
+- Updated the UI to show real-time score and gold values
+
+### 4. Shop System Improvements
+- Added sub-tabs to the shop in the pause menu
+- Created separate tabs for standard and special tetromino pieces
+- Standard tab shows the basic tetromino pieces (I, O, T, S, Z, J, L)
+- Special tab shows unlocked special tetromino pieces and those available for purchase
+
+### 5. UI Enhancements
+- Added CSS styling for the new shop sub-tabs
+- Added styling for the score-to-gold conversion interface
+- Improved visual feedback for successful and failed conversions
+- Updated the shop UI to better organize tetromino upgrades
+
+
+[2025-04-25] Gold and Score Rebalance Update
+
+## Overview
+This update rebalances the scoring and gold systems to create a more strategic gameplay experience. Players now earn gold only when leveling up, and the score calculation for line clears has been modified to be based on the tetromino pieces from left to right, multiplied by the player's level.
+
+## Changes Made
+
+### 1. Reduced Tetromino Score Values
+- Significantly reduced the base score values of all tetromino pieces
+- Standard tetrominos now have scores ranging from 3-7 points
+- Special tetrominos now have scores ranging from 8-13 points
+- This makes each individual piece placement more strategic
+
+### 2. Gold Acquisition Changed to Level-Up Only
+- Players now earn gold only when leveling up
+- Gold awarded = level × 10 (Level 2: 20 gold, Level 3: 30 gold, etc.)
+- Removed the score-to-gold conversion system from the pause menu
+- Added a gold info section to the pause menu explaining the new system
+
+### 3. Line Score Calculation Improved
+- Modified the line score calculation to add up tetromino values from left to right
+- Applied the player's level as a multiplier to the line score
+- This encourages strategic placement of high-value tetrominos
+
+### 4. Shop Balance Adjustments
+- Reduced the base cost of tetromino upgrades from 100 to 30 gold
+- Reduced the level multiplier for upgrade costs from 50 to 15 gold
+- Reduced the costs of special tetrominos by approximately 80%
+- Reduced the score increase from upgrades from 20 to 2 points
+
+### 5. UI Updates
+- Updated the pause menu to show information about the new gold acquisition system
+- Added visual feedback when gold is earned from leveling up
+- Improved the level-up message to show the amount of gold earned

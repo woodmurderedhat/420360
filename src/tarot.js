@@ -20,7 +20,7 @@ var previousCoyoteTime = null;
 function morphEffect(duration = 5000, interval = 500) {
     if (!piece) return;
     let morphing = true;
-    const originalType = piece.typeIndex;
+    // Store original type for potential restoration
     const morphInterval = setInterval(() => {
         if (!morphing || gameOver) return;
         const newType = TarotTetris.Piece.getRandomType();
@@ -182,21 +182,7 @@ function teleportEffect(duration = 4000, interval = 800) {
     updateGameInfo('Teleport: Your piece is jumping around!');
 }
 
-/**
- * Minor Arcana unlock mapping: card name → tetromino key
- */
-var minorArcanaUnlocks = {
-    "Ace of Wands": "SIGIL",
-    "Two of Cups": "HEX",
-    "Three of Swords": "YOD",
-    "Four of Pentacles": "CROSS",
-    "Five of Wands": "KEY",
-    "Six of Cups": "EYE",
-    "Seven of Swords": "SERPENT",
-    "Eight of Pentacles": "TREE",
-    "Nine of Wands": "RUNE",
-    "Ten of Cups": "ANKH"
-};
+// Special tetriminoes are now available only through the shop
 
 // Add Minor Arcana effects to tarotEffects
 // Each unlocks a special tetromino shape for the rest of the game
@@ -212,21 +198,21 @@ var tarotEffects = {
             updateGameInfo('The Fool slows time, giving you a moment to breathe.');
             // Visual: CRT scanlines + blue glow
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('scanlines', 1000, { color: '#6e44ff' });
-                addTarotVisualEffect('neon-glow', 1000, { color: '#6e44ff' });
+                addTarotVisualEffect('scanlines', 3000, { color: '#6e44ff' });
+                addTarotVisualEffect('neon-glow', 3000, { color: '#6e44ff' });
             }
         },
         description: "Slows down the game speed for 10 seconds."
     },
     "The Magician": {
         effect: function() {
-            score *= 2;
+            TarotTetris.score *= 2;
             updateScore();
             updateGameInfo('The Magician doubles your score with a wave of magic!');
             // Visual: Neon rainbow border + particle burst
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('neon-glow', 900, { color: '#ffdd57' });
-                addTarotVisualEffect('particle-burst', 900, { color: '#ffdd57' });
+                addTarotVisualEffect('neon-glow', 3000, { color: '#ffdd57' });
+                addTarotVisualEffect('particle-burst', 3000, { color: '#ffdd57' });
             }
         },
         description: "Doubles your current score."
@@ -246,13 +232,13 @@ var tarotEffects = {
     },
     "The Empress": {
         effect: function() {
-            score += 500;
+            TarotTetris.score += 500;
             updateScore();
             updateGameInfo('The Empress blesses you with 500 bonus points!');
             // Visual: Gold coin burst
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('particle-burst', 900, { color: '#ffaa00' });
-                addTarotVisualEffect('flash', 2000, { color: '#ffaa00' });
+                addTarotVisualEffect('particle-burst', 3000, { color: '#ffaa00' });
+                addTarotVisualEffect('flash', 4000, { color: '#ffaa00' });
             }
         },
         description: "Adds 500 bonus points to your score."
@@ -279,7 +265,7 @@ var tarotEffects = {
     },
     "The Lovers": {
         effect: function() {
-            score += 300;
+            TarotTetris.score += 300;
             updateScore();
             updateGameInfo('The Lovers bring harmony, adding 300 bonus points.');
         },
@@ -324,7 +310,7 @@ var tarotEffects = {
     },
     "Wheel of Fortune": {
         effect: function() {
-            score = Math.floor(score * 1.5);
+            TarotTetris.score = Math.floor(TarotTetris.score * 1.5);
             updateScore();
             updateGameInfo('The Wheel of Fortune spins, increasing your score by 50%!');
         },
@@ -332,7 +318,7 @@ var tarotEffects = {
     },
     "Justice": {
         effect: function() {
-            score += 1000;
+            TarotTetris.score += 1000;
             updateScore();
             updateGameInfo('Justice rewards you with 1000 bonus points!');
         },
@@ -353,7 +339,7 @@ var tarotEffects = {
     "Death": {
         effect: function() {
             board.clearRandomRow();
-            score = Math.max(0, score - 100);
+            TarotTetris.score = Math.max(0, TarotTetris.score - 100);
             updateScore();
             updateGameInfo('Death clears a random row but takes 100 points.');
         },
@@ -426,7 +412,7 @@ var tarotEffects = {
     },
     "The Sun": {
         effect: function() {
-            score += 500;
+            TarotTetris.score += 500;
             updateScore();
             updateGameInfo('The Sun shines brightly, adding 500 bonus points!');
         },
@@ -461,8 +447,8 @@ var tarotEffects = {
             morphEffect();
             // Visual: Glitch + RGB split
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('flash', 2000, { color: '#6e44ff' });
-                addTarotVisualEffect('scanlines', 1000, { color: '#6e44ff' });
+                addTarotVisualEffect('flash', 4000, { color: '#6e44ff' });
+                addTarotVisualEffect('scanlines', 3000, { color: '#6e44ff' });
             }
         },
         description: "Fate is fickle: The active piece morphs into random shapes for a short time."
@@ -472,8 +458,8 @@ var tarotEffects = {
             spinEffect();
             // Visual: Spiral background + motion blur
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('screen-shake', 800, { color: '#ffeb3b' });
-                addTarotVisualEffect('neon-glow', 800, { color: '#ffeb3b' });
+                addTarotVisualEffect('screen-shake', 2000, { color: '#ffeb3b' });
+                addTarotVisualEffect('neon-glow', 3000, { color: '#ffeb3b' });
             }
         },
         description: "Perspective shifts: The active piece spins randomly for a short time."
@@ -487,8 +473,8 @@ var tarotEffects = {
             fragmentEffect();
             // Visual: Piece shatters, pixel dust
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('particle-burst', 1000, { color: '#fff' });
-                addTarotVisualEffect('flash', 2000, { color: '#fff' });
+                addTarotVisualEffect('particle-burst', 3000, { color: '#fff' });
+                addTarotVisualEffect('flash', 4000, { color: '#fff' });
             }
         },
         description: "Collapse averted: The active piece breaks into fragments, then reforms."
@@ -498,7 +484,7 @@ var tarotEffects = {
             phaseEffect();
             // Visual: Blue ghost glow
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('neon-glow', 1000, { color: '#00bcd4' });
+                addTarotVisualEffect('neon-glow', 3000, { color: '#00bcd4' });
             }
         },
         description: "Illusions fade: The active piece can pass through blocks for a short time."
@@ -508,7 +494,7 @@ var tarotEffects = {
             echoEffect();
             // Visual: Afterimage trail
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('scanlines', 1000, { color: '#fff' });
+                addTarotVisualEffect('scanlines', 3000, { color: '#fff' });
             }
         },
         description: "Hidden knowledge: A shadow follows the active piece, trailing its movements."
@@ -518,8 +504,8 @@ var tarotEffects = {
             timeWarpEffect();
             // Visual: Wavy time distortion
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('flash', 2000, { color: '#9c27b0' });
-                addTarotVisualEffect('scanlines', 1000, { color: '#9c27b0' });
+                addTarotVisualEffect('flash', 4000, { color: '#9c27b0' });
+                addTarotVisualEffect('scanlines', 3000, { color: '#9c27b0' });
             }
         },
         description: "Time unbalanced: The fall speed of the active piece fluctuates wildly."
@@ -529,7 +515,7 @@ var tarotEffects = {
             mirrorEffect();
             // Visual: Mirror ripple
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('flash', 2000, { color: '#fff' });
+                addTarotVisualEffect('flash', 4000, { color: '#fff' });
             }
         },
         description: "Reflected fate: The board visuals are flipped horizontally for a short time."
@@ -539,7 +525,7 @@ var tarotEffects = {
             weightEffect();
             // Visual: Heavy impact, screen shake
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('screen-shake', 700, { color: '#ffaa00' });
+                addTarotVisualEffect('screen-shake', 2000, { color: '#ffaa00' });
             }
         },
         description: "Gravity shifts: The active piece becomes heavy and falls rapidly."
@@ -549,31 +535,14 @@ var tarotEffects = {
             teleportEffect();
             // Visual: Pixel dissolve + reappear
             if (typeof addTarotVisualEffect === "function") {
-                addTarotVisualEffect('flash', 2000, { color: '#6e44ff' });
+                addTarotVisualEffect('flash', 4000, { color: '#6e44ff' });
             }
         },
         description: "Wild leap: The active piece teleports to random columns for a short time."
     }
 };
 
-/**
- * Add Minor Arcana unlock effects to tarotEffects
- */
-Object.keys(minorArcanaUnlocks).forEach(function(card) {
-    var shapeKey = minorArcanaUnlocks[card];
-    tarotEffects[card] = {
-        effect: function() {
-            if (!window.unlockedTetrominoes) window.unlockedTetrominoes = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
-            if (window.unlockedTetrominoes.indexOf(shapeKey) === -1) {
-                window.unlockedTetrominoes.push(shapeKey);
-                updateGameInfo(card + " unlocked the " + shapeKey + " tetromino! This shape can now spawn.");
-            } else {
-                updateGameInfo(card + " was played, but the " + shapeKey + " tetromino was already unlocked.");
-            }
-        },
-        description: "Unlocks the special " + shapeKey + " tetromino shape for the rest of the game."
-    };
-});
+// Minor Arcana unlock effects have been removed - special tetriminoes are now only available through the shop
 
 // Safeguard against recursion or game-breaking behavior in tarot card effects
 Object.keys(tarotEffects).forEach(function(card) {
@@ -592,11 +561,11 @@ Object.keys(tarotEffects).forEach(function(card) {
 });
 
 /**
- * Initialize tarot deck with all Major Arcana, advanced effects, and Minor Arcana unlocks.
+ * Initialize tarot deck with all Major Arcana and advanced effects.
  */
 function initializeTarotDeck() {
     tarotDeck = Object.keys(tarotEffects);
-    console.info("Tarot deck initialized with all available cards, including Minor Arcana unlocks.");
+    console.info("Tarot deck initialized with all available cards (Minor Arcana unlocks removed).");
 }
 
 // Add helper methods for new effects
@@ -675,11 +644,30 @@ function addTarotCardToHand() {
     if (playerHand.length < 6) {
         playerHand.push(newCard);
         updateTarotUI();
+
+        // Emit tarot card added event
+        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+            TarotTetris.events.emit(TarotTetris.EVENTS.TAROT_CARD_ADDED, {
+                card: newCard,
+                description: tarotEffects[newCard] ? tarotEffects[newCard].description : '',
+                handSize: playerHand.length
+            });
+        }
     } else {
         updateGameInfo('Warning: Your hand is being played.');
         playTarotCard(0);
         playerHand.push(newCard);
         updateTarotUI();
+
+        // Emit tarot card added event
+        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+            TarotTetris.events.emit(TarotTetris.EVENTS.TAROT_CARD_ADDED, {
+                card: newCard,
+                description: tarotEffects[newCard] ? tarotEffects[newCard].description : '',
+                handSize: playerHand.length,
+                autoPlayed: true
+            });
+        }
     }
 
     window.__addingTarotCard = false;
@@ -735,14 +723,14 @@ function playTarotCard(cardIndex) {
             setTimeout(function() {
                 cardClone.style.opacity = '0';
                 cardClone.style.transform += ' scale(0.5)';
-            }, 600);
+            }, 1500);
 
             setTimeout(function() {
                 if (cardClone.parentNode) {
                     cardClone.parentNode.removeChild(cardClone);
                 }
                 cardElem.classList.remove('activated');
-            }, 1000);
+            }, 2500);
         }
 
         // Add board effects
@@ -761,7 +749,7 @@ function playTarotCard(cardIndex) {
                 if (flashEffect.parentNode) {
                     flashEffect.parentNode.removeChild(flashEffect);
                 }
-            }, 2000);
+            }, 3500);
         }
 
         // Show card name in game info
@@ -770,6 +758,16 @@ function playTarotCard(cardIndex) {
         // Execute card effect
         try {
             tarotEffects[card].effect();
+
+            // Emit tarot card played event
+            if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+                TarotTetris.events.emit(TarotTetris.EVENTS.TAROT_CARD_PLAYED, {
+                    card: card,
+                    cardIndex: cardIndex,
+                    description: tarotEffects[card].description,
+                    remainingCards: playerHand.length - 1
+                });
+            }
         } catch (error) {
             console.error('Error executing effect for card "' + card + '":', error);
         }
@@ -863,8 +861,6 @@ function updateTarotUI() {
         // Add card type class
         if (card.indexOf('Reversed') !== -1) {
             cardElement.classList.add('reversed');
-        } else if (Object.keys(minorArcanaUnlocks).includes(card)) {
-            cardElement.classList.add('minor-arcana');
         } else {
             cardElement.classList.add('major-arcana');
         }

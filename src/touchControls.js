@@ -139,9 +139,20 @@ function handleTouchEnd(event) {
         } else {
             // Single tap - rotate
             if (typeof piece !== 'undefined' && piece.rotate) {
-                piece.rotate(board);
-                if (board.collides(piece) && piece.undoRotate) {
-                    piece.undoRotate();
+                const rotated = piece.rotate(board);
+                // No need to check for collision and undo rotation
+                // as the rotate method now handles wall kicks and returns false if rotation fails
+
+                // Track if the last move was a rotation for T-spin detection
+                if (typeof lastMoveWasRotation !== 'undefined') {
+                    lastMoveWasRotation = rotated;
+                }
+
+                // Check for T-spin if rotation was successful
+                if (rotated && piece.type === 'T' && TarotTetris.tSpin && typeof TarotTetris.tSpin.detectTSpin === 'function') {
+                    if (typeof tSpinDetected !== 'undefined') {
+                        tSpinDetected = TarotTetris.tSpin.detectTSpin(piece, board, true);
+                    }
                 }
             }
             touchState.lastTapTime = Date.now();
@@ -165,19 +176,19 @@ function handleTouchEnd(event) {
             if (typeof TarotTetris.holdPiece === 'function') {
                 // Create state object for holdPiece
                 const holdState = {
-                    heldPiece: window.heldPiece,
+                    heldPieces: window.heldPieces || [],
                     piece: window.piece,
                     canHold: window.canHold,
                     spawnPiece: window.spawnPiece,
                     updateHoldUI: function() {
                         if (typeof TarotTetris.updateHoldUI === 'function') {
-                            TarotTetris.updateHoldUI(window.heldPiece);
+                            TarotTetris.updateHoldUI(window.heldPieces);
                         }
                     }
                 };
                 TarotTetris.holdPiece(holdState);
                 // Update global variables
-                window.heldPiece = holdState.heldPiece;
+                window.heldPieces = holdState.heldPieces;
                 window.piece = holdState.piece;
                 window.canHold = holdState.canHold;
             }
@@ -212,9 +223,20 @@ function executeMove(direction) {
             break;
         case 'up':
             if (piece.rotate) {
-                piece.rotate(board);
-                if (board.collides(piece) && piece.undoRotate) {
-                    piece.undoRotate();
+                const rotated = piece.rotate(board);
+                // No need to check for collision and undo rotation
+                // as the rotate method now handles wall kicks and returns false if rotation fails
+
+                // Track if the last move was a rotation for T-spin detection
+                if (typeof lastMoveWasRotation !== 'undefined') {
+                    lastMoveWasRotation = rotated;
+                }
+
+                // Check for T-spin if rotation was successful
+                if (rotated && piece.type === 'T' && TarotTetris.tSpin && typeof TarotTetris.tSpin.detectTSpin === 'function') {
+                    if (typeof tSpinDetected !== 'undefined') {
+                        tSpinDetected = TarotTetris.tSpin.detectTSpin(piece, board, true);
+                    }
                 }
             }
             break;
@@ -230,19 +252,19 @@ function setupMobileButtons() {
             if (typeof TarotTetris.holdPiece === 'function') {
                 // Create state object for holdPiece
                 const holdState = {
-                    heldPiece: window.heldPiece,
+                    heldPieces: window.heldPieces || [],
                     piece: window.piece,
                     canHold: window.canHold,
                     spawnPiece: window.spawnPiece,
                     updateHoldUI: function() {
                         if (typeof TarotTetris.updateHoldUI === 'function') {
-                            TarotTetris.updateHoldUI(window.heldPiece);
+                            TarotTetris.updateHoldUI(window.heldPieces);
                         }
                     }
                 };
                 TarotTetris.holdPiece(holdState);
                 // Update global variables
-                window.heldPiece = holdState.heldPiece;
+                window.heldPieces = holdState.heldPieces;
                 window.piece = holdState.piece;
                 window.canHold = holdState.canHold;
             }

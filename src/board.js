@@ -8,6 +8,8 @@ class Board {
         this.rows = 20;
         this.columns = 10;
         this.grid = this.createGrid();
+        // Track tetromino types in each cell for score calculation
+        this.pieceTypes = this.createPieceTypeGrid();
     }
 
     /**
@@ -19,6 +21,19 @@ class Board {
             return Array.from({ length: this.rows }, () => Array(this.columns).fill(0));
         } catch (error) {
             console.error("Error creating grid:", error);
+            return []; // Return an empty grid as a fallback
+        }
+    }
+
+    /**
+     * Creates a grid to track tetromino types for score calculation.
+     * @returns {Array<Array<string|null>>} A 2D array tracking tetromino types, filled with null.
+     */
+    createPieceTypeGrid() {
+        try {
+            return Array.from({ length: this.rows }, () => Array(this.columns).fill(null));
+        } catch (error) {
+            console.error("Error creating piece type grid:", error);
             return []; // Return an empty grid as a fallback
         }
     }
@@ -57,6 +72,7 @@ class Board {
      */
     reset() {
         this.grid = this.createGrid();
+        this.pieceTypes = this.createPieceTypeGrid();
     }
 
     /**
@@ -168,6 +184,11 @@ class Board {
                     continue;
                 }
                 this.grid[coord.y][coord.x] = piece.typeIndex + 1; // Use piece's color index
+
+                // Store the piece type for score calculation
+                if (this.pieceTypes && this.pieceTypes[coord.y]) {
+                    this.pieceTypes[coord.y][coord.x] = piece.type;
+                }
             } else {
                 console.warn(`Out-of-bounds coordinate: x=${coord.x}, y=${coord.y}`);
             }
@@ -176,23 +197,70 @@ class Board {
 
     /**
      * Clears full lines from the board.
-     * @returns {number} The number of lines cleared.
+     * @returns {Object} Object containing the number of lines cleared and the score for each line.
      */
     clearLines() {
         const linesToClear = this.checkFullLines();
         if (!Array.isArray(linesToClear)) {
             console.error("checkFullLines did not return an array:", linesToClear);
-            return 0;
+            return { count: 0, lineScores: [] };
         }
+
+        // Calculate score for each line before clearing
+        const lineScores = [];
         for (let line of linesToClear) {
             if (line >= 0 && line < this.grid.length) {
+                // Calculate score for this line based on tetromino pieces
+                const lineScore = this.calculateLineScore(line);
+                lineScores.push(lineScore);
+
+                // Clear the line
                 this.grid.splice(line, 1);
                 this.grid.unshift(Array(this.columns).fill(0));
+
+                // Also clear the piece types for this line
+                if (this.pieceTypes) {
+                    this.pieceTypes.splice(line, 1);
+                    this.pieceTypes.unshift(Array(this.columns).fill(null));
+                }
             } else {
                 console.warn(`Line index out of bounds: ${line}`);
             }
         }
-        return linesToClear.length; // Return the number of lines cleared
+
+        return {
+            count: linesToClear.length,
+            lineScores: lineScores
+        };
+    }
+
+    /**
+     * Calculates the score for a single line based on the tetromino pieces in it from left to right.
+     * @param {number} lineIndex - The index of the line to calculate score for.
+     * @returns {number} The score for the line.
+     */
+    calculateLineScore(lineIndex) {
+        if (!this.pieceTypes || !this.pieceTypes[lineIndex]) {
+            return 0;
+        }
+
+        let lineScore = 0;
+
+        // Calculate score from left to right (order matters now)
+        for (let col = 0; col < this.columns; col++) {
+            const pieceType = this.pieceTypes[lineIndex][col];
+            if (pieceType && TarotTetris.ALL_TETROMINOES[pieceType]) {
+                // Add the piece score to the running total
+                lineScore += TarotTetris.ALL_TETROMINOES[pieceType].score || 0;
+            }
+        }
+
+        // Apply the player's level as a multiplier
+        if (TarotTetris && typeof TarotTetris.level === 'number') {
+            lineScore *= TarotTetris.level;
+        }
+
+        return lineScore;
     }
 
     /**

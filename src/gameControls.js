@@ -6,6 +6,8 @@
 // --- Game control state variables ---
 let hardDropLocked = false;
 let gamePaused = false;
+let lastMoveWasRotation = false;
+let tSpinDetected = null;
 
 // Pause/resume game function
 function togglePause() {
@@ -18,6 +20,15 @@ function togglePause() {
         if (typeof showPauseOverlay === "function") {
             showPauseOverlay();
         }
+
+        // Emit game paused event
+        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+            TarotTetris.events.emit(TarotTetris.EVENTS.GAME_PAUSED, {
+                score: TarotTetris.score,
+                level: TarotTetris.level,
+                gold: TarotTetris.gold
+            });
+        }
     } else {
         // Hide pause overlay if available
         if (typeof hideOverlay === "function") {
@@ -25,6 +36,15 @@ function togglePause() {
             if (pauseOverlay) {
                 hideOverlay(pauseOverlay);
             }
+        }
+
+        // Emit game resumed event
+        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+            TarotTetris.events.emit(TarotTetris.EVENTS.GAME_RESUMED, {
+                score: TarotTetris.score,
+                level: TarotTetris.level,
+                gold: TarotTetris.gold
+            });
         }
     }
 
@@ -35,6 +55,16 @@ function togglePause() {
 function resumeGame() {
     if (gamePaused) {
         gamePaused = false;
+
+        // Emit game resumed event
+        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+            TarotTetris.events.emit(TarotTetris.EVENTS.GAME_RESUMED, {
+                score: TarotTetris.score,
+                level: TarotTetris.level,
+                gold: TarotTetris.gold
+            });
+        }
+
         return true;
     }
     return false;
@@ -84,9 +114,16 @@ document.addEventListener('keydown', (event) => {
         case 'w':
         case 'W':
             if (typeof piece !== "undefined" && piece.rotate) {
-                piece.rotate(board);
-                if (board.collides(piece) && piece.undoRotate) {
-                    piece.undoRotate();
+                const rotated = piece.rotate(board);
+                // No need to check for collision and undo rotation
+                // as the rotate method now handles wall kicks and returns false if rotation fails
+
+                // Track if the last move was a rotation for T-spin detection
+                lastMoveWasRotation = rotated;
+
+                // Check for T-spin if rotation was successful
+                if (rotated && piece.type === 'T' && TarotTetris.tSpin && typeof TarotTetris.tSpin.detectTSpin === 'function') {
+                    tSpinDetected = TarotTetris.tSpin.detectTSpin(piece, board, true);
                 }
             }
             break;
@@ -94,19 +131,19 @@ document.addEventListener('keydown', (event) => {
             if (event.key === 'Shift' && !event.getModifierState('ArrowDown') && typeof TarotTetris.holdPiece === "function") {
                 // Create state object for holdPiece
                 const holdState = {
-                    heldPiece: window.heldPiece,
+                    heldPieces: window.heldPieces || [],
                     piece: window.piece,
                     canHold: window.canHold,
                     spawnPiece: window.spawnPiece,
                     updateHoldUI: function() {
                         if (typeof TarotTetris.updateHoldUI === "function") {
-                            TarotTetris.updateHoldUI(window.heldPiece);
+                            TarotTetris.updateHoldUI(window.heldPieces);
                         }
                     }
                 };
                 TarotTetris.holdPiece(holdState);
                 // Update global variables
-                window.heldPiece = holdState.heldPiece;
+                window.heldPieces = holdState.heldPieces;
                 window.piece = holdState.piece;
                 window.canHold = holdState.canHold;
             }
@@ -136,19 +173,19 @@ document.addEventListener('keydown', (event) => {
             if (typeof TarotTetris.holdPiece === "function") {
                 // Create state object for holdPiece
                 const holdState = {
-                    heldPiece: window.heldPiece,
+                    heldPieces: window.heldPieces || [],
                     piece: window.piece,
                     canHold: window.canHold,
                     spawnPiece: window.spawnPiece,
                     updateHoldUI: function() {
                         if (typeof TarotTetris.updateHoldUI === "function") {
-                            TarotTetris.updateHoldUI(window.heldPiece);
+                            TarotTetris.updateHoldUI(window.heldPieces);
                         }
                     }
                 };
                 TarotTetris.holdPiece(holdState);
                 // Update global variables
-                window.heldPiece = holdState.heldPiece;
+                window.heldPieces = holdState.heldPieces;
                 window.piece = holdState.piece;
                 window.canHold = holdState.canHold;
             }
@@ -212,10 +249,18 @@ if (rotateButton) {
     rotateButton.addEventListener('click', () => {
         if (typeof gameOver !== "undefined" && gameOver) return;
         if (typeof piece !== "undefined" && piece.rotate) {
-            piece.rotate(board);
-            if (board.collides(piece) && piece.undoRotate) {
-                piece.undoRotate();
+            const rotated = piece.rotate(board);
+            // No need to check for collision and undo rotation
+            // as the rotate method now handles wall kicks and returns false if rotation fails
+
+            // Track if the last move was a rotation for T-spin detection
+            lastMoveWasRotation = rotated;
+
+            // Check for T-spin if rotation was successful
+            if (rotated && piece.type === 'T' && TarotTetris.tSpin && typeof TarotTetris.tSpin.detectTSpin === 'function') {
+                tSpinDetected = TarotTetris.tSpin.detectTSpin(piece, board, true);
             }
+
             if (typeof updateScore === "function") updateScore();
         }
     });

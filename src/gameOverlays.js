@@ -217,7 +217,7 @@ function showIntroOverlay() {
 }
 
 /**
- * Create and show the pause overlay
+ * Create and show the pause overlay with tabs
  */
 function showPauseOverlay() {
     // Create overlay container if it doesn't exist
@@ -229,44 +229,161 @@ function showPauseOverlay() {
         document.body.appendChild(overlay);
     }
 
-    // Set overlay content
+    // Set overlay content with tabs
     overlay.innerHTML = `
         <div class="overlay-content">
             <h2 class="overlay-title">Game Paused</h2>
-            <div class="pause-stats">
-                <div class="stat-item">
-                    <span class="stat-label">Score</span>
-                    <span class="stat-value">${TarotTetris.score}</span>
+
+            <!-- Tabs Navigation -->
+            <div class="pause-tabs">
+                <button class="pause-tab active" data-tab="stats">Player Stats</button>
+                <button class="pause-tab" data-tab="shop">Shop</button>
+                <button class="pause-tab" data-tab="controls">Controls</button>
+                <button class="pause-tab" data-tab="game-stats">Game Stats</button>
+                <button class="pause-tab" data-tab="sound">Sound</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="pause-tab-content">
+                <!-- Stats Tab (Default) -->
+                <div class="tab-pane active" id="stats-tab">
+                    <div class="pause-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Score</span>
+                            <span class="stat-value" id="pause-score-value">${TarotTetris.score}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Level</span>
+                            <span class="stat-value">${TarotTetris.level}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Gold</span>
+                            <span class="stat-value gold-value" id="pause-gold-value">${TarotTetris.gold}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Lines to Level Up</span>
+                            <span class="stat-value">${TarotTetris.linesToLevelUp - TarotTetris.linesClearedThisLevel}</span>
+                        </div>
+                    </div>
+
+                    <!-- Gold Info Section -->
+                    <div class="gold-info-section">
+                        <h3>Gold Acquisition</h3>
+                        <p>Gold is earned when you level up!</p>
+                        <div class="gold-info">
+                            <div class="gold-rate">Level 2: 20 Gold</div>
+                            <div class="gold-rate">Level 3: 30 Gold</div>
+                            <div class="gold-rate">Level 4: 40 Gold</div>
+                            <div class="gold-rate">And so on...</div>
+                        </div>
+                        <p class="gold-tip">Use gold to upgrade tetrimino pieces in the shop.</p>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Level</span>
-                    <span class="stat-value">${TarotTetris.level}</span>
+
+                <!-- Shop Tab -->
+                <div class="tab-pane" id="shop-tab">
+                    <div id="shop-container" class="shop-container">
+                        <!-- Shop content will be injected here by shop.js -->
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Lines to Level Up</span>
-                    <span class="stat-value">${TarotTetris.linesToLevelUp - TarotTetris.linesClearedThisLevel}</span>
+
+                <!-- Controls Tab -->
+                <div class="tab-pane" id="controls-tab">
+                    <div class="keyboard-shortcuts">
+                        <h3>Keyboard Shortcuts</h3>
+                        <div class="shortcuts-grid">
+                            <div class="shortcut-item">
+                                <span class="key">← / A</span>
+                                <span>Move Left</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">→ / D</span>
+                                <span>Move Right</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">↓ / S</span>
+                                <span>Soft Drop</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">Shift + ↓</span>
+                                <span>Hard Drop</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">Space</span>
+                                <span>Hard Drop</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">↑ / W</span>
+                                <span>Rotate</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">C</span>
+                                <span>Hold Piece</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">1-9</span>
+                                <span>Play Tarot Card</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">P</span>
+                                <span>Pause/Resume</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">R</span>
+                                <span>Restart Game</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">M</span>
+                                <span>Mute Sound</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">O</span>
+                                <span>Show Objectives</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="key">F11</span>
+                                <span>Fullscreen</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game Stats Tab -->
+                <div class="tab-pane" id="game-stats-tab">
+                    <div class="game-stats">
+                        <h3>Game Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-row">
+                                <span class="stat-name">Total Lines Cleared:</span>
+                                <span class="stat-value">${TarotTetris.linesClearedThisLevel}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-name">Current Combo:</span>
+                                <span class="stat-value">${TarotTetris.combo}</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-name">Game Speed:</span>
+                                <span class="stat-value">${Math.round(1000 / TarotTetris.dropInterval * 100) / 100} blocks/sec</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-name">Unlocked Tetriminos:</span>
+                                <span class="stat-value">${window.unlockedTetrominoes ? window.unlockedTetrominoes.length : 7}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sound Settings Tab -->
+                <div class="tab-pane" id="sound-tab">
+                    <div id="sound-settings-container">
+                        <!-- Sound settings will be dynamically inserted here -->
+                    </div>
                 </div>
             </div>
+
             <div class="pause-buttons">
                 <button id="resume-game" class="neon-btn">Resume Game</button>
                 <button id="restart-game" class="neon-btn">Restart Game</button>
-            </div>
-            <div class="keyboard-shortcuts">
-                <h3>Keyboard Shortcuts</h3>
-                <div class="shortcuts-grid">
-                    <div class="shortcut-item">
-                        <span class="key">P</span>
-                        <span>Pause/Resume</span>
-                    </div>
-                    <div class="shortcut-item">
-                        <span class="key">R</span>
-                        <span>Restart Game</span>
-                    </div>
-                    <div class="shortcut-item">
-                        <span class="key">M</span>
-                        <span>Mute Sound</span>
-                    </div>
-                </div>
             </div>
         </div>
     `;
@@ -274,11 +391,55 @@ function showPauseOverlay() {
     // Show overlay with animation
     setTimeout(() => {
         overlay.classList.add('visible');
+
+        // Emit overlay shown event
+        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+            TarotTetris.events.emit(TarotTetris.EVENTS.UI_OVERLAY_SHOWN, {
+                overlayId: overlay.id,
+                overlayType: 'pause',
+                activeTab: 'stats'
+            });
+        }
     }, 100);
+
+    // Set up tab switching
+    const tabs = overlay.querySelectorAll('.pause-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            tab.classList.add('active');
+
+            // Hide all tab panes
+            const tabPanes = overlay.querySelectorAll('.tab-pane');
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+
+            // Show the selected tab pane
+            const tabName = tab.getAttribute('data-tab');
+            const tabPane = document.getElementById(`${tabName}-tab`);
+            if (tabPane) tabPane.classList.add('active');
+
+            // If shop tab is selected, initialize shop UI
+            if (tabName === 'shop' && typeof TarotTetris.shop === 'object' && typeof TarotTetris.shop.open === 'function') {
+                const shopContainer = document.getElementById('shop-container');
+                if (shopContainer) {
+                    // Create shop UI if it doesn't exist
+                    if (shopContainer.children.length === 0) {
+                        const shopUI = TarotTetris.shop.createShopUI();
+                        shopContainer.innerHTML = '';
+                        shopContainer.appendChild(shopUI);
+                        TarotTetris.shop.updateShopUI();
+                    }
+                }
+            }
+        });
+    });
 
     // Set up button handlers
     const resumeButton = document.getElementById('resume-game');
     const restartButton = document.getElementById('restart-game');
+    const convertScoreButton = document.getElementById('convert-score-btn');
 
     resumeButton.addEventListener('click', () => {
         hideOverlay(overlay);
@@ -306,6 +467,22 @@ function showPauseOverlay() {
             requestAnimationFrame(window.update);
         }
     });
+
+    // No score conversion handler needed anymore as gold is only earned from leveling up
+
+    // Initialize shop if available
+    if (typeof TarotTetris.shop === 'object' && typeof TarotTetris.shop.open === 'function') {
+        TarotTetris.shop.open();
+    }
+
+    // Initialize sound settings if available
+    if (typeof TarotTetris.sound === 'object' && typeof TarotTetris.sound.createSoundSettingsUI === 'function') {
+        const soundSettingsContainer = document.getElementById('sound-settings-container');
+        if (soundSettingsContainer) {
+            soundSettingsContainer.innerHTML = '';
+            soundSettingsContainer.appendChild(TarotTetris.sound.createSoundSettingsUI());
+        }
+    }
 
     // Set as active overlay
     overlayState.activeOverlay = overlay;
@@ -354,6 +531,17 @@ function showGameOverOverlay(playerName, score, level) {
     // Show overlay with animation
     setTimeout(() => {
         overlay.classList.add('visible');
+
+        // Emit overlay shown event
+        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+            TarotTetris.events.emit(TarotTetris.EVENTS.UI_OVERLAY_SHOWN, {
+                overlayId: overlay.id,
+                overlayType: 'gameOver',
+                playerName: playerName || 'Player',
+                score: score,
+                level: level
+            });
+        }
     }, 100);
 
     // Set up button handlers
@@ -415,6 +603,15 @@ function showLevelUpOverlay(level) {
 
     // Show overlay with animation
     overlay.classList.add('visible');
+
+    // Emit overlay shown event
+    if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+        TarotTetris.events.emit(TarotTetris.EVENTS.UI_OVERLAY_SHOWN, {
+            overlayId: overlay.id,
+            overlayType: 'levelUp',
+            level: level
+        });
+    }
 
     // Auto-hide after a delay
     setTimeout(() => {
@@ -499,6 +696,7 @@ function showObjectivesOverlay() {
 function hideOverlay(overlay) {
     if (!overlay) return;
 
+    const overlayId = overlay.id;
     overlay.classList.remove('visible');
     setTimeout(() => {
         if (overlay.parentNode) {
@@ -507,6 +705,14 @@ function hideOverlay(overlay) {
     }, 300); // Match this with CSS transition time
 
     overlayState.activeOverlay = null;
+
+    // Emit overlay hidden event
+    if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+        TarotTetris.events.emit(TarotTetris.EVENTS.UI_OVERLAY_HIDDEN, {
+            overlayId: overlayId,
+            overlayType: overlayId ? overlayId.replace('-overlay', '') : 'unknown'
+        });
+    }
 }
 
 /**

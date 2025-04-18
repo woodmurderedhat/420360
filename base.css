@@ -9,6 +9,7 @@
     --neon-cyan: #00fff7;
     --neon-blue: #6e44ff;
     --neon-green: #39ff14;
+    --neon-gold: #ffd700;
     --arcade-bg: linear-gradient(135deg, #23272b 0%, #1a1a1a 100%);
     --arcade-gradient: linear-gradient(120deg, #ffaa00, #6e44ff, #00fff7, #ff2e9a, #ffaa00);
     --arcade-shadow: 0 0 2rem #6e44ff88, 0 0 1rem #ffdd57;
@@ -198,10 +199,27 @@ h1, .arcade-title {
 }
 
 /* Apply pixel font to key UI elements */
-.score-text, .level-text, .leaderboard-title, .leaderboard-list, #score, #level, #leaderboard {
+.score-text, .level-text, .gold-text, .leaderboard-title, .leaderboard-list, #score, #level, #gold, #leaderboard {
     font-family: 'Press Start 2P', monospace !important;
     letter-spacing: 0.04em;
     text-shadow: 0 0 2px #000, 0 0 8px var(--neon-yellow);
+}
+
+/* Gold specific styling */
+.gold-text, #gold {
+    color: var(--neon-gold);
+    text-shadow: 0 0 2px #000, 0 0 8px var(--neon-gold);
+}
+
+/* Highlight animation for gold changes */
+#gold.highlight {
+    animation: gold-highlight 0.5s ease-in-out;
+}
+
+@keyframes gold-highlight {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); color: white; text-shadow: 0 0 10px var(--neon-gold), 0 0 20px var(--neon-gold); }
+    100% { transform: scale(1); }
 }
 
 /* Footer Ads Row */

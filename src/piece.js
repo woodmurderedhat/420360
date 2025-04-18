@@ -3,25 +3,25 @@
  * All possible tetromino definitions (standard + esoteric).
  */
 exports.ALL_TETROMINOES = {
-    I: { shape: [[1, 1, 1, 1]], score: 40 },
-    O: { shape: [[1, 1], [1, 1]], score: 30 },
-    T: { shape: [[0, 1, 0], [1, 1, 1]], score: 50 },
-    S: { shape: [[0, 1, 1], [1, 1, 0]], score: 60 },
-    Z: { shape: [[1, 1, 0], [0, 1, 1]], score: 60 },
-    J: { shape: [[1, 0, 0], [1, 1, 1]], score: 70 },
-    L: { shape: [[0, 0, 1], [1, 1, 1]], score: 70 },
+    I: { shape: [[1, 1, 1, 1]], score: 4 },
+    O: { shape: [[1, 1], [1, 1]], score: 3 },
+    T: { shape: [[0, 1, 0], [1, 1, 1]], score: 5 },
+    S: { shape: [[0, 1, 1], [1, 1, 0]], score: 6 },
+    Z: { shape: [[1, 1, 0], [0, 1, 1]], score: 6 },
+    J: { shape: [[1, 0, 0], [1, 1, 1]], score: 7 },
+    L: { shape: [[0, 0, 1], [1, 1, 1]], score: 7 },
 
     // Esoteric variants (initially locked)
-    SIGIL: { shape: [[1, 0], [1, 1], [1, 0]], score: 75 },
-    HEX: { shape: [[0, 1, 0], [1, 1, 1], [0, 1, 0]], score: 90 },
-    YOD: { shape: [[0, 1], [1, 1], [0, 1]], score: 85 },
-    CROSS: { shape: [[0, 1, 0], [1, 1, 1], [0, 1, 0]], score: 100 },
-    KEY: { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 1]], score: 95 },
-    EYE: { shape: [[0, 1, 0], [1, 1, 1], [1, 0, 1]], score: 105 },
-    SERPENT: { shape: [[1, 1, 0], [1, 0, 1], [0, 1, 1]], score: 120 },
-    TREE: { shape: [[0, 1, 0], [1, 1, 1], [1, 0, 1]], score: 110 },
-    RUNE: { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 1]], score: 85 },
-    ANKH: { shape: [[0, 1, 0], [1, 1, 1], [0, 1, 0], [0, 1, 0]], score: 130 }
+    SIGIL: { shape: [[1, 0], [1, 1], [1, 0]], score: 8 },
+    HEX: { shape: [[0, 1, 0], [1, 1, 1], [0, 1, 0]], score: 9 },
+    YOD: { shape: [[0, 1], [1, 1], [0, 1]], score: 8 },
+    CROSS: { shape: [[0, 1, 0], [1, 1, 1], [0, 1, 0]], score: 10 },
+    KEY: { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 1]], score: 9 },
+    EYE: { shape: [[0, 1, 0], [1, 1, 1], [1, 0, 1]], score: 11 },
+    SERPENT: { shape: [[1, 1, 0], [1, 0, 1], [0, 1, 1]], score: 12 },
+    TREE: { shape: [[0, 1, 0], [1, 1, 1], [1, 0, 1]], score: 11 },
+    RUNE: { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 1]], score: 8 },
+    ANKH: { shape: [[0, 1, 0], [1, 1, 1], [0, 1, 0], [0, 1, 0]], score: 13 }
 };
 
 // Start with only the standard 7 tetrominoes unlocked
@@ -52,6 +52,7 @@ class Piece {
         this.position = { x: 3, y: 0 }; // Start position
         this.typeIndex = Object.keys(exports.ALL_TETROMINOES).indexOf(randomKey); // For color
         this.type = randomKey;
+        this.rotation = 0; // 0 = spawn orientation, 1 = 90° clockwise, 2 = 180°, 3 = 270° clockwise
     }
 
     /**
@@ -223,27 +224,145 @@ class Piece {
 
     /**
      * Undoes a rotation by rotating the piece back to its original orientation.
+     * @param {Board} board - The game board.
      */
-    undoRotate() {
-        this.rotate();
-        this.rotate();
-        this.rotate();
+    undoRotate(board) {
+        if (!board) return;
+
+        // Store current rotation state (0-3)
+        const currentRotation = this.rotation || 0;
+        const previousRotation = (currentRotation + 3) % 4; // -1 + 4 = 3 (mod 4)
+
+        // Store original shape and position
+        const originalShape = this.shape.map(row => [...row]);
+        const originalPosition = { ...this.position };
+
+        // Rotate the shape three times (equivalent to rotating counter-clockwise once)
+        for (let i = 0; i < 3; i++) {
+            this.shape = this.shape[0].map((_, index) =>
+                this.shape.map(row => row[index]).reverse()
+            );
+        }
+
+        // Check if rotation is valid without wall kicks
+        if (!board.collides(this) &&
+            this.position.x >= 0 &&
+            this.position.x + this.shape[0].length <= board.columns) {
+            // Rotation is valid, update rotation state
+            this.rotation = previousRotation;
+            return true;
+        }
+
+        // Try wall kicks
+        if (TarotTetris.wallKick && typeof TarotTetris.wallKick.getWallKickData === 'function') {
+            const wallKickData = TarotTetris.wallKick.getWallKickData(this.type);
+            const kickKey = `${currentRotation}->${previousRotation}`;
+
+            if (wallKickData[kickKey]) {
+                for (const kick of wallKickData[kickKey]) {
+                    // Apply wall kick
+                    this.position.x = originalPosition.x + kick.x;
+                    this.position.y = originalPosition.y + kick.y;
+
+                    // Check if this position is valid
+                    if (!board.collides(this) &&
+                        this.position.x >= 0 &&
+                        this.position.x + this.shape[0].length <= board.columns &&
+                        this.position.y >= 0) {
+                        // Wall kick successful, update rotation state
+                        this.rotation = previousRotation;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // If we get here, rotation failed, revert to original state
+        this.shape = originalShape;
+        this.position = originalPosition;
+        return false;
     }
 
     /**
-     * Rotates the piece clockwise.
+     * Rotates the piece clockwise with wall kicks.
      * @param {Board} board - The game board.
      */
     rotate(board) {
-        const originalShape = this.shape;
+        if (!board) return;
+
+        // Store current rotation state (0-3)
+        const currentRotation = this.rotation || 0;
+        const nextRotation = (currentRotation + 1) % 4;
+
+        // Store original shape and position
+        const originalShape = this.shape.map(row => [...row]);
+        const originalPosition = { ...this.position };
+
+        // Rotate the shape
         this.shape = this.shape[0].map((_, index) =>
             this.shape.map(row => row[index]).reverse()
         );
-        if (board.collides(this)) {
-            this.shape = originalShape; // Revert rotation if it causes a collision
-        } else if (this.position.x < 0 || this.position.x + this.shape[0].length > board.columns) {
-            this.shape = originalShape; // Revert if rotation goes out of bounds
+
+        // Check if rotation is valid without wall kicks
+        if (!board.collides(this) &&
+            this.position.x >= 0 &&
+            this.position.x + this.shape[0].length <= board.columns) {
+            // Rotation is valid, update rotation state
+            this.rotation = nextRotation;
+
+            // Emit piece rotated event
+            if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+                TarotTetris.events.emit(TarotTetris.EVENTS.PIECE_ROTATED, {
+                    piece: this,
+                    fromRotation: currentRotation,
+                    toRotation: nextRotation,
+                    wallKickApplied: false
+                });
+            }
+
+            return true;
         }
+
+        // Try wall kicks
+        if (TarotTetris.wallKick && typeof TarotTetris.wallKick.getWallKickData === 'function') {
+            const wallKickData = TarotTetris.wallKick.getWallKickData(this.type);
+            const kickKey = `${currentRotation}->${nextRotation}`;
+
+            if (wallKickData[kickKey]) {
+                for (const kick of wallKickData[kickKey]) {
+                    // Apply wall kick
+                    this.position.x = originalPosition.x + kick.x;
+                    this.position.y = originalPosition.y + kick.y;
+
+                    // Check if this position is valid
+                    if (!board.collides(this) &&
+                        this.position.x >= 0 &&
+                        this.position.x + this.shape[0].length <= board.columns &&
+                        this.position.y >= 0) {
+                        // Wall kick successful, update rotation state
+                        this.rotation = nextRotation;
+
+                        // Emit piece rotated event with wall kick info
+                        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+                            TarotTetris.events.emit(TarotTetris.EVENTS.PIECE_ROTATED, {
+                                piece: this,
+                                fromRotation: currentRotation,
+                                toRotation: nextRotation,
+                                wallKickApplied: true,
+                                wallKickOffset: kick
+                            });
+                        }
+
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // If we get here, rotation failed, revert to original state
+        this.shape = originalShape;
+        this.position = originalPosition;
+        return false;
     }
 
     /**
@@ -277,7 +396,15 @@ class Piece {
      * @returns {number} The score value of the piece.
      */
     getScoreValue() {
-        return this.scoreValue;
+        return this.scoreValue || 0;
+    }
+
+    /**
+     * Upgrade this piece (increase score value).
+     * @param {number} amount
+     */
+    upgrade(amount = 50) {
+        this.scoreValue = (this.scoreValue || 0) + amount;
     }
 }
 

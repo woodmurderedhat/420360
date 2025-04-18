@@ -254,6 +254,53 @@ canvas {
     align-items: center;
 }
 
+/* Next Panel */
+#next-panel, .next-metal-panel {
+    background: var(--arcade-metal);
+    border: 2px solid var(--metal-light);
+    border-radius: 0.7rem;
+    box-shadow: 0 0 1rem var(--neon-blue) inset;
+    margin-top: 1.2rem;
+    padding: 0.7rem 0.5rem;
+    color: var(--neon-yellow);
+    text-align: center;
+}
+#next-panel h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: var(--neon-cyan);
+    letter-spacing: 0.04em;
+}
+
+#next-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    min-height: 90px;
+}
+
+.next-piece-preview {
+    display: grid;
+    background: transparent;
+    margin-bottom: 0.2rem;
+    min-width: 48px;
+    min-height: 36px;
+    max-width: 72px;
+    max-height: 54px;
+    justify-content: center;
+    align-items: center;
+    /* Optionally add a border or shadow */
+}
+
+.next-piece-preview .block {
+    width: 18px;
+    height: 18px;
+    border-radius: 0.2rem;
+    box-shadow: 0 0 0.3rem #000a;
+    border: 1px solid #222;
+}
+
 /* Info/Score/Level Text */
 .info-text, .level-text, .score-text {
     font-size: 1.1rem;

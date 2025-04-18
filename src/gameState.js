@@ -1,6 +1,6 @@
 /**
  * Game State and UI Helpers for Tarot Tetris.
- * Attaches state variables and helper functions for score, level, combo, and UI updates to window.TarotTetris.
+ * Attaches state variables and helper functions for score, level, combo, gold, and UI updates to window.TarotTetris.
  */
 (function(exports) {
     exports.score = 0;
@@ -9,6 +9,14 @@
     exports.dropInterval = 500;
     exports.linesClearedThisLevel = 0;
     exports.linesToLevelUp = 10;
+
+    // Load gold from localStorage or initialize to 0
+    try {
+        exports.gold = parseInt(localStorage.getItem('tarotTetrisGold')) || 0;
+    } catch (e) {
+        exports.gold = 0;
+        console.error('Error loading gold from localStorage:', e);
+    }
 
     exports.setGameSpeed = function(speed) {
         exports.dropInterval = speed;
@@ -38,6 +46,84 @@
             console.warn("Level element not found.");
         }
     };
+
+    // Add gold update function
+    exports.updateGold = function(goldElement) {
+        if (goldElement) {
+            goldElement.textContent = `Gold: ${exports.gold}`;
+            // Save gold to localStorage for persistence
+            try {
+                localStorage.setItem('tarotTetrisGold', exports.gold.toString());
+            } catch (e) {
+                console.error('Error saving gold to localStorage:', e);
+            }
+        } else {
+            console.warn("Gold element not found.");
+        }
+    };
+
+    // Add gold to player's total
+    exports.addGold = function(amount) {
+        exports.gold += amount;
+        // Save gold to localStorage for persistence
+        try {
+            localStorage.setItem('tarotTetrisGold', exports.gold.toString());
+        } catch (e) {
+            console.error('Error saving gold to localStorage:', e);
+        }
+        return exports.gold;
+    };
+
+    // Spend gold (returns true if successful, false if not enough gold)
+    exports.spendGold = function(amount) {
+        if (exports.gold >= amount) {
+            exports.gold -= amount;
+            // Save gold to localStorage for persistence
+            try {
+                localStorage.setItem('tarotTetrisGold', exports.gold.toString());
+            } catch (e) {
+                console.error('Error saving gold to localStorage:', e);
+            }
+            return true;
+        }
+        return false;
+    };
+
+    // Convert score to gold at a specified exchange rate
+    exports.convertScoreToGold = function(amount, exchangeRate = 10) {
+        // Check if player has enough score
+        if (exports.score >= amount) {
+            // Calculate gold to award (default: 1 gold per 10 score)
+            const goldAwarded = Math.floor(amount / exchangeRate);
+
+            // Deduct score
+            exports.score -= amount;
+
+            // Add gold
+            exports.gold += goldAwarded;
+
+            // Save gold to localStorage for persistence
+            try {
+                localStorage.setItem('tarotTetrisGold', exports.gold.toString());
+            } catch (e) {
+                console.error('Error saving gold to localStorage:', e);
+            }
+
+            return {
+                success: true,
+                goldAwarded: goldAwarded,
+                remainingScore: exports.score,
+                newGoldTotal: exports.gold
+            };
+        }
+
+        return {
+            success: false,
+            goldAwarded: 0,
+            remainingScore: exports.score,
+            newGoldTotal: exports.gold
+        };
+    };
 })(window.TarotTetris = window.TarotTetris || {});
 
 // Global updateGameInfo for tarot.js and other scripts
@@ -61,5 +147,17 @@ window.updateScore = function() {
         setTimeout(() => scoreElem.classList.remove('highlight'), 500);
     } else {
         console.warn("Score element not found.");
+    }
+};
+
+// Global updateGold for other scripts
+window.updateGold = function() {
+    var goldElem = document.getElementById('gold');
+    if (goldElem) {
+        goldElem.textContent = "Gold: " + (window.TarotTetris && window.TarotTetris.gold !== undefined ? window.TarotTetris.gold : 0);
+        goldElem.classList.add('highlight');
+        setTimeout(() => goldElem.classList.remove('highlight'), 500);
+    } else {
+        console.warn("Gold element not found.");
     }
 };

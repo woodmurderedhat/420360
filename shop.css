@@ -1,0 +1,270 @@
+/* Shop Styles for Tarot Tetris */
+
+.shop-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.shop-tabs {
+    display: flex;
+    border-bottom: 2px solid var(--neon-gold);
+    margin-bottom: 1rem;
+}
+
+.shop-tab {
+    background: var(--arcade-panel-bg);
+    color: var(--neon-yellow);
+    border: none;
+    padding: 0.8rem 1.2rem;
+    font-family: var(--arcade-font);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex: 1;
+    text-align: center;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.shop-tab:hover {
+    background: rgba(255, 215, 0, 0.2);
+    color: var(--neon-gold);
+}
+
+.shop-tab.active {
+    color: var(--neon-gold);
+    border-bottom: 2px solid var(--neon-gold);
+    box-shadow: 0 0 10px var(--neon-gold);
+}
+
+.shop-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.shop-section {
+    margin-bottom: 1.5rem;
+}
+
+.special-tetriminos {
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--neon-blue);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+.shop-section h3 {
+    color: var(--neon-gold);
+    font-family: var(--arcade-text);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 5px var(--neon-gold);
+}
+
+.shop-info {
+    color: var(--neon-blue);
+    margin: 0 0 1rem 0;
+    text-align: center;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.tetrimino-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.tetrimino-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--metal-light);
+    border-radius: 0.5rem;
+    padding: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s;
+}
+
+.tetrimino-item:hover {
+    border-color: var(--neon-gold);
+    box-shadow: 0 0 10px var(--neon-gold);
+}
+
+.tetrimino-item.locked {
+    opacity: 0.8;
+    filter: grayscale(0.5);
+}
+
+.tetrimino-item.special-tetrimino {
+    border-color: var(--neon-blue);
+    background: rgba(0, 30, 60, 0.3);
+}
+
+.tetrimino-item.special-tetrimino:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue);
+}
+
+.tetrimino-item.unlocking {
+    animation: unlocking 0.5s ease-in-out;
+}
+
+@keyframes unlocking {
+    0% { transform: scale(1); filter: grayscale(0.5); }
+    50% { transform: scale(1.1); filter: grayscale(0); box-shadow: 0 0 20px var(--neon-gold); }
+    100% { transform: scale(1); filter: grayscale(0); }
+}
+
+.tetrimino-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    margin-bottom: 0.8rem;
+}
+
+.mini-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 15px);
+    grid-template-rows: repeat(4, 15px);
+    gap: 1px;
+}
+
+.mini-cell {
+    width: 15px;
+    height: 15px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mini-cell.filled {
+    background: var(--neon-gold);
+    box-shadow: 0 0 5px var(--neon-gold);
+    border: none;
+}
+
+.tetrimino-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tetrimino-name {
+    font-family: var(--arcade-text);
+    color: var(--neon-yellow);
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.tetrimino-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--metal-light);
+}
+
+.shop-btn {
+    background: var(--arcade-gradient);
+    color: #fff;
+    border: none;
+    border-radius: 0.3rem;
+    padding: 0.5rem;
+    font-family: var(--arcade-font);
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: all 0.3s;
+}
+
+.shop-btn:hover {
+    background: var(--neon-gold);
+    box-shadow: 0 0 10px var(--neon-gold);
+}
+
+.shop-btn.special-unlock-btn {
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+}
+
+.shop-btn.special-unlock-btn:hover {
+    background: var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue);
+}
+
+.shop-btn.success {
+    background: var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green);
+}
+
+.shop-btn.error {
+    background: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+/* Shop Notification */
+.shop-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid var(--neon-blue);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    max-width: 400px;
+    width: 90%;
+    z-index: 1000;
+    box-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 0, 0, 0.5);
+    animation: notification-appear 0.5s ease-out;
+}
+
+.shop-notification h3 {
+    color: var(--neon-blue);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-size: 1.3rem;
+    text-shadow: 0 0 5px var(--neon-blue);
+}
+
+.shop-notification p {
+    color: #fff;
+    margin-bottom: 0.8rem;
+    text-align: center;
+}
+
+.shop-notification button {
+    display: block;
+    margin: 1.5rem auto 0;
+    padding: 0.5rem 2rem;
+}
+
+.shop-notification.closing {
+    animation: notification-disappear 0.5s ease-in forwards;
+}
+
+@keyframes notification-appear {
+    0% { opacity: 0; transform: translate(-50%, -60%); }
+    100% { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes notification-disappear {
+    0% { opacity: 1; transform: translate(-50%, -50%); }
+    100% { opacity: 0; transform: translate(-50%, -40%); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .tetrimino-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .shop-tab {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+}

@@ -189,6 +189,38 @@ canvas {
     background-color: transparent; /* Transparent background */
 }
 
+/* Combo Text Display */
+.combo-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--arcade-font);
+    font-size: 1.5rem;
+    color: var(--neon-gold);
+    text-shadow: 0 0 10px var(--neon-gold), 0 0 20px var(--neon-gold);
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    z-index: 20;
+    display: none;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.combo-text.pulse {
+    display: block;
+    animation: combo-pulse 1s ease-in-out;
+}
+
+@keyframes combo-pulse {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
 /* Player Info Styles */
 #player-info {
     display: flex;

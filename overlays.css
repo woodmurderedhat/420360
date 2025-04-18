@@ -531,6 +531,32 @@
     margin-top: 1rem;
 }
 
+.gold-earned {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1.5rem 0;
+    font-size: 1.5rem;
+    color: var(--neon-gold);
+    text-shadow: 0 0 5px var(--neon-gold);
+    animation: gold-shine 2s ease-in-out infinite;
+}
+
+.gold-icon {
+    font-size: 2rem;
+    margin-right: 0.5rem;
+}
+
+.gold-amount {
+    font-weight: bold;
+}
+
+@keyframes gold-shine {
+    0% { opacity: 0.8; text-shadow: 0 0 5px var(--neon-gold); }
+    50% { opacity: 1; text-shadow: 0 0 15px var(--neon-gold), 0 0 25px var(--neon-gold); }
+    100% { opacity: 0.8; text-shadow: 0 0 5px var(--neon-gold); }
+}
+
 @keyframes level-up-pulse {
     0% { transform: scale(0.5); opacity: 0; }
     50% { transform: scale(1.2); opacity: 1; }

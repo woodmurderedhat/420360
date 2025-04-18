@@ -55,6 +55,31 @@
         }
     }
 
+    // Initialize game upgrades from localStorage
+    function initGameUpgrades() {
+        try {
+            const savedUpgrades = localStorage.getItem('tarotTetrisUpgrades');
+            if (savedUpgrades) {
+                const upgrades = JSON.parse(savedUpgrades);
+
+                // Apply upgrade effects
+                window.comboMultiplierLevel = upgrades.combo_bonus || 0;
+                window.tarotChanceLevel = upgrades.tarot_chance || 0;
+                window.ghostPieceLevel = upgrades.ghost_piece || 0;
+                window.coyoteTimeLevel = upgrades.coyote_time || 0;
+
+                // Update coyote time if the function exists
+                if (typeof window.getCoyoteTime === 'function') {
+                    window.coyoteTime = window.getCoyoteTime();
+                }
+
+                console.log('Loaded upgrade levels:', upgrades);
+            }
+        } catch (e) {
+            console.error('Error loading game upgrades:', e);
+        }
+    }
+
     // Save tetrimino levels to localStorage
     function saveTetriminoLevels() {
         try {
@@ -338,7 +363,159 @@
             // Show game upgrades
             const upgradesContainer = document.createElement('div');
             upgradesContainer.className = 'shop-section';
-            upgradesContainer.innerHTML = '<h3>Game Upgrades</h3><p>Coming soon!</p>';
+            upgradesContainer.innerHTML = '<h3>Game Upgrades</h3>';
+
+            // Create upgrades grid
+            const upgradesGrid = document.createElement('div');
+            upgradesGrid.className = 'upgrades-grid';
+
+            // Define available upgrades
+            const gameUpgrades = [
+                {
+                    id: 'coyote_time',
+                    name: 'Extended Coyote Time',
+                    description: 'Increases the time you can still move a piece after it lands',
+                    baseCost: 50,
+                    maxLevel: 3,
+                    effect: (level) => {
+                        // Increase coyote time by 100ms per level
+                        if (typeof window.coyoteTime !== 'undefined') {
+                            window.coyoteTime = 300 + (level * 100);
+                        }
+                    }
+                },
+                {
+                    id: 'combo_bonus',
+                    name: 'Combo Multiplier',
+                    description: 'Increases the score multiplier for combos',
+                    baseCost: 75,
+                    maxLevel: 5,
+                    effect: (level) => {
+                        // This will be used in the clearLines function
+                        window.comboMultiplierLevel = level;
+                    }
+                },
+                {
+                    id: 'tarot_chance',
+                    name: 'Tarot Frequency',
+                    description: 'Increases the chance of getting a tarot card when clearing lines',
+                    baseCost: 100,
+                    maxLevel: 3,
+                    effect: (level) => {
+                        // This will be used in the addTarotCardToHand function
+                        window.tarotChanceLevel = level;
+                    }
+                },
+                {
+                    id: 'ghost_piece',
+                    name: 'Enhanced Ghost Piece',
+                    description: 'Makes the ghost piece more visible and useful',
+                    baseCost: 60,
+                    maxLevel: 2,
+                    effect: (level) => {
+                        window.ghostPieceLevel = level;
+                    }
+                }
+            ];
+
+            // Load upgrade levels from localStorage
+            let upgradeProgress = {};
+            try {
+                const savedProgress = localStorage.getItem('tarotTetrisUpgrades');
+                if (savedProgress) {
+                    upgradeProgress = JSON.parse(savedProgress);
+                }
+            } catch (e) {
+                console.error('Error loading upgrade progress:', e);
+            }
+
+            // Create UI for each upgrade
+            gameUpgrades.forEach(upgrade => {
+                const currentLevel = upgradeProgress[upgrade.id] || 0;
+                const nextLevel = currentLevel + 1;
+                const isMaxed = currentLevel >= upgrade.maxLevel;
+
+                // Calculate cost with level scaling
+                const upgradeCost = isMaxed ? 'MAX' : upgrade.baseCost + (currentLevel * 25);
+
+                // Create upgrade item
+                const upgradeItem = document.createElement('div');
+                upgradeItem.className = 'upgrade-item';
+                if (isMaxed) upgradeItem.classList.add('maxed');
+
+                upgradeItem.innerHTML = `
+                    <div class="upgrade-info">
+                        <h4>${upgrade.name}</h4>
+                        <p>${upgrade.description}</p>
+                        <div class="upgrade-level">
+                            <span>Level: ${currentLevel}/${upgrade.maxLevel}</span>
+                            <div class="level-bar">
+                                ${Array(upgrade.maxLevel).fill().map((_, i) =>
+                                    `<div class="level-pip ${i < currentLevel ? 'filled' : ''}"></div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="upgrade-action">
+                        <button class="shop-btn upgrade-btn ${isMaxed ? 'disabled' : ''}">
+                            ${isMaxed ? 'MAXED' : `Upgrade (${upgradeCost} Gold)`}
+                        </button>
+                    </div>
+                `;
+
+                // Add click handler for upgrade button
+                if (!isMaxed) {
+                    const upgradeBtn = upgradeItem.querySelector('.upgrade-btn');
+                    upgradeBtn.addEventListener('click', () => {
+                        if (TarotTetris.spendGold(upgradeCost)) {
+                            // Update level
+                            upgradeProgress[upgrade.id] = nextLevel;
+
+                            // Save progress
+                            try {
+                                localStorage.setItem('tarotTetrisUpgrades', JSON.stringify(upgradeProgress));
+                            } catch (e) {
+                                console.error('Error saving upgrade progress:', e);
+                            }
+
+                            // Apply effect
+                            upgrade.effect(nextLevel);
+
+                            // Update UI
+                            updateShopUI();
+
+                            // Update gold display
+                            const goldElement = document.getElementById('gold');
+                            if (goldElement && typeof TarotTetris.updateGold === 'function') {
+                                TarotTetris.updateGold(goldElement);
+                            }
+
+                            // Success feedback
+                            upgradeBtn.classList.add('success');
+                            setTimeout(() => upgradeBtn.classList.remove('success'), 500);
+
+                            // Emit upgrade purchased event
+                            if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+                                TarotTetris.events.emit(TarotTetris.EVENTS.ITEM_PURCHASED, {
+                                    itemId: upgrade.id,
+                                    itemName: upgrade.name,
+                                    oldLevel: currentLevel,
+                                    newLevel: nextLevel,
+                                    cost: upgradeCost
+                                });
+                            }
+                        } else {
+                            // Failure feedback
+                            upgradeBtn.classList.add('error');
+                            setTimeout(() => upgradeBtn.classList.remove('error'), 500);
+                        }
+                    });
+                }
+
+                upgradesGrid.appendChild(upgradeItem);
+            });
+
+            upgradesContainer.appendChild(upgradesGrid);
             contentContainer.appendChild(upgradesContainer);
         }
     }
@@ -359,10 +536,20 @@
             const grid = document.createElement('div');
             grid.className = 'mini-grid';
 
+            // Get the color index for this tetromino type
+            const typeIndex = Object.keys(TarotTetris.ALL_TETROMINOES).indexOf(type);
+            // Same color palette used in the game
+            const colors = ['#ff5722', '#4caf50', '#2196f3', '#ffeb3b', '#9c27b0', '#00bcd4', '#e91e63'];
+            const color = colors[typeIndex % colors.length];
+
             tetrimino.shape.forEach(row => {
                 row.forEach(cell => {
                     const cellElem = document.createElement('div');
                     cellElem.className = cell ? 'mini-cell filled' : 'mini-cell';
+                    if (cell) {
+                        cellElem.style.backgroundColor = color;
+                        cellElem.style.boxShadow = `0 0 5px ${color}`;
+                    }
                     grid.appendChild(cellElem);
                 });
             });
@@ -452,12 +639,15 @@
     // Initialize the shop
     function initShop() {
         initTetriminoLevels();
+        initGameUpgrades();
 
         // Export functions to global scope
         window.openShop = openShop;
         window.closeShop = closeShop;
         window.upgradeTetrimino = upgradeTetrimino;
         window.unlockTetrimino = unlockTetrimino;
+
+        console.log('Shop system initialized with game upgrades');
     }
 
     // Open the shop

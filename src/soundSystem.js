@@ -18,6 +18,14 @@
         effects: {}
     };
 
+    // Music playlist management
+    const musicPlaylist = {
+        tracks: [],
+        currentIndex: 0,
+        isPlaying: false,
+        gameMode: 'menu' // Can be 'menu', 'gameplay', 'gameover'
+    };
+
     // List of sound effects
     const SOUND_EFFECTS = {
         PIECE_MOVE: 'move',
@@ -37,31 +45,26 @@
         TETRIMINO_UNLOCK: 'unlock'
     };
 
-    // Sound file paths - using actual sound files from assets/sounds directory
-    const SOUND_PATHS = {
-        [SOUND_EFFECTS.PIECE_MOVE]: 'assets/sounds/Clap02.wav',
-        [SOUND_EFFECTS.PIECE_ROTATE]: 'assets/sounds/Clap03.wav',
-        [SOUND_EFFECTS.PIECE_DROP]: 'assets/sounds/Clap04.wav',
-        [SOUND_EFFECTS.PIECE_LOCK]: 'assets/sounds/Clap05.wav',
-        [SOUND_EFFECTS.PIECE_HOLD]: 'assets/sounds/Clap06.wav',
-        [SOUND_EFFECTS.LINE_CLEAR]: 'assets/sounds/Clap02.wav',
-        [SOUND_EFFECTS.LEVEL_UP]: 'assets/sounds/Clap03.wav',
-        [SOUND_EFFECTS.GAME_OVER]: 'assets/sounds/Clap04.wav',
-        [SOUND_EFFECTS.TAROT_CARD_PLAY]: 'assets/sounds/Clap05.wav',
-        [SOUND_EFFECTS.TAROT_CARD_DRAW]: 'assets/sounds/Clap06.wav',
-        [SOUND_EFFECTS.MENU_SELECT]: 'assets/sounds/Clap02.wav',
-        [SOUND_EFFECTS.MENU_NAVIGATE]: 'assets/sounds/Clap03.wav',
-        [SOUND_EFFECTS.SHOP_PURCHASE]: 'assets/sounds/Clap04.wav',
-        [SOUND_EFFECTS.SHOP_UPGRADE]: 'assets/sounds/Clap05.wav',
-        [SOUND_EFFECTS.TETRIMINO_UNLOCK]: 'assets/sounds/Clap06.wav'
-    };
+    // Sound file paths - will be populated dynamically
+    const SOUND_PATHS = {};
 
-    // Music tracks - using actual music files from assets/music directory
-    const MUSIC_TRACKS = {
-        MAIN_THEME: 'assets/music/BreakBeat_Slice01.wav',
-        GAME_PLAY: 'assets/music/BreakBeat_Slice02.wav',
-        GAME_OVER: 'assets/music/BreakBeat_Slice03.wav',
-        LEVEL_UP: 'assets/music/BreakBeat_Slice04.wav'
+    // Default sound mappings - fallbacks if specific sounds aren't found
+    const DEFAULT_SOUND_MAPPINGS = {
+        [SOUND_EFFECTS.PIECE_MOVE]: 'Clap02.wav',
+        [SOUND_EFFECTS.PIECE_ROTATE]: 'Clap03.wav',
+        [SOUND_EFFECTS.PIECE_DROP]: 'Clap04.wav',
+        [SOUND_EFFECTS.PIECE_LOCK]: 'Clap05.wav',
+        [SOUND_EFFECTS.PIECE_HOLD]: 'Clap06.wav',
+        [SOUND_EFFECTS.LINE_CLEAR]: 'Clap02.wav',
+        [SOUND_EFFECTS.LEVEL_UP]: 'Clap03.wav',
+        [SOUND_EFFECTS.GAME_OVER]: 'Clap04.wav',
+        [SOUND_EFFECTS.TAROT_CARD_PLAY]: 'Clap05.wav',
+        [SOUND_EFFECTS.TAROT_CARD_DRAW]: 'Clap06.wav',
+        [SOUND_EFFECTS.MENU_SELECT]: 'Clap02.wav',
+        [SOUND_EFFECTS.MENU_NAVIGATE]: 'Clap03.wav',
+        [SOUND_EFFECTS.SHOP_PURCHASE]: 'Clap04.wav',
+        [SOUND_EFFECTS.SHOP_UPGRADE]: 'Clap05.wav',
+        [SOUND_EFFECTS.TETRIMINO_UNLOCK]: 'Clap06.wav'
     };
 
     /**
@@ -81,14 +84,78 @@
 
         // Create music element
         audioElements.music = new Audio();
-        audioElements.music.loop = true;
+        audioElements.music.loop = false; // Set to false for playlist functionality
         audioElements.music.volume = soundSettings.musicVolume;
+
+        // Set up event for when a track ends to play the next one
+        audioElements.music.addEventListener('ended', playNextTrack);
+
+        // Load available sounds and music
+        loadSoundFiles();
+        loadMusicFiles();
 
         // Set up event listeners
         setupEventListeners();
 
         // Create placeholder elements for sound effects
         // We'll create actual audio elements on demand to save resources
+    }
+
+    /**
+     * Load sound files from the assets/sounds directory
+     */
+    function loadSoundFiles() {
+        // In a browser environment, we can't directly read directory contents
+        // So we'll use our default mappings and check if files exist
+        for (const [soundId, filename] of Object.entries(DEFAULT_SOUND_MAPPINGS)) {
+            SOUND_PATHS[soundId] = `assets/sounds/${filename}`;
+        }
+
+        console.log('Sound files loaded:', Object.keys(SOUND_PATHS).length);
+    }
+
+    /**
+     * Load music files from the assets/music directory
+     * and also include music files from assets/sounds if needed
+     */
+    function loadMusicFiles() {
+        // In a browser environment, we can't directly read directory contents
+        // So we'll hardcode the music files we know exist
+        const knownMusicFiles = [
+            'assets/music/recording_2024-03-24_14-41.wav'
+        ];
+
+        // Add BreakBeat files - check both music and sounds directories
+        const breakBeatFiles = [
+            { path: 'assets/music/BreakBeat_Slice01.wav', fallback: 'assets/sounds/BreakBeat_Slice01.wav' },
+            { path: 'assets/music/BreakBeat_Slice02.wav', fallback: 'assets/sounds/BreakBeat_Slice02.wav' },
+            { path: 'assets/music/BreakBeat_Slice03.wav', fallback: 'assets/sounds/BreakBeat_Slice03.wav' },
+            { path: 'assets/music/BreakBeat_Slice04.wav', fallback: 'assets/sounds/BreakBeat_Slice04.wav' }
+        ];
+
+        // Check each BreakBeat file and add it to the playlist
+        breakBeatFiles.forEach(file => {
+            // We'll add the primary path and let the audio system fall back if needed
+            knownMusicFiles.push(file.path);
+
+            // Log a warning if we're using the fallback path
+            const testAudio = new Audio();
+            testAudio.src = file.path;
+            testAudio.addEventListener('error', () => {
+                console.warn(`Music file ${file.path} not found, using fallback: ${file.fallback}`);
+                // Replace the path in the playlist
+                const index = musicPlaylist.tracks.indexOf(file.path);
+                if (index !== -1) {
+                    musicPlaylist.tracks[index] = file.fallback;
+                }
+            });
+        });
+
+        // Add all known music files to the playlist
+        musicPlaylist.tracks = knownMusicFiles;
+        musicPlaylist.currentIndex = 0;
+
+        console.log('Music playlist loaded:', musicPlaylist.tracks.length, 'tracks');
     }
 
     /**
@@ -129,37 +196,45 @@
             TarotTetris.events.on(TarotTetris.EVENTS.GAME_INITIALIZED, () => {
                 // Play a startup sound when the game is initialized
                 playSound(SOUND_EFFECTS.MENU_SELECT);
-                // Start with main theme music
-                playMusic(MUSIC_TRACKS.MAIN_THEME);
+                // Start with menu music
+                musicPlaylist.gameMode = 'menu';
+                startMusicPlaylist();
             });
 
             TarotTetris.events.on(TarotTetris.EVENTS.GAME_STARTED, () => {
-                playMusic(MUSIC_TRACKS.GAME_PLAY);
+                musicPlaylist.gameMode = 'gameplay';
+                startMusicPlaylist();
             });
 
             TarotTetris.events.on(TarotTetris.EVENTS.GAME_PAUSED, () => {
                 // Play a pause sound
                 playSound(SOUND_EFFECTS.MENU_SELECT);
+                // Pause music
+                if (audioElements.music) {
+                    audioElements.music.pause();
+                    musicPlaylist.isPlaying = false;
+                }
             });
 
             TarotTetris.events.on(TarotTetris.EVENTS.GAME_RESUMED, () => {
                 // Play a resume sound
                 playSound(SOUND_EFFECTS.MENU_SELECT);
+                // Resume music
+                if (audioElements.music && soundSettings.musicEnabled) {
+                    audioElements.music.play().catch(e => console.warn('Could not play audio:', e));
+                    musicPlaylist.isPlaying = true;
+                }
             });
 
             TarotTetris.events.on(TarotTetris.EVENTS.GAME_OVER, () => {
                 playSound(SOUND_EFFECTS.GAME_OVER);
-                playMusic(MUSIC_TRACKS.GAME_OVER, false);
+                musicPlaylist.gameMode = 'gameover';
+                startMusicPlaylist();
             });
 
             TarotTetris.events.on(TarotTetris.EVENTS.LEVEL_UP, () => {
                 playSound(SOUND_EFFECTS.LEVEL_UP);
-                // Briefly play level up music, then return to game play
-                const currentMusic = audioElements.music.src;
-                playMusic(MUSIC_TRACKS.LEVEL_UP, false);
-                setTimeout(() => {
-                    playMusic(currentMusic);
-                }, 3000);
+                // We'll just play the level up sound without changing music
             });
 
             // Piece events
@@ -230,19 +305,21 @@
 
             // UI events
             TarotTetris.events.on(TarotTetris.EVENTS.UI_OVERLAY_SHOWN, (data) => {
-                if (data.overlayType === 'pause') {
+                if (data && data.overlayType === 'pause') {
                     // Pause music when pause overlay is shown
                     if (audioElements.music) {
                         audioElements.music.pause();
+                        musicPlaylist.isPlaying = false;
                     }
                 }
             });
 
             TarotTetris.events.on(TarotTetris.EVENTS.UI_OVERLAY_HIDDEN, (data) => {
-                if (data.overlayType === 'pause') {
+                if (data && data.overlayType === 'pause') {
                     // Resume music when pause overlay is hidden
                     if (audioElements.music && !audioElements.music.ended && soundSettings.musicEnabled) {
                         audioElements.music.play().catch(e => console.warn('Could not play audio:', e));
+                        musicPlaylist.isPlaying = true;
                     }
                 }
             });
@@ -267,23 +344,140 @@
             return;
         }
 
-        // Create or reuse audio element
-        let audio = audioElements.effects[soundId];
-        if (!audio) {
-            audio = new Audio(soundPath);
-            audioElements.effects[soundId] = audio;
-        } else {
-            // Reset the audio to play from the beginning
-            audio.currentTime = 0;
-        }
+        try {
+            // Always create a new audio element to avoid interruption issues
+            const audio = new Audio(soundPath);
+            audio.volume = soundVolume;
 
-        // Set volume and play
-        audio.volume = soundVolume;
-        audio.play().catch(e => console.warn('Could not play audio:', e));
+            // Store the audio element for potential future reference
+            audioElements.effects[soundId] = audio;
+
+            // Play the sound with a promise to handle errors
+            audio.play().catch(e => {
+                // Just log the error but don't retry for sound effects
+                // as they're usually time-sensitive
+                console.warn(`Could not play sound effect ${soundId}:`, e);
+            });
+        } catch (e) {
+            console.warn(`Error setting up sound effect ${soundId}:`, e);
+        }
     }
 
     /**
-     * Play background music
+     * Start playing the music playlist
+     */
+    function startMusicPlaylist() {
+        if (!soundSettings.musicEnabled || musicPlaylist.tracks.length === 0) return;
+
+        // Stop any currently playing music first
+        if (audioElements.music) {
+            try {
+                audioElements.music.pause();
+                audioElements.music.currentTime = 0;
+            } catch (e) {
+                console.warn('Error stopping current music:', e);
+            }
+        }
+
+        // Reset to the first track
+        musicPlaylist.currentIndex = 0;
+        musicPlaylist.isPlaying = true;
+
+        // Play the current track
+        setTimeout(playCurrentTrack, 100); // Small delay to avoid interruption issues
+    }
+
+    /**
+     * Play the current track in the playlist
+     */
+    function playCurrentTrack() {
+        if (!soundSettings.musicEnabled || !musicPlaylist.isPlaying) return;
+
+        // Make sure we have a valid index
+        if (musicPlaylist.currentIndex >= musicPlaylist.tracks.length) {
+            musicPlaylist.currentIndex = 0;
+        }
+
+        // Get the current track
+        const currentTrack = musicPlaylist.tracks[musicPlaylist.currentIndex];
+
+        // Create a new audio element each time to avoid interruption issues
+        const oldAudio = audioElements.music;
+
+        // Create a new audio element
+        audioElements.music = new Audio();
+        audioElements.music.loop = false; // We handle looping through the playlist
+        audioElements.music.volume = soundSettings.musicVolume;
+
+        // Set up event for when a track ends to play the next one
+        audioElements.music.addEventListener('ended', playNextTrack);
+
+        // Set new music source
+        audioElements.music.src = currentTrack;
+
+        // Stop old audio if it exists
+        if (oldAudio) {
+            try {
+                oldAudio.pause();
+                oldAudio.currentTime = 0;
+                // Remove event listeners to prevent memory leaks
+                oldAudio.removeEventListener('ended', playNextTrack);
+            } catch (e) {
+                console.warn('Error stopping previous audio:', e);
+            }
+        }
+
+        // Play the music with retry logic
+        const playWithRetry = (retries = 3) => {
+            audioElements.music.play().catch(e => {
+                console.warn(`Could not play audio (retries left: ${retries}):`, e);
+                if (retries > 0) {
+                    // Wait a bit and retry
+                    setTimeout(() => playWithRetry(retries - 1), 500);
+                } else {
+                    // Try the next track if this one fails after all retries
+                    setTimeout(playNextTrack, 1000);
+                }
+            });
+        };
+
+        playWithRetry();
+    }
+
+    /**
+     * Play the next track in the playlist
+     */
+    function playNextTrack() {
+        if (!soundSettings.musicEnabled) return;
+
+        // Set playing state
+        musicPlaylist.isPlaying = true;
+
+        // Move to the next track
+        musicPlaylist.currentIndex = (musicPlaylist.currentIndex + 1) % musicPlaylist.tracks.length;
+
+        // Play the current track with a small delay to avoid interruption issues
+        setTimeout(playCurrentTrack, 50);
+    }
+
+    /**
+     * Play the previous track in the playlist
+     */
+    function playPreviousTrack() {
+        if (!soundSettings.musicEnabled) return;
+
+        // Set playing state
+        musicPlaylist.isPlaying = true;
+
+        // Move to the previous track
+        musicPlaylist.currentIndex = (musicPlaylist.currentIndex - 1 + musicPlaylist.tracks.length) % musicPlaylist.tracks.length;
+
+        // Play the current track with a small delay to avoid interruption issues
+        setTimeout(playCurrentTrack, 50);
+    }
+
+    /**
+     * Play background music (legacy method, now uses playlist)
      * @param {string} musicPath - The path to the music file
      * @param {boolean} loop - Whether to loop the music (default: true)
      */
@@ -303,15 +497,30 @@
 
         // Play the music
         audioElements.music.play().catch(e => console.warn('Could not play audio:', e));
+
+        // Update playlist state
+        musicPlaylist.isPlaying = true;
     }
 
     /**
      * Stop the currently playing music
      */
     function stopMusic() {
+        // Update playlist state first
+        musicPlaylist.isPlaying = false;
+
+        // Then stop the audio
         if (audioElements.music) {
-            audioElements.music.pause();
-            audioElements.music.currentTime = 0;
+            try {
+                audioElements.music.pause();
+                audioElements.music.currentTime = 0;
+            } catch (e) {
+                console.warn('Error stopping music:', e);
+                // Create a new audio element to ensure clean state
+                audioElements.music = new Audio();
+                audioElements.music.volume = soundSettings.musicVolume;
+                audioElements.music.addEventListener('ended', playNextTrack);
+            }
         }
     }
 
@@ -324,8 +533,13 @@
 
         if (soundSettings.musicEnabled) {
             // Resume music if it was playing
-            if (audioElements.music && audioElements.music.src) {
-                audioElements.music.play().catch(e => console.warn('Could not play audio:', e));
+            if (musicPlaylist.isPlaying) {
+                if (audioElements.music && audioElements.music.src) {
+                    audioElements.music.play().catch(e => console.warn('Could not play audio:', e));
+                } else {
+                    // Start the playlist if no music is currently loaded
+                    startMusicPlaylist();
+                }
             }
         } else {
             // Pause music
@@ -358,6 +572,22 @@
             audioElements.music.volume = soundSettings.musicVolume;
         }
         saveSettings();
+    }
+
+    /**
+     * Get the current music track information
+     * @returns {Object} Information about the current track
+     */
+    function getCurrentTrackInfo() {
+        if (musicPlaylist.tracks.length === 0) {
+            return { index: -1, path: null, total: 0 };
+        }
+
+        return {
+            index: musicPlaylist.currentIndex,
+            path: musicPlaylist.tracks[musicPlaylist.currentIndex],
+            total: musicPlaylist.tracks.length
+        };
     }
 
     /**
@@ -458,8 +688,11 @@
         setSoundVolume,
         getSettings,
         createSoundSettingsUI,
-        SOUND_EFFECTS,
-        MUSIC_TRACKS
+        startMusicPlaylist,
+        playNextTrack,
+        playPreviousTrack,
+        getCurrentTrackInfo,
+        SOUND_EFFECTS
     };
 
 })(window.TarotTetris = window.TarotTetris || {});

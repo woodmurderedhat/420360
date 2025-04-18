@@ -439,7 +439,6 @@ function showPauseOverlay() {
     // Set up button handlers
     const resumeButton = document.getElementById('resume-game');
     const restartButton = document.getElementById('restart-game');
-    const convertScoreButton = document.getElementById('convert-score-btn');
 
     resumeButton.addEventListener('click', () => {
         hideOverlay(overlay);
@@ -590,6 +589,9 @@ function showLevelUpOverlay(level) {
         document.body.appendChild(overlay);
     }
 
+    // Calculate gold earned (level * 10)
+    const goldEarned = level * 10;
+
     // Set overlay content
     overlay.innerHTML = `
         <div class="overlay-content">
@@ -598,6 +600,10 @@ function showLevelUpOverlay(level) {
                 <div class="level-number">${level}</div>
             </div>
             <p class="level-message">The game will now speed up!</p>
+            <div class="gold-earned">
+                <span class="gold-icon">💰</span>
+                <span class="gold-amount">+${goldEarned} Gold</span>
+            </div>
         </div>
     `;
 

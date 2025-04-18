@@ -90,6 +90,8 @@
     };
 
     // Convert score to gold at a specified exchange rate
+    // NOTE: This function is kept for compatibility but is no longer used in the main game flow.
+    // Gold is now only earned through leveling up.
     exports.convertScoreToGold = function(amount, exchangeRate = 10) {
         // Check if player has enough score
         if (exports.score >= amount) {

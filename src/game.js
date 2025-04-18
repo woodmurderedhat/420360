@@ -80,6 +80,27 @@ function initializeGame() {
     initializeTarotDeck();
     playerHand = [];
 
+    // Load upgrade levels from localStorage
+    try {
+        const savedUpgrades = localStorage.getItem('tarotTetrisUpgrades');
+        if (savedUpgrades) {
+            const upgrades = JSON.parse(savedUpgrades);
+
+            // Apply upgrade effects
+            window.comboMultiplierLevel = upgrades.combo_bonus || 0;
+            window.tarotChanceLevel = upgrades.tarot_chance || 0;
+            window.ghostPieceLevel = upgrades.ghost_piece || 0;
+            window.coyoteTimeLevel = upgrades.coyote_time || 0;
+
+            // Update coyote time based on upgrade level
+            coyoteTime = getCoyoteTime();
+
+            console.log('Loaded upgrade levels:', upgrades);
+        }
+    } catch (e) {
+        console.error('Error loading upgrade levels:', e);
+    }
+
     // Reset hold pieces
     heldPieces = [];
     window.heldPieces = heldPieces;
@@ -212,7 +233,7 @@ function hardDropPiece() {
         // Normal line clear (no T-spin)
         const linesCleared = clearLines();
         if (linesCleared > 0) {
-            TarotTetris.score += calculateScore(linesCleared);
+            // Score is already calculated and added in clearLines()
             TarotTetris.updateScore(scoreElement);
 
             // Update objectives panel if it exists
@@ -245,6 +266,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize sound system
     if (TarotTetris.sound && typeof TarotTetris.sound.initialize === 'function') {
         TarotTetris.sound.initialize();
+    }
+
+    // Initialize shop system to load game upgrades
+    if (TarotTetris.shop && typeof TarotTetris.shop.init === 'function') {
+        TarotTetris.shop.init();
     }
 
     // Show intro overlay on first load
@@ -360,10 +386,7 @@ function spawnPiece() {
     // Update preview UI
     updateNextUI();
 
-    // Add tarot card to hand if the function exists
-    if (typeof addTarotCardToHand === 'function') {
-        addTarotCardToHand();
-    }
+    // Tarot cards are now drawn when lines are cleared, not when pieces spawn
 
     if (board.collides(piece) || board.isBoardFull()) {
         handleGameOver();
@@ -406,7 +429,15 @@ function spawnPiece() {
 
 // Note: hardDropPiece is already defined above
 
-let coyoteTime = 300; // 300ms coyote time
+// Base coyote time with upgrade level applied
+function getCoyoteTime() {
+    // Get coyote time upgrade level (0-3)
+    const coyoteTimeLevel = window.coyoteTimeLevel || 0;
+    // Base coyote time: 300ms, +100ms per level
+    return 300 + (coyoteTimeLevel * 100);
+}
+
+let coyoteTime = getCoyoteTime(); // Initialize coyote time
 let coyoteTimerActive = false;
 
 // Enhanced update loop with modern UI updates
@@ -454,8 +485,7 @@ function update(time = 0) {
                 }
 
                 if (linesCleared > 0) {
-                    // Add normal line clear score
-                    TarotTetris.score += calculateScore(linesCleared);
+                    // Score is already calculated and added in clearLines()
                     TarotTetris.updateScore(scoreElement);
 
                     // Update objectives panel if it exists
@@ -473,7 +503,7 @@ function update(time = 0) {
                 // Normal line clear (no T-spin)
                 const linesCleared = clearLines();
                 if (linesCleared > 0) {
-                    TarotTetris.score += calculateScore(linesCleared);
+                    // Score is already calculated and added in clearLines()
                     TarotTetris.updateScore(scoreElement);
 
                     // Update objectives panel if it exists
@@ -562,8 +592,36 @@ function clearLines() {
 
         // Apply combo multiplier if combo is active
         if (TarotTetris.combo > 1) {
-            const comboMultiplier = Math.min(2, 1 + (TarotTetris.combo - 1) * 0.1); // Max 2x multiplier at 11+ combo
+            // Get combo multiplier level from upgrades (0-5)
+            const comboUpgradeLevel = window.comboMultiplierLevel || 0;
+
+            // Base multiplier: 1.1x at combo 2, increasing by 0.1 per combo
+            // Upgrade adds 0.05 per level to the multiplier growth rate
+            const baseGrowthRate = 0.1;
+            const upgradeBonus = comboUpgradeLevel * 0.05;
+            const growthRate = baseGrowthRate + upgradeBonus;
+
+            // Calculate multiplier with a higher cap based on upgrade level
+            const maxMultiplier = 2 + (comboUpgradeLevel * 0.2); // Max 3x at upgrade level 5
+            const comboMultiplier = Math.min(maxMultiplier, 1 + (TarotTetris.combo - 1) * growthRate);
+
             totalScore = Math.floor(totalScore * comboMultiplier);
+
+            // Show combo multiplier if it's significant
+            if (TarotTetris.combo >= 3) {
+                const comboText = document.getElementById('combo-text');
+                if (comboText) {
+                    comboText.textContent = `${TarotTetris.combo}x Combo! (${comboMultiplier.toFixed(1)}x)`;
+                    comboText.style.display = 'block';
+                    comboText.classList.add('pulse');
+                    setTimeout(() => {
+                        comboText.classList.remove('pulse');
+                        if (TarotTetris.combo < 3) {
+                            comboText.style.display = 'none';
+                        }
+                    }, 1000);
+                }
+            }
         }
 
         // Apply level multiplier
@@ -598,6 +656,11 @@ function clearLines() {
                 scoreEarned: totalScore,
                 score: TarotTetris.score
             });
+        }
+
+        // Add tarot card to hand when lines are cleared
+        if (typeof addTarotCardToHand === 'function') {
+            addTarotCardToHand();
         }
     } else {
         TarotTetris.combo = 0; // Reset combo if no lines are cleared
@@ -664,31 +727,12 @@ function increaseLevel() {
     }
 }
 
-// This function is now deprecated as score is calculated in clearLines()
-// It's kept for backward compatibility with any code that might call it
-function calculateScore(linesCleared) {
-    console.warn("calculateScore is deprecated. Score is now calculated based on tetromino pieces in each line.");
-    if (!piece) {
-        console.warn("Piece is undefined when calculating score.");
-        return 0;
-    }
-
-    const pieceScore = piece.getScoreValue(); // Get the unique score value of the current piece
-
-    // Base score is lines cleared * piece score value
-    let score = linesCleared * pieceScore;
-
-    // Apply combo multiplier if combo is active
-    if (TarotTetris.combo > 1) {
-        const comboMultiplier = Math.min(2, 1 + (TarotTetris.combo - 1) * 0.1); // Max 2x multiplier at 11+ combo
-        score = Math.floor(score * comboMultiplier);
-    }
-
-    // Apply level multiplier
-    const levelMultiplier = 1 + (TarotTetris.level - 1) * 0.1; // 10% increase per level
-    score = Math.floor(score * levelMultiplier);
-
-    return score;
+// This function is deprecated and no longer used in the game
+// Score is now calculated in clearLines() based on tetromino pieces in each line
+// This function is kept only for reference and backward compatibility
+function calculateScore(_linesCleared) {
+    console.error("calculateScore is deprecated and should not be called. Score is now calculated in clearLines() based on tetromino pieces in each line.");
+    return 0; // Return 0 to prevent any score calculation from this function
 }
 
 // Upgrade function for held pieces

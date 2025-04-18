@@ -638,36 +638,54 @@ function addTarotCardToHand() {
     // Prevent recursive calls if we're already in the process of adding a card
     if (window.__addingTarotCard) return;
 
+    // Get tarot chance upgrade level (0-3)
+    const tarotChanceLevel = window.tarotChanceLevel || 0;
+
+    // Base chance to draw a card: 100%
+    // With upgrades, we can draw multiple cards
+    const numCardsToAdd = 1 + (Math.random() < (tarotChanceLevel * 0.25) ? 1 : 0);
+
     window.__addingTarotCard = true;
-    var newCard = drawTarotCard();
 
-    if (playerHand.length < 6) {
-        playerHand.push(newCard);
-        updateTarotUI();
+    for (let i = 0; i < numCardsToAdd; i++) {
+        var newCard = drawTarotCard();
 
-        // Emit tarot card added event
-        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
-            TarotTetris.events.emit(TarotTetris.EVENTS.TAROT_CARD_ADDED, {
-                card: newCard,
-                description: tarotEffects[newCard] ? tarotEffects[newCard].description : '',
-                handSize: playerHand.length
-            });
+        if (playerHand.length < 6) {
+            playerHand.push(newCard);
+
+            // Emit tarot card added event
+            if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+                TarotTetris.events.emit(TarotTetris.EVENTS.TAROT_CARD_ADDED, {
+                    card: newCard,
+                    description: tarotEffects[newCard] ? tarotEffects[newCard].description : '',
+                    handSize: playerHand.length,
+                    fromUpgrade: i > 0
+                });
+            }
+        } else {
+            updateGameInfo('Warning: Your hand is being played.');
+            playTarotCard(0);
+            playerHand.push(newCard);
+
+            // Emit tarot card added event
+            if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
+                TarotTetris.events.emit(TarotTetris.EVENTS.TAROT_CARD_ADDED, {
+                    card: newCard,
+                    description: tarotEffects[newCard] ? tarotEffects[newCard].description : '',
+                    handSize: playerHand.length,
+                    autoPlayed: true,
+                    fromUpgrade: i > 0
+                });
+            }
         }
-    } else {
-        updateGameInfo('Warning: Your hand is being played.');
-        playTarotCard(0);
-        playerHand.push(newCard);
-        updateTarotUI();
+    }
 
-        // Emit tarot card added event
-        if (TarotTetris.events && typeof TarotTetris.events.emit === 'function') {
-            TarotTetris.events.emit(TarotTetris.EVENTS.TAROT_CARD_ADDED, {
-                card: newCard,
-                description: tarotEffects[newCard] ? tarotEffects[newCard].description : '',
-                handSize: playerHand.length,
-                autoPlayed: true
-            });
-        }
+    // Update UI after all cards have been added
+    updateTarotUI();
+
+    // If we got a bonus card from the upgrade, show a message
+    if (numCardsToAdd > 1) {
+        updateGameInfo(`Tarot Frequency upgrade gave you ${numCardsToAdd} cards!`);
     }
 
     window.__addingTarotCard = false;

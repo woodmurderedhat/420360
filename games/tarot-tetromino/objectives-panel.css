@@ -1,0 +1,198 @@
+/* Objectives Panel Styles */
+.objectives-panel {
+    position: fixed;
+    top: 100px;
+    right: -300px;
+    width: 280px;
+    background: var(--arcade-panel-bg);
+    border: 3px solid var(--neon-yellow);
+    border-radius: var(--arcade-radius) 0 0 var(--arcade-radius);
+    box-shadow: 0 0 1.5rem var(--neon-blue), 0 0 1rem var(--neon-yellow);
+    z-index: 1000;
+    transition: right 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    backdrop-filter: blur(8px);
+}
+
+.objectives-panel.expanded {
+    right: 0;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 2px solid var(--neon-yellow);
+    border-radius: var(--arcade-radius) 0 0 0;
+}
+
+.panel-header h3 {
+    margin: 0;
+    color: var(--neon-yellow);
+    font-size: 1.2rem;
+    text-shadow: 0 0 0.8rem var(--neon-yellow);
+}
+
+.close-panel {
+    background: none;
+    border: none;
+    color: var(--neon-cyan);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.close-panel:hover {
+    background-color: var(--neon-cyan);
+    color: #000;
+}
+
+.panel-content {
+    padding: 1rem;
+}
+
+.objective {
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.objective:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.objective-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.objective-icon {
+    font-size: 1.5rem;
+    margin-right: 0.8rem;
+}
+
+.objective-title {
+    color: var(--neon-cyan);
+    font-weight: bold;
+}
+
+.objective-details {
+    padding-left: 2.3rem;
+}
+
+.objective-progress {
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+    height: 0.6rem;
+    background-color: var(--metal-mid);
+    border-radius: 0.3rem;
+    overflow: hidden;
+    margin-bottom: 0.3rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-blue));
+    border-radius: 0.3rem;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    color: #ddd;
+    font-size: 0.8rem;
+    text-align: right;
+}
+
+.objective-description {
+    color: #ddd;
+    font-size: 0.9rem;
+}
+
+.level-display, .score-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 0.8rem var(--neon-yellow);
+    margin-bottom: 0.5rem;
+}
+
+/* Toggle Button */
+.toggle-objectives-btn {
+    position: fixed;
+    top: 100px;
+    right: 0;
+    background: var(--arcade-panel-bg);
+    border: 3px solid var(--neon-yellow);
+    border-right: none;
+    border-radius: var(--arcade-radius) 0 0 var(--arcade-radius);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 0 1rem var(--neon-blue), 0 0 0.5rem var(--neon-yellow);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toggle-objectives-btn:hover, .toggle-objectives-btn.active {
+    background: var(--neon-blue);
+    box-shadow: 0 0 1.5rem var(--neon-blue), 0 0 1rem var(--neon-yellow);
+}
+
+.toggle-objectives-btn .icon {
+    font-size: 1.2rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .objectives-panel {
+        top: auto;
+        bottom: 70px;
+        right: -280px;
+        width: 260px;
+        border-radius: var(--arcade-radius) 0 0 var(--arcade-radius);
+    }
+    
+    .toggle-objectives-btn {
+        top: auto;
+        bottom: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .objectives-panel {
+        width: 240px;
+        right: -250px;
+    }
+    
+    .panel-header h3 {
+        font-size: 1rem;
+    }
+    
+    .objective-title {
+        font-size: 0.9rem;
+    }
+    
+    .objective-icon {
+        font-size: 1.2rem;
+    }
+    
+    .level-display, .score-display {
+        font-size: 1.2rem;
+    }
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarot Tetromino</title>
+    <meta name="description" content="A mystical twist on the classic Tetris game with tarot card influences.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="overlays.css">
+    <link rel="stylesheet" href="objectives-panel.css">
+    <link rel="stylesheet" href="modern-tarot.css">
+    <link rel="stylesheet" href="shop.css">
+    <link rel="stylesheet" href="css/sound-settings.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cinzel+Decorative:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Arcade Banner Header -->
+    <header class="arcade-header metal-frame neon-glow">
+        <h1 class="arcade-title metal-text">Tarot Tetromino</h1>
+        <div id="player-info" class="metal-panel neon-glow" role="region" aria-label="Player Info">
+            <input type="hidden" id="player-name" value="Player">
+        </div>
+        <a href="../../index.html" class="back-link neon-link" aria-label="Back to 420360.xyz Home">← Back to 420360.xyz</a>
+    </header>
+
+    <!-- Tarot Dock Sidebar / Topbar -->
+    <nav id="tarot-dock" class="metal-frame neon-glow hidden" aria-label="Tarot Cards">
+        <div id="tarot-container" class="tarot-metal-panel" role="region" aria-label="Tarot Cards"></div>
+    </nav>
+
+    <!-- Main Game Layout -->
+    <main id="game-layout" class="arcade-layout">
+        <!-- Info Panel (Left) -->
+        <aside id="left-column" class="metal-panel neon-glow" role="complementary" aria-label="Game Info">
+            <div id="game-info" aria-live="polite" class="info-text">Game Info: Waiting for player...</div>
+            <div id="level" aria-live="polite" class="level-text">Level: 1</div>
+            <div id="score" aria-live="polite" class="score-text">Score: 0</div>
+            <div id="gold" aria-live="polite" class="gold-text">Gold: 0</div>
+            <div id="hold-panel" class="hold-metal-panel">
+                <h3>Hold</h3>
+                <div id="hold-container"></div>
+            </div>
+            <div id="next-panel" class="next-metal-panel">
+                <h3>Next</h3>
+                <div id="next-container"></div>
+            </div>
+        </aside>
+
+        <!-- Game Board (Center) -->
+        <section id="middle-column" class="arcade-board metal-frame neon-glow" role="region" aria-label="Game Board">
+            <div id="board-effects"></div>
+            <div id="canvas-wrapper" class="canvas-metal-frame">
+                <canvas id="tetris" width="300" height="600" aria-label="Tetris Game Board"></canvas>
+                <div id="combo-text" class="combo-text"></div>
+            </div>
+            <div id="mobile-controls" class="mobile-controls-metal" role="group" aria-label="Mobile Controls">
+                <div class="mobile-controls-row">
+                    <button class="mobile-button neon-btn" id="hold-piece" aria-label="Hold Piece">
+                        <span class="icon">🔄</span>
+                        <span class="label">Hold</span>
+                    </button>
+                    <button class="mobile-button neon-btn" id="rotate" aria-label="Rotate Piece">
+                        <span class="icon">↻</span>
+                        <span class="label">Rotate</span>
+                    </button>
+                    <button class="mobile-button neon-btn" id="hard-drop" aria-label="Hard Drop">
+                        <span class="icon">⤓</span>
+                        <span class="label">Drop</span>
+                    </button>
+                </div>
+                <div class="mobile-controls-row">
+                    <button class="mobile-button neon-btn" id="move-left" aria-label="Move Left">
+                        <span class="icon">←</span>
+                    </button>
+                    <button class="mobile-button neon-btn" id="move-down" aria-label="Move Down">
+                        <span class="icon">↓</span>
+                    </button>
+                    <button class="mobile-button neon-btn" id="move-right" aria-label="Move Right">
+                        <span class="icon">→</span>
+                    </button>
+                </div>
+                <div class="mobile-controls-row mobile-menu-row">
+                    <button class="mobile-button menu-button" id="mobile-pause" aria-label="Pause Game">
+                        <span class="icon">⏸️</span>
+                    </button>
+                    <button class="mobile-button menu-button" id="mobile-objectives" aria-label="Show Objectives">
+                        <span class="icon">📋</span>
+                    </button>
+                </div>
+            </div>
+            <div id="swipe-overlay" class="swipe-overlay" aria-hidden="true"></div>
+        </section>
+
+        <!-- Leaderboard (Right) -->
+        <!-- Leaderboard moved to footer. Right column removed. -->
+    </main>
+
+    <!-- Arcade Footer with Leaderboard and Ads -->
+    <footer class="arcade-footer metal-frame neon-glow">
+        <div class="footer-content">
+            <a
+                href="https://woodmurderedhat.com"
+                class="footer-link neon-link"
+                target="_blank"
+                rel="noopener"
+                aria-label="Visit woodmurderedhat.com"
+            >
+                woodmurderedhat.com
+            </a>
+
+            <!-- Leaderboard in Footer -->
+            <section id="footer-leaderboard" class="metal-panel neon-glow pixel-font" aria-label="Leaderboard">
+                <h2 class="leaderboard-title metal-text">Leaderboard</h2>
+                <div id="leaderboard" class="leaderboard-list" role="list" aria-label="Top Scores"></div>
+            </section>
+
+            <!-- Dynamic Arcade/Metal Ads (injected by JS) -->
+            <!-- Sidebar ad container (for tarot dock/side) -->
+            <div id="sidebar-ad-container" aria-label="Sidebar Ads"></div>
+            <!-- Below gameboard ad container -->
+            <div id="below-board-ad-container" aria-label="Below Gameboard Ads"></div>
+
+            <section class="footer-faq metal-panel" aria-label="Game FAQ">
+                <h2>How to Play</h2>
+                <dl>
+                    <dt><strong>How do I play?</strong></dt>
+                    <dd>Move and rotate falling tetrominoes to complete lines. Use arrow keys or on-screen controls.</dd>
+                    <dt><strong>What are Tarot Cards?</strong></dt>
+                    <dd>Tarot cards grant mystical effects—click to activate them and change the game!</dd>
+                    <dt><strong>How do I win or lose?</strong></dt>
+                    <dd>The game ends when the board fills up. Try to get the highest score!</dd>
+                    <dt><strong>Tips:</strong></dt>
+                    <dd>Use tarot cards wisely for powerful combos.</dd>
+                </dl>
+            </section>
+            <button id="fullscreen-button" class="neon-btn" aria-label="Toggle Fullscreen">Fullscreen</button>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="src/eventSystem.js"></script>
+    <script src="src/soundSystem.js"></script>
+    <script src="src/wallKick.js"></script>
+    <script src="src/tSpinDetection.js"></script>
+    <script src="src/board.js"></script>
+    <script src="src/piece.js"></script>
+    <script src="src/leaderboard.js"></script>
+    <script src="src/gameOverlays.js"></script>
+    <script src="src/objectivesPanel.js"></script>
+    <script src="src/tarot.js"></script>
+    <script src="src/arcadeads.js"></script>
+    <script src="src/gameControls.js"></script>
+    <script src="src/visualEffects.js"></script>
+    <script src="src/hold.js"></script>
+    <script src="src/ghostPiece.js"></script>
+    <script src="src/gameState.js"></script>
+    <script src="src/touchControls.js"></script>
+    <script src="src/shop.js"></script>
+    <script src="src/game.js"></script>
+
+    <!-- Game initialization is handled in game.js -->
+</body>
+</html>

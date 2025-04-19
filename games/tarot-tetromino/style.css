@@ -1,0 +1,31 @@
+@import url("base.css");
+@import url("tarot.css");
+@import url("board.css");
+@import url("footer.css");
+@import url("panel.css");
+@import url("effects.css");
+
+.hidden {
+  display: none !important;
+}
+
+/* Game started state */
+body.game-started {
+  /* No aggressive scroll prevention */
+}
+
+/* Back link to 420360.xyz */
+.back-link {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.back-link:hover {
+  background-color: rgba(0, 200, 255, 0.3);
+  transform: translateY(-2px);
+}

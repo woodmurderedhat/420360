@@ -1,0 +1,132 @@
+# Tarot Tetromino Codebase Analysis
+
+## Overview
+Tarot Tetromino is a web-based game that combines classic Tetris gameplay with tarot card mechanics. The game is built using vanilla JavaScript, HTML, and CSS without any external frameworks. It features a modular architecture with separate files for different game components.
+
+## Core Structure
+- **HTML/CSS/JavaScript-based web game**
+- **No external frameworks, pure vanilla JavaScript**
+- **Modular code organization with separate files for different game components**
+- **Uses a namespace pattern with `window.TarotTetris` to organize code**
+
+## Key Components
+
+### Game Core (game.js)
+- Main game loop and initialization
+- Piece spawning and movement
+- Collision detection
+- Scoring system
+- Level progression
+- Game state management (game over, restart)
+- Event handling for game events
+
+### Board System (board.js)
+- Game board representation and rendering
+- Line clearing mechanics
+- Piece collision detection
+- Board state management
+- Special board effects (clearing rows, adding garbage rows)
+- Score calculation based on tetromino pieces in each line
+
+### Piece System (piece.js)
+- Tetromino shapes and properties
+- Piece rotation and movement
+- Wall kick implementation for rotation
+- Standard and special tetromino definitions
+- Piece rendering and collision detection
+
+### Tarot Card System (tarot.js)
+- Tarot deck initialization
+- Card drawing mechanics
+- Card effect implementation
+- Visual effects for card activation
+- Player hand management
+- Various tarot card effects (morphing, spinning, drifting, etc.)
+
+### Shop System (shop.js)
+- In-game currency (gold)
+- Tetromino upgrades
+- Special tetromino unlocks
+- Game upgrades (combo multiplier, coyote time, etc.)
+- UI for shop interaction
+- Persistent upgrades via localStorage
+
+### Game State (gameState.js)
+- Score, level, and combo tracking
+- Gold management
+- UI update functions
+- Game speed control
+- Persistent state via localStorage
+
+### Event System (eventSystem.js)
+- Custom event handling
+- Game state change notifications
+- Component communication
+- Event subscription and emission
+
+### Visual Effects (visualEffects.js)
+- Particle effects
+- Screen effects (flashes, shakes)
+- Animation systems
+
+### Ghost Piece (ghostPiece.js)
+- Ghost piece visualization
+- Shows where the piece will land
+
+### Hold System (hold.js)
+- Hold piece functionality
+- Piece swapping
+
+### Game Controls (gameControls.js, touchControls.js)
+- Keyboard input handling
+- Touch input for mobile devices
+- Game control logic
+
+### Game Overlays (gameOverlays.js)
+- UI overlays for game states (intro, game over, level up)
+- Modal dialogs
+
+### Leaderboard (leaderboard.js)
+- High score tracking
+- Score display
+- Persistent scores via localStorage
+
+### Wall Kick System (wallKick.js)
+- Wall kick data for piece rotation
+- Rotation collision handling
+
+### T-Spin Detection (tSpinDetection.js)
+- T-spin move detection
+- Bonus scoring for T-spins
+
+## Gameplay Elements
+- Standard Tetris mechanics (line clearing, piece rotation)
+- Tarot card collection and activation
+- Shop for purchasing upgrades
+- Objectives system for bonus rewards
+- Leaderboard for high scores
+- T-spin detection and scoring
+- Hold piece functionality
+- Ghost piece visualization
+- Combo system for scoring
+
+## Technical Features
+- Mobile-responsive design
+- Touch controls for mobile devices
+- Local storage for game progress and high scores
+- Accessibility considerations in UI
+- Event-driven architecture
+- Modular code organization
+
+## Code Patterns
+- Namespace pattern using `window.TarotTetris`
+- IIFE (Immediately Invoked Function Expression) for module encapsulation
+- Event-driven communication between components
+- Object-oriented design for game entities
+- Defensive programming with error handling
+- Local storage for persistence
+
+## Dependencies
+- No external JavaScript libraries
+- Uses Google Fonts for typography
+- Self-contained within the game directory

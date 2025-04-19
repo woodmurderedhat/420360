@@ -1,0 +1,76 @@
+# Tarot Tetromino Codebase Context
+
+## Overview
+Tarot Tetromino is a unique twist on the classic Tetris game that incorporates tarot card mechanics. The game features standard Tetris gameplay with the addition of tarot cards that can be collected and played to trigger various effects on the game board.
+
+## Core Structure
+- HTML/CSS/JavaScript-based web game
+- No external frameworks, pure vanilla JavaScript
+- Modular code organization with separate files for different game components
+
+## Key Components
+
+### Game Core (game.js)
+- Main game loop and initialization
+- Piece spawning and movement
+- Collision detection
+- Scoring system
+- Level progression
+
+### Board System (board.js)
+- Game board representation and rendering
+- Line clearing mechanics
+- Piece collision detection
+- Board state management
+
+### Piece System (piece.js)
+- Tetromino shapes and properties
+- Piece rotation and movement
+- Ghost piece visualization
+- Hold piece functionality
+
+### Tarot Card System (tarot.js)
+- Tarot deck initialization
+- Card drawing mechanics
+- Card effect implementation
+- Visual effects for card activation
+
+### Shop System (shop.js)
+- In-game currency (gold)
+- Purchasable upgrades
+- Special tetromino unlocks
+- Persistent upgrades via localStorage
+
+### Sound System (soundSystem.js)
+- Background music management
+- Sound effects for game actions
+- Volume controls and settings
+
+### Event System (eventSystem.js)
+- Custom event handling
+- Game state change notifications
+- Component communication
+
+### Visual Effects (visualEffects.js)
+- Particle effects
+- Screen effects (flashes, shakes)
+- Animation systems
+
+## Gameplay Elements
+- Standard Tetris mechanics (line clearing, piece rotation)
+- Tarot card collection and activation
+- Shop for purchasing upgrades
+- Objectives system for bonus rewards
+- Leaderboard for high scores
+- T-spin detection and scoring
+
+## Technical Features
+- Mobile-responsive design
+- Touch controls for mobile devices
+- Local storage for game progress and high scores
+- Accessibility considerations in UI
+
+## Dependencies
+- No external JavaScript libraries
+- Uses Google Fonts for typography
+- Self-contained within the game directory

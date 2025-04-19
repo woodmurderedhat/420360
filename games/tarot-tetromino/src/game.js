@@ -168,15 +168,31 @@ if (restartGameButton) {
     console.warn("Restart game button not found.");
 }
 
-// Hard drop function for mobile controls
+// Hard drop function for mobile controls and keyboard
 function hardDropPiece() {
     if (typeof gameOver !== 'undefined' && gameOver) return;
     if (typeof gamePaused !== 'undefined' && gamePaused) return;
     if (typeof piece === 'undefined' || !piece) return;
 
-    // Drop the piece all the way down
-    while (piece.canMoveDown(board)) {
-        piece.moveDown();
+    // Use the ghost piece system to determine the landing position
+    if (TarotTetris.getLandingPosition && typeof TarotTetris.getLandingPosition === 'function') {
+        // Get the landing position from the ghost piece system
+        const landingY = TarotTetris.getLandingPosition(piece, board);
+
+        // Move the piece directly to the landing position
+        if (landingY > piece.position.y) {
+            piece.position.y = landingY;
+        } else {
+            // Fallback to the old method if ghost piece calculation fails
+            while (piece.canMoveDown(board)) {
+                piece.moveDown();
+            }
+        }
+    } else {
+        // Fallback to the old method if ghost piece system is not available
+        while (piece.canMoveDown(board)) {
+            piece.moveDown();
+        }
     }
 
     // Lock the piece in place

@@ -271,12 +271,65 @@ function setupMobileButtons() {
         });
     }
 
+    // Rotate button
+    const rotateButton = document.getElementById('rotate');
+    if (rotateButton) {
+        rotateButton.addEventListener('click', () => {
+            if (typeof piece !== 'undefined' && piece.rotate) {
+                const rotated = piece.rotate(board);
+
+                // Track if the last move was a rotation for T-spin detection
+                if (typeof lastMoveWasRotation !== 'undefined') {
+                    lastMoveWasRotation = rotated;
+                }
+
+                // Check for T-spin if rotation was successful
+                if (rotated && piece.type === 'T' && TarotTetris.tSpin &&
+                    typeof TarotTetris.tSpin.detectTSpin === 'function') {
+                    if (typeof tSpinDetected !== 'undefined') {
+                        tSpinDetected = TarotTetris.tSpin.detectTSpin(piece, board, true);
+                    }
+                }
+            }
+        });
+    }
+
     // Hard drop button
     const hardDropButton = document.getElementById('hard-drop');
     if (hardDropButton) {
         hardDropButton.addEventListener('click', () => {
             if (typeof hardDropPiece === 'function') {
                 hardDropPiece();
+            }
+        });
+    }
+
+    // Move left button
+    const moveLeftButton = document.getElementById('move-left');
+    if (moveLeftButton) {
+        moveLeftButton.addEventListener('click', () => {
+            if (typeof piece !== 'undefined' && piece.canMoveLeft && piece.canMoveLeft(board)) {
+                piece.moveLeft();
+            }
+        });
+    }
+
+    // Move right button
+    const moveRightButton = document.getElementById('move-right');
+    if (moveRightButton) {
+        moveRightButton.addEventListener('click', () => {
+            if (typeof piece !== 'undefined' && piece.canMoveRight && piece.canMoveRight(board)) {
+                piece.moveRight();
+            }
+        });
+    }
+
+    // Move down button
+    const moveDownButton = document.getElementById('move-down');
+    if (moveDownButton) {
+        moveDownButton.addEventListener('click', () => {
+            if (typeof piece !== 'undefined' && piece.canMoveDown && piece.canMoveDown(board)) {
+                piece.moveDown();
             }
         });
     }

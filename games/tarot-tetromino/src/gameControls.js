@@ -279,8 +279,8 @@ if (moveRightButton) {
 if (moveDownButton) {
     moveDownButton.addEventListener('click', () => {
         if (typeof gameOver !== "undefined" && gameOver) return;
-        if (typeof hardDropPiece === "function") {
-            hardDropPiece();
+        if (typeof piece !== "undefined" && piece.canMoveDown && piece.canMoveDown(board)) {
+            piece.moveDown();
             if (typeof updateScore === "function") updateScore();
         }
     });

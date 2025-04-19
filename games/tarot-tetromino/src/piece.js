@@ -245,9 +245,19 @@ class Piece {
         }
 
         // Check if rotation is valid without wall kicks
-        if (!board.collides(this) &&
-            this.position.x >= 0 &&
-            this.position.x + this.shape[0].length <= board.columns) {
+        // Use getCoordinates to check boundaries properly
+        const coordinates = this.getCoordinates();
+        let isValidPosition = true;
+
+        // Check if any part of the piece is out of bounds
+        for (let coord of coordinates) {
+            if (coord.x < 0 || coord.x >= board.columns || coord.y < 0 || coord.y >= board.rows) {
+                isValidPosition = false;
+                break;
+            }
+        }
+
+        if (!board.collides(this) && isValidPosition) {
             // Rotation is valid, update rotation state
             this.rotation = previousRotation;
             return true;
@@ -264,11 +274,19 @@ class Piece {
                     this.position.x = originalPosition.x + kick.x;
                     this.position.y = originalPosition.y + kick.y;
 
-                    // Check if this position is valid
-                    if (!board.collides(this) &&
-                        this.position.x >= 0 &&
-                        this.position.x + this.shape[0].length <= board.columns &&
-                        this.position.y >= 0) {
+                    // Check if this position is valid using getCoordinates
+                    const kickCoordinates = this.getCoordinates();
+                    let isValidKickPosition = true;
+
+                    // Check if any part of the piece is out of bounds
+                    for (let coord of kickCoordinates) {
+                        if (coord.x < 0 || coord.x >= board.columns || coord.y < 0 || coord.y >= board.rows) {
+                            isValidKickPosition = false;
+                            break;
+                        }
+                    }
+
+                    if (!board.collides(this) && isValidKickPosition) {
                         // Wall kick successful, update rotation state
                         this.rotation = previousRotation;
                         return true;
@@ -304,9 +322,19 @@ class Piece {
         );
 
         // Check if rotation is valid without wall kicks
-        if (!board.collides(this) &&
-            this.position.x >= 0 &&
-            this.position.x + this.shape[0].length <= board.columns) {
+        // Use getCoordinates to check boundaries properly
+        const coordinates = this.getCoordinates();
+        let isValidPosition = true;
+
+        // Check if any part of the piece is out of bounds
+        for (let coord of coordinates) {
+            if (coord.x < 0 || coord.x >= board.columns || coord.y < 0 || coord.y >= board.rows) {
+                isValidPosition = false;
+                break;
+            }
+        }
+
+        if (!board.collides(this) && isValidPosition) {
             // Rotation is valid, update rotation state
             this.rotation = nextRotation;
 
@@ -334,11 +362,19 @@ class Piece {
                     this.position.x = originalPosition.x + kick.x;
                     this.position.y = originalPosition.y + kick.y;
 
-                    // Check if this position is valid
-                    if (!board.collides(this) &&
-                        this.position.x >= 0 &&
-                        this.position.x + this.shape[0].length <= board.columns &&
-                        this.position.y >= 0) {
+                    // Check if this position is valid using getCoordinates
+                    const kickCoordinates = this.getCoordinates();
+                    let isValidKickPosition = true;
+
+                    // Check if any part of the piece is out of bounds
+                    for (let coord of kickCoordinates) {
+                        if (coord.x < 0 || coord.x >= board.columns || coord.y < 0 || coord.y >= board.rows) {
+                            isValidKickPosition = false;
+                            break;
+                        }
+                    }
+
+                    if (!board.collides(this) && isValidKickPosition) {
                         // Wall kick successful, update rotation state
                         this.rotation = nextRotation;
 

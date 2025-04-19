@@ -1,0 +1,317 @@
+# Tarot Tetromino - Improvement Roadmap
+
+This document outlines recommended improvements for the Tarot Tetromino game based on a comprehensive code review. These suggestions are organized by priority and category to facilitate implementation planning.
+
+## High Priority Improvements
+
+### Code Structure and Organization
+
+1. **Reduce Global State**
+   - Replace global window properties with encapsulated objects
+   - Example:
+     ```javascript
+     // Instead of:
+     window.__phaseActive = true;
+     
+     // Use:
+     TarotTetris.effects = {
+         phase: { active: false, duration: 0 }
+     };
+     
+     function activatePhase(duration) {
+         TarotTetris.effects.phase.active = true;
+         TarotTetris.effects.phase.duration = duration;
+     }
+     ```
+
+2. **Extract Duplicate Logic**
+   - Consolidate duplicate code in line clearing and scoring
+   - Create helper functions for common operations
+   - Example:
+     ```javascript
+     function handleLineClearing(tSpinInfo) {
+         const linesCleared = clearLines();
+         if (linesCleared > 0) {
+             handleScoring(linesCleared, tSpinInfo);
+             checkLevelUp();
+             updateUI();
+         }
+         return linesCleared;
+     }
+     ```
+
+3. **Separate Concerns**
+   - Better separate rendering, game logic, and UI updates
+   - Example:
+     ```javascript
+     // Game logic
+     function updateGameState(deltaTime) {
+         // Update game state based on deltaTime
+     }
+     
+     // Rendering
+     function renderGame() {
+         // Render the current game state
+     }
+     
+     // Main loop
+     function gameLoop(time) {
+         const deltaTime = time - lastTime;
+         updateGameState(deltaTime);
+         renderGame();
+         requestAnimationFrame(gameLoop);
+     }
+     ```
+
+### Bug Fixes and Edge Cases
+
+1. **Fix Potential Race Conditions in Tarot Card Effects**
+   - Implement a manager for active effects to prevent conflicts
+   - Add priority system for conflicting effects
+
+2. **Improve Piece Rotation Near Boundaries**
+   - Enhance wall kick system to handle more edge cases
+   - Add more comprehensive testing for rotation edge cases
+
+3. **Address localStorage Limitations**
+   - Implement fallback mechanism when localStorage is unavailable
+   - Add size checks to prevent exceeding storage limits
+   - Consider alternative storage options (IndexedDB) for larger data
+
+## Medium Priority Improvements
+
+### Performance Optimization
+
+1. **Implement Dirty Rectangle Rendering**
+   - Only redraw parts of the canvas that have changed
+   - Example:
+     ```javascript
+     function drawBoard() {
+         // Only redraw cells that have changed
+         changedCells.forEach(cell => {
+             drawCell(cell.x, cell.y, cell.value);
+         });
+         changedCells = [];
+     }
+     ```
+
+2. **Use Offscreen Canvas for Static Elements**
+   - Pre-render static elements to improve performance
+   - Example:
+     ```javascript
+     const offscreenCanvas = document.createElement('canvas');
+     offscreenCanvas.width = canvas.width;
+     offscreenCanvas.height = canvas.height;
+     const offscreenContext = offscreenCanvas.getContext('2d');
+     
+     // Draw static elements once
+     function drawStaticElements() {
+         // Draw grid lines, etc.
+     }
+     
+     // In main render loop
+     function render() {
+         context.clearRect(0, 0, canvas.width, canvas.height);
+         context.drawImage(offscreenCanvas, 0, 0);
+         // Draw dynamic elements
+     }
+     ```
+
+3. **Optimize Event Handling**
+   - Use event delegation for similar elements
+   - Throttle or debounce frequent events (resize, touch)
+   - Example:
+     ```javascript
+     // Instead of adding/removing event listeners frequently
+     // Use event delegation
+     document.addEventListener('click', function(event) {
+         if (event.target.matches('.tarot-card')) {
+             const cardIndex = Array.from(event.target.parentNode.children).indexOf(event.target);
+             playTarotCard(cardIndex);
+         }
+     });
+     ```
+
+4. **Batch DOM Updates**
+   - Update multiple DOM elements in a single operation
+   - Example:
+     ```javascript
+     // Instead of multiple individual DOM updates
+     function updateUI() {
+         scoreElement.textContent = `Score: ${TarotTetris.score}`;
+         levelElement.textContent = `Level: ${TarotTetris.level}`;
+         goldElement.textContent = `Gold: ${TarotTetris.gold}`;
+     }
+     ```
+
+### User Experience Enhancements
+
+1. **Improve Mobile Touch Controls**
+   - Increase touch target sizes
+   - Add haptic feedback for touch actions
+   - Implement swipe gestures for piece movement
+
+2. **Enhance Visual Feedback**
+   - Add animations for line clears, level ups, and score increases
+   - Improve visual effects for tarot card activations
+   - Add particle effects for game events
+
+3. **Refine Tarot Card Hand Management**
+   - Allow players to choose which card to discard when hand is full
+   - Add card sorting or filtering options
+   - Implement card combination effects
+
+## Low Priority Improvements
+
+### Testing Infrastructure
+
+1. **Implement Unit Tests for Core Logic**
+   - Example Jest test for collision detection:
+     ```javascript
+     test('piece collides with wall', () => {
+         const board = new TarotTetris.Board();
+         const piece = new TarotTetris.Piece('I');
+         piece.position = { x: -1, y: 0 }; // Position outside left wall
+         expect(board.collides(piece)).toBe(true);
+     });
+     ```
+
+2. **Add Integration Tests for Game Flow**
+   - Test complete game scenarios
+   - Verify state transitions and event handling
+
+3. **Create Automated UI Tests**
+   - Test user interactions and UI updates
+   - Verify responsive design across different screen sizes
+
+### Accessibility Improvements
+
+1. **Enhance Keyboard Controls**
+   - Ensure all game functions are accessible via keyboard
+   - Add ARIA attributes for screen readers
+   - Example:
+     ```javascript
+     // Add ARIA labels for game elements
+     document.getElementById('tetris').setAttribute('aria-label', 'Tetris Game Board');
+     
+     // Ensure all interactive elements are keyboard accessible
+     document.querySelectorAll('.tarot-card').forEach(card => {
+         card.setAttribute('tabindex', '0');
+         card.addEventListener('keydown', (e) => {
+             if (e.key === 'Enter' || e.key === ' ') {
+                 // Activate card on Enter or Space
+                 const cardIndex = Array.from(card.parentNode.children).indexOf(card);
+                 playTarotCard(cardIndex);
+             }
+         });
+     });
+     ```
+
+2. **Improve Color Contrast and Visual Cues**
+   - Ensure sufficient color contrast for text and UI elements
+   - Add alternative visual cues for color-based information
+   - Example:
+     ```css
+     /* Ensure sufficient color contrast */
+     .game-info {
+         color: #ffffff;
+         background-color: #333333;
+         font-weight: bold;
+     }
+     
+     /* Add focus indicators */
+     .tarot-card:focus {
+         outline: 3px solid #ffdd00;
+         box-shadow: 0 0 10px #ffdd00;
+     }
+     ```
+
+3. **Add Game Settings for Accessibility**
+   - Allow players to adjust game speed
+   - Add options for larger text and UI elements
+   - Implement colorblind-friendly mode
+
+### Feature Enhancements
+
+1. **Expand Roguelike Elements**
+   - Add more permanent upgrades and progression
+   - Implement daily/weekly challenges
+   - Add achievement system
+
+2. **Enhance Tarot Card System**
+   - Add more card types and effects
+   - Implement card synergies and combinations
+   - Add rare/legendary cards with powerful effects
+
+3. **Improve Multiplayer Potential**
+   - Add leaderboard API integration
+   - Implement ghost data for competing against other players' records
+   - Add basic multiplayer functionality (vs mode)
+
+## Technical Debt Reduction
+
+1. **Refactor Namespace Pattern to ES6 Modules**
+   - Convert IIFE pattern to proper ES6 modules
+   - Use import/export syntax for better code organization
+   - Example:
+     ```javascript
+     // board.js
+     export class Board {
+         // Implementation
+     }
+     
+     // game.js
+     import { Board } from './board.js';
+     ```
+
+2. **Standardize Error Handling**
+   - Implement consistent error handling throughout the codebase
+   - Add error reporting and logging system
+   - Example:
+     ```javascript
+     function handleError(context, error) {
+         console.error(`Error in ${context}:`, error);
+         // Log to analytics or error reporting service
+         if (typeof errorReporting !== 'undefined') {
+             errorReporting.logError(context, error);
+         }
+     }
+     ```
+
+3. **Improve Code Documentation**
+   - Add more comprehensive JSDoc comments
+   - Create architecture documentation
+   - Document game mechanics and formulas
+
+## Implementation Strategy
+
+1. **Phase 1: Critical Fixes**
+   - Address high-priority bugs and edge cases
+   - Reduce global state
+   - Extract duplicate logic
+
+2. **Phase 2: Performance Optimization**
+   - Implement dirty rectangle rendering
+   - Optimize event handling
+   - Batch DOM updates
+
+3. **Phase 3: User Experience**
+   - Improve mobile controls
+   - Enhance visual feedback
+   - Refine tarot card system
+
+4. **Phase 4: Testing and Accessibility**
+   - Implement unit and integration tests
+   - Enhance keyboard controls
+   - Improve color contrast and visual cues
+
+5. **Phase 5: Feature Enhancements**
+   - Expand roguelike elements
+   - Add new tarot cards and effects
+   - Implement multiplayer features
+
+## Conclusion
+
+These improvements will enhance the Tarot Tetromino game's performance, maintainability, and user experience. By addressing these issues systematically, the game will become more robust, accessible, and enjoyable for players across different devices and abilities.
+
+The suggested changes respect the existing architecture while introducing modern best practices and optimizations. This roadmap provides a clear path forward for continued development and refinement of the game.

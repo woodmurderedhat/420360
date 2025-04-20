@@ -9,14 +9,16 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <canvas id="treeCanvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
     <div class="ui-overlay">
         <div class="game-header">
             <h1>Tree Idler</h1>
             <a href="../../index.html" class="back-link">← Back to 420360.xyz</a>
         </div>
         <div class="ui-panels">
-            <div class="resources-panel">
+            <div class="tree-panel draggable-panel resizable-panel">
+                <canvas id="treeCanvas"></canvas>
+            </div>
+            <div class="resources-panel draggable-panel resizable-panel">
                 <h2>Resources</h2>
                 <div class="resource">
                     <span>Sunlight:</span>
@@ -31,15 +33,15 @@
                     <span id="growthStage">1</span>
                 </div>
             </div>
-            <div class="fruit-panel" id="fruitPanel">
+            <div class="fruit-panel draggable-panel resizable-panel" id="fruitPanel">
                 <h2>Fruit Bonuses</h2>
                 <div id="fruitBonuses"></div>
             </div>
-            <div class="upgrades-panel">
+            <div class="upgrades-panel draggable-panel resizable-panel">
                 <h2>Upgrades</h2>
                 <div id="upgradesList"></div>
             </div>
-            <div class="growth-panel">
+            <div class="growth-panel draggable-panel resizable-panel">
                 <h2>Tree Growth</h2>
                 <button id="growButton" class="grow-button">Grow Tree</button>
                 <div id="growthCost"></div>
@@ -48,5 +50,6 @@
     </div>
     <!-- JavaScript Modules -->
     <script type="module" src="js/Game.js"></script>
+    <script type="module" src="js/PanelManager.js"></script>
 </body>
 </html>

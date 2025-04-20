@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Idler</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>Tree Idler</h1>
+            <a href="../../index.html" class="back-link">← Back to 420360.xyz</a>
+        </div>
+
+        <div class="game-content">
+            <canvas id="treeCanvas" width="600" height="500"></canvas>
+
+            <div class="game-ui">
+                <div class="resources-panel">
+                    <h2>Resources</h2>
+                    <div class="resource">
+                        <span>Sunlight:</span>
+                        <span id="sunlight">0</span>
+                    </div>
+                    <div class="resource">
+                        <span>Water:</span>
+                        <span id="water">0</span>
+                    </div>
+                    <div class="resource">
+                        <span>Growth Stage:</span>
+                        <span id="growthStage">1</span>
+                    </div>
+                </div>
+
+                <div class="upgrades-panel">
+                    <h2>Upgrades</h2>
+                    <div id="upgradesList"></div>
+                </div>
+
+                <div class="growth-panel">
+                    <h2>Tree Growth</h2>
+                    <button id="growButton" class="grow-button">Grow Tree</button>
+                    <div id="growthCost"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="js/Game.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+# Tree Idler Game - Codebase Context
+
+## Project Overview
+Tree Idler is a browser-based idle resource management game where the player embodies a tree. The primary goal is to grow the tree by collecting sunlight and water, farmed using leaves and roots, respectively. The game is built entirely with client-side technologies (HTML, CSS, JavaScript) and uses the HTML5 Canvas for rendering.
+
+## File Structure
+- `index.html` - Main entry point and HTML structure
+- `styles.css` - Game styling
+- `js/` - JavaScript modules
+  - `Game.js` - Main game controller and entry point
+  - `Resources.js` - Resource management (sunlight and water)
+  - `Tree.js` - Tree growth stages and properties
+  - `Leaves.js` - Leaf management and sunlight production
+  - `Roots.js` - Root management and water production
+  - `Fruits.js` - Fruit generation and harvesting
+  - `Upgrades.js` - Upgrade system
+  - `Renderer.js` - Canvas rendering
+  - `UI.js` - User interface management
+  - `SaveLoad.js` - Game state persistence
+
+## Core Game Mechanics
+
+### Resources
+- **Sunlight**: Collected by leaves
+- **Water**: Collected by roots
+- Both resources are used for upgrades and tree growth
+
+### Tree Growth
+- The tree progresses through 10 growth stages
+- Each stage increases:
+  - Number of leaf and root slots
+  - Collection efficiency
+  - Visual complexity (branch depth)
+  - At stage 3, fruits become available
+
+### Leaves and Roots
+- Leaves collect sunlight
+- Roots collect water
+- Both can be:
+  - Added to available slots (unlocked by tree growth)
+  - Upgraded to increase efficiency
+
+### Fruits
+- Appear randomly on the tree (after stage 3)
+- Can be harvested by clicking
+- Provide bonus resources
+
+### Upgrades
+- Upgrade leaves to increase sunlight production
+- Upgrade roots to increase water production
+- Add new leaves/roots to available slots
+
+### Save System
+- Game state is automatically saved to localStorage
+- Offline progress is calculated when the player returns
+
+## Rendering System
+- Tree is procedurally generated with recursive branching
+- Branch depth increases with tree growth stage
+- Leaves are attached to branch endpoints
+- Roots mirror the branching pattern below ground
+- Fruits appear as circles on branches
+
+## User Interface
+- Resource counters (sunlight, water)
+- Growth stage indicator
+- Upgrade buttons with costs
+- Tree growth button
+
+## Game Loop
+1. Update resource collection based on leaves and roots
+2. Update fruit growth and generation
+3. Render the tree and UI
+4. Save game state periodically
+
+## Dependencies
+- No external libraries or frameworks
+- Uses native browser APIs:
+  - HTML5 Canvas for rendering
+  - localStorage for save data
+  - requestAnimationFrame for game loop
+
+## Future Considerations
+- Different leaf/root types with unique properties
+- Seasonal changes affecting resource rates
+- Animations for visual appeal
+- Mobile responsiveness improvements

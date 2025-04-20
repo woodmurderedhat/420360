@@ -1,0 +1,96 @@
+Game Design Document: Tree Idler
+Overview
+Tree Idler is a browser-based idler resource management game where the player embodies a tree. The primary goal is to grow the tree by collecting sunlight and water, farmed using leaves and roots, respectively. Designed to be compatible with GitHub Pages, the game runs entirely on the client side using JavaScript, HTML, and CSS. It features a modular and dynamic architecture, with all visual elements procedurally drawn using mathematical functions. The game is UI-heavy, incorporating clickable upgrades for leaves and fruits to enhance player interaction and progression.
+Core Mechanics
+Resources
+
+Sunlight: Automatically collected by leaves over time.
+Water: Automatically collected by roots over time.
+
+Resource Collection
+
+Leaves and roots gather resources at rates influenced by upgrades and the tree's growth stage.
+Collection persists continuously, supporting offline progress calculated upon the player's return.
+
+Tree Growth
+
+Players spend resources to advance the tree through growth stages.
+Each stage may increase the number of leaf and root slots, boost collection efficiency, or unlock features like fruit production.
+
+Upgrades
+
+Resources can be spent to enhance leaves and roots, either by improving their collection rates or adding new slots.
+Additional upgrades may unlock special abilities or improve fruit-related mechanics.
+
+Fruits
+
+Fruits appear at specific growth stages and can be harvested via player clicks.
+Harvesting fruits yields bonus resources or other benefits.
+
+Visual Representation
+
+Visuals are rendered on an HTML5 canvas using mathematical functions.
+The tree is procedurally generated with a recursive branching algorithm, where branch length, angle, and depth adjust according to the growth stage.
+Leaves and roots are attached to branches, with fruits appearing as small shapes on designated branches when available.
+
+User Interface
+
+A sidebar or bottom panel displays:
+Current sunlight and water amounts.
+Tree growth stage.
+Available upgrades with costs and effects.
+
+
+Clickable buttons enable purchasing upgrades and harvesting fruits.
+The UI updates dynamically to reflect the current game state, built with HTML and CSS for clarity and accessibility.
+
+Technical Architecture
+
+Technologies: JavaScript, HTML5 canvas, and CSS, with no server-side dependencies.
+Rendering: HTML5 canvas for dynamic, math-based visuals.
+Persistence: LocalStorage saves the game state and calculates offline progress.
+Modularity: The codebase is split into distinct modules for maintainability and scalability.
+
+Modules
+
+Game.js: Orchestrates the main game loop, updating resources, growth, and upgrades.
+Resources.js: Manages sunlight and water tracking and expenditure.
+Tree.js: Controls growth stages and their impacts on gameplay.
+Leaves.js: Handles leaf slots, sunlight collection, and related upgrades.
+Roots.js: Manages root slots, water collection, and upgrades.
+Upgrades.js: Defines upgrade options, costs, and effects.
+Fruits.js: Oversees fruit production, harvesting, and bonuses.
+Renderer.js: Draws the tree, leaves, roots, and fruits on the canvas.
+UI.js: Manages UI display and player interactions.
+SaveLoad.js: Saves and loads game state, computes offline progress.
+
+Compatibility and Deployment
+
+Fully client-side, ensuring compatibility with GitHub Pages' static hosting.
+All assets are static, requiring no server-side processing.
+LocalStorage ensures progress persists across browser sessions.
+
+Game Flow
+
+Start: The game begins with a sapling, featuring one leaf slot and one root slot.
+Progression: Leaves and roots automatically collect resources; players spend them to grow the tree or purchase upgrades.
+Growth: Advancing growth stages increases complexity (e.g., more branches) and unlocks features like fruits.
+Interaction: Players click to harvest fruits or apply upgrades, balancing resource allocation for optimal growth.
+
+Visual Design Notes
+
+Tree: A trunk with recursive branches, scaled by growth stage (e.g., depth = 1 at stage 1, depth = 2 at stage 2).
+Leaves: Small shapes at branch ends, increasing in number with upgrades or growth.
+Roots: Downward curves or lines, mirroring branch logic.
+Fruits: Circles or similar shapes on branches, harvestable via clicks.
+
+Future Considerations
+
+Variety: Introduce different leaf/root types with unique properties.
+Dynamics: Add seasonal changes affecting resource rates.
+Enhancements: Include animations (e.g., swaying leaves) for visual appeal.
+Responsiveness: Optimize for mobile devices with a responsive layout.
+
+Conclusion
+Tree Idler combines idler mechanics with resource management in a visually engaging, browser-friendly package. Its modular design and mathematical rendering ensure flexibility and performance, while the UI-heavy approach keeps players engaged. This document provides a roadmap for development, balancing simplicity with room for future expansion.
+Word Count: ~800

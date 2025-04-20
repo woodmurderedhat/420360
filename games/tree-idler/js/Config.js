@@ -20,7 +20,7 @@ const Config = {
   // Upgrade costs
   UPGRADE_COSTS: {
     leaves: { sunlight: 100, water: 50 },
-    roots: { water: 100, nutrients: 50 },
+    roots: { sunlight: 50, water: 100 }, // FIXED: use sunlight and water, not nutrients
     fruit: { sunlight: 200, water: 100, nutrients: 100 },
   },
 

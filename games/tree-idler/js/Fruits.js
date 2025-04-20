@@ -3,7 +3,6 @@
  * @classdesc Manages fruit production and harvesting, including spawning, growth, and harvesting logic for different fruit types.
  */
 import Config from "./Config.js";
-import Cost from "./Cost.js";
 import eventBus from "./EventBus.js";
 
 export default class Fruits {
@@ -139,7 +138,7 @@ export default class Fruits {
         // Copy array to avoid mutation issues
         const ripeFruits = this.fruits.filter(fruit => fruit.growth >= threshold);
         ripeFruits.forEach(fruit => {
-            const multiplier = 1 + (valueMultiplier * 0.2);
+            const multiplier = 1 + (valueMultiplier * 0.25); // Changed from 0.2 to 0.25 to match harvestFruit
             totalSunlight += Math.floor(fruit.value.sunlight * multiplier);
             totalWater += Math.floor(fruit.value.water * multiplier);
             // Remove fruit

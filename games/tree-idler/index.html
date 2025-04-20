@@ -109,14 +109,41 @@
     const volumeSlider = document.getElementById('volumeSlider');
     const volumeValue = document.getElementById('volumeValue');
     volumeSlider.addEventListener('input', () => {
-      volumeValue.textContent = Math.round(volumeSlider.value * 100) + '%';
-      // Save or apply volume as needed
+      const volume = parseFloat(volumeSlider.value);
+      volumeValue.textContent = Math.round(volume * 100) + '%';
+      // Save volume setting to localStorage
+      localStorage.setItem('treeIdlerVolume', volume);
+      // Apply volume setting to any audio elements if they exist
+      document.querySelectorAll('audio').forEach(audio => {
+        audio.volume = volume;
+      });
     });
+    // Load saved volume setting
+    const savedVolume = localStorage.getItem('treeIdlerVolume');
+    if (savedVolume !== null) {
+      volumeSlider.value = savedVolume;
+      volumeValue.textContent = Math.round(parseFloat(savedVolume) * 100) + '%';
+    }
+
     // Graphics select
     const graphicsSelect = document.getElementById('graphicsSelect');
     graphicsSelect.addEventListener('change', () => {
-      // Save or apply graphics setting as needed
+      const graphicsSetting = graphicsSelect.value;
+      // Save graphics setting to localStorage
+      localStorage.setItem('treeIdlerGraphics', graphicsSetting);
+      // Apply graphics setting
+      document.body.setAttribute('data-graphics', graphicsSetting);
+      // Notify the game about graphics change if it's loaded
+      if (window.game && window.game.renderer) {
+        window.game.renderer.setGraphicsQuality(graphicsSetting);
+      }
     });
+    // Load saved graphics setting
+    const savedGraphics = localStorage.getItem('treeIdlerGraphics');
+    if (savedGraphics) {
+      graphicsSelect.value = savedGraphics;
+      document.body.setAttribute('data-graphics', savedGraphics);
+    }
     // Confirmation prompt for reset
     const resetGame = window.game && window.game.resetGame ? window.game.resetGame.bind(window.game) : null;
     if (resetGame) {

@@ -9,9 +9,11 @@ function makePanelsDraggableAndResizable() {
         let offsetX = 0, offsetY = 0;
         let startX = 0, startY = 0;
 
+        // Mouse events
         panel.addEventListener('mousedown', function(e) {
             // Only drag if not clicking on a button or input
-            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' ||
+                e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -29,6 +31,37 @@ function makePanelsDraggableAndResizable() {
         });
 
         document.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                panel.style.zIndex = 10;
+                document.body.style.userSelect = '';
+            }
+        });
+
+        // Touch events for mobile
+        panel.addEventListener('touchstart', function(e) {
+            // Only drag if not touching a button or input
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' ||
+                e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            const rect = panel.getBoundingClientRect();
+            offsetX = startX - rect.left;
+            offsetY = startY - rect.top;
+            panel.style.zIndex = 1000;
+            document.body.style.userSelect = 'none';
+            e.preventDefault(); // Prevent scrolling while dragging
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function(e) {
+            if (!isDragging) return;
+            panel.style.left = (e.touches[0].clientX - offsetX) + 'px';
+            panel.style.top = (e.touches[0].clientY - offsetY) + 'px';
+            e.preventDefault(); // Prevent scrolling while dragging
+        }, { passive: false });
+
+        document.addEventListener('touchend', function() {
             if (isDragging) {
                 isDragging = false;
                 panel.style.zIndex = 10;

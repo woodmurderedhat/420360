@@ -10,6 +10,13 @@ export default class Renderer {
         this.ctx = this.canvas.getContext('2d');
         this.updateDimensions();
         this.fruitClickCallbacks = [];
+        this.graphicsQuality = 'high'; // Default to high quality
+
+        // Load saved graphics quality if available
+        const savedQuality = localStorage.getItem('treeIdlerGraphics');
+        if (savedQuality) {
+            this.setGraphicsQuality(savedQuality);
+        }
 
         // Add resize listener for responsive canvas
         window.addEventListener('resize', this.handleResize.bind(this));
@@ -93,7 +100,7 @@ export default class Renderer {
      * Draw the parallax background
      */
     drawParallaxBackground() {
-        const { COLORS, ANIMATION } = Config;
+        const { COLORS } = Config;
         // Sky
         this.ctx.fillStyle = COLORS.backgroundSky;
         this.ctx.fillRect(0, 0, this.width, this.height);
@@ -222,8 +229,10 @@ export default class Renderer {
             leaves.forEach((leaf, index) => {
                 if (index < this.branchEnds.length) {
                     const end = this.branchEnds[index];
-                    // Sway animation
-                    const sway = Math.sin(time * Config.ANIMATION.leafSwaySpeed + index) * Config.ANIMATION.leafSwayAmplitude;
+                    // Sway animation - default values if not using Config.ANIMATION
+                    const leafSwaySpeed = Config.ANIMATION ? Config.ANIMATION.leafSwaySpeed : 1.2;
+                    const leafSwayAmplitude = Config.ANIMATION ? Config.ANIMATION.leafSwayAmplitude : 0.15;
+                    const sway = Math.sin(time * leafSwaySpeed + index) * leafSwayAmplitude;
                     const size = 8 + leaf.level * 1.7 * this.treeScale;
                     this.ctx.save();
                     this.ctx.translate(end.x, end.y);
@@ -367,6 +376,35 @@ export default class Renderer {
                 });
                 break;
             }
+        }
+    }
+
+    /**
+     * Set graphics quality level
+     * @param {string} quality - Quality level ('high', 'medium', or 'low')
+     */
+    setGraphicsQuality(quality) {
+        if (!['high', 'medium', 'low'].includes(quality)) {
+            console.warn(`Invalid graphics quality: ${quality}. Using 'high' instead.`);
+            quality = 'high';
+        }
+
+        this.graphicsQuality = quality;
+
+        // Apply quality settings
+        switch (quality) {
+            case 'low':
+                // Reduce visual effects
+                this.ctx.imageSmoothingEnabled = false;
+                break;
+            case 'medium':
+                this.ctx.imageSmoothingEnabled = true;
+                this.ctx.imageSmoothingQuality = 'low';
+                break;
+            case 'high':
+                this.ctx.imageSmoothingEnabled = true;
+                this.ctx.imageSmoothingQuality = 'high';
+                break;
         }
     }
 }

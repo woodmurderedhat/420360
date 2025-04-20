@@ -1,5 +1,6 @@
 /**
  * SaveLoad.js - Handles saving and loading game state
+ * @classdesc Handles saving and loading game state, including localStorage persistence and offline progress.
  */
 export default class SaveLoad {
     constructor() {

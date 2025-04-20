@@ -1,6 +1,11 @@
 /**
  * Upgrades.js - Manages available upgrades
+ * @classdesc Manages available upgrades, upgrade logic, and upgrade state for leaves, roots, and fruits.
  */
+import Config from "./Config.js";
+import Cost from "./Cost.js";
+import eventBus from "./EventBus.js";
+
 export default class Upgrades {
     constructor(leaves, roots, tree, fruits) {
         this.leaves = leaves;
@@ -63,7 +68,7 @@ export default class Upgrades {
                 type: 'add_leaf',
                 name: 'Add Leaf',
                 description: `Add a new leaf (${this.leaves.slots.length + 1}/${this.leaves.maxSlots})`,
-                cost: { sunlight: 20 * Math.pow(2, this.leaves.slots.length), water: 10 * Math.pow(2, this.leaves.slots.length) }
+                cost: Cost.fromObject({ sunlight: Config.UPGRADE_COSTS.leaves.sunlight * Math.pow(2, this.leaves.slots.length), water: Config.UPGRADE_COSTS.leaves.water * Math.pow(2, this.leaves.slots.length) })
             });
         }
 
@@ -74,7 +79,7 @@ export default class Upgrades {
                 type: 'add_root',
                 name: 'Add Root',
                 description: `Add a new root (${this.roots.slots.length + 1}/${this.roots.maxSlots})`,
-                cost: { sunlight: 10 * Math.pow(2, this.roots.slots.length), water: 20 * Math.pow(2, this.roots.slots.length) }
+                cost: Cost.fromObject({ sunlight: Config.UPGRADE_COSTS.roots.sunlight * Math.pow(2, this.roots.slots.length), water: Config.UPGRADE_COSTS.roots.water * Math.pow(2, this.roots.slots.length) })
             });
         }
 
@@ -89,7 +94,7 @@ export default class Upgrades {
                     type: 'fruit_growth_rate',
                     name: 'Faster Fruit Growth',
                     description: `Increase fruit growth rate by 15% (Level ${level}/10)` + (level === 10 ? ' (MAX)' : ''),
-                    cost: { sunlight: baseCost, water: baseCost },
+                    cost: Cost.fromObject({ sunlight: baseCost, water: baseCost }),
                     currentLevel: this.fruitUpgrades.growthRate
                 });
             }
@@ -103,7 +108,7 @@ export default class Upgrades {
                     type: 'fruit_value',
                     name: 'Juicier Fruits',
                     description: `Increase resources gained from fruits by 20% (Level ${level}/10)` + (level === 10 ? ' (MAX)' : ''),
-                    cost: { sunlight: baseCost, water: baseCost },
+                    cost: Cost.fromObject({ sunlight: baseCost, water: baseCost }),
                     currentLevel: this.fruitUpgrades.value
                 });
             }
@@ -117,7 +122,7 @@ export default class Upgrades {
                     type: 'fruit_max',
                     name: 'More Fruits',
                     description: `Increase maximum number of fruits by 1 (Level ${level}/5)` + (level === 5 ? ' (MAX)' : ''),
-                    cost: { sunlight: baseCost, water: baseCost },
+                    cost: Cost.fromObject({ sunlight: baseCost, water: baseCost }),
                     currentLevel: this.fruitUpgrades.maxFruits
                 });
             }
@@ -129,7 +134,7 @@ export default class Upgrades {
                     type: 'fruit_auto_harvest',
                     name: 'Auto-Harvest Fruits',
                     description: 'Automatically harvest ripe fruits every 10 seconds.',
-                    cost: { sunlight: 1000, water: 1000 },
+                    cost: Cost.fromObject({ sunlight: 1000, water: 1000 }),
                     currentLevel: 0
                 });
             }
@@ -145,67 +150,78 @@ export default class Upgrades {
      * @returns {boolean} - Whether upgrade was successfully applied
      */
     applyUpgrade(upgradeId, resources) {
-        const upgrades = this.getAvailableUpgrades();
-        const upgrade = upgrades.find(u => u.id === upgradeId);
+        try {
+            const upgrades = this.getAvailableUpgrades();
+            const upgrade = upgrades.find(u => u.id === upgradeId);
 
-        if (!upgrade) {
+            if (!upgrade) {
+                return false;
+            }
+
+            let result = false;
+
+            switch (upgrade.type) {
+                case 'leaf':
+                    result = this.leaves.upgradeLeaf(upgrade.slotIndex, resources);
+                    break;
+
+                case 'root':
+                    result = this.roots.upgradeRoot(upgrade.slotIndex, resources);
+                    break;
+
+                case 'add_leaf':
+                    result = upgrade.cost.spend(resources) && this.leaves.addLeaf();
+                    break;
+
+                case 'add_root':
+                    result = upgrade.cost.spend(resources) && this.roots.addRoot();
+                    break;
+
+                case 'fruit_growth_rate':
+                    if (upgrade.cost.spend(resources)) {
+                        this.fruitUpgrades.growthRate++;
+                        // Increase growth rate by 15% per level
+                        this.fruits.fruitGrowthRate = 0.1 * (1 + 0.15 * this.fruitUpgrades.growthRate);
+                        result = true;
+                    }
+                    break;
+
+                case 'fruit_value':
+                    if (upgrade.cost.spend(resources)) {
+                        this.fruitUpgrades.value++;
+                        // Effect is applied when fruits are harvested in Fruits.js
+                        result = true;
+                    }
+                    break;
+
+                case 'fruit_max':
+                    if (upgrade.cost.spend(resources)) {
+                        this.fruitUpgrades.maxFruits++;
+                        this.fruits.maxFruits = 3 + this.fruitUpgrades.maxFruits;
+                        result = true;
+                    }
+                    break;
+
+                case 'fruit_auto_harvest':
+                    if (upgrade.cost.spend(resources)) {
+                        this.fruitUpgrades.autoHarvest = true;
+                        this.fruits.enableAutoHarvest();
+                        result = true;
+                    }
+                    break;
+
+                default:
+                    result = false;
+            }
+
+            if (result) {
+                eventBus.emit('upgradePurchased', { upgradeId });
+            }
+
+            return result;
+        } catch (e) {
+            console.error('Upgrade error:', e);
             return false;
-        }
-
-        switch (upgrade.type) {
-            case 'leaf':
-                return this.leaves.upgradeLeaf(upgrade.slotIndex, resources);
-
-            case 'root':
-                return this.roots.upgradeRoot(upgrade.slotIndex, resources);
-
-            case 'add_leaf':
-                if (resources.spendResources(upgrade.cost.sunlight, upgrade.cost.water)) {
-                    return this.leaves.addLeaf();
-                }
-                return false;
-
-            case 'add_root':
-                if (resources.spendResources(upgrade.cost.sunlight, upgrade.cost.water)) {
-                    return this.roots.addRoot();
-                }
-                return false;
-
-            case 'fruit_growth_rate':
-                if (resources.spendResources(upgrade.cost.sunlight, upgrade.cost.water)) {
-                    this.fruitUpgrades.growthRate++;
-                    // Increase growth rate by 15% per level
-                    this.fruits.fruitGrowthRate = 0.1 * (1 + 0.15 * this.fruitUpgrades.growthRate);
-                    return true;
-                }
-                return false;
-
-            case 'fruit_value':
-                if (resources.spendResources(upgrade.cost.sunlight, upgrade.cost.water)) {
-                    this.fruitUpgrades.value++;
-                    // Effect is applied when fruits are harvested in Fruits.js
-                    return true;
-                }
-                return false;
-
-            case 'fruit_max':
-                if (resources.spendResources(upgrade.cost.sunlight, upgrade.cost.water)) {
-                    this.fruitUpgrades.maxFruits++;
-                    this.fruits.maxFruits = 3 + this.fruitUpgrades.maxFruits;
-                    return true;
-                }
-                return false;
-
-            case 'fruit_auto_harvest':
-                if (resources.spendResources(upgrade.cost.sunlight, upgrade.cost.water)) {
-                    this.fruitUpgrades.autoHarvest = true;
-                    this.fruits.enableAutoHarvest();
-                    return true;
-                }
-                return false;
-
-            default:
-                return false;
         }
     }
 }

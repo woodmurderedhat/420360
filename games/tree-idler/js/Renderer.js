@@ -1,5 +1,6 @@
 /**
  * Renderer.js - Handles canvas rendering of the tree and its components
+ * @classdesc Handles canvas rendering of the tree, roots, leaves, and fruits.
  */
 export default class Renderer {
     constructor(canvasId) {

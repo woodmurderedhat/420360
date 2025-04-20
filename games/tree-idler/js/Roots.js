@@ -1,6 +1,9 @@
 /**
  * Roots.js - Manages root slots and water production
  */
+import Config from "./Config.js";
+import Cost from "./Cost.js";
+
 export default class Roots {
     constructor() {
         this.slots = [];
@@ -55,15 +58,11 @@ export default class Roots {
      * @returns {Object} - Cost object with sunlight and water properties
      */
     getUpgradeCost(currentLevel) {
-        // Exponential cost increase
-        const baseCost = 5;
-        const costMultiplier = 1.5;
+        // Use Cost class for upgrade cost
+        const baseCost = Config.UPGRADE_COSTS.roots.water;
+        const costMultiplier = Config.UPGRADE_MULTIPLIERS.roots;
         const cost = Math.floor(baseCost * Math.pow(costMultiplier, currentLevel - 1));
-        
-        return {
-            water: cost,
-            sunlight: Math.floor(cost / 2) // Sunlight cost is half of water cost
-        };
+        return new Cost(Math.floor(cost / 2), cost); // sunlight, water
     }
 
     /**

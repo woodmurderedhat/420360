@@ -1,5 +1,6 @@
 /**
  * Game.js - Main game controller
+ * @classdesc Main game controller. Orchestrates game state, loop, rendering, upgrades, and persistence.
  */
 import Resources from './Resources.js';
 import Tree from './Tree.js';

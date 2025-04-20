@@ -1,6 +1,8 @@
 /**
  * Resources.js - Manages the game's resources (sunlight and water)
  */
+import Config from "./Config.js";
+
 export default class Resources {
     constructor() {
         this.sunlight = 0;
@@ -16,6 +18,9 @@ export default class Resources {
     update(deltaTime) {
         this.sunlight += this.sunlightPerSecond * deltaTime;
         this.water += this.waterPerSecond * deltaTime;
+        // Resource capping
+        this.sunlight = Math.min(this.sunlight, Config.MAX_SUNLIGHT);
+        this.water = Math.min(this.water, Config.MAX_WATER);
     }
 
     /**
@@ -82,6 +87,9 @@ export default class Resources {
     addResources(sunlight, water) {
         this.sunlight += sunlight;
         this.water += water;
+        // Resource capping
+        this.sunlight = Math.min(this.sunlight, Config.MAX_SUNLIGHT);
+        this.water = Math.min(this.water, Config.MAX_WATER);
     }
 
     /**

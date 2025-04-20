@@ -1,6 +1,11 @@
 /**
  * Fruits.js - Manages fruit production and harvesting
+ * @classdesc Manages fruit production and harvesting, including spawning, growth, and harvesting logic for different fruit types.
  */
+import Config from "./Config.js";
+import Cost from "./Cost.js";
+import eventBus from "./EventBus.js";
+
 export default class Fruits {
     constructor() {
         this.enabled = false;
@@ -10,6 +15,13 @@ export default class Fruits {
         this.nextFruitId = 1;
         this.autoHarvest = false;
         this.autoHarvestTimer = 0;
+        this.fruitTypes = Config.FRUIT_TYPES;
+        this.autoHarvestThreshold = 1; // Default: harvest when fully ripe
+        eventBus.on('setAutoHarvestThreshold', (threshold) => {
+            if (typeof threshold === 'number' && threshold >= 0 && threshold <= 1) {
+                this.autoHarvestThreshold = threshold;
+            }
+        });
     }
 
     /**
@@ -44,12 +56,12 @@ export default class Fruits {
             }
         }
 
-        // Auto-harvest logic
+        // Auto-harvest logic with threshold
         if (this.autoHarvest) {
             this.autoHarvestTimer += deltaTime;
             if (this.autoHarvestTimer >= 10) {
                 this.autoHarvestTimer = 0;
-                this.harvestAllRipeFruits();
+                this.harvestAllRipeFruits(this.autoHarvestThreshold);
             }
         }
     }
@@ -59,18 +71,20 @@ export default class Fruits {
      */
     spawnFruit() {
         if (this.fruits.length < this.maxFruits) {
-            // Random position on the tree
+            // Pick a random fruit type from config
+            const fruitType = this.fruitTypes[Math.floor(Math.random() * this.fruitTypes.length)];
             const angle = Math.random() * Math.PI * 2;
-            const distance = 0.3 + Math.random() * 0.4; // 30-70% from center
+            const distance = 0.3 + Math.random() * 0.4;
 
             this.fruits.push({
                 id: this.nextFruitId++,
                 growth: 0,
                 position: { angle, distance },
                 value: {
-                    sunlight: 10 + Math.floor(Math.random() * 10),
-                    water: 10 + Math.floor(Math.random() * 10)
-                }
+                    sunlight: fruitType.value,
+                    water: fruitType.value
+                },
+                type: fruitType.name
             });
         }
     }
@@ -115,13 +129,15 @@ export default class Fruits {
 
     /**
      * Harvest all ripe fruits (for auto-harvest)
-     * Returns total value harvested
+     * @param {number} threshold - Minimum growth (0-1) to harvest
+     * @param {number} valueMultiplier
+     * @returns {{sunlight:number,water:number}}
      */
-    harvestAllRipeFruits(valueMultiplier = 0) {
+    harvestAllRipeFruits(threshold = 1, valueMultiplier = 0) {
         let totalSunlight = 0;
         let totalWater = 0;
         // Copy array to avoid mutation issues
-        const ripeFruits = this.fruits.filter(fruit => fruit.growth >= 1);
+        const ripeFruits = this.fruits.filter(fruit => fruit.growth >= threshold);
         ripeFruits.forEach(fruit => {
             const multiplier = 1 + (valueMultiplier * 0.2);
             totalSunlight += Math.floor(fruit.value.sunlight * multiplier);

@@ -1,6 +1,8 @@
 /**
  * Leaves.js - Manages leaf slots and sunlight production
  */
+import Config from "./Config.js";
+
 export default class Leaves {
     constructor() {
         this.slots = [];
@@ -55,15 +57,11 @@ export default class Leaves {
      * @returns {Object} - Cost object with sunlight and water properties
      */
     getUpgradeCost(currentLevel) {
-        // Exponential cost increase
-        const baseCost = 5;
-        const costMultiplier = 1.5;
+        // Use Cost class for upgrade cost
+        const baseCost = Config.UPGRADE_COSTS.leaves.sunlight;
+        const costMultiplier = Config.UPGRADE_MULTIPLIERS.leaves;
         const cost = Math.floor(baseCost * Math.pow(costMultiplier, currentLevel - 1));
-        
-        return {
-            sunlight: cost,
-            water: Math.floor(cost / 2) // Water cost is half of sunlight cost
-        };
+        return new (require('./Cost.js').default)(cost, Math.floor(cost / 2));
     }
 
     /**

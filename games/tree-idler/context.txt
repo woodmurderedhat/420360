@@ -44,6 +44,7 @@ Tree Idler is a browser-based idle resource management game where the player emb
 - Appear randomly on the tree (after stage 3)
 - Can be harvested by clicking
 - Provide bonus resources
+- Can be enhanced with upgrades (growth rate, value, maximum number)
 
 ### Upgrades
 - Upgrade leaves to increase sunlight production
@@ -80,8 +81,13 @@ Tree Idler is a browser-based idle resource management game where the player emb
   - localStorage for save data
   - requestAnimationFrame for game loop
 
+## Responsive Design
+- Adapts to different screen sizes
+- Mobile-friendly interface with larger touch targets
+- Responsive canvas that adjusts to container size
+- Optimized layout for both desktop and mobile devices
+
 ## Future Considerations
 - Different leaf/root types with unique properties
 - Seasonal changes affecting resource rates
 - Animations for visual appeal
-- Mobile responsiveness improvements

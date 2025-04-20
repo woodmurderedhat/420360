@@ -5,11 +5,37 @@ export default class Renderer {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
+        this.updateDimensions();
+        this.fruitClickCallbacks = [];
+
+        // Add resize listener for responsive canvas
+        window.addEventListener('resize', this.handleResize.bind(this));
+    }
+
+    /**
+     * Update canvas dimensions and related properties
+     */
+    updateDimensions() {
+        // Get the current dimensions of the canvas element
+        const rect = this.canvas.getBoundingClientRect();
+
+        // Update canvas dimensions if they've changed
+        if (this.canvas.width !== rect.width || this.canvas.height !== rect.height) {
+            this.canvas.width = rect.width;
+            this.canvas.height = rect.height;
+        }
+
         this.width = this.canvas.width;
         this.height = this.canvas.height;
         this.centerX = this.width / 2;
         this.centerY = this.height * 0.8; // Tree base is near bottom
-        this.fruitClickCallbacks = [];
+    }
+
+    /**
+     * Handle window resize events
+     */
+    handleResize() {
+        this.updateDimensions();
     }
 
     /**
@@ -24,23 +50,33 @@ export default class Renderer {
      * @param {Object} gameState - Current game state
      */
     render(gameState) {
+        this.updateDimensions();
         this.clear();
-        
+
         const { tree, leaves, roots, fruits } = gameState;
         const treeProperties = tree.getCurrentStageProperties();
-        
+        const growthStage = tree.growthStage || 1;
+        const maxStage = tree.maxGrowthStage || 10;
+
+        // Calculate scale: start small, grow to fill more of the background
+        // At stage 1: ~20% of height, at max: ~70%
+        const minScale = 0.18;
+        const maxScale = 0.7;
+        const scale = minScale + (maxScale - minScale) * ((growthStage - 1) / (maxStage - 1));
+        this.treeScale = scale;
+
+        // CenterY: base of tree is a bit above bottom, but leaves room for UI overlays
+        this.centerY = this.height * (0.88 - 0.18 * scale);
+        this.centerX = this.width / 2;
+
         // Draw ground
         this.drawGround();
-        
         // Draw roots
         this.drawRoots(roots.slots, treeProperties.branchDepth);
-        
         // Draw trunk and branches
-        this.drawTree(treeProperties.branchDepth);
-        
+        this.drawTree(treeProperties.branchDepth, growthStage, maxStage);
         // Draw leaves
-        this.drawLeaves(leaves.slots);
-        
+        this.drawLeaves(leaves.slots, growthStage, maxStage);
         // Draw fruits
         if (fruits.enabled) {
             this.drawFruits(fruits.fruits);
@@ -55,7 +91,7 @@ export default class Renderer {
         this.ctx.beginPath();
         this.ctx.rect(0, this.centerY, this.width, this.height - this.centerY);
         this.ctx.fill();
-        
+
         // Add some texture
         this.ctx.fillStyle = '#654321'; // Darker brown
         for (let i = 0; i < 20; i++) {
@@ -71,24 +107,30 @@ export default class Renderer {
     /**
      * Draw the tree trunk and branches
      * @param {number} depth - Branch recursion depth
+     * @param {number} growthStage - Current growth stage
+     * @param {number} maxStage - Max growth stage
      */
-    drawTree(depth) {
-        // Draw trunk
-        const trunkHeight = 100 + depth * 15;
-        const trunkWidth = 10 + depth * 2;
-        
-        this.ctx.fillStyle = '#5D4037'; // Brown
+    drawTree(depth, growthStage, maxStage) {
+        // Scale trunk height/width with treeScale
+        const trunkHeight = this.height * this.treeScale * (0.25 + 0.04 * depth);
+        const trunkWidth = Math.max(8, this.width * 0.012 * this.treeScale + depth * 1.2);
+
+        this.ctx.fillStyle = '#5D4037';
         this.ctx.beginPath();
         this.ctx.rect(this.centerX - trunkWidth / 2, this.centerY - trunkHeight, trunkWidth, trunkHeight);
         this.ctx.fill();
-        
-        // Draw branches recursively
+
+        // Branch length and spread scale with growth
         const startX = this.centerX;
         const startY = this.centerY - trunkHeight;
-        const length = 60 + depth * 5;
-        const angle = -Math.PI / 2; // Straight up
-        
-        this.drawBranch(startX, startY, length, angle, depth);
+        const baseLength = this.height * this.treeScale * 0.18;
+        const length = baseLength + depth * 8;
+        // Spread: at stage 1, branches are more upright; at max, more horizontal
+        const minSpread = Math.PI / 7;
+        const maxSpread = Math.PI / 3.2;
+        const spread = minSpread + (maxSpread - minSpread) * ((growthStage - 1) / (maxStage - 1));
+        const angle = -Math.PI / 2;
+        this.drawBranch(startX, startY, length, angle, depth, spread);
     }
 
     /**
@@ -98,69 +140,58 @@ export default class Renderer {
      * @param {number} length - Branch length
      * @param {number} angle - Branch angle
      * @param {number} depth - Recursion depth remaining
+     * @param {number} spread - Branch spread angle
      */
-    drawBranch(x, y, length, angle, depth) {
+    drawBranch(x, y, length, angle, depth, spread) {
         if (depth <= 0) return;
-        
         const endX = x + Math.cos(angle) * length;
         const endY = y + Math.sin(angle) * length;
-        const width = 3 + depth;
-        
-        // Draw this branch
-        this.ctx.strokeStyle = '#5D4037'; // Brown
+        const width = Math.max(2, 2 + depth * this.treeScale * 2);
+        this.ctx.strokeStyle = '#5D4037';
         this.ctx.lineWidth = width;
         this.ctx.beginPath();
         this.ctx.moveTo(x, y);
         this.ctx.lineTo(endX, endY);
         this.ctx.stroke();
-        
-        // Store branch end points for leaf placement
-        if (!this.branchEnds) {
-            this.branchEnds = [];
-        }
-        
+        if (!this.branchEnds) this.branchEnds = [];
         if (depth === 1) {
             this.branchEnds.push({ x: endX, y: endY, angle });
         }
-        
         // Recursively draw child branches
-        const newLength = length * 0.7;
-        const branchAngle = Math.PI / 4 + Math.random() * 0.2;
-        
-        this.drawBranch(endX, endY, newLength, angle - branchAngle, depth - 1);
-        this.drawBranch(endX, endY, newLength, angle + branchAngle, depth - 1);
+        const newLength = length * (0.68 + 0.04 * this.treeScale);
+        this.drawBranch(endX, endY, newLength, angle - spread, depth - 1, spread);
+        this.drawBranch(endX, endY, newLength, angle + spread, depth - 1, spread);
     }
 
     /**
      * Draw leaves
      * @param {Array} leaves - Array of leaf objects
+     * @param {number} growthStage
+     * @param {number} maxStage
      */
-    drawLeaves(leaves) {
-        // Reset branch ends for new render
+    drawLeaves(leaves, growthStage, maxStage) {
         this.branchEnds = [];
-        
-        // Get branch ends from the tree
+        // Use same scaling as drawTree
         const startX = this.centerX;
-        const startY = this.centerY - (100 + 15 * 6); // Same as in drawTree
-        const length = 60 + 5 * 6;
+        const trunkHeight = this.height * this.treeScale * (0.25 + 0.04 * 6);
+        const startY = this.centerY - trunkHeight;
+        const baseLength = this.height * this.treeScale * 0.18;
+        const length = baseLength + 6 * 8;
+        const minSpread = Math.PI / 7;
+        const maxSpread = Math.PI / 3.2;
+        const spread = minSpread + (maxSpread - minSpread) * ((growthStage - 1) / (maxStage - 1));
         const angle = -Math.PI / 2;
-        
-        this.drawBranch(startX, startY, length, angle, 6);
-        
-        // Draw leaves at branch ends
+        this.drawBranch(startX, startY, length, angle, 6, spread);
         if (this.branchEnds.length > 0) {
             leaves.forEach((leaf, index) => {
                 if (index < this.branchEnds.length) {
                     const end = this.branchEnds[index];
-                    const size = 10 + leaf.level * 2;
-                    
-                    this.ctx.fillStyle = `rgba(0, 128, 0, ${0.7 + leaf.efficiency * 0.1})`; // Green with opacity based on efficiency
+                    const size = 8 + leaf.level * 1.7 * this.treeScale;
+                    this.ctx.fillStyle = `rgba(0, 128, 0, ${0.7 + leaf.efficiency * 0.1})`;
                     this.ctx.beginPath();
                     this.ctx.ellipse(end.x, end.y, size, size * 0.6, end.angle + Math.PI / 4, 0, Math.PI * 2);
                     this.ctx.fill();
-                    
-                    // Add a vein
-                    this.ctx.strokeStyle = '#006400'; // Dark green
+                    this.ctx.strokeStyle = '#006400';
                     this.ctx.lineWidth = 1;
                     this.ctx.beginPath();
                     this.ctx.moveTo(end.x, end.y);
@@ -180,12 +211,12 @@ export default class Renderer {
         const rootStartX = this.centerX;
         const rootStartY = this.centerY;
         const baseAngle = Math.PI / 2; // Downward
-        
+
         // Draw main roots
         roots.forEach((root, index) => {
             const angle = baseAngle + (index - (roots.length - 1) / 2) * (Math.PI / 6);
             const length = 40 + root.level * 5;
-            
+
             this.drawRoot(rootStartX, rootStartY, length, angle, Math.min(depth, 3), root.level);
         });
     }
@@ -201,11 +232,11 @@ export default class Renderer {
      */
     drawRoot(x, y, length, angle, depth, level) {
         if (depth <= 0) return;
-        
+
         const endX = x + Math.cos(angle) * length;
         const endY = y + Math.sin(angle) * length;
         const width = 2 + depth;
-        
+
         // Draw this root
         this.ctx.strokeStyle = `rgba(101, 67, 33, ${0.6 + level * 0.05})`; // Brown with opacity based on level
         this.ctx.lineWidth = width;
@@ -213,12 +244,12 @@ export default class Renderer {
         this.ctx.moveTo(x, y);
         this.ctx.lineTo(endX, endY);
         this.ctx.stroke();
-        
+
         // Recursively draw child roots
         if (depth > 1) {
             const newLength = length * 0.6;
             const rootAngle = Math.PI / 5;
-            
+
             this.drawRoot(endX, endY, newLength, angle - rootAngle, depth - 1, level);
             this.drawRoot(endX, endY, newLength, angle + rootAngle, depth - 1, level);
         }
@@ -231,12 +262,12 @@ export default class Renderer {
     drawFruits(fruits) {
         // Store fruit positions for click detection
         this.fruitPositions = [];
-        
+
         fruits.forEach(fruit => {
             // Calculate position based on angle and distance from center
             const x = this.centerX + Math.cos(fruit.position.angle) * (fruit.position.distance * 100);
             const y = (this.centerY - 100) + Math.sin(fruit.position.angle) * (fruit.position.distance * 100);
-            
+
             // Store position for click detection
             this.fruitPositions.push({
                 id: fruit.id,
@@ -244,13 +275,13 @@ export default class Renderer {
                 y,
                 radius: 10 * fruit.growth
             });
-            
+
             // Draw fruit
             this.ctx.fillStyle = fruit.growth >= 1 ? '#FF5722' : '#FFA726'; // Orange/amber based on growth
             this.ctx.beginPath();
             this.ctx.arc(x, y, 10 * fruit.growth, 0, Math.PI * 2);
             this.ctx.fill();
-            
+
             // Add highlight
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
             this.ctx.beginPath();
@@ -265,7 +296,7 @@ export default class Renderer {
      */
     onFruitClick(callback) {
         this.fruitClickCallbacks.push(callback);
-        
+
         // Add click event listener if not already added
         if (this.fruitClickCallbacks.length === 1) {
             this.canvas.addEventListener('click', this.handleCanvasClick.bind(this));
@@ -278,15 +309,15 @@ export default class Renderer {
      */
     handleCanvasClick(event) {
         if (!this.fruitPositions) return;
-        
+
         const rect = this.canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        
+
         // Check if click is on a fruit
         for (const fruit of this.fruitPositions) {
             const distance = Math.sqrt(Math.pow(x - fruit.x, 2) + Math.pow(y - fruit.y, 2));
-            
+
             if (distance <= fruit.radius) {
                 // Notify all callbacks
                 this.fruitClickCallbacks.forEach(callback => {

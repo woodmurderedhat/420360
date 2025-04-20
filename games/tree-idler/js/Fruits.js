@@ -8,6 +8,8 @@ export default class Fruits {
         this.maxFruits = 3;
         this.fruitGrowthRate = 0.1; // Base growth rate per second
         this.nextFruitId = 1;
+        this.autoHarvest = false;
+        this.autoHarvestTimer = 0;
     }
 
     /**
@@ -18,7 +20,7 @@ export default class Fruits {
      */
     update(deltaTime, fruitsEnabled, growthStage) {
         this.enabled = fruitsEnabled;
-        
+
         if (!this.enabled) {
             return;
         }
@@ -41,6 +43,15 @@ export default class Fruits {
                 this.spawnFruit();
             }
         }
+
+        // Auto-harvest logic
+        if (this.autoHarvest) {
+            this.autoHarvestTimer += deltaTime;
+            if (this.autoHarvestTimer >= 10) {
+                this.autoHarvestTimer = 0;
+                this.harvestAllRipeFruits();
+            }
+        }
     }
 
     /**
@@ -51,7 +62,7 @@ export default class Fruits {
             // Random position on the tree
             const angle = Math.random() * Math.PI * 2;
             const distance = 0.3 + Math.random() * 0.4; // 30-70% from center
-            
+
             this.fruits.push({
                 id: this.nextFruitId++,
                 growth: 0,
@@ -67,25 +78,59 @@ export default class Fruits {
     /**
      * Harvest a fruit by ID
      * @param {number} fruitId - ID of the fruit to harvest
+     * @param {number} valueMultiplier - Multiplier for fruit value from upgrades
      * @returns {Object|null} - Harvested fruit value or null if not found/not ready
      */
-    harvestFruit(fruitId) {
+    harvestFruit(fruitId, valueMultiplier = 0) {
         const fruitIndex = this.fruits.findIndex(f => f.id === fruitId);
-        
+
         if (fruitIndex === -1) {
             return null;
         }
-        
+
         const fruit = this.fruits[fruitIndex];
-        
+
         // Only harvest fully grown fruits
         if (fruit.growth >= 1) {
-            const value = { ...fruit.value };
+            // Apply value multiplier from upgrades (25% per level)
+            const multiplier = 1 + (valueMultiplier * 0.25);
+            const value = {
+                sunlight: Math.floor(fruit.value.sunlight * multiplier),
+                water: Math.floor(fruit.value.water * multiplier)
+            };
+
             this.fruits.splice(fruitIndex, 1);
             return value;
         }
-        
+
         return null;
+    }
+
+    /**
+     * Enable auto-harvest for fruits
+     */
+    enableAutoHarvest() {
+        this.autoHarvest = true;
+    }
+
+    /**
+     * Harvest all ripe fruits (for auto-harvest)
+     * Returns total value harvested
+     */
+    harvestAllRipeFruits(valueMultiplier = 0) {
+        let totalSunlight = 0;
+        let totalWater = 0;
+        // Copy array to avoid mutation issues
+        const ripeFruits = this.fruits.filter(fruit => fruit.growth >= 1);
+        ripeFruits.forEach(fruit => {
+            const multiplier = 1 + (valueMultiplier * 0.2);
+            totalSunlight += Math.floor(fruit.value.sunlight * multiplier);
+            totalWater += Math.floor(fruit.value.water * multiplier);
+            // Remove fruit
+            const idx = this.fruits.findIndex(f => f.id === fruit.id);
+            if (idx !== -1) this.fruits.splice(idx, 1);
+        });
+        return { sunlight: totalSunlight, water: totalWater };
     }
 
     /**
@@ -106,7 +151,9 @@ export default class Fruits {
             fruits: this.fruits,
             maxFruits: this.maxFruits,
             fruitGrowthRate: this.fruitGrowthRate,
-            nextFruitId: this.nextFruitId
+            nextFruitId: this.nextFruitId,
+            autoHarvest: this.autoHarvest,
+            autoHarvestTimer: this.autoHarvestTimer
         };
     }
 
@@ -121,6 +168,8 @@ export default class Fruits {
             this.maxFruits = state.maxFruits || 3;
             this.fruitGrowthRate = state.fruitGrowthRate || 0.1;
             this.nextFruitId = state.nextFruitId || 1;
+            this.autoHarvest = state.autoHarvest || false;
+            this.autoHarvestTimer = state.autoHarvestTimer || 0;
         }
     }
 }

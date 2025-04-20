@@ -47,6 +47,9 @@ export default class UI {
         
         // Update upgrades list
         this.updateUpgradesList();
+
+        // Update fruit bonuses panel
+        this.updateFruitBonuses();
     }
 
     /**
@@ -94,16 +97,47 @@ export default class UI {
                 <button class="upgrade-button" data-upgrade-id="${upgrade.id}" ${canAfford ? '' : 'disabled'}>
                     Purchase
                 </button>
+                <div class="upgrade-feedback" style="color:#2e7d32;font-size:0.9em;display:none;"></div>
             `;
             
             // Add click handler
             const button = upgradeElement.querySelector('button');
+            const feedback = upgradeElement.querySelector('.upgrade-feedback');
             button.addEventListener('click', () => {
-                this.game.applyUpgrade(upgrade.id);
+                const success = this.game.applyUpgrade(upgrade.id);
+                feedback.style.display = 'block';
+                if (success) {
+                    feedback.textContent = 'Upgrade purchased!';
+                    feedback.style.color = '#2e7d32';
+                } else {
+                    feedback.textContent = 'Not enough resources!';
+                    feedback.style.color = '#d32f2f';
+                }
+                setTimeout(() => { feedback.style.display = 'none'; }, 1200);
             });
             
             this.upgradesListElement.appendChild(upgradeElement);
         });
+    }
+
+    /**
+     * Update the fruit bonuses panel
+     */
+    updateFruitBonuses() {
+        const fruitBonuses = document.getElementById('fruitBonuses');
+        const { upgrades, fruits } = this.game;
+        if (!fruitBonuses) return;
+        if (!fruits.enabled) {
+            fruitBonuses.innerHTML = '<span style="color:#888">Fruits are locked. Reach growth stage 3 to unlock.</span>';
+            return;
+        }
+        const u = upgrades.fruitUpgrades;
+        fruitBonuses.innerHTML = `
+            <div title="Each level increases fruit growth speed by 15%">🍏 Growth Rate: <b>${u.growthRate}</b> / 10</div>
+            <div title="Each level increases fruit value by 20%">🍊 Value Bonus: <b>${u.value}</b> / 10</div>
+            <div title="Each level increases max fruits by 1">🍒 Max Fruits: <b>${3 + u.maxFruits}</b></div>
+            <div title="Automatically harvests ripe fruits every 10s">⚡ Auto-Harvest: <b style="color:${u.autoHarvest ? '#2e7d32' : '#d32f2f'}">${u.autoHarvest ? 'ON' : 'OFF'}</b></div>
+        `;
     }
 
     /**

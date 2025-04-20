@@ -1,3 +1,5 @@
+import Config from "./Config.js";
+
 /**
  * Renderer.js - Handles canvas rendering of the tree and its components
  * @classdesc Handles canvas rendering of the tree, roots, leaves, and fruits.
@@ -54,6 +56,9 @@ export default class Renderer {
         this.updateDimensions();
         this.clear();
 
+        // Parallax background
+        this.drawParallaxBackground();
+
         const { tree, leaves, roots, fruits } = gameState;
         const treeProperties = tree.getCurrentStageProperties();
         const growthStage = tree.growthStage || 1;
@@ -76,8 +81,8 @@ export default class Renderer {
         this.drawRoots(roots.slots, treeProperties.branchDepth);
         // Draw trunk and branches
         this.drawTree(treeProperties.branchDepth, growthStage, maxStage);
-        // Draw leaves
-        this.drawLeaves(leaves.slots, growthStage, maxStage);
+        // Draw leaves with animation
+        this.drawLeaves(leaves.slots, growthStage, maxStage, performance.now() / 1000);
         // Draw fruits
         if (fruits.enabled) {
             this.drawFruits(fruits.fruits);
@@ -85,10 +90,39 @@ export default class Renderer {
     }
 
     /**
+     * Draw the parallax background
+     */
+    drawParallaxBackground() {
+        const { COLORS, ANIMATION } = Config;
+        // Sky
+        this.ctx.fillStyle = COLORS.backgroundSky;
+        this.ctx.fillRect(0, 0, this.width, this.height);
+        // Mountains (simple parallax)
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.5;
+        this.ctx.fillStyle = COLORS.backgroundMountains;
+        const offset = (performance.now() / 10000) % this.width;
+        for (let i = 0; i < 2; i++) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(-offset + i * this.width, this.height * 0.7);
+            this.ctx.lineTo(200 - offset + i * this.width, this.height * 0.5);
+            this.ctx.lineTo(400 - offset + i * this.width, this.height * 0.7);
+            this.ctx.lineTo(600 - offset + i * this.width, this.height * 0.55);
+            this.ctx.lineTo(800 - offset + i * this.width, this.height * 0.7);
+            this.ctx.lineTo(this.width + 100 - offset + i * this.width, this.height * 0.7);
+            this.ctx.lineTo(this.width + 100 - offset + i * this.width, this.height);
+            this.ctx.lineTo(-100 - offset + i * this.width, this.height);
+            this.ctx.closePath();
+            this.ctx.fill();
+        }
+        this.ctx.restore();
+    }
+
+    /**
      * Draw the ground
      */
     drawGround() {
-        this.ctx.fillStyle = '#8B4513'; // Brown
+        this.ctx.fillStyle = Config.COLORS.backgroundGround;
         this.ctx.beginPath();
         this.ctx.rect(0, this.centerY, this.width, this.height - this.centerY);
         this.ctx.fill();
@@ -116,7 +150,7 @@ export default class Renderer {
         const trunkHeight = this.height * this.treeScale * (0.25 + 0.04 * depth);
         const trunkWidth = Math.max(8, this.width * 0.012 * this.treeScale + depth * 1.2);
 
-        this.ctx.fillStyle = '#5D4037';
+        this.ctx.fillStyle = Config.COLORS.treeTrunk;
         this.ctx.beginPath();
         this.ctx.rect(this.centerX - trunkWidth / 2, this.centerY - trunkHeight, trunkWidth, trunkHeight);
         this.ctx.fill();
@@ -169,8 +203,9 @@ export default class Renderer {
      * @param {Array} leaves - Array of leaf objects
      * @param {number} growthStage
      * @param {number} maxStage
+     * @param {number} time - Current time for animation
      */
-    drawLeaves(leaves, growthStage, maxStage) {
+    drawLeaves(leaves, growthStage, maxStage, time = 0) {
         this.branchEnds = [];
         // Use same scaling as drawTree
         const startX = this.centerX;
@@ -187,17 +222,23 @@ export default class Renderer {
             leaves.forEach((leaf, index) => {
                 if (index < this.branchEnds.length) {
                     const end = this.branchEnds[index];
+                    // Sway animation
+                    const sway = Math.sin(time * Config.ANIMATION.leafSwaySpeed + index) * Config.ANIMATION.leafSwayAmplitude;
                     const size = 8 + leaf.level * 1.7 * this.treeScale;
-                    this.ctx.fillStyle = `rgba(0, 128, 0, ${0.7 + leaf.efficiency * 0.1})`;
+                    this.ctx.save();
+                    this.ctx.translate(end.x, end.y);
+                    this.ctx.rotate(end.angle + Math.PI / 4 + sway);
+                    this.ctx.fillStyle = Config.COLORS.leaf;
                     this.ctx.beginPath();
-                    this.ctx.ellipse(end.x, end.y, size, size * 0.6, end.angle + Math.PI / 4, 0, Math.PI * 2);
+                    this.ctx.ellipse(0, 0, size, size * 0.6, 0, 0, Math.PI * 2);
                     this.ctx.fill();
-                    this.ctx.strokeStyle = '#006400';
+                    this.ctx.strokeStyle = Config.COLORS.leafStroke;
                     this.ctx.lineWidth = 1;
                     this.ctx.beginPath();
-                    this.ctx.moveTo(end.x, end.y);
-                    this.ctx.lineTo(end.x + Math.cos(end.angle) * size, end.y + Math.sin(end.angle) * size);
+                    this.ctx.moveTo(0, 0);
+                    this.ctx.lineTo(size, 0);
                     this.ctx.stroke();
+                    this.ctx.restore();
                 }
             });
         }
@@ -278,7 +319,7 @@ export default class Renderer {
             });
 
             // Draw fruit
-            this.ctx.fillStyle = fruit.growth >= 1 ? '#FF5722' : '#FFA726'; // Orange/amber based on growth
+            this.ctx.fillStyle = fruit.growth >= 1 ? Config.COLORS.fruitRipe : Config.COLORS.fruitUnripe;
             this.ctx.beginPath();
             this.ctx.arc(x, y, 10 * fruit.growth, 0, Math.PI * 2);
             this.ctx.fill();

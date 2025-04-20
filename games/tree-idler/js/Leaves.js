@@ -2,6 +2,7 @@
  * Leaves.js - Manages leaf slots and sunlight production
  */
 import Config from "./Config.js";
+import Cost from "./Cost.js";
 
 export default class Leaves {
     constructor() {
@@ -61,7 +62,7 @@ export default class Leaves {
         const baseCost = Config.UPGRADE_COSTS.leaves.sunlight;
         const costMultiplier = Config.UPGRADE_MULTIPLIERS.leaves;
         const cost = Math.floor(baseCost * Math.pow(costMultiplier, currentLevel - 1));
-        return new (require('./Cost.js').default)(cost, Math.floor(cost / 2));
+        return new Cost(cost, Math.floor(cost / 2));
     }
 
     /**

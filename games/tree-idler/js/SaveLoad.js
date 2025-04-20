@@ -1,3 +1,5 @@
+import LZString from "https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js";
+
 /**
  * SaveLoad.js - Handles saving and loading game state
  * @classdesc Handles saving and loading game state, including localStorage persistence and offline progress.
@@ -21,8 +23,14 @@ export default class SaveLoad {
             fruits: gameState.fruits.getState(),
             lastSaveTime: Date.now()
         };
-        
-        localStorage.setItem(this.saveKey, JSON.stringify(saveData));
+        // Backup previous save
+        const prevSave = localStorage.getItem(this.saveKey);
+        if (prevSave) {
+            localStorage.setItem(this.saveKey + "_backup", prevSave);
+        }
+        // Compress and save
+        const compressed = LZString.compressToUTF16(JSON.stringify(saveData));
+        localStorage.setItem(this.saveKey, compressed);
         this.lastSaveTime = Date.now();
     }
 
@@ -31,16 +39,32 @@ export default class SaveLoad {
      * @returns {Object|null} - Loaded game state or null if no save exists
      */
     loadGame() {
-        const saveData = localStorage.getItem(this.saveKey);
-        
-        if (!saveData) {
-            return null;
-        }
-        
+        const compressed = localStorage.getItem(this.saveKey);
+        if (!compressed) return null;
         try {
-            return JSON.parse(saveData);
+            const json = LZString.decompressFromUTF16(compressed);
+            const saveData = JSON.parse(json);
+            // Data validation
+            if (!saveData || typeof saveData !== "object") return null;
+            if (!saveData.resources || !saveData.tree || !saveData.leaves || !saveData.roots || !saveData.fruits) return null;
+            // Validate resource numbers
+            ["sunlight", "water"].forEach(key => {
+                if (typeof saveData.resources[key] !== "number" || saveData.resources[key] < 0) saveData.resources[key] = 0;
+            });
+            return saveData;
         } catch (error) {
-            console.error('Error loading save data:', error);
+            console.error("Error loading save data:", error);
+            // Try backup
+            const backup = localStorage.getItem(this.saveKey + "_backup");
+            if (backup) {
+                try {
+                    const json = LZString.decompressFromUTF16(backup);
+                    const saveData = JSON.parse(json);
+                    return saveData;
+                } catch (e) {
+                    return null;
+                }
+            }
             return null;
         }
     }

@@ -187,4 +187,16 @@ export default class Fruits {
             this.autoHarvestTimer = state.autoHarvestTimer || 0;
         }
     }
+
+    /**
+     * Reset fruits to initial state but preserve upgrades
+     */
+    reset() {
+        this.enabled = false;
+        this.fruits = [];
+        // Don't reset maxFruits or fruitGrowthRate as they come from upgrades
+        this.nextFruitId = 1;
+        // Don't reset autoHarvest as it comes from upgrades
+        this.autoHarvestTimer = 0;
+    }
 }

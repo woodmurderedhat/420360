@@ -30,13 +30,13 @@ export default class Resources {
     calculateOfflineProgress(elapsedTime) {
         // Cap offline progress to prevent excessive resources
         const cappedTime = Math.min(elapsedTime, 24 * 60 * 60); // Max 24 hours
-        
+
         const sunlightGained = this.sunlightPerSecond * cappedTime;
         const waterGained = this.waterPerSecond * cappedTime;
-        
+
         this.sunlight += sunlightGained;
         this.water += waterGained;
-        
+
         return {
             sunlightGained,
             waterGained,
@@ -116,5 +116,15 @@ export default class Resources {
             this.sunlightPerSecond = state.sunlightPerSecond || 0;
             this.waterPerSecond = state.waterPerSecond || 0;
         }
+    }
+
+    /**
+     * Reset resources to initial state
+     */
+    reset() {
+        this.sunlight = 0;
+        this.water = 0;
+        this.sunlightPerSecond = 0;
+        this.waterPerSecond = 0;
     }
 }

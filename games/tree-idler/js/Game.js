@@ -215,11 +215,41 @@ class Game {
     }
 
     /**
-     * Reset the game
+     * Reset the game completely (hard reset)
      */
     resetGame() {
         this.saveLoad.resetGame();
         window.location.reload();
+    }
+
+    /**
+     * Perform a prestige reset
+     * @returns {Object} - Prestige rewards
+     */
+    prestigeReset() {
+        // Get prestige rewards from tree
+        const rewards = this.tree.prestige();
+
+        // Reset resources
+        this.resources.reset();
+
+        // Reset leaves and roots
+        this.leaves.reset();
+        this.roots.reset();
+
+        // Reset fruits but keep upgrades
+        this.fruits.reset();
+
+        // Reset upgrades but keep prestige-related ones
+        this.upgrades.reset(true);
+
+        // Save the game after prestige
+        this.saveGame();
+
+        // Update UI
+        this.ui.update();
+
+        return rewards;
     }
 }
 

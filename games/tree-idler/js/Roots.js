@@ -8,7 +8,7 @@ export default class Roots {
     constructor() {
         this.slots = [];
         this.maxSlots = 1;
-        
+
         // Initialize with one basic root
         this.addRoot();
     }
@@ -42,13 +42,13 @@ export default class Roots {
 
         const root = this.slots[slotIndex];
         const upgradeCost = this.getUpgradeCost(root.level);
-        
+
         if (resources.spendResources(upgradeCost.sunlight, upgradeCost.water)) {
             root.level++;
             root.efficiency = 1 + (root.level - 1) * 0.2; // 20% increase per level
             return true;
         }
-        
+
         return false;
     }
 
@@ -103,11 +103,20 @@ export default class Roots {
         if (state) {
             this.slots = state.slots || [];
             this.maxSlots = state.maxSlots || 1;
-            
+
             // Ensure at least one root if slots are empty
             if (this.slots.length === 0 && this.maxSlots > 0) {
                 this.addRoot();
             }
         }
+    }
+
+    /**
+     * Reset roots to initial state
+     */
+    reset() {
+        this.slots = [];
+        this.maxSlots = 1;
+        this.addRoot(); // Start with one basic root
     }
 }

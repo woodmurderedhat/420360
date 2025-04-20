@@ -7,7 +7,7 @@ import eventBus from "./EventBus.js";
 export default class UI {
     constructor(game) {
         this.game = game;
-        
+
         // Cache DOM elements
         this.sunlightElement = document.getElementById('sunlight');
         this.waterElement = document.getElementById('water');
@@ -15,7 +15,13 @@ export default class UI {
         this.upgradesListElement = document.getElementById('upgradesList');
         this.growButtonElement = document.getElementById('growButton');
         this.growthCostElement = document.getElementById('growthCost');
-        
+
+        // Prestige elements
+        this.prestigeLevelElement = document.getElementById('prestigeLevel');
+        this.prestigeMultiplierElement = document.getElementById('prestigeMultiplier');
+        this.currentStageElement = document.getElementById('currentStage');
+        this.prestigeButtonElement = document.getElementById('prestigeButton');
+
         // Debounced update
         this.update = this.debounce(this.update.bind(this), 50);
 
@@ -78,6 +84,16 @@ export default class UI {
                 }
             }
         });
+
+        // Prestige button
+        if (this.prestigeButtonElement) {
+            this.prestigeButtonElement.addEventListener('click', () => {
+                if (confirm('Are you sure you want to prestige? You will lose all progress but gain permanent bonuses.')) {
+                    const rewards = this.game.prestigeReset();
+                    this.showPrestigeRewards(rewards);
+                }
+            });
+        }
     }
 
     /**
@@ -85,7 +101,7 @@ export default class UI {
      */
     update() {
         const { resources, tree, upgrades } = this.game;
-        
+
         // Update resource displays with tooltips and formatting
         this.sunlightElement.textContent = Math.floor(resources.sunlight).toLocaleString();
         this.sunlightElement.title = `Sunlight: ${Math.floor(resources.sunlight).toLocaleString()} (+${resources.sunlightPerSecond.toFixed(1)}/s)`;
@@ -93,15 +109,63 @@ export default class UI {
         this.waterElement.title = `Water: ${Math.floor(resources.water).toLocaleString()} (+${resources.waterPerSecond.toFixed(1)}/s)`;
         this.growthStageElement.textContent = tree.growthStage;
         this.growthStageElement.title = `Current Growth Stage: ${tree.growthStage}`;
-        
+
         // Update growth button and cost
         this.updateGrowthButton();
-        
+
         // Update upgrades list
         this.updateUpgradesList();
 
         // Update fruit bonuses panel
         this.updateFruitBonuses();
+
+        // Update prestige panel
+        this.updatePrestigePanel();
+    }
+
+    /**
+     * Update the prestige panel
+     */
+    updatePrestigePanel() {
+        const { tree } = this.game;
+
+        if (this.prestigeLevelElement) {
+            this.prestigeLevelElement.textContent = tree.prestigeLevel;
+        }
+
+        if (this.prestigeMultiplierElement) {
+            this.prestigeMultiplierElement.textContent = tree.prestigeMultiplier.toFixed(1);
+        }
+
+        if (this.currentStageElement) {
+            this.currentStageElement.textContent = tree.growthStage;
+        }
+    }
+
+    /**
+     * Show prestige rewards notification
+     * @param {Object} rewards - Prestige rewards
+     */
+    showPrestigeRewards(rewards) {
+        const notification = document.createElement('div');
+        notification.className = 'offline-progress';
+        notification.innerHTML = `
+            <h3>Prestige Complete!</h3>
+            <p>You have prestiged and gained permanent bonuses:</p>
+            <ul>
+                <li>+${rewards.prestigeGain} Prestige Levels (Total: ${rewards.prestigeLevel})</li>
+                <li>+${rewards.productionBonus.toFixed(1)}% Production Bonus (${rewards.prestigeMultiplier.toFixed(1)}x)</li>
+            </ul>
+            <p>Your tree has been reset to stage 1, but with increased production!</p>
+            <button id="closePrestigeNotification">OK</button>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Add close button handler
+        document.getElementById('closePrestigeNotification').addEventListener('click', () => {
+            notification.remove();
+        });
     }
 
     /**
@@ -110,12 +174,12 @@ export default class UI {
     updateGrowthButton() {
         const { tree, resources } = this.game;
         const nextStage = tree.getNextStageProperties();
-        
+
         if (nextStage) {
             const cost = tree.getGrowthCost();
             this.growthCostElement.textContent = `Cost: ${cost.sunlight.toLocaleString()} Sunlight, ${cost.water.toLocaleString()} Water`;
             this.growthCostElement.title = `Grow to stage ${tree.growthStage + 1}`;
-            
+
             // Enable/disable button based on resources
             const canAfford = resources.hasEnoughResources(cost.sunlight, cost.water);
             this.growButtonElement.disabled = !canAfford;
@@ -133,17 +197,17 @@ export default class UI {
     updateUpgradesList() {
         const availableUpgrades = this.game.upgrades.getAvailableUpgrades();
         const { resources } = this.game;
-        
+
         // Clear current list
         this.upgradesListElement.innerHTML = '';
-        
+
         // Add each upgrade
         availableUpgrades.forEach(upgrade => {
             const upgradeElement = document.createElement('div');
             upgradeElement.className = 'upgrade-item';
-            
+
             const canAfford = resources.hasEnoughResources(upgrade.cost.sunlight, upgrade.cost.water);
-            
+
             // Dynamic description
             let description = upgrade.description;
             if (typeof upgrade.dynamicDescription === 'function') {
@@ -161,7 +225,7 @@ export default class UI {
                 </button>
                 <div class="upgrade-feedback" style="color:#2e7d32;font-size:0.9em;display:none;"></div>
             `;
-            
+
             this.upgradesListElement.appendChild(upgradeElement);
         });
     }
@@ -194,13 +258,13 @@ export default class UI {
         const hours = Math.floor(progress.timeProcessed / 3600);
         const minutes = Math.floor((progress.timeProcessed % 3600) / 60);
         const seconds = Math.floor(progress.timeProcessed % 60);
-        
-        const timeString = hours > 0 
-            ? `${hours}h ${minutes}m ${seconds}s` 
-            : minutes > 0 
-                ? `${minutes}m ${seconds}s` 
+
+        const timeString = hours > 0
+            ? `${hours}h ${minutes}m ${seconds}s`
+            : minutes > 0
+                ? `${minutes}m ${seconds}s`
                 : `${seconds}s`;
-        
+
         const notification = document.createElement('div');
         notification.className = 'offline-progress';
         notification.innerHTML = `
@@ -213,9 +277,9 @@ export default class UI {
             </ul>
             <button id="closeNotification">OK</button>
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         // Add close button handler
         document.getElementById('closeNotification').addEventListener('click', () => {
             notification.remove();

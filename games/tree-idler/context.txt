@@ -91,3 +91,11 @@ Tree Idler is a browser-based idle resource management game where the player emb
 - Different leaf/root types with unique properties
 - Seasonal changes affecting resource rates
 - Animations for visual appeal
+
+## Planned Improvements
+- Implement infinite growth stages beyond the current 10 stages
+- Add prestige mechanics for meaningful resets with persistent bonuses
+- Expand upgrade system for endless progression
+- Improve UI intuitiveness and feedback
+- Add statistics tracking across resets
+- Create a dedicated reset panel with prestige bonuses

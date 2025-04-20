@@ -8,7 +8,7 @@ export default class Leaves {
     constructor() {
         this.slots = [];
         this.maxSlots = 1;
-        
+
         // Initialize with one basic leaf
         this.addLeaf();
     }
@@ -42,13 +42,13 @@ export default class Leaves {
 
         const leaf = this.slots[slotIndex];
         const upgradeCost = this.getUpgradeCost(leaf.level);
-        
+
         if (resources.spendResources(upgradeCost.sunlight, upgradeCost.water)) {
             leaf.level++;
             leaf.efficiency = 1 + (leaf.level - 1) * 0.2; // 20% increase per level
             return true;
         }
-        
+
         return false;
     }
 
@@ -103,11 +103,20 @@ export default class Leaves {
         if (state) {
             this.slots = state.slots || [];
             this.maxSlots = state.maxSlots || 1;
-            
+
             // Ensure at least one leaf if slots are empty
             if (this.slots.length === 0 && this.maxSlots > 0) {
                 this.addLeaf();
             }
         }
+    }
+
+    /**
+     * Reset leaves to initial state
+     */
+    reset() {
+        this.slots = [];
+        this.maxSlots = 1;
+        this.addLeaf(); // Start with one basic leaf
     }
 }

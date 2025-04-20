@@ -224,4 +224,24 @@ export default class Upgrades {
             return false;
         }
     }
+
+    /**
+     * Reset upgrade levels for prestige
+     * @param {boolean} keepPrestige - Whether to keep prestige-related upgrades
+     */
+    reset(keepPrestige = true) {
+        // Reset fruit upgrades but keep auto-harvest if keepPrestige is true
+        const autoHarvest = this.fruitUpgrades.autoHarvest;
+
+        this.fruitUpgrades = {
+            growthRate: 0,
+            value: 0,
+            maxFruits: 0,
+            autoHarvest: keepPrestige && autoHarvest
+        };
+
+        // Update fruit properties
+        this.fruits.fruitGrowthRate = 0.1; // Reset to base rate
+        this.fruits.maxFruits = 3; // Reset to base max
+    }
 }

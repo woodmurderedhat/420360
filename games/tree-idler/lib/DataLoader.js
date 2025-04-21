@@ -1,7 +1,7 @@
 // DataLoader.js
 // Responsible for parsing and validating the manifest using a local validator.
 
-import { validateManifest } from './validator/manifestValidator.js';
+import { validateManifest } from './Validator.js';
 
 // JSON Schema for the manifest (kept for reference, not used by AJV)
 const manifestSchema = {

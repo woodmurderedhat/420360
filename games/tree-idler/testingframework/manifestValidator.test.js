@@ -1,7 +1,7 @@
 // manifestValidator.test.js
 // Unit tests for manifestValidator.js using the vanilla test framework
 import { test, assert, assertEqual, describe, beforeEach } from './test-framework.js';
-import { validateManifest } from '../lib/validator/manifestValidator.js';
+import { validateManifest } from '../lib/Validator.js';
 
 describe('Manifest Validator', () => {
   test('validates a valid manifest', () => {

@@ -1,61 +1,55 @@
-# Tree Idler Progress Plan
+1. Analyze current tree growth logic in Tree.js and identify all procedural growth code.
+2. Research and outline the Saplings Growing Up Algorithm and sunray-based growth algorithms suitable for simulation.
 
-## 1. Verify Game Startup
-- [x] Ensure the game starts up correctly without errors.
-- [x] Validate the manifest schema using the custom validator.
-  - Created comprehensive tests for the manifest validator.
-  - Verified that the validator correctly identifies valid and invalid manifests.
-- [x] Check if all modules are loaded and activated properly.
-  - Confirmed that all modules in the manifest are loaded and activated in the correct order.
+- Saplings Growing Up Algorithm: Models tree growth as a series of stages, where each stage increases trunk height, branch complexity, and resource slots (leaves, roots, fruits, critters). Growth is recursive, with parameters for trunk/branch length, width, angle, and branching factor. Each stage unlocks new features and visual complexity.
+- Sunray-based Growth Algorithm: Simulates the effect of sunlight direction and intensity on branch and leaf growth. Branches and leaves grow more towards the light source, with parameters for sun angle, intensity, and shadowing. This can be implemented by biasing branch angles and leaf density towards the sun direction, and reducing growth in shaded areas.
+- Integration: The simulator should allow dynamic adjustment of growth parameters based on stage, season, sunlight, and species. The algorithms should be modular, allowing for future extension (e.g., wind, weather, species traits).
 
-## 2. Implement Missing Stubs
-- [x] Complete the implementation of `ServiceWorker.js`.
-  - Added logic for caching assets, handling fetch events, and lifecycle management.
-- [x] Add procedural rendering logic in `Tree.js` or a dedicated renderer.
-  - Implemented recursive branching algorithm with seasonal effects.
-  - Added support for fruits, critters, and visual growth stages.
+3. Design a new modular file (TreeGrowthSimulator.js) to encapsulate all tree growth logic, exposing a clean API.
 
-## 3. Test Framework and Coverage
-- [ ] Ensure all test files in `testingframework/` are executed without errors.
-- [x] Add missing test cases for uncovered modules (e.g., `PluginManager.js`, `DataLoader.js`).
-  - Created comprehensive test suite for PluginManager.js.
-  - Added tests for DataLoader.js manifest validation.
+- File: lib/TreeGrowthSimulator.js
+- Exports:
+  - createSimulator(options): Initializes a simulator instance with parameters (species, sunlight, season, etc.).
+  - getGrowthParameters(stage, sunlight, season, species): Returns parameters for trunk, branches, leaves, roots, etc., using Saplings and sunray-based logic.
+  - renderTree(ctx, width, height, state): Draws the tree on a canvas using the current state and growth parameters.
+  - simulateGrowth(state, delta): Advances the tree state by delta time or resources, updating stage and slots.
+- Internals:
+  - Implements recursive branching, sunray bias, and dynamic slot unlocking.
+  - Modular for future extension (wind, weather, species traits).
 
-## 4. Codebase Consistency
-- [x] Verify all modules adhere to the framework described in `CodeFramework.txt`.
-  - Confirmed all modules export a `name` constant.
-  - Verified all modules implement the required lifecycle methods (install, activate, deactivate).
-  - Checked that all modules use the EventBus for communication.
-  - Confirmed UI components are implemented as Web Components.
-- [x] Ensure all features align with the design in `DesignDoc.txt`.
-  - Verified core gameplay loop (collect resources, spend & upgrade, advance growth stage).
-  - Confirmed implementation of leaves, roots, fruits, and critters systems.
-  - Validated visual feedback and procedural rendering.
-  - Checked accessibility features including color-blind mode and ARIA attributes.
+4. Refactor Tree.js to delegate all growth rendering and simulation to the new module.
+5. Implement the Saplings Growing Up Algorithm in the new module, supporting dynamic growth stages and branching.
+6. Integrate sunray-based growth effects, allowing sunlight direction/intensity to influence growth patterns.
+7. Ensure the new module supports dynamic parameters (species, stage, season, etc.) for extensibility.
+- Refactor TreeGrowthSimulator.js to accept and use dynamic parameters for species, stage, season, sunlight, and future extensibility (e.g., weather, upgrades).
+- Allow easy extension for new tree types and environmental effects.
 
-## 5. Accessibility and UX
-- [x] Test ARIA attributes and keyboard navigation for all UI components.
-  - Enhanced ARIA attributes for the Achievement Garden component.
-  - Added proper roles, aria-labels, and aria-live regions for dynamic content.
-  - Ensured all interactive elements are keyboard accessible with proper focus indicators.
-- [x] Verify color-blind mode functionality.
-  - Enhanced color-blind mode to support the Achievement Garden component.
-  - Added high-contrast styles and border indicators for visual elements.
-  - Ensured all interactive elements have proper focus indicators.
+8. Update event handling and UI rendering to use the new simulator.
+- Ensure UI.js and event handlers pass all relevant parameters (species, sunlight, season, etc.) to the simulator.
+- Update UI rendering logic to reflect new growth and sunray effects.
+- Test integration to confirm correct rendering and parameter flow.
 
-## 6. Future Enhancements
-- [x] Add support for dynamic seasonal cycles and weather events.
-  - Implemented seasonal visual effects (spring flowers, summer sun, autumn leaves, winter snow).
-  - Added season state to tree and rendering logic.
-- [x] Implement the Achievement Garden visual display.
-  - Added visual garden representation with SVG plants for each achievement.
-  - Implemented growing animation for newly unlocked achievements.
-  - Added progress tracking and visual feedback.
+Next: Implement dynamic parameter support in TreeGrowthSimulator.js and update UI integration.
+9. Test and validate the new growth system for visual and gameplay consistency.
+10. Document the new architecture and algorithms for future maintainability.
 
----
+11. Implement Seasons & Weather System
+- Add a modular weather system (Weather.js) as a plugin, following the plugin lifecycle (install, activate, deactivate).
+- Emit weather events (rain, drought, frost) that affect resource rates and tree visuals.
+- Integrate with TreeGrowthSimulator.js to visually reflect weather (e.g., rain animation, frost overlay).
+- Use EventBus for decoupled communication (e.g., 'weatherChanged', 'weatherEvent').
 
-### Next Steps
-1. Validate the manifest and ensure the game initializes correctly.
-2. Run all tests and fix any failing cases.
-3. Verify accessibility features and color-blind mode.
-4. Continue updating this document as progress is made.
+12. Expand Multiple Tree Species
+- Allow unlocking and switching between tree species (Oak, Willow, Pine, etc.).
+- Each species has unique growth parameters and perks.
+- UI for species selection and display of species-specific art.
+
+13. Achievement Garden Expansion
+- Add more milestone trophies and unlockable tree statues.
+- Visual display of rare/legendary achievements in the garden panel.
+
+14. Automated Testing & QA
+- Add/expand tests for new weather, species, and achievement features.
+- Ensure all new UI components and plugins are covered by integration and UI tests.
+
+Next: Begin with step 11, implementing the modular Seasons & Weather system as a plugin, following the framework and event-driven architecture.

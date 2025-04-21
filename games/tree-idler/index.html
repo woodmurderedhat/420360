@@ -3,6 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <title>Tree Idler</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #e8f5e9 0%, #b2dfdb 100%);
+      font-family: 'Quicksand', Arial, sans-serif;
+      color: #205522;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: url('data:image/svg+xml;utf8,<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><ellipse cx="200" cy="200" rx="180" ry="80" fill="%2366bb6a" fill-opacity="0.07"/></svg>') repeat;
+      z-index: 0;
+      pointer-events: none;
+    }
+    h1, h2, h3 {
+      font-family: 'Quicksand', Arial, sans-serif;
+      color: #388e3c;
+      letter-spacing: 0.04em;
+      margin-top: 0.7em;
+      margin-bottom: 0.5em;
+    }
+    h1 {
+      font-size: 2.2em;
+      text-align: center;
+      margin-top: 1.2em;
+      margin-bottom: 0.7em;
+      text-shadow: 0 2px 8px #a5d6a7;
+    }
+    /* Make sure all panels float above the background accent */
+    .panel, achievement-garden, resource-panel, tree-panel, meta-panel, leaf-lottery-panel, squirrel-modal, toast-panel {
+      position: relative;
+      z-index: 1;
+    }
+  </style>
 </head>
 <body>
   <h1>Tree Idler</h1>

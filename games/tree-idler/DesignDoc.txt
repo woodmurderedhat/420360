@@ -1,96 +1,102 @@
-Game Design Document: Tree Idler
-Overview
-Tree Idler is a browser-based idler resource management game where the player embodies a tree. The primary goal is to grow the tree by collecting sunlight and water, farmed using leaves and roots, respectively. Designed to be compatible with GitHub Pages, the game runs entirely on the client side using JavaScript, HTML, and CSS. It features a modular and dynamic architecture, with all visual elements procedurally drawn using mathematical functions. The game is UI-heavy, incorporating clickable upgrades for leaves and fruits to enhance player interaction and progression.
-Core Mechanics
-Resources
+Below is an expanded, more compelling version of your Tree Idler design document. It’s been reorganized around solid game‑design principles, highlights the core loops and feedback, and sprinkles in quirky features to keep players smiling as they nurture their arboreal empire.
 
-Sunlight: Automatically collected by leaves over time.
-Water: Automatically collected by roots over time.
+---
 
-Resource Collection
+## Executive Summary  
+Tree Idler is a single‑player, browser‑based idle game in which you grow a sentient tree from a humble Seedling to an all‑powerful Elder—and beyond. By balancing sunlight and water collection, triggering whimsical mini‑events, and mastering layered progression systems (including prestige and seasonal resets), players are drawn into a flow state of incremental growth and delightful surprises.  
 
-Leaves and roots gather resources at rates influenced by upgrades and the tree's growth stage.
-Collection persists continuously, supporting offline progress calculated upon the player's return.
+## Game Vision & Design Pillars  
+1. **Organic Growth**  
+   - Every tap or offline bonus feels like another ring in your tree’s trunk: meaningful and satisfying.  
+2. **Surprise & Delight**  
+   - Random “Nature’s Gifts,” quirky critters, and seasonal quirks keep the experience fresh.  
+3. **Easy to Learn, Hard to Master**  
+   - Simple core loop (collect → upgrade → grow) with deep meta‑systems (prestige, environmental events, achievements).  
+4. **Visual Elegance**  
+   - Procedural art that evolves with growth stage, reinforcing progression and player pride.  
 
-Tree Growth
+## Core Gameplay Loop  
+1. **Collect Resources**  
+   - **Sunlight** gathered by leaves; **Water** gathered by roots.  
+2. **Spend & Upgrade**  
+   - Invest in new leaves/roots, efficiency multipliers, or whimsical side‑systems (e.g., Leaf Lottery).  
+3. **Advance Growth Stage**  
+   - Unlock new slots, visual variety, and meta‑features (fruits, critter habitats).  
+4. **Repeat & Prestige**  
+   - Hit “Legendary” growth, prestige for permanent multipliers, then climb faster next run.  
 
-Players spend resources to advance the tree through growth stages.
-Each stage may increase the number of leaf and root slots, boost collection efficiency, or unlock features like fruit production.
+This atomic loop is tuned for a strong “goal gradient” effect: costs scale to keep tension, while reward feedback (animations, sound cues) keeps players in flow.  
 
-Upgrades
+## Progression & Metagame  
 
-Resources can be spent to enhance leaves and roots, either by improving their collection rates or adding new slots.
-Additional upgrades may unlock special abilities or improve fruit-related mechanics.
+### Stages & Scaling  
+- **10 Named Stages** (Seedling → Elder Tree) with exponential cost growth, then infinite “Legendary” tiers.  
+- **Slot Unlocks** at each stage: leaf/root slots + side‑systems (fruits start at stage 3; critter burrows at stage 7).  
+- **Visual Milestones**: Each stage adds unique branch patterns, color palettes, and seasonal overlays.  
 
-Fruits
+### Prestige & Legacy  
+- **Prestige Reset** yields a permanent +10% global production bonus per prestige level.  
+- **Legacy Points** earned on prestige can be spent on evergreen upgrades:  
+  - **Seed Vault**: Start next run with bonus resources.  
+  - **Deep Roots**: Permanent water bonus.  
+  - **Sun Crystal**: Permanent sunlight bonus.  
+- **Meta‑Progress Bar** shows legacy unlocks, giving long‑term goals beyond immediate growth.  
 
-Fruits appear at specific growth stages and can be harvested via player clicks.
-Harvesting fruits yields bonus resources or other benefits.
+## Core Systems & Quirky Additions  
 
-Visual Representation
+### 1. Leaves & Roots  
+- **Leveling**: +20% efficiency per level.  
+- **Slot Expansion**: One addition per tree stage.  
+- **Quirk: Leaf Lottery**  
+  - Once per hour, players can spend a small amount of sunlight to draw a “Gold Leaf” card that grants random buffs (e.g., x2 sunlight for 5 min, instant minor prestige point).  
 
-Visuals are rendered on an HTML5 canvas using mathematical functions.
-The tree is procedurally generated with a recursive branching algorithm, where branch length, angle, and depth adjust according to the growth stage.
-Leaves and roots are attached to branches, with fruits appearing as small shapes on designated branches when available.
+### 2. Fruits & Critters  
+- **Fruits** (stage 3+): Up to 3 ripe at once (upgradeable to 8).  
+  - Growth speed and value both upgradeable; auto‑harvest with adjustable ripeness slider.  
+- **Quirk: Squirrel Ambush**  
+  - Occasionally, a cheeky squirrel appears and steals a ripe fruit—prompting a mini‑tap challenge to scare it off for bonus resources.  
 
-User Interface
+### 3. Dynamic Events  
+- **Seasonal Cycles** (future): Seasons shift resource rates—Autumn boosts fruit value; Spring spawns extra leaves.  
+- **Daily “Nature’s Gift”**: A random event each day (e.g., “Morning Dew”: free water drip every 30 min).  
 
-A sidebar or bottom panel displays:
-Current sunlight and water amounts.
-Tree growth stage.
-Available upgrades with costs and effects.
+### 4. Prestige Layer  
+- **Auto‑Harvest Preservation**: Keeps purchased auto‑harvest and critter traps across resets.  
+- **Quirk: Legacy Oak**  
+  - Every 5 prestiges, your tree spawns a “Legacy Oak” sapling alongside your main tree for passive bonus.  
 
+## Player Feedback & Flow  
+- **Visual Feedback**:  
+  - Leaves gently sway as sunlight is gathered; roots pulse as water flows.  
+  - Growth ring animation on each stage‑up.  
+- **Audio Cues**:  
+  - Light chimes on fruit ripeness; deep wood‑drum on prestige.  
+- **Progress Bars & Notifications**:  
+  - Clear cost‑to‑next‑stage bar; toast alerts for random events.  
 
-Clickable buttons enable purchasing upgrades and harvesting fruits.
-The UI updates dynamically to reflect the current game state, built with HTML and CSS for clarity and accessibility.
+## UI/UX & Accessibility  
+- **Draggable Panels**: Customize layout; collapse/expand for minimal mode.  
+- **Hotkeys & Keyboard Navigation**: Fast‑track upgrades with “L” for leaves, “R” for roots, “F” for fruits.  
+- **ARIA & Tooltips**: All buttons labeled; hover text explains stats.  
+- **Color‑Blind Mode**: Alternative palettes; icon accents highlight resource types.  
 
-Technical Architecture
+## Technical Architecture (Brief)  
+- **Frontend Only**: Vanilla JS + HTML5 canvas; no server.  
+- **Procedural Renderer**: Recursive branching + perlin noise for natural sway.  
+- **Persistence**: localStorage + LZ‑String; hourly backups.  
+- **Modular Code**: Clear separation (Resources, Tree, UI, Events, SaveLoad).  
 
-Technologies: JavaScript, HTML5 canvas, and CSS, with no server-side dependencies.
-Rendering: HTML5 canvas for dynamic, math-based visuals.
-Persistence: LocalStorage saves the game state and calculates offline progress.
-Modularity: The codebase is split into distinct modules for maintainability and scalability.
+## Retention & Monetization (Optional)  
+- **Ad‑Free Upgrade**: One‑time purchase to disable ads and unlock a unique “Crystal Blossom” cosmetic stage.  
+- **Season Pass (Future)**: Cosmetic skins and special “Event Seeds” for limited‑time growth patterns.  
+- **Daily Login Rewards**: Encourages return visits with incremental boosts or Legacy Points.  
 
-Modules
+## Future Roadmap  
+1. **Seasons & Weather**: Rainstorms, droughts, and frost events.  
+2. **Achievement Garden**: Trophies for milestones, unlockable tree statues.  
+3. **Multiple Tree Species**: Each with unique perks (e.g., Willow for faster fruits, Pine for higher sunlight cap).  
+4. **Social Grove**: Compare growth rings with friends, share saplings in a communal forest.  
 
-Game.js: Orchestrates the main game loop, updating resources, growth, and upgrades.
-Resources.js: Manages sunlight and water tracking and expenditure.
-Tree.js: Controls growth stages and their impacts on gameplay.
-Leaves.js: Handles leaf slots, sunlight collection, and related upgrades.
-Roots.js: Manages root slots, water collection, and upgrades.
-Upgrades.js: Defines upgrade options, costs, and effects.
-Fruits.js: Oversees fruit production, harvesting, and bonuses.
-Renderer.js: Draws the tree, leaves, roots, and fruits on the canvas.
-UI.js: Manages UI display and player interactions.
-SaveLoad.js: Saves and loads game state, computes offline progress.
+---
 
-Compatibility and Deployment
-
-Fully client-side, ensuring compatibility with GitHub Pages' static hosting.
-All assets are static, requiring no server-side processing.
-LocalStorage ensures progress persists across browser sessions.
-
-Game Flow
-
-Start: The game begins with a sapling, featuring one leaf slot and one root slot.
-Progression: Leaves and roots automatically collect resources; players spend them to grow the tree or purchase upgrades.
-Growth: Advancing growth stages increases complexity (e.g., more branches) and unlocks features like fruits.
-Interaction: Players click to harvest fruits or apply upgrades, balancing resource allocation for optimal growth.
-
-Visual Design Notes
-
-Tree: A trunk with recursive branches, scaled by growth stage (e.g., depth = 1 at stage 1, depth = 2 at stage 2).
-Leaves: Small shapes at branch ends, increasing in number with upgrades or growth.
-Roots: Downward curves or lines, mirroring branch logic.
-Fruits: Circles or similar shapes on branches, harvestable via clicks.
-
-Future Considerations
-
-Variety: Introduce different leaf/root types with unique properties.
-Dynamics: Add seasonal changes affecting resource rates.
-Enhancements: Include animations (e.g., swaying leaves) for visual appeal.
-Responsiveness: Optimize for mobile devices with a responsive layout.
-
-Conclusion
-Tree Idler combines idler mechanics with resource management in a visually engaging, browser-friendly package. Its modular design and mathematical rendering ensure flexibility and performance, while the UI-heavy approach keeps players engaged. This document provides a roadmap for development, balancing simplicity with room for future expansion.
-Word Count: ~800
+With these layered systems, quirky mini‑features, and clear feedback loops, Tree Idler offers both immediate, bite‑sized fun and a deep, long‑term progression that keeps players rooted in its world.

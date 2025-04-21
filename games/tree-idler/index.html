@@ -1,202 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Tree Idler</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Tree Idler</title>
 </head>
 <body>
-    <div class="ui-overlay" role="main">
-        <div class="game-header" tabindex="0" aria-label="Tree Idler Game Header">
-            <h1>Tree Idler</h1>
-            <a href="../../index.html" class="back-link" tabindex="0" aria-label="Back to 420360.xyz">← Back to 420360.xyz</a>
-        </div>
-        <div class="ui-panels">
-            <div class="tree-panel draggable-panel resizable-panel" tabindex="0" aria-label="Tree Visualization Panel">
-                <canvas id="treeCanvas" aria-label="Tree Canvas" tabindex="0" role="img"></canvas>
-            </div>
-            <div class="resources-panel draggable-panel resizable-panel" tabindex="0" aria-label="Resources Panel">
-                <h2>Resources</h2>
-                <div class="resource">
-                    <span>Sunlight:</span>
-                    <span id="sunlight" tabindex="0" aria-label="Sunlight amount">0</span>
-                </div>
-                <div class="resource">
-                    <span>Water:</span>
-                    <span id="water" tabindex="0" aria-label="Water amount">0</span>
-                </div>
-                <div class="resource">
-                    <span>Growth Stage:</span>
-                    <span id="growthStage" tabindex="0" aria-label="Growth stage">1</span>
-                </div>
-            </div>
-            <div class="fruit-panel draggable-panel resizable-panel" id="fruitPanel" tabindex="0" aria-label="Fruit Bonuses Panel">
-                <h2>Fruit Bonuses</h2>
-                <div id="fruitBonuses"></div>
-                <div id="autoHarvestThresholdControl" style="margin-top:12px;">
-                  <label for="autoHarvestThresholdSlider" style="font-size:0.95em;">Auto-Harvest Threshold:</label>
-                  <input type="range" id="autoHarvestThresholdSlider" min="0.5" max="1" step="0.01" value="1" style="width:120px;vertical-align:middle;" tabindex="0" aria-label="Auto-Harvest Threshold Slider">
-                  <span id="autoHarvestThresholdValue">100%</span>
-                  <span title="Set the minimum ripeness (as a percent) for auto-harvest. Lower values harvest less ripe fruit." aria-label="Auto-Harvest Threshold Help">?</span>
-                </div>
-            </div>
-            <div class="upgrades-panel draggable-panel resizable-panel" tabindex="0" aria-label="Upgrades Panel">
-                <h2>Upgrades</h2>
-                <div id="upgradesList"></div>
-            </div>
-            <div class="growth-panel draggable-panel resizable-panel" tabindex="0" aria-label="Tree Growth Panel">
-                <h2>Tree Growth</h2>
-                <button id="growButton" class="grow-button" tabindex="0" aria-label="Grow Tree">Grow Tree</button>
-                <div id="growthCost"></div>
-            </div>
-            <div class="prestige-panel draggable-panel resizable-panel" tabindex="0" aria-label="Prestige Panel">
-                <h2>Prestige</h2>
-                <div id="prestigeInfo">
-                    <div class="prestige-stat">Prestige Level: <span id="prestigeLevel">0</span></div>
-                    <div class="prestige-stat">Production Multiplier: <span id="prestigeMultiplier">1.0</span>x</div>
-                    <div class="prestige-stat">Current Growth Stage: <span id="currentStage">1</span></div>
-                </div>
-                <div id="prestigeDescription">
-                    Prestige to reset your progress but gain permanent bonuses. Higher growth stages provide better rewards.
-                </div>
-                <button id="prestigeButton" class="prestige-button" tabindex="0" aria-label="Prestige Reset">Prestige Reset</button>
-            </div>
-            <div class="settings-panel draggable-panel resizable-panel" tabindex="0" aria-label="Settings Panel" style="background:#fff;position:fixed;top:20px;right:20px;z-index:1001;min-width:220px;max-width:340px;display:none;">
-                <h2>Settings</h2>
-                <label for="volumeSlider">Volume:</label>
-                <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" style="width:120px;vertical-align:middle;">
-                <span id="volumeValue">100%</span>
-                <br><br>
-                <label for="graphicsSelect">Graphics:</label>
-                <select id="graphicsSelect">
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
-                </select>
-                <br><br>
-                <button id="closeSettingsBtn">Close</button>
-            </div>
-            <button id="openSettingsBtn" style="position:fixed;top:20px;right:20px;z-index:1002;">⚙️</button>
-        </div>
-    </div>
-    <!-- JavaScript Modules -->
-    <script type="module" src="js/Game.js"></script>
-    <script type="module" src="js/PanelManager.js"></script>
-    <script>
-    // Keyboard navigation for upgrades and main controls
-    document.addEventListener('keydown', function(e) {
-      // Tab/arrow navigation for upgrades
-      const upgrades = document.querySelectorAll('.upgrade-button');
-      if (upgrades.length && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-        const active = document.activeElement;
-        let idx = Array.from(upgrades).indexOf(active);
-        if (e.key === 'ArrowDown') idx = (idx + 1) % upgrades.length;
-        if (e.key === 'ArrowUp') idx = (idx - 1 + upgrades.length) % upgrades.length;
-        upgrades[idx].focus();
-        e.preventDefault();
+  <h1>Tree Idler</h1>
+  <!-- Central JSON Manifest -->
+  <script id="game-manifest" type="application/json">
+  {
+    "modules": [
+      { "name": "Resources", "path": "./lib/Resources.js" },
+      { "name": "Tree",      "path": "./lib/Tree.js" },
+      { "name": "UI",        "path": "./lib/UI.js" },
+      { "name": "SaveLoad",  "path": "./lib/SaveLoad.js" },
+      { "name": "Events",    "path": "./lib/Events.js" },
+      { "name": "Achievements", "path": "./lib/Achievements.js" }
+    ],
+    "initialState": { 
+      "sunlight": 0, 
+      "water": 0,
+      "upgrades": {
+        "leafEfficiency": 1,
+        "rootEfficiency": 1
       }
-      // Enter/Space to activate focused button
-      if ((e.key === 'Enter' || e.key === ' ') && document.activeElement.classList.contains('upgrade-button')) {
-        document.activeElement.click();
-        e.preventDefault();
-      }
-      // Grow button keyboard activation
-      const growBtn = document.getElementById('growButton');
-      if ((e.key === 'Enter' || e.key === ' ') && document.activeElement === growBtn) {
-        growBtn.click();
-        e.preventDefault();
-      }
-    });
-
-    // Settings menu logic
-    const openSettingsBtn = document.getElementById('openSettingsBtn');
-    const settingsPanel = document.querySelector('.settings-panel');
-    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-    openSettingsBtn.addEventListener('click', () => { settingsPanel.style.display = 'block'; });
-    closeSettingsBtn.addEventListener('click', () => { settingsPanel.style.display = 'none'; });
-    // Volume slider
-    const volumeSlider = document.getElementById('volumeSlider');
-    const volumeValue = document.getElementById('volumeValue');
-    volumeSlider.addEventListener('input', () => {
-      const volume = parseFloat(volumeSlider.value);
-      volumeValue.textContent = Math.round(volume * 100) + '%';
-      // Save volume setting to localStorage
-      localStorage.setItem('treeIdlerVolume', volume);
-      // Apply volume setting to any audio elements if they exist
-      document.querySelectorAll('audio').forEach(audio => {
-        audio.volume = volume;
-      });
-    });
-    // Load saved volume setting
-    const savedVolume = localStorage.getItem('treeIdlerVolume');
-    if (savedVolume !== null) {
-      volumeSlider.value = savedVolume;
-      volumeValue.textContent = Math.round(parseFloat(savedVolume) * 100) + '%';
+    },
+    "schemaVersion": "1.0.0"
+  }
+  </script>
+  <!-- Import Map for Core Modules -->
+  <script type="importmap">
+  {
+    "imports": {
+      "PluginManager": "./lib/PluginManager.js"
     }
-
-    // Graphics select
-    const graphicsSelect = document.getElementById('graphicsSelect');
-    graphicsSelect.addEventListener('change', () => {
-      const graphicsSetting = graphicsSelect.value;
-      // Save graphics setting to localStorage
-      localStorage.setItem('treeIdlerGraphics', graphicsSetting);
-      // Apply graphics setting
-      document.body.setAttribute('data-graphics', graphicsSetting);
-      // Notify the game about graphics change if it's loaded
-      if (window.game && window.game.renderer) {
-        window.game.renderer.setGraphicsQuality(graphicsSetting);
-      }
-    });
-    // Load saved graphics setting
-    const savedGraphics = localStorage.getItem('treeIdlerGraphics');
-    if (savedGraphics) {
-      graphicsSelect.value = savedGraphics;
-      document.body.setAttribute('data-graphics', savedGraphics);
-    }
-    // Add hard reset button to settings panel
-    const resetGame = window.game && window.game.resetGame ? window.game.resetGame.bind(window.game) : null;
-    if (resetGame) {
-      const resetBtn = document.createElement('button');
-      resetBtn.textContent = 'Hard Reset Game';
-      resetBtn.style.marginTop = '12px';
-      resetBtn.style.background = '#d32f2f';
-      resetBtn.onclick = () => {
-        if (confirm('Are you sure you want to HARD RESET your game? This will delete ALL progress including prestige levels and cannot be undone!')) {
-          resetGame();
-        }
-      };
-      document.querySelector('.settings-panel').appendChild(resetBtn);
-    }
-    // Visual feedback for upgrades/harvest
-    document.body.addEventListener('click', function(e) {
-      if (e.target.classList.contains('upgrade-button')) {
-        const feedback = document.createElement('div');
-        feedback.textContent = '✨';
-        feedback.style.position = 'fixed';
-        feedback.style.left = e.clientX + 'px';
-        feedback.style.top = e.clientY + 'px';
-        feedback.style.fontSize = '2em';
-        feedback.style.pointerEvents = 'none';
-        feedback.style.transition = 'opacity 0.8s, transform 0.8s';
-        feedback.style.opacity = '1';
-        document.body.appendChild(feedback);
-        setTimeout(() => {
-          feedback.style.opacity = '0';
-          feedback.style.transform = 'translateY(-40px)';
-        }, 10);
-        setTimeout(() => document.body.removeChild(feedback), 900);
-      }
-    });
-    // Touch optimization: make buttons larger on mobile
-    if (window.innerWidth < 768) {
-      document.querySelectorAll('button').forEach(btn => {
-        btn.style.minHeight = '44px';
-        btn.style.fontSize = '1.1em';
-      });
-    }
-    </script>
+  }
+  </script>
+  <!-- Bootstrapper -->
+  <script type="module" src="./module-loader.js"></script>
 </body>
 </html>

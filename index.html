@@ -4,71 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>420360.xyz - Arcade Gaming Site</title>
-    <meta name="description" content="A collection of unique arcade-style games with modern twists.">
+    <meta name="description" content="420360.xyz offers free, modern arcade games playable instantly in your browser. Enjoy unique titles like Tarot Tetromino and Tree Idler—no downloads needed.">
+    <meta name="keywords" content="arcade games, browser games, free games, tetris, idle games, tarot, retro games, online games, 420360, 420360.xyz, Tree Idler, Tarot Tetromino">
+    <meta name="author" content="420360.xyz">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#222233">
     
-    <!-- Social Media Meta Tags -->
+    <!-- Social Media & SEO Meta Tags -->
     <meta property="og:title" content="420360.xyz - Arcade Gaming Site">
-    <meta property="og:description" content="A collection of unique arcade-style games with modern twists.">
-    <meta property="og:image" content="https://247420.xyz/assets/images/420360arcadebanner.png">
-    <meta property="og:url" content="https://247420.xyz/">
+    <meta property="og:description" content="A collection of unique arcade-style games with modern twists. Play free browser games like Tarot Tetromino and Tree Idler on any device.">
+    <meta property="og:image" content="https://420360.xyz/assets/images/420360arcadebanner.png">
+    <meta property="og:url" content="https://420360.xyz/">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="420360.xyz">
+    <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="420360.xyz - Arcade Gaming Site">
-    <meta name="twitter:description" content="A collection of unique arcade-style games with modern twists.">
-    <meta name="twitter:image" content="https://247420.xyz/assets/images/420360arcadebanner.png">
-
+    <meta name="twitter:description" content="A collection of unique arcade-style games with modern twists. Play free browser games like Tarot Tetromino and Tree Idler on any device.">
+    <meta name="twitter:image" content="https://420360.xyz/assets/images/420360arcadebanner.png">
+    <meta name="twitter:site" content="@420360xyz">
+    <meta name="twitter:creator" content="@420360xyz">
+    <!-- Pinterest -->
+    <meta name="pinterest-rich-pin" content="true">
+    <!-- Facebook Messenger -->
+    <meta property="al:android:url" content="https://420360.xyz/">
+    <meta property="al:ios:url" content="https://420360.xyz/">
+    <!-- WhatsApp -->
+    
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <link rel="stylesheet" href="css/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Pixel Art Animated Background -->
+    <div class="pixel-bg" aria-hidden="true">
+        <div class="pixel-particles"></div>
+        <canvas id="starfield"></canvas>
+        <img src="assets/images/420360arcadebanner.png" alt="420360 Arcade Banner" class="hero-banner">
+    </div>
     <!-- Site Header -->
-    <header class="site-header">
+    <header class="site-header metal-effect" role="banner">
         <div class="container">
-            <h1 class="site-title">420360.xyz</h1>
+            <h1 class="site-title interactive-title" tabindex="0">420360.xyz</h1>
             <p class="site-tagline">Modern Arcade Gaming</p>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="main-content">
-        <section class="hero">
+    <main class="main-content" role="main">
+        <section class="hero hero-animated animated-section" aria-label="Welcome to the Arcade">
             <div class="container">
-                <h2>Welcome to the Arcade</h2>
+                <h2 class="glow">Welcome to the Arcade</h2>
                 <p>Discover unique gaming experiences with modern twists on classic arcade games.</p>
+                <div class="arcade-coins" aria-hidden="true">
+                    <div class="coin"></div>
+                    <div class="coin"></div>
+                    <div class="coin"></div>
+                </div>
             </div>
         </section>
 
-        <section class="games-showcase">
+        <section class="games-showcase animated-section" aria-label="Our Games">
             <div class="container">
-                <h2>Our Games</h2>
-                <div class="games-grid">
+                <h2 class="glow">Our Games</h2>
+                <div class="games-grid animated-grid">
                     <!-- Tarot Tetromino Game Card -->
-                    <div class="game-card">
+                    <article class="game-card pixel-card animated-card" tabindex="0" aria-label="Tarot Tetromino">
                         <div class="game-image">
                             <img src="assets/images/320x320.png" alt="Tarot Tetromino">
                         </div>
                         <div class="game-info">
                             <h3>Tarot Tetromino</h3>
                             <p>A mystical twist on the classic Tetris game with tarot card influences.</p>
-                            <a href="games/tarot-tetromino/index.html" class="play-button">Play Now</a>
+                            <a href="games/tarot-tetromino/index.html" class="play-button animated-btn" aria-label="Play Tarot Tetromino">Play Now</a>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Tree Idler Game Card -->
-                    <div class="game-card">
+                    <article class="game-card pixel-card animated-card" tabindex="0" aria-label="Tree Idler">
                         <div class="game-image">
                             <img src="assets/images/320x320.png" alt="Tree Idler">
                         </div>
                         <div class="game-info">
                             <h3>Tree Idler</h3>
                             <p>Grow your tree by collecting sunlight and water in this relaxing idle game.</p>
-                            <a href="games/tree-idler/index.html" class="play-button">Play Now</a>
+                            <a href="games/tree-idler/index.html" class="play-button animated-btn" aria-label="Play Tree Idler">Play Now</a>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Coming Soon Game Card -->
-                    <div class="game-card coming-soon">
+                    <article class="game-card coming-soon pixel-card animated-card" tabindex="0" aria-label="Coming Soon">
                         <div class="game-image">
                             <img src="assets/images/32x32.png" alt="Coming Soon">
                         </div>
@@ -77,14 +102,14 @@
                             <p>More exciting games are on the way! Check back soon for updates.</p>
                             <span class="coming-soon-label">Coming Soon</span>
                         </div>
-                    </div>
+                    </article>
                 </div>
             </div>
         </section>
 
-        <section class="about-section">
+        <section class="about-section animated-section" aria-label="About 420360.xyz">
             <div class="container">
-                <h2>About 420360.xyz</h2>
+                <h2 class="glow">About 420360.xyz</h2>
                 <p>420360.xyz is a collection of unique arcade-style games with modern twists. Our games combine classic gameplay mechanics with innovative features to create fresh gaming experiences.</p>
                 <p>All games are free to play and optimized for both desktop and mobile devices.</p>
                 <!-- Expanded SEO content -->
@@ -96,14 +121,9 @@
     </main>
 
     <!-- Site Footer -->
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-links">
-                    <a href="#" class="footer-link">About</a>
-                    <a href="#" class="footer-link">Contact</a>
-                    <a href="#" class="footer-link">Privacy Policy</a>
-                </div>
                 <div class="footer-credit">
                     <p>&copy; 2025 420360.xyz. All rights reserved.</p>
                     <a href="https://woodmurderedhat.com" class="footer-link" target="_blank" rel="noopener">woodmurderedhat.com</a>
@@ -114,5 +134,46 @@
 
     <!-- Scripts -->
     <script src="js/main.js"></script>
+    <script>
+    // Starfield animation for pixel-bg
+    const canvas = document.getElementById('starfield');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        // Make squares instead of stars, and make them bigger
+        let squares = Array.from({length: 60}, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            s: Math.random() * 32 + 32, // size 10-22px
+            d: Math.random() * 0.5 + 0.2
+        }));
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight * 0.5;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let sq of squares) {
+                ctx.fillStyle = 'rgba(0,200,255,0.18)';
+                ctx.fillRect(sq.x, sq.y, sq.s, sq.s);
+                ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+                ctx.strokeRect(sq.x, sq.y, sq.s, sq.s);
+                sq.y += sq.d;
+                if (sq.y > canvas.height) {
+                    sq.x = Math.random() * canvas.width;
+                    sq.y = 0;
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
+    // Interactive title effect
+    document.querySelectorAll('.interactive-title').forEach(title => {
+        title.addEventListener('mouseenter', () => title.classList.add('sparkle'));
+        title.addEventListener('mouseleave', () => title.classList.remove('sparkle'));
+    });
+    </script>
 </body>
 </html>

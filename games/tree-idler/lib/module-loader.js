@@ -11,7 +11,7 @@
   let manifest;
   try {
     manifest = JSON.parse(manifestScript.textContent);
-    const { loadManifest } = await import('./lib/DataLoader.js');
+    const { loadManifest } = await import('./DataLoader.js');
     await loadManifest(manifest); // Throws if invalid
     console.log('Manifest schema validated.');
   } catch (e) {
@@ -19,15 +19,7 @@
     return;
   }
 
-  // 2. Register service worker (if supported)
-  if ('serviceWorker' in navigator) {
-    try {
-      await navigator.serviceWorker.register('./service-worker.js');
-      console.log('Service worker registered.');
-    } catch (e) {
-      console.warn('Service worker registration failed:', e);
-    }
-  }
+  // REMOVED Service worker registration - Assuming handled by ServiceWorker.js module
 
   // --- State Management Setup ---
   // Initialize state from manifest defaults first
@@ -51,12 +43,15 @@
     console.log('State after loadState:', gameState);
 
     // --- Apply Seed Vault Bonus --- 
+    // REMOVED: This logic is handled in SaveLoad.js to avoid double application.
+    /*
     if (gameState.legacyUpgrades?.seedVault) {
         const seedVaultBonus = 50; // Define the bonus amount
         gameState.sunlight = (gameState.sunlight || 0) + seedVaultBonus;
         gameState.water = (gameState.water || 0) + seedVaultBonus;
         console.log(`Applied Seed Vault bonus: +${seedVaultBonus} sunlight & water.`);
     }
+    */
     // --- End Seed Vault Bonus ---
 
     // Notify all modules that state has been loaded/rehydrated

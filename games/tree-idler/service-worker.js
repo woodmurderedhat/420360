@@ -2,19 +2,21 @@
 // Service worker registration and logic.
 
 const CACHE_NAME = 'tree-idler-cache-v1';
+// Use relative paths for GitHub Pages compatibility
 const CORE_ASSETS = [
-  '/',
-  '/index.html',
-  '/module-loader.js',
-  '/service-worker.js',
-  '/lib/DataLoader.js',
-  '/lib/PluginManager.js',
-  '/lib/EventBus.js',
-  '/lib/Resources.js',
-  '/lib/Tree.js',
-  '/lib/UI.js',
-  '/lib/SaveLoad.js',
-  '/lib/ServiceWorker.js'
+  './', // Root index.html
+  './index.html',
+  './module-loader.js',
+  './service-worker.js',
+  './lib/DataLoader.js',
+  './lib/PluginManager.js',
+  './lib/EventBus.js',
+  './lib/Resources.js',
+  './lib/Tree.js',
+  './lib/UI.js',
+  './lib/SaveLoad.js',
+  './lib/ServiceWorker.js' // Assuming this file exists, otherwise remove
+  // Add other core assets like CSS, images, fonts if needed
 ];
 
 self.addEventListener('install', event => {

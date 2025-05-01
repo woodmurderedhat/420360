@@ -1,79 +1,142 @@
 // Tree.js
-// Handles growth stages, slots, and procedural rendering.
+// Handles growth stages, slots, prestige, and triggers procedural rendering.
 import { emit, on, off } from './EventBus.js';
-import { createSimulator } from './TreeGrowthSimulator.js';
 
 export const name = 'Tree';
 
-let state = null;
-let simulator = createSimulator();
-
-function getInitialTree() {
-  return {
-    stage: 1,
-    slots: {
-      leaves: 1,
-      roots: 1,
-      fruits: 0,
-      critters: 0
-    },
-    visualSeed: Math.random(),
-    legendary: 0,
-    season: 'spring'
-  };
-}
+let getState = () => ({}); // Placeholder
+let updateState = () => {}; // Placeholder
+let EventBus = null;
+let manifest = {}; // Store manifest for initial state access
 
 export function install(api) {
-  state = api?.state?.tree || getInitialTree();
-  emit('treeInitialized', { ...state });
+  getState = api.getState;
+  updateState = api.updateState;
+  EventBus = api.EventBus;
+  manifest = api.manifest;
+
+  // Initialize tree state if not present
+  const initialState = getState();
+  if (!initialState.tree) {
+    handleStateLoaded(initialState); // Use loaded state handler for initialization
+  }
 }
 
-export function activate() {
-  on('advanceStage', handleAdvanceStage);
-  on('renderTree', handleRenderTree);
-  on('seasonChange', handleSeasonChange);
+export function activate(api) {
+  getState = api.getState;
+  updateState = api.updateState;
+  EventBus = api.EventBus;
+  manifest = api.manifest;
+
+  EventBus.on('advanceStageRequest', handleAdvanceStageRequest);
+  EventBus.on('seasonChange', handleSeasonChange); // Assuming Weather module emits this
+  // EventBus.on('prestigeRequest', handlePrestigeRequest); // Prestige is handled by SaveLoad
+  EventBus.on('stateLoaded', handleStateLoaded);
 }
 
-export function deactivate() {
-  off('advanceStage', handleAdvanceStage);
-  off('renderTree', handleRenderTree);
-  off('seasonChange', handleSeasonChange);
+export function deactivate(api) {
+  EventBus.off('advanceStageRequest', handleAdvanceStageRequest);
+  EventBus.off('seasonChange', handleSeasonChange);
+  // EventBus.off('prestigeRequest', handlePrestigeRequest);
+  EventBus.off('stateLoaded', handleStateLoaded);
+  getState = () => ({});
+  updateState = () => {};
+  EventBus = null;
+  manifest = {};
 }
 
-function handleAdvanceStage() {
-  state.stage++;
-  // Unlock slots at certain stages
-  if (state.stage % 2 === 0) state.slots.leaves++;
-  if (state.stage % 2 === 1) state.slots.roots++;
-  if (state.stage === 3) state.slots.fruits = 1;
-  if (state.stage === 7) state.slots.critters = 1;
-  emit('treeStageAdvanced', { ...state });
-  emit('stateUpdated', { tree: { ...state } });
-  // Trigger a re-render with the new stage
-  emit('renderTree', { canvas: null, state: { ...state } });
+function handleStateLoaded(loadedState) {
+  if (!loadedState.tree) {
+    const initialTreeState = manifest.initialState?.tree || {
+      growthStage: 0,
+      slots: { leaves: 1, roots: 1, fruits: 0, critters: 0 },
+      visualSeed: Math.random(),
+      season: 'spring' // Default season
+    };
+    // Ensure prestige/legacy points from root state are considered if tree state is missing
+    initialTreeState.prestigeLevel = loadedState.prestigeLevel || 0;
+    initialTreeState.legacyPoints = loadedState.legacyPoints || 0;
+    updateState({ tree: initialTreeState });
+    EventBus.emit('treeInitialized', getState().tree); // Emit initialization event
+  } else {
+    // Ensure tree state has necessary fields, merging with defaults if needed
+    const treeState = { ...(manifest.initialState?.tree || {}), ...loadedState.tree };
+    treeState.prestigeLevel = loadedState.prestigeLevel || treeState.prestigeLevel || 0;
+    treeState.legacyPoints = loadedState.legacyPoints || treeState.legacyPoints || 0;
+    treeState.growthStage = treeState.growthStage || 0;
+    treeState.slots = treeState.slots || { leaves: 1, roots: 1, fruits: 0, critters: 0 };
+    treeState.visualSeed = treeState.visualSeed || Math.random();
+    treeState.season = treeState.season || 'spring';
+    updateState({ tree: treeState }); // Ensure state is updated even if tree existed
+  }
+  // Trigger initial render after state is set/loaded
+  EventBus.emit('renderTreeRequest', getState().tree);
+}
+
+function calculateStageCost(stage) {
+  // Exponential cost, e.g., 10 * 1.5^stage
+  return Math.floor(10 * Math.pow(1.8, stage));
+}
+
+function handleAdvanceStageRequest() {
+  const currentState = getState();
+  const treeState = currentState.tree || {};
+  const currentStage = treeState.growthStage || 0;
+  const cost = calculateStageCost(currentStage);
+
+  if (currentState.sunlight >= cost) {
+    updateState({ sunlight: currentState.sunlight - cost });
+    EventBus.emit('resourcesUpdated', { sunlight: getState().sunlight });
+
+    const newStage = currentStage + 1;
+    const newSlots = { ...treeState.slots };
+
+    // Slot unlocks based on DesignDoc
+    // 10 named stages (0-9), then Legendary (10+)
+    if (newStage <= 10) { // Apply specific unlocks up to stage 10
+        // Example: Add one leaf/root slot per stage alternately
+        if (newStage % 2 !== 0) newSlots.leaves = (newSlots.leaves || 1) + 1;
+        if (newStage % 2 === 0) newSlots.roots = (newSlots.roots || 1) + 1;
+        // Fruits unlock at stage 3 (index 2 if 0-based, or check >= 3)
+        if (newStage === 3) newSlots.fruits = Math.max(newSlots.fruits || 0, 1); // Start with 1 slot
+        // Critters unlock at stage 7
+        if (newStage === 7) newSlots.critters = Math.max(newSlots.critters || 0, 1);
+    } else {
+        // Legendary stages might grant different/fewer slots
+        // Example: Add a slot every 5 legendary levels
+        if (newStage % 5 === 0) {
+            newSlots.leaves = (newSlots.leaves || 0) + 1;
+            newSlots.roots = (newSlots.roots || 0) + 1;
+        }
+    }
+
+    updateState({
+      tree: {
+        ...treeState,
+        growthStage: newStage,
+        slots: newSlots
+      }
+    });
+    EventBus.emit('treeStageAdvanced', getState().tree);
+    EventBus.emit('renderTreeRequest', getState().tree);
+    EventBus.emit('uiNotification', { message: `Tree reached Stage ${newStage}!`, type: 'success' });
+
+  } else {
+    EventBus.emit('uiNotification', { message: `Need ${cost} sunlight to advance stage.`, type: 'warning' });
+  }
 }
 
 function handleSeasonChange(e) {
-  state.season = e.detail.season;
-  emit('stateUpdated', { tree: { ...state } });
-  // Trigger a re-render with the new season
-  emit('renderTree', { canvas: null, state: { ...state } });
+  const newSeason = e.detail?.season || 'spring';
+  const treeState = getState().tree || {};
+  if (treeState.season !== newSeason) {
+      updateState({ tree: { ...treeState, season: newSeason } });
+      EventBus.emit('treeSeasonChanged', getState().tree);
+      EventBus.emit('renderTreeRequest', getState().tree);
+      EventBus.emit('uiNotification', { message: `Season changed to ${newSeason}.` });
+  }
 }
 
-/**
- * Procedural tree rendering using TreeGrowthSimulator
- * @param {Object} e - Event with canvas and state
- */
-function handleRenderTree(e) {
-  const { canvas, state } = e.detail;
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const width = canvas.width;
-  const height = canvas.height;
-  ctx.clearRect(0, 0, width, height);
-  simulator.renderTree(ctx, width, height, state);
-}
+// REMOVED handlePrestigeRequest - Handled by SaveLoad module
 
-// The following functions are kept for legacy or migration purposes
-// drawTree, drawLeaves, drawRoots, drawFruits, drawCritters
-// These are no longer part of the rendering pipeline
+// REMOVED handleSpendLegacyPoints - Handled by SaveLoad module

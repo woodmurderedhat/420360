@@ -2,6 +2,7 @@
 // Web Components for panels, drag/drop, accessibility.
 import { on, off, emit } from './EventBus.js';
 import { makeDraggable, addCollapseButton } from './ui-helpers.js';
+// Import component classes directly
 import { ResourcePanel } from './ResourcePanel.js';
 import { TreePanel } from './TreePanel.js';
 import { ToastPanel } from './ToastPanel.js';
@@ -13,148 +14,211 @@ import { AchievementGarden } from './AchievementGarden.js';
 
 export const name = 'UI';
 
+// Store API methods
+let getState = () => ({});
+let updateState = () => {};
+let EventBus = null;
+
+// Keep references to the component instances
 let resourcePanel = null;
 let treePanel = null;
 let toastPanel = null;
 let leafLotteryPanel = null;
-let leafLotteryCooldown = 0;
 let squirrelModal = null;
-let squirrelTimeout = null;
-let colorBlindMode = false;
+let colorBlindToggle = null; // Reference to the toggle element
 let metaPanel = null;
 let achievementGarden = null;
 
+// Local state derived from global state or component interactions
+let squirrelTimeout = null;
+
+// --- Helper Functions --- 
+
 function applyColorBlindMode() {
+  const colorBlindMode = getState().settings?.colorBlindMode || false;
   document.body.classList.toggle('color-blind', colorBlindMode);
-  // Update panels if needed
-  if (resourcePanel) resourcePanel.setColorBlind(colorBlindMode);
-  if (treePanel) treePanel.setColorBlind(colorBlindMode);
+  // Notify components that might need internal updates
+  EventBus.emit('colorBlindModeChanged', { enabled: colorBlindMode });
 }
 
-function updateAchievementGarden(e) {
-  if (achievementGarden) achievementGarden.setAchievements(e.detail);
+function updateAllPanels() {
+    const state = getState();
+    if (resourcePanel) resourcePanel.update(state);
+    if (treePanel) treePanel.update(state);
+    if (metaPanel) metaPanel.update(state);
+    if (achievementGarden) achievementGarden.setAchievements(state.achievements);
+    if (leafLotteryPanel) leafLotteryPanel.update(state);
 }
 
-function updateMetaPanel(e) {
-  if (metaPanel) metaPanel.setMeta(e.detail);
+// --- Event Handlers --- 
+
+// General state updates (e.g., after load, prestige)
+function handleStateLoadedOrInitialized(state) {
+    console.log("UI received stateLoaded/Initialized", state);
+    if (!state) state = getState(); // Ensure we have state
+    updateAllPanels();
+    applyColorBlindMode(); // Apply initial colorblind setting
+    applyLayout(state.layout || {}); // Apply saved layout
 }
 
-// Keyboard hotkeys for upgrades
+// Resource-specific updates
+function handleResourcesUpdate(detail) {
+    const state = getState();
+    if (resourcePanel) resourcePanel.update(state);
+    if (treePanel) treePanel.update(state); // Tree panel might need resource costs for next stage
+    if (metaPanel) metaPanel.update(state); // Meta panel might need legacy points for upgrades
+    if (leafLotteryPanel) leafLotteryPanel.handleResourceUpdate(state);
+}
+
+// Tree-specific updates
+function handleTreeUpdate(detail) {
+    const state = getState();
+    if (treePanel) treePanel.update(state);
+    if (metaPanel) metaPanel.update(state); // Meta panel shows prestige level, potentially affected by tree state indirectly
+}
+
+// Meta/Prestige updates
+function handleMetaUpdate(detail) {
+    if (metaPanel) metaPanel.update(getState());
+}
+
+// Achievement updates
+function handleAchievementsUpdate(detail) {
+    if (achievementGarden) achievementGarden.setAchievements(detail);
+}
+
+// Notifications
+function handleUINotification(e) {
+    if (toastPanel) toastPanel.showToast(e.detail.message, e.detail.type || 'info');
+}
+
+// Color Blind Toggle Interaction
+function handleColorBlindToggle(e) {
+    const enabled = e.detail.enabled;
+    updateState({ settings: { ...getState().settings, colorBlindMode: enabled } });
+    applyColorBlindMode();
+}
+
+// Keyboard hotkeys for upgrades (emit requests)
 function handleHotkeys(e) {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.key === 'l' || e.key === 'L') {
-    window.dispatchEvent(new CustomEvent('upgradeLeaf'));
-  } else if (e.key === 'r' || e.key === 'R') {
-    window.dispatchEvent(new CustomEvent('upgradeRoot'));
-  } else if (e.key === 'f' || e.key === 'F') {
-    window.dispatchEvent(new CustomEvent('upgradeFruit'));
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+  switch (e.key.toLowerCase()) {
+    case 'l': EventBus.emit('upgradeRequest', { type: 'leafEfficiency' }); break;
+    case 'r': EventBus.emit('upgradeRequest', { type: 'rootEfficiency' }); break;
+    case 'f': EventBus.emit('upgradeRequest', { type: 'fruitValue' }); break;
   }
 }
 
-function updatePanel(e) {
-  if (resourcePanel) resourcePanel.setResources(e.detail);
-}
-
-function updateTreePanel(e) {
-  // e.detail should include sunlight and water for progress bar
-  const state = e.detail;
-  // Try to get sunlight/water from global state if not present
-  let sunlight = state.sunlight;
-  let water = state.water;
-  let weather = state.weather;
-  if (window.__treeIdlerState) {
-    sunlight = window.__treeIdlerState.sunlight;
-    water = window.__treeIdlerState.water;
-    if (window.__treeIdlerState.weather) weather = window.__treeIdlerState.weather;
-  }
-  if (treePanel) treePanel.setTree({ ...state, sunlight, water, weather });
-}
+// --- Quirks / Mini-Events --- 
 
 function handleNatureGift(e) {
-  if (toastPanel) toastPanel.showToast(`🌱 Nature's Gift: ${e.detail.type} (+${e.detail.amount} ${e.detail.bonus})`);
+  if (toastPanel) toastPanel.showToast(`🌱 Nature's Gift: ${e.detail.type} (+${e.detail.amount} ${e.detail.bonus})`, 'success');
 }
+
 function handleSquirrelAmbush() {
-  if (squirrelModal) squirrelModal.remove();
+  if (squirrelModal && squirrelModal.parentNode) squirrelModal.remove(); // Remove existing if any
   squirrelModal = document.createElement('squirrel-modal');
   document.body.appendChild(squirrelModal);
-  // If not tapped in 3 seconds, fruit is lost
+  
+  if (squirrelTimeout) clearTimeout(squirrelTimeout);
+
   squirrelTimeout = setTimeout(() => {
-    if (squirrelModal) squirrelModal.remove();
+    if (squirrelModal && squirrelModal.parentNode) squirrelModal.remove();
     squirrelModal = null;
-    window.dispatchEvent(new CustomEvent('squirrelMissed'));
+    EventBus.emit('squirrelMissed'); // Notify logic module
+    squirrelTimeout = null;
   }, 3000);
+
+  squirrelModal.addEventListener('scared', () => {
+      if (squirrelTimeout) clearTimeout(squirrelTimeout);
+      squirrelTimeout = null;
+      if (squirrelModal && squirrelModal.parentNode) squirrelModal.remove();
+      squirrelModal = null;
+      EventBus.emit('squirrelScared'); // Notify logic module
+  }, { once: true });
 }
+
 function handleSquirrelScared() {
-  // Show bonus toast
-  if (toastPanel) toastPanel.showToast('🎉 You scared off the squirrel! Bonus fruit!');
+  if (toastPanel) toastPanel.showToast('🎉 Scared the squirrel! Bonus fruit!', 'success');
 }
+
 function handleSquirrelMissed() {
-  if (toastPanel) toastPanel.showToast('😱 The squirrel got away with your fruit!');
+  if (toastPanel) toastPanel.showToast('😱 Squirrel got away with a fruit!', 'warning');
 }
+
 function handleQuirkEvent(e) {
-  if (toastPanel) toastPanel.showToast(`🍀 ${e.detail.type}: ${e.detail.reward} for ${e.detail.duration}s!`);
+  if (toastPanel) toastPanel.showToast(`🍀 ${e.detail.type}: ${e.detail.reward} for ${e.detail.duration}s!`, 'info');
 }
-function handlePrestigeAwarded(e) {
-  if (toastPanel) toastPanel.showToast(`🌳 Prestige! Level ${e.detail.prestigeLevel}, Legacy Points: ${e.detail.legacyPoints}`);
+
+// --- Prestige & Lottery --- 
+
+function handlePrestigeComplete(e) {
+  if (toastPanel) toastPanel.showToast(`🌳 Prestige! Level ${e.detail.newPrestigeLevel}. Gained ${e.detail.earnedLegacyPoints} Legacy Point(s).`, 'success');
+  handleMetaUpdate();
 }
-function handleLeafLotteryCooldown(e) {
-  leafLotteryCooldown = Date.now() + e.detail.cooldownMs;
-  if (leafLotteryPanel) leafLotteryPanel.updateCooldown();
-}
+
+// --- Layout Persistence --- 
 
 function applyLayout(layout) {
-  if (layout.Resource && resourcePanel) {
-    if (layout.Resource.left) resourcePanel.style.left = layout.Resource.left;
-    if (layout.Resource.top) resourcePanel.style.top = layout.Resource.top;
-    resourcePanel.style.position = 'fixed';
-    if (layout.Resource.collapsed) {
-      const content = resourcePanel.shadowRoot.querySelector('.panel');
-      if (content) content.style.display = 'none';
-      const btn = resourcePanel.shadowRoot.querySelector('button[aria-label^="Collapse"]');
-      if (btn) btn.textContent = '+';
+    const panels = {
+        Resource: resourcePanel,
+        Tree: treePanel,
+        Meta: metaPanel,
+        Achievements: achievementGarden,
+        Lottery: leafLotteryPanel
+    };
+    for (const name in layout) {
+        const panelElement = panels[name];
+        const panelLayout = layout[name];
+        if (panelElement && panelLayout) {
+            if (panelLayout.left) panelElement.style.left = panelLayout.left;
+            if (panelLayout.top) panelElement.style.top = panelLayout.top;
+            panelElement.style.position = 'fixed';
+            
+            const content = panelElement.shadowRoot?.querySelector('.panel-content');
+            const button = panelElement.shadowRoot?.querySelector('.collapse-button');
+            if (panelLayout.collapsed) {
+                if (content) content.style.display = 'none';
+                if (button) button.textContent = '+';
+                panelElement.setAttribute('collapsed', '');
+            } else {
+                if (content) content.style.display = '';
+                if (button) button.textContent = '-';
+                panelElement.removeAttribute('collapsed');
+            }
+        }
     }
-  }
-  if (layout.Tree && treePanel) {
-    if (layout.Tree.left) treePanel.style.left = layout.Tree.left;
-    if (layout.Tree.top) treePanel.style.top = layout.Tree.top;
-    treePanel.style.position = 'fixed';
-    if (layout.Tree.collapsed) {
-      const content = treePanel.shadowRoot.querySelector('.panel');
-      if (content) content.style.display = 'none';
-      const btn = treePanel.shadowRoot.querySelector('button[aria-label^="Collapse"]');
-      if (btn) btn.textContent = '+';
-    }
+}
+
+// --- Plugin Lifecycle --- 
+
+export function install(api) {
+  getState = api.getState;
+  updateState = api.updateState;
+  EventBus = api.EventBus;
+
+  const components = {
+      'resource-panel': ResourcePanel,
+      'tree-panel': TreePanel,
+      'toast-panel': ToastPanel,
+      'leaf-lottery-panel': LeafLotteryPanel,
+      'squirrel-modal': SquirrelModal,
+      'color-blind-toggle': ColorBlindToggle,
+      'meta-panel': MetaPanel,
+      'achievement-garden': AchievementGarden
+  };
+  for (const tagName in components) {
+      if (!customElements.get(tagName)) {
+          customElements.define(tagName, components[tagName]);
+      }
   }
 }
 
-export function install() {
-  if (!customElements.get('resource-panel')) {
-    customElements.define('resource-panel', ResourcePanel);
-  }
-  if (!customElements.get('tree-panel')) {
-    customElements.define('tree-panel', TreePanel);
-  }
-  if (!customElements.get('toast-panel')) {
-    customElements.define('toast-panel', ToastPanel);
-  }
-  if (!customElements.get('leaf-lottery-panel')) {
-    customElements.define('leaf-lottery-panel', LeafLotteryPanel);
-  }
-  if (!customElements.get('squirrel-modal')) {
-    customElements.define('squirrel-modal', SquirrelModal);
-  }
-  if (!customElements.get('color-blind-toggle')) {
-    customElements.define('color-blind-toggle', ColorBlindToggle);
-  }
-  if (!customElements.get('meta-panel')) {
-    customElements.define('meta-panel', MetaPanel);
-  }
-  if (!customElements.get('achievement-garden')) {
-    customElements.define('achievement-garden', AchievementGarden);
-  }
-}
+export function activate(api) {
+  getState = api.getState;
+  updateState = api.updateState;
+  EventBus = api.EventBus;
 
-export function activate() {
   if (!resourcePanel) {
     resourcePanel = document.createElement('resource-panel');
     document.body.appendChild(resourcePanel);
@@ -174,129 +238,106 @@ export function activate() {
   if (!leafLotteryPanel) {
     leafLotteryPanel = document.createElement('leaf-lottery-panel');
     document.body.appendChild(leafLotteryPanel);
+    makeDraggable(leafLotteryPanel, 'Lottery');
+    addCollapseButton(leafLotteryPanel, 'Lottery');
   }
   if (!metaPanel) {
     metaPanel = document.createElement('meta-panel');
     document.body.appendChild(metaPanel);
+    makeDraggable(metaPanel, 'Meta');
+    addCollapseButton(metaPanel, 'Meta');
   }
   if (!achievementGarden) {
     achievementGarden = document.createElement('achievement-garden');
     document.body.appendChild(achievementGarden);
+    makeDraggable(achievementGarden, 'Achievements');
+    addCollapseButton(achievementGarden, 'Achievements');
   }
-  if (!document.querySelector('color-blind-toggle')) {
-    document.body.appendChild(document.createElement('color-blind-toggle'));
+  if (!colorBlindToggle) {
+    colorBlindToggle = document.createElement('color-blind-toggle');
+    document.body.appendChild(colorBlindToggle);
+    colorBlindToggle.addEventListener('toggle', handleColorBlindToggle);
   }
-  on('resourcesUpdated', updatePanel);
-  on('treeInitialized', updateTreePanel);
-  on('treeStageAdvanced', updateTreePanel);
-  on('natureGift', handleNatureGift);
-  on('squirrelAmbush', handleSquirrelAmbush);
-  on('squirrelScared', handleSquirrelScared);
-  on('squirrelMissed', handleSquirrelMissed);
-  on('quirkEvent', handleQuirkEvent);
-  on('prestigeAwarded', handlePrestigeAwarded);
-  on('leafLotteryCooldown', handleLeafLotteryCooldown);
-  on('metaUpdated', updateMetaPanel);
-  on('achievementsUpdated', updateAchievementGarden);
-  on('layoutRestored', e => applyLayout(e.detail));
+
+  EventBus.on('stateLoaded', handleStateLoadedOrInitialized);
+  EventBus.on('resourcesInitialized', handleStateLoadedOrInitialized);
+  EventBus.on('treeInitialized', handleStateLoadedOrInitialized);
+  EventBus.on('resourcesUpdated', handleResourcesUpdate);
+  EventBus.on('treeStageAdvanced', handleTreeUpdate);
+  EventBus.on('treeSeasonChanged', handleTreeUpdate);
+  EventBus.on('prestigeComplete', handlePrestigeComplete);
+  EventBus.on('legacyUpgradePurchased', handleMetaUpdate);
+  EventBus.on('achievementsUpdated', handleAchievementsUpdate);
+  EventBus.on('uiNotification', handleUINotification);
+  EventBus.on('natureGift', handleNatureGift);
+  EventBus.on('squirrelAmbush', handleSquirrelAmbush);
+  EventBus.on('squirrelScared', handleSquirrelScared);
+  EventBus.on('squirrelMissed', handleSquirrelMissed);
+  EventBus.on('quirkEvent', handleQuirkEvent);
+  EventBus.on('layoutRestored', applyLayout);
+
   window.addEventListener('keydown', handleHotkeys);
+
+  handleStateLoadedOrInitialized();
 }
 
-export function deactivate() {
-  off('resourcesUpdated', updatePanel);
-  off('treeInitialized', updateTreePanel);
-  off('treeStageAdvanced', updateTreePanel);
-  off('natureGift', handleNatureGift);
-  off('squirrelAmbush', handleSquirrelAmbush);
-  off('squirrelScared', handleSquirrelScared);
-  off('squirrelMissed', handleSquirrelMissed);
-  off('quirkEvent', handleQuirkEvent);
-  off('prestigeAwarded', handlePrestigeAwarded);
-  off('leafLotteryCooldown', handleLeafLotteryCooldown);
-  off('metaUpdated', updateMetaPanel);
-  off('achievementsUpdated', updateAchievementGarden);
-  off('layoutRestored', e => applyLayout(e.detail));
-  if (resourcePanel && resourcePanel.parentNode) {
-    resourcePanel.parentNode.removeChild(resourcePanel);
-    resourcePanel = null;
-  }
-  if (treePanel && treePanel.parentNode) {
-    treePanel.parentNode.removeChild(treePanel);
-    treePanel = null;
-  }
-  if (toastPanel && toastPanel.parentNode) {
-    toastPanel.parentNode.removeChild(toastPanel);
-    toastPanel = null;
-  }
-  if (leafLotteryPanel && leafLotteryPanel.parentNode) {
-    leafLotteryPanel.parentNode.removeChild(leafLotteryPanel);
-    leafLotteryPanel = null;
-  }
-  if (metaPanel && metaPanel.parentNode) {
-    metaPanel.parentNode.removeChild(metaPanel);
-    metaPanel = null;
-  }
-  if (achievementGarden && achievementGarden.parentNode) {
-    achievementGarden.parentNode.removeChild(achievementGarden);
-    achievementGarden = null;
-  }
-  if (squirrelModal && squirrelModal.parentNode) {
-    squirrelModal.parentNode.removeChild(squirrelModal);
-    squirrelModal = null;
-  }
+export function deactivate(api) {
+  EventBus.off('stateLoaded', handleStateLoadedOrInitialized);
+  EventBus.off('resourcesInitialized', handleStateLoadedOrInitialized);
+  EventBus.off('treeInitialized', handleStateLoadedOrInitialized);
+  EventBus.off('resourcesUpdated', handleResourcesUpdate);
+  EventBus.off('treeStageAdvanced', handleTreeUpdate);
+  EventBus.off('treeSeasonChanged', handleTreeUpdate);
+  EventBus.off('prestigeComplete', handlePrestigeComplete);
+  EventBus.off('legacyUpgradePurchased', handleMetaUpdate);
+  EventBus.off('achievementsUpdated', handleAchievementsUpdate);
+  EventBus.off('uiNotification', handleUINotification);
+  EventBus.off('natureGift', handleNatureGift);
+  EventBus.off('squirrelAmbush', handleSquirrelAmbush);
+  EventBus.off('squirrelScared', handleSquirrelScared);
+  EventBus.off('squirrelMissed', handleSquirrelMissed);
+  EventBus.off('quirkEvent', handleQuirkEvent);
+  EventBus.off('layoutRestored', applyLayout);
+
   window.removeEventListener('keydown', handleHotkeys);
+  if (colorBlindToggle) {
+      colorBlindToggle.removeEventListener('toggle', handleColorBlindToggle);
+  }
+
+  [resourcePanel, treePanel, toastPanel, leafLotteryPanel, metaPanel, achievementGarden, colorBlindToggle, squirrelModal].forEach(el => {
+      if (el && el.parentNode) {
+          el.parentNode.removeChild(el);
+      }
+  });
+
+  resourcePanel = treePanel = toastPanel = leafLotteryPanel = metaPanel = achievementGarden = colorBlindToggle = squirrelModal = null;
+  getState = () => ({});
+  updateState = () => {};
+  EventBus = null;
+  if (squirrelTimeout) clearTimeout(squirrelTimeout);
+  squirrelTimeout = null;
 }
 
-// Add color-blind styles globally
 if (!document.getElementById('cb-style')) {
   const style = document.createElement('style');
   style.id = 'cb-style';
   style.textContent = `
-    body.color-blind .panel, .cb.panel {
-      background: #f5f5f5 !important;
-      color: #222 !important;
-      border: 2px dashed #0077cc !important;
+    body.color-blind [data-resource="sunlight"] {
+        border: 1px solid yellow;
     }
-    body.color-blind .leaf, .cb .leaf {
-      color: #0077cc !important;
-      filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #0077cc);
+    body.color-blind [data-resource="water"] {
+        border: 1px solid blue;
     }
-    body.color-blind .root, .cb .root {
-      color: #cc7700 !important;
-      filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #cc7700);
+    body.color-blind .panel {
+      background-color: #fff;
+      color: #000;
+      border: 2px solid #000;
     }
-    body.color-blind .growth-ring, .cb .growth-ring {
-      border-color: #0077cc !important;
+    body.color-blind button {
+        border: 2px solid transparent;
     }
-    body.color-blind .toast, .cb .toast {
-      background: #222 !important;
-      color: #fff !important;
-      border: 2px solid #0077cc !important;
-    }
-    body.color-blind .garden-container, .cb .garden-container {
-      border: 2px dashed #0077cc !important;
-    }
-    body.color-blind .soil-layer, .cb .soil-layer {
-      background: #555 !important;
-    }
-    body.color-blind .grass-layer, .cb .grass-layer {
-      background: #0077cc !important;
-    }
-    body.color-blind .sky-layer, .cb .sky-layer {
-      background: #f5f5f5 !important;
-    }
-    body.color-blind .plant svg path, .cb .plant svg path {
-      stroke: #000 !important;
-    }
-    body.color-blind .plant svg ellipse, body.color-blind .plant svg circle, body.color-blind .plant svg polygon,
-    .cb .plant svg ellipse, .cb .plant svg circle, .cb .plant svg polygon {
-      stroke: #000 !important;
-      stroke-width: 1px !important;
-    }
-    body.color-blind .plant-tooltip, .cb .plant-tooltip {
-      background: #000 !important;
-      color: #fff !important;
-      border: 1px solid #0077cc !important;
+    body.color-blind button:focus, body.color-blind button:hover {
+        border-color: blue; 
     }
     button:focus, [tabindex="0"]:focus {
       outline: 3px solid #00aaff !important;

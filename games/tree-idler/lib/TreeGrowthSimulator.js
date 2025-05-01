@@ -6,7 +6,6 @@ export function createSimulator(options = {}) {
     options,
     getGrowthParameters,
     renderTree,
-    simulateGrowth,
   };
 }
 
@@ -141,6 +140,7 @@ function drawRoots(ctx, x, y, params) {
   }
 }
 
+// Draws the tree on a canvas using the current state and growth parameters
 export function renderTree(ctx, width, height, state) {
   const params = getGrowthParameters(state.stage, state.sunlight, state.season, state.species);
   params.seed = state.visualSeed || Math.random();
@@ -199,22 +199,4 @@ function drawDrought(ctx, width, height) {
     ctx.stroke();
   }
   ctx.restore();
-}
-
-// Advances the tree state by delta (time/resources)
-export function simulateGrowth(state, delta) {
-  // Simple: advance stage every 60s, unlock slots at certain stages
-  const newState = { ...state };
-  if (!newState._growthTimer) newState._growthTimer = 0;
-  newState._growthTimer += delta;
-  if (newState._growthTimer >= 60) {
-    newState.stage = (newState.stage || 1) + 1;
-    newState._growthTimer = 0;
-    // Unlock slots
-    if (newState.stage % 2 === 0) newState.slots.leaves++;
-    if (newState.stage % 2 === 1) newState.slots.roots++;
-    if (newState.stage === 3) newState.slots.fruits = 1;
-    if (newState.stage === 7) newState.slots.critters = 1;
-  }
-  return newState;
 }

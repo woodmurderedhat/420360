@@ -1,128 +1,105 @@
 // Events.js
-// Handles random events, prestige, and meta-progression.
+// Handles random events (Nature's Gift, Squirrel Ambush), and Legacy Oak quirk.
 import { emit, on, off } from './EventBus.js';
 
 export const name = 'Events';
 
 let eventInterval = null;
-let legacyPoints = 0;
-let prestigeLevel = 0;
-let gameState = null;
-let treeState = null;
-let evergreenUpgrades = { seedVault: false, deepRoots: false, sunCrystal: false };
+let getState = () => ({});
+let updateState = () => {};
+let EventBus = null;
 
-function randomEvent() {
+// Constants for balancing (could be moved to manifest/config)
+const RANDOM_EVENT_MIN_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
+const RANDOM_EVENT_MAX_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
+function scheduleRandomEvent() {
+    const delay = RANDOM_EVENT_MIN_INTERVAL_MS + Math.random() * (RANDOM_EVENT_MAX_INTERVAL_MS - RANDOM_EVENT_MIN_INTERVAL_MS);
+    if (eventInterval) clearTimeout(eventInterval); // Clear existing timeout
+    eventInterval = setTimeout(() => {
+        triggerRandomEvent();
+        scheduleRandomEvent(); // Schedule the next one
+    }, delay);
+}
+
+function triggerRandomEvent() {
   const roll = Math.random();
+  const state = getState();
+  const treeState = state.tree || {};
+
+  // Nature's Gift (e.g., 50% chance)
   if (roll < 0.5) {
-    emit('natureGift', { type: 'Morning Dew', bonus: 'water', amount: 10 });
-  } else if (roll < 0.8) {
-    // Only trigger ambush if at least 1 fruit
-    if (treeState && treeState.slots && treeState.slots.fruits > 0) {
-      treeState.slots.fruits--;
-      emit('squirrelAmbush', { stolen: 'fruit', challenge: true });
-      emit('stateUpdated', { tree: { ...treeState } });
-    }
-  } else {
-    emit('quirkEvent', { type: 'Leaf Lottery', reward: 'buff', duration: 300 });
+    // Example: Free water
+    const amount = 10 + Math.floor(Math.random() * 10); // Random amount
+    updateState({ water: (state.water || 0) + amount });
+    EventBus.emit('natureGift', { type: 'Morning Dew', bonus: 'water', amount: amount });
+    EventBus.emit('resourcesUpdated', { water: getState().water }); // Notify UI
   }
-}
-
-function emitMetaUpdate() {
-  emit('metaUpdated', {
-    prestigeLevel,
-    legacyPoints,
-    upgrades: { ...evergreenUpgrades }
-  });
-}
-
-export function install(api) {
-  // Initialize meta-progression state if needed
-  legacyPoints = api?.state?.legacyPoints || 0;
-  prestigeLevel = api?.state?.prestigeLevel || 0;
-  gameState = api?.state;
-  treeState = api?.state?.tree;
-  evergreenUpgrades = api?.state?.evergreenUpgrades || { seedVault: false, deepRoots: false, sunCrystal: false };
-}
-
-function handlePrestige(e) {
-  prestigeLevel++;
-  legacyPoints += 1;
-  emit('prestigeAwarded', { prestigeLevel, legacyPoints });
-  emit('stateUpdated', { legacyPoints, prestigeLevel });
-  emitMetaUpdate();
-}
-
-function handleLeafLotteryDraw() {
-  if (!gameState) return;
-  if (gameState.sunlight < 50) {
-    emit('quirkEvent', { type: 'Leaf Lottery', reward: 'Not enough sunlight!', duration: 0 });
-    return;
+  // Squirrel Ambush (e.g., 30% chance, requires Stage 7+ and fruits)
+  else if (roll < 0.8 && treeState.growthStage >= 7 && state.fruits >= 1) {
+    // Deduct fruit immediately - player needs to scare to get bonus
+    updateState({ fruits: state.fruits - 1 });
+    EventBus.emit('resourcesUpdated', { fruits: getState().fruits }); // Notify UI of deduction
+    EventBus.emit('squirrelAmbush'); // Notify UI to show modal
   }
-  gameState.sunlight -= 50;
-  const buffs = [
-    { reward: 'x2 sunlight', duration: 300 },
-    { reward: 'x2 water', duration: 300 },
-    { reward: 'instant prestige point', duration: 0 },
-    { reward: '+100 water', duration: 0 },
-    { reward: '+100 sunlight', duration: 0 }
-  ];
-  const buff = buffs[Math.floor(Math.random() * buffs.length)];
-  if (buff.reward === 'instant prestige point') {
-    prestigeLevel++;
-    legacyPoints += 1;
-    emit('prestigeAwarded', { prestigeLevel, legacyPoints });
-    emit('stateUpdated', { legacyPoints, prestigeLevel });
-  } else if (buff.reward === '+100 water') {
-    gameState.water = (gameState.water || 0) + 100;
-  } else if (buff.reward === '+100 sunlight') {
-    gameState.sunlight += 100;
+  // Other potential events...
+  else {
+    // Placeholder for future events
+    console.log("Minor random event triggered (no effect yet).");
   }
-  emit('quirkEvent', { type: 'Leaf Lottery', reward: buff.reward, duration: buff.duration });
-  emit('stateUpdated', { sunlight: gameState.sunlight, water: gameState.water });
-  emit('leafLotteryCooldown', { cooldownMs: 3600_000 });
+
+  // Schedule next event
+  scheduleRandomEvent();
 }
 
 function handleSquirrelScared() {
-  if (treeState && treeState.slots) {
-    treeState.slots.fruits++;
-    emit('stateUpdated', { tree: { ...treeState } });
-  }
+  // Bonus: Give back the stolen fruit + 1 extra
+  const state = getState();
+  const bonusFruits = 2;
+  updateState({ fruits: (state.fruits || 0) + bonusFruits });
+  EventBus.emit('resourcesUpdated', { fruits: getState().fruits });
+  // UI notification is handled by UI.js listening to this event
 }
 
 function handleSquirrelMissed() {
-  // No bonus, fruit already deducted
+  // No change needed, fruit was already deducted on ambush trigger.
+  // UI notification handled by UI.js
 }
 
-function handleBuyEvergreenUpgrade(e) {
-  const { upgrade } = e.detail;
-  if (!evergreenUpgrades[upgrade] && legacyPoints > 0) {
-    evergreenUpgrades[upgrade] = true;
-    legacyPoints--;
-    emit('metaUpdated', {
-      prestigeLevel,
-      legacyPoints,
-      upgrades: { ...evergreenUpgrades }
-    });
-    emit('stateUpdated', { legacyPoints, evergreenUpgrades: { ...evergreenUpgrades } });
-  }
+function handlePrestigeComplete(e) {
+    // Check for Legacy Oak quirk
+    // REMOVED Legacy Oak calculation - handled in SaveLoad.js
+}
+
+export function install(api) {
+  getState = api.getState;
+  updateState = api.updateState;
+  EventBus = api.EventBus;
 }
 
 export function activate(api) {
-  // Random event every 2–5 minutes
-  eventInterval = setInterval(randomEvent, 120000 + Math.random() * 180000);
-  on('prestige', handlePrestige);
-  on('leafLotteryDraw', handleLeafLotteryDraw);
-  on('squirrelScared', handleSquirrelScared);
-  on('squirrelMissed', handleSquirrelMissed);
-  on('buyEvergreenUpgrade', handleBuyEvergreenUpgrade);
-  emitMetaUpdate();
+  getState = api.getState;
+  updateState = api.updateState;
+  EventBus = api.EventBus;
+
+  // Start random event scheduling
+  scheduleRandomEvent();
+
+  // Listen for relevant events
+  EventBus.on('squirrelScared', handleSquirrelScared);
+  EventBus.on('squirrelMissed', handleSquirrelMissed);
+  EventBus.on('prestigeComplete', handlePrestigeComplete); // Listen for prestige to check for Legacy Oak
 }
 
 export function deactivate(api) {
-  if (eventInterval) clearInterval(eventInterval);
-  off('prestige', handlePrestige);
-  off('leafLotteryDraw', handleLeafLotteryDraw);
-  off('squirrelScared', handleSquirrelScared);
-  off('squirrelMissed', handleSquirrelMissed);
-  off('buyEvergreenUpgrade', handleBuyEvergreenUpgrade);
+  if (eventInterval) clearTimeout(eventInterval);
+  eventInterval = null;
+
+  EventBus.off('squirrelScared', handleSquirrelScared);
+  EventBus.off('squirrelMissed', handleSquirrelMissed);
+  EventBus.off('prestigeComplete', handlePrestigeComplete);
+
+  getState = () => ({});
+  updateState = () => {};
+  EventBus = null;
 }

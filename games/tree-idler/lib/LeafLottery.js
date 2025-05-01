@@ -1,4 +1,4 @@
-import { EventBus } from './EventBus.js'; // Assuming EventBus is available via import map or relative path
+import { emit, on, off } from './EventBus.js'; // Correctly import functions
 
 export const name = 'LeafLottery';
 
@@ -16,9 +16,6 @@ const BUFFS = [
 // Plugin API refs
 let getState = () => ({});
 let updateState = () => {};
-let EventBus = null; // Added EventBus ref for consistency
-
-// Module state (loaded from main game state)
 let lastLotteryTime = 0;
 let handleStateLoadedListener = null; // Store the listener function
 
@@ -34,7 +31,7 @@ function tryLottery() {
     const status = isAvailable();
     if (!status.available) {
         console.warn('Lottery not available.', status);
-        EventBus.emit('uiNotification', { message: `Lottery not ready! ${!status.cooldownOver ? 'On cooldown.' : 'Not enough sunlight.'}`, type: 'warning' });
+        emit('uiNotification', { message: `Lottery not ready! ${!status.cooldownOver ? 'On cooldown.' : 'Not enough sunlight.'}`, type: 'warning' }); // Use imported emit
         return;
     }
 
@@ -42,7 +39,7 @@ function tryLottery() {
 
     // Deduct cost using updateState
     updateState({ sunlight: currentState.sunlight - LOTTERY_COST });
-    EventBus.emit('resourcesUpdated', getState()); // Notify UI about cost deduction
+    emit('resourcesUpdated', getState()); // Use imported emit
 
     // Set cooldown
     lastLotteryTime = Date.now();
@@ -56,28 +53,28 @@ function tryLottery() {
     if (selectedBuff.type === 'instant_fruit') {
         // Handle instant effects directly or via specific events if needed
         updateState({ fruits: (currentState.fruits || 0) + selectedBuff.value });
-        EventBus.emit('resourcesUpdated', getState());
-        EventBus.emit('uiNotification', { message: `Leaf Lottery: ${selectedBuff.description}`, type: 'success' });
+        emit('resourcesUpdated', getState()); // Use imported emit
+        emit('uiNotification', { message: `Leaf Lottery: ${selectedBuff.description}`, type: 'success' }); // Use imported emit
     } else if (selectedBuff.type === 'instant_lp') {
         const currentLP = currentState.legacyPoints || 0;
         updateState({ legacyPoints: currentLP + selectedBuff.value });
-        EventBus.emit('resourcesUpdated', getState()); // Notify UI (MetaPanel uses this)
-        EventBus.emit('uiNotification', { message: `Leaf Lottery: ${selectedBuff.description}`, type: 'success' });
+        emit('resourcesUpdated', getState()); // Use imported emit
+        emit('uiNotification', { message: `Leaf Lottery: ${selectedBuff.description}`, type: 'success' }); // Use imported emit
     } else if (selectedBuff.duration > 0) {
-        EventBus.emit('applyBuff', {
+        emit('applyBuff', { // Use imported emit
             type: selectedBuff.type,
             value: selectedBuff.value,
             duration: selectedBuff.duration
         });
-        EventBus.emit('uiNotification', { message: `Leaf Lottery Buff: ${selectedBuff.description}`, type: 'success' });
+        emit('uiNotification', { message: `Leaf Lottery Buff: ${selectedBuff.description}`, type: 'success' }); // Use imported emit
     } else {
         // Handle other potential instant effects
         console.log(`Lottery Result (Instant): ${selectedBuff.description}`);
-        EventBus.emit('uiNotification', { message: `Leaf Lottery: ${selectedBuff.description}`, type: 'success' });
+        emit('uiNotification', { message: `Leaf Lottery: ${selectedBuff.description}`, type: 'success' }); // Use imported emit
     }
 
     // Notify UI about cooldown and result
-    EventBus.emit('lotteryStateUpdated', {
+    emit('lotteryStateUpdated', { // Use imported emit
         available: false,
         cooldownEnds: lastLotteryTime + LOTTERY_COOLDOWN,
         lastResult: selectedBuff.description
@@ -98,29 +95,28 @@ export function install(api) {
 export function activate(api) {
     getState = api.getState;
     updateState = api.updateState;
-    EventBus = api.EventBus; // Store EventBus reference
 
     // Re-read state in case it was loaded after install
     const currentState = getState();
     lastLotteryTime = currentState.leafLottery?.lastLotteryTime || 0;
 
-    EventBus.on('tryLottery', tryLottery);
+    on('tryLottery', tryLottery); // Use imported on
 
     // Store the listener function
     handleStateLoadedListener = (loadedState) => {
         // Update local state if game is loaded
         lastLotteryTime = loadedState.leafLottery?.lastLotteryTime || 0;
         // Broadcast initial/loaded state to UI
-        EventBus.emit('lotteryStateUpdated', {
+        emit('lotteryStateUpdated', { // Use imported emit
             available: isAvailable().available,
             cooldownEnds: lastLotteryTime + LOTTERY_COOLDOWN,
             lastResult: null // Result isn't saved
         });
     };
-    EventBus.on('stateLoaded', handleStateLoadedListener);
+    on('stateLoaded', handleStateLoadedListener); // Use imported on
 
     // Broadcast initial state to UI
-    EventBus.emit('lotteryStateUpdated', {
+    emit('lotteryStateUpdated', { // Use imported emit
         available: isAvailable().available,
         cooldownEnds: lastLotteryTime + LOTTERY_COOLDOWN,
         lastResult: null
@@ -128,15 +124,14 @@ export function activate(api) {
 }
 
 export function deactivate(api) {
-    EventBus.off('tryLottery', tryLottery);
+    off('tryLottery', tryLottery); // Use imported off
     // Use the stored listener function for removal
     if (handleStateLoadedListener) {
-        EventBus.off('stateLoaded', handleStateLoadedListener);
+        off('stateLoaded', handleStateLoadedListener); // Use imported off
         handleStateLoadedListener = null; // Clear the stored listener
     }
     getState = () => ({});
     updateState = () => {};
-    EventBus = null; // Clear EventBus reference
 }
 
 // --- Save/Load Integration --- //

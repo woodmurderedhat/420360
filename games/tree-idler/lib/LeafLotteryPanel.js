@@ -1,4 +1,4 @@
-import { EventBus } from './EventBus.js';
+import { emit, on, off } from './EventBus.js'; // Correctly import functions
 import { formatTime } from './ui-helpers.js'; // Assuming a helper for time formatting
 
 const template = document.createElement('template');
@@ -84,18 +84,18 @@ class LeafLotteryPanel extends HTMLElement {
 
     connectedCallback() {
         this.lotteryButton.addEventListener('click', () => {
-            EventBus.emit('tryLottery');
+            emit('tryLottery'); // Use imported emit directly
         });
 
-        EventBus.on('lotteryStateUpdated', this.updateLotteryState);
-        EventBus.on('buffsUpdated', this.updateActiveBuffs);
-        EventBus.on('resourcesUpdated', this.handleResourceUpdate);
+        on('lotteryStateUpdated', this.updateLotteryState); // Use imported on directly
+        on('buffsUpdated', this.updateActiveBuffs); // Use imported on directly
+        on('resourcesUpdated', this.handleResourceUpdate); // Use imported on directly
     }
 
     disconnectedCallback() {
-        EventBus.off('lotteryStateUpdated', this.updateLotteryState);
-        EventBus.off('buffsUpdated', this.updateActiveBuffs);
-        EventBus.off('resourcesUpdated', this.handleResourceUpdate);
+        off('lotteryStateUpdated', this.updateLotteryState); // Use imported off directly
+        off('buffsUpdated', this.updateActiveBuffs); // Use imported off directly
+        off('resourcesUpdated', this.handleResourceUpdate); // Use imported off directly
     }
 
     handleResourceUpdate = (state) => {

@@ -87,7 +87,9 @@
   const saveLoadModuleInfo = manifest.modules.find(m => m.name === 'SaveLoad');
   if (saveLoadModuleInfo) {
     try {
-      const saveLoadPlugin = await import(saveLoadModuleInfo.path);
+      // Resolve path relative to the HTML document's base URI
+      const absolutePath = new URL(saveLoadModuleInfo.path, document.baseURI).href;
+      const saveLoadPlugin = await import(absolutePath);
       if (saveLoadPlugin.install) PluginManager.installPlugin(saveLoadPlugin, pluginApi);
       // Activate SaveLoad early to trigger potential 'loadState' event
       if (saveLoadPlugin.activate) PluginManager.activatePlugin(saveLoadPlugin, pluginApi);
@@ -132,7 +134,9 @@
     if (mod.core) continue; 
 
     try {
-      const plugin = await import(mod.path);
+      // Resolve path relative to the HTML document's base URI
+      const absolutePath = new URL(mod.path, document.baseURI).href;
+      const plugin = await import(absolutePath);
       // Basic validation (can be expanded)
       if (!plugin.name) {
          console.warn(`Plugin from ${mod.path} is missing a 'name' export. Skipping.`);

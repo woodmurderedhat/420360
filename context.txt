@@ -16,20 +16,11 @@
     - `placeholder.jpg` - Generic placeholder image
 - `games/` - Individual game directories
   - `tarot-tetromino/` - Tarot Tetromino game
-  - `tree-idler/` - Tree Idler game
 
 ## Games
 
 ### Tarot Tetromino
 A mystical twist on the classic Tetris game with tarot card influences. The game combines traditional Tetris gameplay with tarot card mechanics that provide special abilities and effects.
-
-### Tree Idler
-A relaxing idle game where players grow a tree by collecting sunlight and water. The game features:
-- Resource collection (sunlight and water)
-- Tree growth through multiple stages
-- Upgrades for leaves and roots
-- Fruit harvesting
-- Procedurally generated tree visuals using HTML5 Canvas
 
 ## Landing Page Structure
 The landing page (`index.html`) contains:
@@ -46,5 +37,3 @@ Each game card in the games showcase section includes:
 - "Play Now" button linking to the game
 
 ## Recent Changes
-- Added Tree Idler game to the games showcase section on the main landing page
-- Added a back link to the Tree Idler game to navigate back to the main landing page

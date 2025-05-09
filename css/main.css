@@ -237,7 +237,7 @@ img {
 
 .games-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 2rem;
     position: relative;
     z-index: 20;
@@ -276,6 +276,11 @@ img {
 
 .game-card:hover .game-image img {
     transform: scale(1.1);
+}
+
+.game-card img[alt="Generative Art"] {
+    object-fit: contain;
+    background-color: var(--dark-color);
 }
 
 .game-info {

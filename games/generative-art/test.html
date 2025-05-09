@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Generative Art</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <canvas id="artCanvas"></canvas>
+    <div id="controlsPanel">
+        <button id="togglePanelButton" title="Toggle settings panel">Hide Settings</button>
+
+        <!-- Style Selection -->
+        <div class="control-section">
+            <h3>Style</h3>
+            <label for="styleSelector">Art Style:</label>
+            <select id="styleSelector"></select>
+            <div id="currentStyleDisplay">Current Style: <span></span></div>
+        </div>
+
+        <!-- Shape Controls -->
+        <div class="control-section">
+            <h3>Shape Controls</h3>
+            <label for="numShapes">Number of Shapes:</label>
+            <input type="range" id="numShapes" min="10" max="1000" step="10" value="100">
+            <span id="numShapesValue" class="slider-value">100</span>
+
+            <label for="lineWidth">Line Width:</label>
+            <input type="range" id="lineWidth" min="0.5" max="10" step="0.1" value="1">
+            <span id="lineWidthValue" class="slider-value">1</span>
+        </div>
+
+        <!-- Other controls omitted for brevity -->
+    </div>
+
+    <div id="testResults" style="position: fixed; top: 10px; right: 10px; background: white; padding: 10px; border: 1px solid #ccc; max-width: 400px; max-height: 80vh; overflow: auto; z-index: 1000;">
+        <h3>Test Results</h3>
+        <pre id="testOutput"></pre>
+    </div>
+
+    <script type="module">
+        // Redirect console.log to our test output div
+        const originalConsoleLog = console.log;
+        const testOutput = document.getElementById('testOutput');
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            const message = args.map(arg => {
+                if (typeof arg === 'object') {
+                    return JSON.stringify(arg, null, 2);
+                } else {
+                    return String(arg);
+                }
+            }).join(' ');
+            testOutput.textContent += message + '\n';
+        };
+        
+        // Import our test script
+        import './js/test.js';
+    </script>
+</body>
+</html>

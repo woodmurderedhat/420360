@@ -31,30 +31,137 @@
     <canvas id="artCanvas"></canvas>
     <div id="controlsPanel">
         <button id="togglePanelButton" title="Toggle settings panel">Hide Settings</button>
-        <label for="styleSelector">Style:</label>
-        <select id="styleSelector"></select>
-        <button id="regenerateButton">Regenerate</button>
-        <button id="exportButton">Export PNG</button>
-        <div id="currentStyleDisplay">Current Style: <span></span></div>
-        <label for="numShapes">Number of Shapes:</label>
-        <input type="range" id="numShapes" min="10" max="1000" step="10" value="100">
-        <span id="numShapesValue" class="slider-value"></span>
-        <label for="lineWidth">Line Width:</label>
-        <input type="range" id="lineWidth" min="0.5" max="10" step="0.1" value="1">
-        <span id="lineWidthValue" class="slider-value"></span>
-        <label for="canvasWidth">Canvas Width:</label>
-        <input type="number" id="canvasWidth" min="200" max="3840" step="10" placeholder="window.innerWidth">
-        <label for="canvasHeight">Canvas Height:</label>
-        <input type="number" id="canvasHeight" min="200" max="2160" step="10" placeholder="window.innerHeight">
-        <label for="seedInput">Seed:</label>
-        <input type="text" id="seedInput" placeholder="random">
-        <button id="randomSeedButton">Random Seed</button>
-        <div id="currentSeedDisplay">Seed: <span></span></div>
-        <button id="resetSettings">Reset Defaults</button>
-        <button id="applySettings">Apply</button>
-        <button id="copyLinkButton">Copy Link</button>
-        <div id="shortcuts" class="panel-text">Shortcuts: <code>R</code>=Regenerate, <code>E</code>=Export, <code>1-7</code>=Styles</div>
+
+        <!-- Style Selection -->
+        <div class="control-section">
+            <h3>Style</h3>
+            <label for="styleSelector">Art Style:</label>
+            <select id="styleSelector"></select>
+            <div id="currentStyleDisplay">Current Style: <span></span></div>
+        </div>
+
+        <!-- Shape Controls -->
+        <div class="control-section">
+            <h3>Shape Controls</h3>
+            <label for="numShapes">Number of Shapes:</label>
+            <input type="range" id="numShapes" min="10" max="1000" step="10" value="100">
+            <span id="numShapesValue" class="slider-value">100</span>
+
+            <label for="lineWidth">Line Width:</label>
+            <input type="range" id="lineWidth" min="0.5" max="10" step="0.1" value="1">
+            <span id="lineWidthValue" class="slider-value">1</span>
+        </div>
+
+        <!-- Color Controls -->
+        <div class="control-section">
+            <h3>Color Settings</h3>
+            <label for="colorThemeSelector">Color Theme:</label>
+            <select id="colorThemeSelector">
+                <option value="random">Random</option>
+                <option value="monochrome">Monochrome</option>
+                <option value="complementary">Complementary</option>
+                <option value="analogous">Analogous</option>
+                <option value="triadic">Triadic</option>
+                <option value="custom">Custom</option>
+            </select>
+
+            <div id="customColorControls" style="display: none;">
+                <label for="baseHue">Base Hue (0-360):</label>
+                <input type="range" id="baseHue" min="0" max="360" step="1" value="180">
+                <span id="baseHueValue" class="slider-value">180</span>
+
+                <label for="saturation">Saturation (0-100):</label>
+                <input type="range" id="saturation" min="0" max="100" step="1" value="70">
+                <span id="saturationValue" class="slider-value">70</span>
+
+                <label for="lightness">Lightness (0-100):</label>
+                <input type="range" id="lightness" min="0" max="100" step="1" value="50">
+                <span id="lightnessValue" class="slider-value">50</span>
+            </div>
+
+            <label for="backgroundColorPicker">Background Color:</label>
+            <input type="color" id="backgroundColorPicker" value="#ffffff">
+        </div>
+
+        <!-- Animation Controls -->
+        <div class="control-section">
+            <h3>Animation</h3>
+            <div class="toggle-control">
+                <label for="animationToggle">Enable Animation:</label>
+                <input type="checkbox" id="animationToggle">
+            </div>
+
+            <label for="animationSpeed">Animation Speed:</label>
+            <input type="range" id="animationSpeed" min="1" max="100" step="1" value="50" disabled>
+            <span id="animationSpeedValue" class="slider-value">50</span>
+
+            <div class="toggle-control">
+                <label for="interactiveToggle">Interactive Mode:</label>
+                <input type="checkbox" id="interactiveToggle">
+            </div>
+        </div>
+
+        <!-- Canvas Size -->
+        <div class="control-section">
+            <h3>Canvas Size</h3>
+            <label for="canvasWidth">Width:</label>
+            <input type="number" id="canvasWidth" min="200" max="3840" step="10" placeholder="window.innerWidth">
+
+            <label for="canvasHeight">Height:</label>
+            <input type="number" id="canvasHeight" min="200" max="2160" step="10" placeholder="window.innerHeight">
+        </div>
+
+        <!-- Seed Controls -->
+        <div class="control-section">
+            <h3>Seed</h3>
+            <label for="seedInput">Seed Value:</label>
+            <input type="text" id="seedInput" placeholder="random">
+            <button id="randomSeedButton">Random Seed</button>
+            <div id="currentSeedDisplay">Seed: <span></span></div>
+        </div>
+
+        <!-- History Controls -->
+        <div class="control-section">
+            <h3>History</h3>
+            <div class="history-controls">
+                <button id="undoButton" title="Undo (Ctrl+Z)" disabled>Undo</button>
+                <button id="redoButton" title="Redo (Ctrl+Y)" disabled>Redo</button>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="control-section buttons-section">
+            <button id="regenerateButton">Regenerate</button>
+            <button id="exportButton">Export PNG</button>
+            <button id="saveToGalleryButton">Save to Gallery</button>
+            <button id="galleryButton">Open Gallery</button>
+            <button id="resetSettings">Reset Defaults</button>
+            <button id="applySettings">Apply Settings</button>
+            <button id="copyLinkButton">Copy Link</button>
+            <button id="fullscreenButton">Fullscreen</button>
+        </div>
+
+        <div id="shortcuts" class="panel-text">
+            Shortcuts: <code>R</code>=Regenerate, <code>E</code>=Export, <code>G</code>=Gallery,
+            <code>Space</code>=Toggle Animation, <code>1-9</code>=Styles, <code>F</code>=Fullscreen,
+            <code>Ctrl+Z</code>=Undo, <code>Ctrl+Y</code>=Redo
+        </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Gallery Modal -->
+    <div id="galleryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Your Gallery</h2>
+            <div id="galleryContainer" class="gallery-container"></div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="loading-indicator">
+        <div class="spinner"></div>
+        <div class="loading-text">Generating artwork...</div>
+    </div>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

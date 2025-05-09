@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Noctis Reverie - A generative art experience">
+  <title>Noctis Reverie</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6e44ff">
+  <!-- iOS PWA support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/png" href="assets/icon-192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="assets/icon-512.png" sizes="512x512">
+</head>
+<body>
+  <main>
+    <canvas id="reverie-canvas"></canvas>
+    
+    <div class="controls-panel">
+      <button id="start-btn" class="btn primary">Start</button>
+      <button id="regenerate-btn" class="btn">Regenerate</button>
+      <button id="credits-btn" class="btn">Credits</button>
+    </div>
+    
+    <dialog id="credits-modal" aria-labelledby="credits-title">
+      <h2 id="credits-title">Noctis Reverie</h2>
+      <p>A generative art experience that runs in your browser.</p>
+      <p>Created with HTML5, CSS3, and JavaScript - no dependencies, no build step.</p>
+      <button id="close-credits-btn" class="btn">Close</button>
+    </dialog>
+  </main>
+  
+  <script>
+    // Register service worker for offline capability
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(reg => console.log('Service worker registered:', reg))
+          .catch(err => console.error('Service worker registration failed:', err));
+      });
+    }
+  </script>
+  
+  <script type="module" src="./modules/main.js"></script>
+</body>
+</html>

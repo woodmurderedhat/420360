@@ -1,0 +1,118 @@
+/* Noctis Reverie - Main Stylesheet */
+
+:root {
+  --bg-color: #0a0a12;
+  --text-color: #e0e0e8;
+  --accent-color: #6e44ff;
+  --secondary-color: #2a2a3a;
+  --btn-hover: #8055ff;
+  --btn-active: #5533cc;
+  --modal-bg: rgba(20, 20, 30, 0.95);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+#reverie-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.controls-panel {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  z-index: 2;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: var(--btn-hover);
+}
+
+.btn:active {
+  background-color: var(--btn-active);
+}
+
+.btn.primary {
+  background-color: var(--accent-color);
+}
+
+#credits-modal {
+  background-color: var(--modal-bg);
+  color: var(--text-color);
+  max-width: 500px;
+  padding: 2rem;
+  border: 1px solid var(--accent-color);
+  border-radius: 8px;
+  z-index: 10;
+}
+
+#credits-modal::backdrop {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+#credits-modal h2 {
+  margin-bottom: 1rem;
+  color: var(--accent-color);
+}
+
+#credits-modal p {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+#close-credits-btn {
+  margin-top: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .controls-panel {
+    flex-direction: column;
+    bottom: 1rem;
+    gap: 0.5rem;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}

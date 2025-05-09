@@ -1,0 +1,9 @@
+{
+  "shapes": [
+    "circle.svg",
+    "square.svg",
+    "triangle.svg",
+    "star.svg",
+    "hexagon.svg"
+  ]
+}

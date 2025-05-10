@@ -23,20 +23,24 @@ let mouseMoveThrottle = 16; // Throttle mouse events to ~60fps
 let bufferCanvas = null;
 let bufferCtx = null;
 
-// Export animation state
+// Export animation state constants
+export {
+    fpsLimit,
+    fpsInterval,
+    mouseMoveThrottle
+};
+
+// Export mutable animation state variables
 export {
     isAnimating,
     animationFrameId,
     lastFrameTime,
     frameCount,
     animationSpeed,
-    fpsLimit,
-    fpsInterval,
     isInteractive,
     mouseX,
     mouseY,
-    lastMouseMoveTime,
-    mouseMoveThrottle
+    lastMouseMoveTime
 };
 
 // Export mutable buffer references

@@ -9,6 +9,7 @@ import { drawGeometricGrid, drawOrganicNoise } from './styles.js';
 import { drawFractalLines, drawParticleSwarm, drawOrganicSplatters } from './styles-advanced.js';
 import { drawGlitchMosaic, drawNeonWaves, drawPixelSort } from './styles-experimental.js';
 import { drawVoronoiCells } from './styles-more.js';
+import { drawDefaultMasterpiece } from './styles-default.js';
 
 // Animation state
 let isAnimating = false;
@@ -206,6 +207,9 @@ function animationLoop(canvas, ctx, style, settings = {}) {
     try {
         // Draw based on selected style
         switch (style) {
+            case artStyles.DEFAULT:
+                drawDefaultMasterpiece(bufferCtx, palette, true, params);
+                break;
             case artStyles.GEOMETRIC_GRID:
                 drawGeometricGrid(bufferCtx, palette, true, params);
                 break;

@@ -1,0 +1,42 @@
+Review of js/main.js - Fixes and Potential Improvements:
+
+1.  **Implement Full Gallery Item Deletion Logic:**
+    -   File: `js/main.js`
+    -   Function: `openGallery`
+    -   Current Behavior: The callback provided to `populateGallery` for deleting an item currently only logs the action to the console: `console.log(`Deleted gallery item: ${id}`);`. The item is not removed from data storage (e.g., localStorage) or the gallery UI.
+    -   Required Action: Enhance this callback to:
+        a.  Call a function to remove the item's data from persistent storage.
+        b.  Update the gallery UI to remove the deleted item's DOM element or re-render the gallery.
+    -   Relevant code snippet in `js/main.js` (within the `openGallery` function):
+        ```javascript
+        // ...
+        populateGallery(galleryContainer,
+            // On select callback
+            (item) => { /* ... */ },
+            // On delete callback
+            (id) => {
+                console.log(`Deleted gallery item: ${id}`); // <-- Needs full implementation
+                // TODO: Add logic to delete from storage and update UI
+            }
+        );
+        // ...
+        ```
+
+2.  **Improve Resize Handling Performance with Debounce:**
+    -   File: `js/main.js`
+    -   Event Listener: `window.addEventListener('resize', ...)` (near the end of the file).
+    -   Current Behavior: The `resize` event directly calls `initCanvas()` on every trigger when custom canvas dimensions are not set. Frequent calls to `initCanvas()` (which involves dimension calculations, canvas scaling, and re-rendering) can be performance-intensive during rapid window resizing.
+    -   Required Action: Wrap the `initCanvas()` call within the resize handler with the `debounce` function (already imported from `js/utils.js`). This will delay the execution of `initCanvas()` until a pause in resizing occurs, improving UI responsiveness.
+    -   Example modification:
+        ```javascript
+        // At the top of js/main.js, ensure debounce is imported:
+        // import { /* ..., */ debounce } from './utils.js';
+
+        // Modify the resize listener (near the end of the file):
+        window.addEventListener('resize', debounce(() => {
+            // Only resize if custom dimensions are not set
+            if (!canvasWidthInput.value && !canvasHeightInput.value) {
+                initCanvas();
+            }
+        }, 250)); // Debounce with a 250ms delay (adjust as needed)
+        ```

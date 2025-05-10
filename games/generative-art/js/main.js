@@ -9,6 +9,7 @@ import { artStyles, drawGeometricGrid, drawOrganicNoise } from './styles.js';
 import { drawFractalLines, drawParticleSwarm, drawOrganicSplatters } from './styles-advanced.js';
 import { drawGlitchMosaic, drawNeonWaves, drawPixelSort } from './styles-experimental.js';
 import { drawVoronoiCells, drawGeometricGridPrimitive, drawOrganicNoisePrimitive } from './styles-more.js';
+import { drawDefaultMasterpiece } from './styles-default.js';
 import {
     initAnimation,
     startAnimation,
@@ -21,7 +22,8 @@ import {
     saveToGallery,
     loadGallery,
     populateGallery,
-    exportAsPNG
+    exportAsPNG,
+    deleteFromGallery
 } from './gallery.js';
 import {
     saveToHistory,
@@ -159,6 +161,9 @@ function drawArtwork(style, showLoading = true) {
 
             // Draw based on selected style
             switch (style) {
+                case artStyles.DEFAULT:
+                    drawDefaultMasterpiece(ctx, palette, false, params);
+                    break;
                 case artStyles.GEOMETRIC_GRID:
                     drawGeometricGrid(ctx, palette, false, params);
                     break;
@@ -986,7 +991,67 @@ function openGallery() {
         },
         // On delete callback
         (id) => {
-            console.log(`Deleted gallery item: ${id}`);
+            // Remove from storage
+            deleteFromGallery(id);
+            // Re-render gallery UI
+            populateGallery(galleryContainer,
+                (item) => {
+                    if (item.settings) {
+                        if (item.settings.style) {
+                            currentArtStyle = item.settings.style;
+                            styleSelector.value = currentArtStyle;
+                            currentStyleDisplaySpan.textContent = currentArtStyle;
+                        }
+                        if (item.settings.numShapes) {
+                            numShapesInput.value = item.settings.numShapes;
+                            numShapes = +item.settings.numShapes;
+                            numShapesDisplay.textContent = item.settings.numShapes;
+                        }
+                        if (item.settings.lineWidth) {
+                            lineWidthInput.value = item.settings.lineWidth;
+                            lineWidth = +item.settings.lineWidth;
+                            lineWidthDisplay.textContent = item.settings.lineWidth;
+                        }
+                        if (item.settings.seed) {
+                            seedInput.value = item.settings.seed;
+                            currentSeedDisplay.textContent = item.settings.seed;
+                        }
+                        if (item.settings.colorTheme && colorThemeSelector) {
+                            colorThemeSelector.value = item.settings.colorTheme;
+                            colorTheme = item.settings.colorTheme;
+                            if (customColorControls) {
+                                customColorControls.style.display = colorTheme === 'custom' ? 'block' : 'none';
+                            }
+                        }
+                        if (item.settings.baseHue && baseHueInput) {
+                            baseHueInput.value = item.settings.baseHue;
+                            baseHue = +item.settings.baseHue;
+                            if (baseHueDisplay) baseHueDisplay.textContent = item.settings.baseHue;
+                        }
+                        if (item.settings.saturation && saturationInput) {
+                            saturationInput.value = item.settings.saturation;
+                            saturation = +item.settings.saturation;
+                            if (saturationDisplay) saturationDisplay.textContent = item.settings.saturation;
+                        }
+                        if (item.settings.lightness && lightnessInput) {
+                            lightnessInput.value = item.settings.lightness;
+                            lightness = +item.settings.lightness;
+                            if (lightnessDisplay) lightnessDisplay.textContent = item.settings.lightness;
+                        }
+                        if (item.settings.backgroundColor && backgroundColorPicker) {
+                            backgroundColorPicker.value = item.settings.backgroundColor;
+                            backgroundColor = item.settings.backgroundColor;
+                        }
+                        applySettingsBtn.click();
+                    }
+                    galleryModal.style.display = 'none';
+                },
+                (id) => {
+                    // Recursively handle delete
+                    deleteFromGallery(id);
+                    populateGallery(galleryContainer, arguments.callee, arguments.callee);
+                }
+            );
         }
     );
 }
@@ -1060,9 +1125,9 @@ window.addEventListener('load', () => {
 });
 
 // Handle window resize
-window.addEventListener('resize', () => {
+window.addEventListener('resize', debounce(() => {
     // Only resize if custom dimensions are not set
     if (!canvasWidthInput.value && !canvasHeightInput.value) {
         initCanvas();
     }
-});
+}, 250));

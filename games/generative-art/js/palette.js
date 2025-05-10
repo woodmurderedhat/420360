@@ -20,10 +20,10 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
     let paletteBaseHue = colorTheme === 'custom' ? baseHue : Math.random() * 360;
     let paletteSaturation = colorTheme === 'custom' ? saturation : 70 + Math.random() * 30;
     let paletteLightness = colorTheme === 'custom' ? lightness : 50 + Math.random() * 20;
-    
+
     const palette = [];
     let numColors = 5;
-    
+
     // Generate palette based on color theme
     switch (colorTheme) {
         case 'monochrome':
@@ -34,18 +34,18 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                 palette.push(hslToString(paletteBaseHue, paletteSaturation, l));
             }
             break;
-            
+
         case 'complementary':
             // Base color and its complement
             palette.push(hslToString(paletteBaseHue, paletteSaturation, paletteLightness));
             palette.push(hslToString((paletteBaseHue + 180) % 360, paletteSaturation, paletteLightness));
-            
+
             // Add variations
             palette.push(hslToString(paletteBaseHue, paletteSaturation * 0.8, paletteLightness * 1.2));
             palette.push(hslToString((paletteBaseHue + 180) % 360, paletteSaturation * 0.8, paletteLightness * 1.2));
             palette.push(hslToString(paletteBaseHue, paletteSaturation * 0.6, paletteLightness * 0.8));
             break;
-            
+
         case 'analogous':
             // Base color and analogous colors
             for (let i = 0; i < 5; i++) {
@@ -53,7 +53,7 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                 palette.push(hslToString(hue, paletteSaturation, paletteLightness));
             }
             break;
-            
+
         case 'triadic':
             // Three colors evenly spaced
             for (let i = 0; i < 3; i++) {
@@ -64,7 +64,7 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                 palette.push(hslToString(hue, paletteSaturation * 1.1, paletteLightness * 0.7));
             }
             break;
-            
+
         case 'random':
         default:
             // Style-specific palettes
@@ -78,7 +78,7 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                         palette.push(hslToString(hue, paletteSaturation, paletteLightness));
                     }
                     break;
-                    
+
                 case artStyles.ORGANIC_NOISE:
                     numColors = 7;
                     paletteSaturation = 60 + Math.random() * 25;
@@ -88,12 +88,12 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                         palette.push(hslToString(hue, paletteSaturation, paletteLightness));
                     }
                     break;
-                    
+
                 case artStyles.FRACTAL_LINES:
                     palette.push(hslToString(paletteBaseHue, 80 + Math.random() * 20, 30 + Math.random() * 20));
                     palette.push(hslToString((paletteBaseHue + 180 + (Math.random() - 0.5) * 60) % 360, 80 + Math.random() * 20, 70 + Math.random() * 20));
                     break;
-                    
+
                 case artStyles.PARTICLE_SWARM:
                     numColors = 3 + Math.floor(Math.random() * 3);
                     for (let i = 0; i < numColors; i++) {
@@ -101,7 +101,7 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                         palette.push(hslToString(hue, 90 + Math.random() * 10, 50 + Math.random() * 10));
                     }
                     break;
-                    
+
                 case artStyles.ORGANIC_SPLATTERS:
                     numColors = 4;
                     paletteSaturation = 75 + Math.random() * 25;
@@ -111,7 +111,7 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                         palette.push(hslToString(hue, paletteSaturation, paletteLightness));
                     }
                     break;
-                    
+
                 case artStyles.GLITCH_MOSAIC:
                     if (Math.random() < 0.5) {
                         numColors = 6;
@@ -126,7 +126,7 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                         palette.push(hslToString(0, 0, 80 + Math.random() * 10));
                     }
                     break;
-                    
+
                 case artStyles.NEON_WAVES:
                     // Neon colors with dark background
                     palette.push(hslToString(paletteBaseHue, 100, 60)); // Main neon color
@@ -135,7 +135,7 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                     palette.push(hslToString((paletteBaseHue + 240) % 360, 100, 60));
                     palette.push(hslToString(0, 0, 10)); // Dark background/accent
                     break;
-                    
+
                 case artStyles.PIXEL_SORT:
                     // Limited palette for pixel sorting
                     numColors = 3 + Math.floor(Math.random() * 3);
@@ -144,7 +144,7 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                         palette.push(hslToString(hue, 70 + Math.random() * 30, 40 + Math.random() * 30));
                     }
                     break;
-                    
+
                 case artStyles.VORONOI_CELLS:
                     // Soft colors for Voronoi cells
                     numColors = 5 + Math.floor(Math.random() * 3);
@@ -155,7 +155,30 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                         palette.push(hslToString(hue, paletteSaturation, paletteLightness));
                     }
                     break;
-                    
+
+                case artStyles.DEFAULT:
+                    // Rich, diverse palette for the default masterpiece style
+                    // Include a wide range of colors that work well together
+                    numColors = 8 + Math.floor(Math.random() * 4);
+
+                    // Add some vibrant colors
+                    for (let i = 0; i < numColors / 2; i++) {
+                        const hue = (paletteBaseHue + i * (360 / (numColors / 2))) % 360;
+                        palette.push(hslToString(hue, 85 + Math.random() * 15, 55 + Math.random() * 15));
+                    }
+
+                    // Add some softer, more pastel colors
+                    for (let i = 0; i < numColors / 2; i++) {
+                        const hue = (paletteBaseHue + 30 + i * (360 / (numColors / 2))) % 360;
+                        palette.push(hslToString(hue, 60 + Math.random() * 20, 75 + Math.random() * 15));
+                    }
+
+                    // Add a few neutral colors
+                    palette.push(hslToString(0, 0, 95)); // Near white
+                    palette.push(hslToString(0, 0, 20)); // Near black
+                    palette.push(hslToString(paletteBaseHue, 15, 50)); // Muted base hue
+                    break;
+
                 default:
                     for (let i = 0; i < numColors; i++) {
                         const hue = (paletteBaseHue + (i * (360 / numColors))) % 360;
@@ -163,7 +186,7 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                     }
             }
     }
-    
+
     return palette;
 }
 

@@ -42,30 +42,30 @@ import {
 // Application state
 const appState = {
     currentArtStyle: artStyles.DEFAULT,
-    numShapes: +numShapesInput.value,
-    lineWidth: +lineWidthInput.value,
+    numShapes: numShapesInput ? +numShapesInput.value : 100,
+    lineWidth: lineWidthInput ? +lineWidthInput.value : 1,
     backgroundColor: backgroundColorPicker ? backgroundColorPicker.value : '#ffffff',
     colorTheme: colorThemeSelector ? colorThemeSelector.value : 'random',
     baseHue: baseHueInput ? +baseHueInput.value : 180,
     saturation: saturationInput ? +saturationInput.value : 70,
     lightness: lightnessInput ? +lightnessInput.value : 50,
 
-    // Layer opacity settings
-    voronoiOpacity: voronoiOpacityInput ? +voronoiOpacityInput.value : 0.4,
-    organicSplattersOpacity: organicSplattersOpacityInput ? +organicSplattersOpacityInput.value : 0.3,
-    neonWavesOpacity: neonWavesOpacityInput ? +neonWavesOpacityInput.value : 0.6,
-    fractalLinesOpacity: fractalLinesOpacityInput ? +fractalLinesOpacityInput.value : 0.7,
-    geometricGridOpacity: geometricGridOpacityInput ? +geometricGridOpacityInput.value : 0.6,
-    particleSwarmOpacity: particleSwarmOpacityInput ? +particleSwarmOpacityInput.value : 0.5,
-    organicNoiseOpacity: organicNoiseOpacityInput ? +organicNoiseOpacityInput.value : 0.3,
-    glitchMosaicOpacity: glitchMosaicOpacityInput ? +glitchMosaicOpacityInput.value : 0.15,
-    pixelSortOpacity: pixelSortOpacityInput ? +pixelSortOpacityInput.value : 0.2,
+    // Layer opacity settings - default values
+    voronoiOpacity: 0.4,
+    organicSplattersOpacity: 0.3,
+    neonWavesOpacity: 0.6,
+    fractalLinesOpacity: 0.7,
+    geometricGridOpacity: 0.6,
+    particleSwarmOpacity: 0.5,
+    organicNoiseOpacity: 0.3,
+    glitchMosaicOpacity: 0.15,
+    pixelSortOpacity: 0.2,
 
-    // Layer density settings
-    voronoiDensity: voronoiDensityInput ? +voronoiDensityInput.value : 15,
-    organicSplattersDensity: organicSplattersDensityInput ? +organicSplattersDensityInput.value : 10,
-    neonWavesDensity: neonWavesDensityInput ? +neonWavesDensityInput.value : 5,
-    fractalLinesDensity: fractalLinesDensityInput ? +fractalLinesDensityInput.value : 2
+    // Layer density settings - default values
+    voronoiDensity: 15,
+    organicSplattersDensity: 10,
+    neonWavesDensity: 5,
+    fractalLinesDensity: 2
 };
 
 /**
@@ -180,36 +180,36 @@ function drawArtwork(style, showLoading = true) {
 function getCurrentAppState() {
     return {
         style: appState.currentArtStyle,
-        numShapes: +numShapesInput.value,
-        lineWidth: +lineWidthInput.value,
-        canvasWidth: canvasWidthInput.value,
-        canvasHeight: canvasHeightInput.value,
-        seed: seedInput.value,
-        colorTheme: colorThemeSelector ? colorThemeSelector.value : 'random',
-        baseHue: baseHueInput ? +baseHueInput.value : 180,
-        saturation: saturationInput ? +saturationInput.value : 70,
-        lightness: lightnessInput ? +lightnessInput.value : 50,
-        backgroundColor: backgroundColorPicker ? backgroundColorPicker.value : '#ffffff',
+        numShapes: numShapesInput ? +numShapesInput.value : appState.numShapes,
+        lineWidth: lineWidthInput ? +lineWidthInput.value : appState.lineWidth,
+        canvasWidth: canvasWidthInput ? canvasWidthInput.value : '',
+        canvasHeight: canvasHeightInput ? canvasHeightInput.value : '',
+        seed: seedInput ? seedInput.value : '',
+        colorTheme: colorThemeSelector ? colorThemeSelector.value : appState.colorTheme,
+        baseHue: baseHueInput ? +baseHueInput.value : appState.baseHue,
+        saturation: saturationInput ? +saturationInput.value : appState.saturation,
+        lightness: lightnessInput ? +lightnessInput.value : appState.lightness,
+        backgroundColor: backgroundColorPicker ? backgroundColorPicker.value : appState.backgroundColor,
         isAnimating: animationToggle ? animationToggle.checked : false,
         animationSpeed: animationSpeedInput ? +animationSpeedInput.value : 50,
         isInteractive: interactiveToggle ? interactiveToggle.checked : false,
 
-        // Layer opacity settings
-        voronoiOpacity: voronoiOpacityInput ? +voronoiOpacityInput.value : 0.4,
-        organicSplattersOpacity: organicSplattersOpacityInput ? +organicSplattersOpacityInput.value : 0.3,
-        neonWavesOpacity: neonWavesOpacityInput ? +neonWavesOpacityInput.value : 0.6,
-        fractalLinesOpacity: fractalLinesOpacityInput ? +fractalLinesOpacityInput.value : 0.7,
-        geometricGridOpacity: geometricGridOpacityInput ? +geometricGridOpacityInput.value : 0.6,
-        particleSwarmOpacity: particleSwarmOpacityInput ? +particleSwarmOpacityInput.value : 0.5,
-        organicNoiseOpacity: organicNoiseOpacityInput ? +organicNoiseOpacityInput.value : 0.3,
-        glitchMosaicOpacity: glitchMosaicOpacityInput ? +glitchMosaicOpacityInput.value : 0.15,
-        pixelSortOpacity: pixelSortOpacityInput ? +pixelSortOpacityInput.value : 0.2,
+        // Layer opacity settings - use appState values
+        voronoiOpacity: appState.voronoiOpacity,
+        organicSplattersOpacity: appState.organicSplattersOpacity,
+        neonWavesOpacity: appState.neonWavesOpacity,
+        fractalLinesOpacity: appState.fractalLinesOpacity,
+        geometricGridOpacity: appState.geometricGridOpacity,
+        particleSwarmOpacity: appState.particleSwarmOpacity,
+        organicNoiseOpacity: appState.organicNoiseOpacity,
+        glitchMosaicOpacity: appState.glitchMosaicOpacity,
+        pixelSortOpacity: appState.pixelSortOpacity,
 
-        // Layer density settings
-        voronoiDensity: voronoiDensityInput ? +voronoiDensityInput.value : 15,
-        organicSplattersDensity: organicSplattersDensityInput ? +organicSplattersDensityInput.value : 10,
-        neonWavesDensity: neonWavesDensityInput ? +neonWavesDensityInput.value : 5,
-        fractalLinesDensity: fractalLinesDensityInput ? +fractalLinesDensityInput.value : 2
+        // Layer density settings - use appState values
+        voronoiDensity: appState.voronoiDensity,
+        organicSplattersDensity: appState.organicSplattersDensity,
+        neonWavesDensity: appState.neonWavesDensity,
+        fractalLinesDensity: appState.fractalLinesDensity
     };
 }
 

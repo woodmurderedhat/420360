@@ -117,8 +117,26 @@ const settingsKey = 'generativeArtSettings';
  * @param {Function} applyAppState - Function to apply app state
  */
 function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyAppState) {
-    // The UI now focuses only on the Default art style
-    // No style selector needed
+    // Initialize layer opacity controls if they exist
+    if (document.getElementById('voronoiOpacity')) {
+        voronoiOpacityInput.value = appState.voronoiOpacity;
+        organicSplattersOpacityInput.value = appState.organicSplattersOpacity;
+        neonWavesOpacityInput.value = appState.neonWavesOpacity;
+        fractalLinesOpacityInput.value = appState.fractalLinesOpacity;
+        geometricGridOpacityInput.value = appState.geometricGridOpacity;
+        particleSwarmOpacityInput.value = appState.particleSwarmOpacity;
+        organicNoiseOpacityInput.value = appState.organicNoiseOpacity;
+        glitchMosaicOpacityInput.value = appState.glitchMosaicOpacity;
+        pixelSortOpacityInput.value = appState.pixelSortOpacity;
+    }
+
+    // Initialize layer density controls if they exist
+    if (document.getElementById('voronoiDensity')) {
+        voronoiDensityInput.value = appState.voronoiDensity;
+        organicSplattersDensityInput.value = appState.organicSplattersDensity;
+        neonWavesDensityInput.value = appState.neonWavesDensity;
+        fractalLinesDensityInput.value = appState.fractalLinesDensity;
+    }
 
     // Regenerate button
     regenerateButton.addEventListener('click', () => {
@@ -208,22 +226,26 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
         if (lightnessInput) appState.lightness = +lightnessInput.value;
         if (backgroundColorPicker) appState.backgroundColor = backgroundColorPicker.value;
 
-        // Update layer opacity settings
-        if (voronoiOpacityInput) appState.voronoiOpacity = +voronoiOpacityInput.value;
-        if (organicSplattersOpacityInput) appState.organicSplattersOpacity = +organicSplattersOpacityInput.value;
-        if (neonWavesOpacityInput) appState.neonWavesOpacity = +neonWavesOpacityInput.value;
-        if (fractalLinesOpacityInput) appState.fractalLinesOpacity = +fractalLinesOpacityInput.value;
-        if (geometricGridOpacityInput) appState.geometricGridOpacity = +geometricGridOpacityInput.value;
-        if (particleSwarmOpacityInput) appState.particleSwarmOpacity = +particleSwarmOpacityInput.value;
-        if (organicNoiseOpacityInput) appState.organicNoiseOpacity = +organicNoiseOpacityInput.value;
-        if (glitchMosaicOpacityInput) appState.glitchMosaicOpacity = +glitchMosaicOpacityInput.value;
-        if (pixelSortOpacityInput) appState.pixelSortOpacity = +pixelSortOpacityInput.value;
+        // Update layer opacity settings if the elements exist
+        if (document.getElementById('voronoiOpacity')) {
+            appState.voronoiOpacity = +voronoiOpacityInput.value;
+            appState.organicSplattersOpacity = +organicSplattersOpacityInput.value;
+            appState.neonWavesOpacity = +neonWavesOpacityInput.value;
+            appState.fractalLinesOpacity = +fractalLinesOpacityInput.value;
+            appState.geometricGridOpacity = +geometricGridOpacityInput.value;
+            appState.particleSwarmOpacity = +particleSwarmOpacityInput.value;
+            appState.organicNoiseOpacity = +organicNoiseOpacityInput.value;
+            appState.glitchMosaicOpacity = +glitchMosaicOpacityInput.value;
+            appState.pixelSortOpacity = +pixelSortOpacityInput.value;
+        }
 
-        // Update layer density settings
-        if (voronoiDensityInput) appState.voronoiDensity = +voronoiDensityInput.value;
-        if (organicSplattersDensityInput) appState.organicSplattersDensity = +organicSplattersDensityInput.value;
-        if (neonWavesDensityInput) appState.neonWavesDensity = +neonWavesDensityInput.value;
-        if (fractalLinesDensityInput) appState.fractalLinesDensity = +fractalLinesDensityInput.value;
+        // Update layer density settings if the elements exist
+        if (document.getElementById('voronoiDensity')) {
+            appState.voronoiDensity = +voronoiDensityInput.value;
+            appState.organicSplattersDensity = +organicSplattersDensityInput.value;
+            appState.neonWavesDensity = +neonWavesDensityInput.value;
+            appState.fractalLinesDensity = +fractalLinesDensityInput.value;
+        }
 
         // Update animation settings
         if (animationSpeedInput) {
@@ -928,81 +950,60 @@ function setupSliderDisplays() {
         });
     }
 
-    // Layer opacity sliders
-    if (voronoiOpacityInput && voronoiOpacityDisplay) {
+    // Layer opacity sliders - only set up if elements exist
+    if (document.getElementById('voronoiOpacity')) {
+        // Set up layer opacity sliders
         voronoiOpacityInput.addEventListener('input', () => {
             voronoiOpacityDisplay.textContent = voronoiOpacityInput.value;
         });
-    }
 
-    if (organicSplattersOpacityInput && organicSplattersOpacityDisplay) {
         organicSplattersOpacityInput.addEventListener('input', () => {
             organicSplattersOpacityDisplay.textContent = organicSplattersOpacityInput.value;
         });
-    }
 
-    if (neonWavesOpacityInput && neonWavesOpacityDisplay) {
         neonWavesOpacityInput.addEventListener('input', () => {
             neonWavesOpacityDisplay.textContent = neonWavesOpacityInput.value;
         });
-    }
 
-    if (fractalLinesOpacityInput && fractalLinesOpacityDisplay) {
         fractalLinesOpacityInput.addEventListener('input', () => {
             fractalLinesOpacityDisplay.textContent = fractalLinesOpacityInput.value;
         });
-    }
 
-    if (geometricGridOpacityInput && geometricGridOpacityDisplay) {
         geometricGridOpacityInput.addEventListener('input', () => {
             geometricGridOpacityDisplay.textContent = geometricGridOpacityInput.value;
         });
-    }
 
-    if (particleSwarmOpacityInput && particleSwarmOpacityDisplay) {
         particleSwarmOpacityInput.addEventListener('input', () => {
             particleSwarmOpacityDisplay.textContent = particleSwarmOpacityInput.value;
         });
-    }
 
-    if (organicNoiseOpacityInput && organicNoiseOpacityDisplay) {
         organicNoiseOpacityInput.addEventListener('input', () => {
             organicNoiseOpacityDisplay.textContent = organicNoiseOpacityInput.value;
         });
-    }
 
-    if (glitchMosaicOpacityInput && glitchMosaicOpacityDisplay) {
         glitchMosaicOpacityInput.addEventListener('input', () => {
             glitchMosaicOpacityDisplay.textContent = glitchMosaicOpacityInput.value;
         });
-    }
 
-    if (pixelSortOpacityInput && pixelSortOpacityDisplay) {
         pixelSortOpacityInput.addEventListener('input', () => {
             pixelSortOpacityDisplay.textContent = pixelSortOpacityInput.value;
         });
     }
 
-    // Layer density sliders
-    if (voronoiDensityInput && voronoiDensityDisplay) {
+    // Layer density sliders - only set up if elements exist
+    if (document.getElementById('voronoiDensity')) {
         voronoiDensityInput.addEventListener('input', () => {
             voronoiDensityDisplay.textContent = voronoiDensityInput.value;
         });
-    }
 
-    if (organicSplattersDensityInput && organicSplattersDensityDisplay) {
         organicSplattersDensityInput.addEventListener('input', () => {
             organicSplattersDensityDisplay.textContent = organicSplattersDensityInput.value;
         });
-    }
 
-    if (neonWavesDensityInput && neonWavesDensityDisplay) {
         neonWavesDensityInput.addEventListener('input', () => {
             neonWavesDensityDisplay.textContent = neonWavesDensityInput.value;
         });
-    }
 
-    if (fractalLinesDensityInput && fractalLinesDensityDisplay) {
         fractalLinesDensityInput.addEventListener('input', () => {
             fractalLinesDensityDisplay.textContent = fractalLinesDensityInput.value;
         });

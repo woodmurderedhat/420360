@@ -31,8 +31,7 @@ const ctx = canvas.getContext('2d', { alpha: false }); // Disable alpha for bett
 const regenerateButton = document.getElementById('regenerateButton');
 const exportButton = document.getElementById('exportButton');
 const galleryButton = document.getElementById('galleryButton');
-const styleSelector = document.getElementById('styleSelector');
-const currentStyleDisplaySpan = document.querySelector('#currentStyleDisplay span');
+const saveToGalleryButton = document.getElementById('saveToGalleryButton');
 
 // Control panel elements
 const numShapesInput = document.getElementById('numShapes');
@@ -45,18 +44,36 @@ const randomSeedButton = document.getElementById('randomSeedButton');
 const togglePanelButton = document.getElementById('togglePanelButton');
 const controlsPanel = document.getElementById('controlsPanel');
 const currentSeedDisplay = document.querySelector('#currentSeedDisplay span');
-const saveToGalleryButton = document.getElementById('saveToGalleryButton');
 
-// New UI elements
+// Color UI elements
 const colorThemeSelector = document.getElementById('colorThemeSelector');
 const customColorControls = document.getElementById('customColorControls');
 const baseHueInput = document.getElementById('baseHue');
 const saturationInput = document.getElementById('saturation');
 const lightnessInput = document.getElementById('lightness');
 const backgroundColorPicker = document.getElementById('backgroundColorPicker');
+
+// Animation UI elements
 const animationToggle = document.getElementById('animationToggle');
 const animationSpeedInput = document.getElementById('animationSpeed');
 const interactiveToggle = document.getElementById('interactiveToggle');
+
+// Layer opacity controls
+const voronoiOpacityInput = document.getElementById('voronoiOpacity');
+const organicSplattersOpacityInput = document.getElementById('organicSplattersOpacity');
+const neonWavesOpacityInput = document.getElementById('neonWavesOpacity');
+const fractalLinesOpacityInput = document.getElementById('fractalLinesOpacity');
+const geometricGridOpacityInput = document.getElementById('geometricGridOpacity');
+const particleSwarmOpacityInput = document.getElementById('particleSwarmOpacity');
+const organicNoiseOpacityInput = document.getElementById('organicNoiseOpacity');
+const glitchMosaicOpacityInput = document.getElementById('glitchMosaicOpacity');
+const pixelSortOpacityInput = document.getElementById('pixelSortOpacity');
+
+// Layer density controls
+const voronoiDensityInput = document.getElementById('voronoiDensity');
+const organicSplattersDensityInput = document.getElementById('organicSplattersDensity');
+const neonWavesDensityInput = document.getElementById('neonWavesDensity');
+const fractalLinesDensityInput = document.getElementById('fractalLinesDensity');
 
 // Gallery modal elements
 const galleryModal = document.getElementById('galleryModal');
@@ -71,11 +88,28 @@ const saturationDisplay = document.getElementById('saturationValue');
 const lightnessDisplay = document.getElementById('lightnessValue');
 const animationSpeedDisplay = document.getElementById('animationSpeedValue');
 
+// Display elements for layer opacity values
+const voronoiOpacityDisplay = document.getElementById('voronoiOpacityValue');
+const organicSplattersOpacityDisplay = document.getElementById('organicSplattersOpacityValue');
+const neonWavesOpacityDisplay = document.getElementById('neonWavesOpacityValue');
+const fractalLinesOpacityDisplay = document.getElementById('fractalLinesOpacityValue');
+const geometricGridOpacityDisplay = document.getElementById('geometricGridOpacityValue');
+const particleSwarmOpacityDisplay = document.getElementById('particleSwarmOpacityValue');
+const organicNoiseOpacityDisplay = document.getElementById('organicNoiseOpacityValue');
+const glitchMosaicOpacityDisplay = document.getElementById('glitchMosaicOpacityValue');
+const pixelSortOpacityDisplay = document.getElementById('pixelSortOpacityValue');
+
+// Display elements for layer density values
+const voronoiDensityDisplay = document.getElementById('voronoiDensityValue');
+const organicSplattersDensityDisplay = document.getElementById('organicSplattersDensityValue');
+const neonWavesDensityDisplay = document.getElementById('neonWavesDensityValue');
+const fractalLinesDensityDisplay = document.getElementById('fractalLinesDensityValue');
+
 // Local storage key for settings
 const settingsKey = 'generativeArtSettings';
 
 /**
- * Set up the UI controls, including style selector and event listeners.
+ * Set up the UI controls and event listeners.
  * @param {Object} appState - The application state
  * @param {Function} drawArtwork - Function to draw artwork
  * @param {Function} initCanvas - Function to initialize canvas
@@ -83,31 +117,8 @@ const settingsKey = 'generativeArtSettings';
  * @param {Function} applyAppState - Function to apply app state
  */
 function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyAppState) {
-    // Populate style selector
-    Object.values(artStyles).forEach(styleName => {
-        const option = document.createElement('option');
-        option.value = styleName;
-        option.textContent = styleName;
-        if (styleName === appState.currentArtStyle) {
-            option.selected = true;
-        }
-        styleSelector.appendChild(option);
-    });
-    currentStyleDisplaySpan.textContent = appState.currentArtStyle;
-
-    // Style selector change event
-    styleSelector.addEventListener('change', (event) => {
-        appState.currentArtStyle = event.target.value;
-        currentStyleDisplaySpan.textContent = appState.currentArtStyle;
-
-        // Stop animation if running
-        if (animationToggle && animationToggle.checked) {
-            stopAnimation();
-            animationToggle.checked = false;
-        }
-
-        drawArtwork(appState.currentArtStyle);
-    });
+    // The UI now focuses only on the Default art style
+    // No style selector needed
 
     // Regenerate button
     regenerateButton.addEventListener('click', () => {
@@ -179,7 +190,7 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
         // Reset transforms
         ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-        // Update settings
+        // Update basic settings
         appState.numShapes = +numShapesInput.value;
         appState.lineWidth = +lineWidthInput.value;
 
@@ -196,6 +207,23 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
         if (saturationInput) appState.saturation = +saturationInput.value;
         if (lightnessInput) appState.lightness = +lightnessInput.value;
         if (backgroundColorPicker) appState.backgroundColor = backgroundColorPicker.value;
+
+        // Update layer opacity settings
+        if (voronoiOpacityInput) appState.voronoiOpacity = +voronoiOpacityInput.value;
+        if (organicSplattersOpacityInput) appState.organicSplattersOpacity = +organicSplattersOpacityInput.value;
+        if (neonWavesOpacityInput) appState.neonWavesOpacity = +neonWavesOpacityInput.value;
+        if (fractalLinesOpacityInput) appState.fractalLinesOpacity = +fractalLinesOpacityInput.value;
+        if (geometricGridOpacityInput) appState.geometricGridOpacity = +geometricGridOpacityInput.value;
+        if (particleSwarmOpacityInput) appState.particleSwarmOpacity = +particleSwarmOpacityInput.value;
+        if (organicNoiseOpacityInput) appState.organicNoiseOpacity = +organicNoiseOpacityInput.value;
+        if (glitchMosaicOpacityInput) appState.glitchMosaicOpacity = +glitchMosaicOpacityInput.value;
+        if (pixelSortOpacityInput) appState.pixelSortOpacity = +pixelSortOpacityInput.value;
+
+        // Update layer density settings
+        if (voronoiDensityInput) appState.voronoiDensity = +voronoiDensityInput.value;
+        if (organicSplattersDensityInput) appState.organicSplattersDensity = +organicSplattersDensityInput.value;
+        if (neonWavesDensityInput) appState.neonWavesDensity = +neonWavesDensityInput.value;
+        if (fractalLinesDensityInput) appState.fractalLinesDensity = +fractalLinesDensityInput.value;
 
         // Update animation settings
         if (animationSpeedInput) {
@@ -225,12 +253,12 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
         // Save state to history
         saveToHistory(getCurrentAppState());
 
-        // Redraw artwork
-        drawArtwork(appState.currentArtStyle);
+        // Redraw artwork with the Default art style
+        drawArtwork('Default');
 
         // Start animation if enabled
         if (animationToggle && animationToggle.checked) {
-            startAnimation(canvas, ctx, appState.currentArtStyle, {
+            startAnimation(canvas, ctx, 'Default', {
                 animationSpeed: +animationSpeedInput.value,
                 isInteractive: interactiveToggle ? interactiveToggle.checked : false,
                 backgroundColor: appState.backgroundColor,
@@ -239,7 +267,22 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
                 saturation: appState.saturation,
                 lightness: appState.lightness,
                 lineWidth: appState.lineWidth,
-                numShapes: appState.numShapes
+                numShapes: appState.numShapes,
+                // Layer opacity settings
+                voronoiOpacity: appState.voronoiOpacity,
+                organicSplattersOpacity: appState.organicSplattersOpacity,
+                neonWavesOpacity: appState.neonWavesOpacity,
+                fractalLinesOpacity: appState.fractalLinesOpacity,
+                geometricGridOpacity: appState.geometricGridOpacity,
+                particleSwarmOpacity: appState.particleSwarmOpacity,
+                organicNoiseOpacity: appState.organicNoiseOpacity,
+                glitchMosaicOpacity: appState.glitchMosaicOpacity,
+                pixelSortOpacity: appState.pixelSortOpacity,
+                // Layer density settings
+                voronoiDensity: appState.voronoiDensity,
+                organicSplattersDensity: appState.organicSplattersDensity,
+                neonWavesDensity: appState.neonWavesDensity,
+                fractalLinesDensity: appState.fractalLinesDensity
             });
         }
     });
@@ -257,10 +300,8 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
             canvasHeightInput.value = '';
             seedInput.value = '';
 
-            // Reset style selection
-            appState.currentArtStyle = artStyles.GEOMETRIC_GRID;
-            styleSelector.value = appState.currentArtStyle;
-            currentStyleDisplaySpan.textContent = appState.currentArtStyle;
+            // Set to Default art style
+            appState.currentArtStyle = artStyles.DEFAULT;
 
             // Reset color settings
             if (colorThemeSelector) colorThemeSelector.value = 'random';
@@ -304,9 +345,7 @@ function openGallery(appState, applySettingsBtn, applyAppState) {
             // Load settings from gallery item
             if (item.settings) {
                 if (item.settings.style) {
-                    appState.currentArtStyle = item.settings.style;
-                    styleSelector.value = appState.currentArtStyle;
-                    currentStyleDisplaySpan.textContent = appState.currentArtStyle;
+                    appState.currentArtStyle = artStyles.DEFAULT;
                 }
 
                 if (item.settings.numShapes) {
@@ -376,9 +415,7 @@ function openGallery(appState, applySettingsBtn, applyAppState) {
                     // Load settings from gallery item
                     if (item.settings) {
                         if (item.settings.style) {
-                            appState.currentArtStyle = item.settings.style;
-                            styleSelector.value = appState.currentArtStyle;
-                            currentStyleDisplaySpan.textContent = appState.currentArtStyle;
+                            appState.currentArtStyle = artStyles.DEFAULT;
                         }
 
                         if (item.settings.numShapes) {
@@ -553,9 +590,7 @@ function loadSettings(appState) {
 
             // Load style
             if (s.style && Object.values(artStyles).includes(s.style)) {
-                appState.currentArtStyle = s.style;
-                styleSelector.value = appState.currentArtStyle;
-                currentStyleDisplaySpan.textContent = appState.currentArtStyle;
+                appState.currentArtStyle = artStyles.DEFAULT;
             }
 
             // Load color settings
@@ -746,16 +781,13 @@ function setupKeyboardShortcuts(appState, drawArtwork, regenerateButton, exportB
             }
         }
 
-        // Style selection (1-9)
-        const styleKeys = Object.values(artStyles);
-        if (event.key >= '1' && event.key <= String(styleKeys.length)) {
-            const styleIndex = parseInt(event.key) - 1;
-            if (styleKeys[styleIndex]) {
-                appState.currentArtStyle = styleKeys[styleIndex];
-                styleSelector.value = appState.currentArtStyle;
-                currentStyleDisplaySpan.textContent = appState.currentArtStyle;
-                drawArtwork(appState.currentArtStyle);
-            }
+        // Number keys 1-9 will regenerate the artwork
+        if (event.key >= '1' && event.key <= '9') {
+            // Always use Default art style
+            appState.currentArtStyle = artStyles.DEFAULT;
+            // Regenerate with new seed
+            setSeed(null);
+            drawArtwork(appState.currentArtStyle);
         }
     });
 }
@@ -868,6 +900,7 @@ function setupAnimationControls(appState, drawArtwork) {
  * Set up slider value displays
  */
 function setupSliderDisplays() {
+    // Basic sliders
     numShapesInput.addEventListener('input', () => {
         numShapesDisplay.textContent = numShapesInput.value;
     });
@@ -876,6 +909,7 @@ function setupSliderDisplays() {
         lineWidthDisplay.textContent = lineWidthInput.value;
     });
 
+    // Color sliders
     if (baseHueInput && baseHueDisplay) {
         baseHueInput.addEventListener('input', () => {
             baseHueDisplay.textContent = baseHueInput.value;
@@ -891,6 +925,86 @@ function setupSliderDisplays() {
     if (lightnessInput && lightnessDisplay) {
         lightnessInput.addEventListener('input', () => {
             lightnessDisplay.textContent = lightnessInput.value;
+        });
+    }
+
+    // Layer opacity sliders
+    if (voronoiOpacityInput && voronoiOpacityDisplay) {
+        voronoiOpacityInput.addEventListener('input', () => {
+            voronoiOpacityDisplay.textContent = voronoiOpacityInput.value;
+        });
+    }
+
+    if (organicSplattersOpacityInput && organicSplattersOpacityDisplay) {
+        organicSplattersOpacityInput.addEventListener('input', () => {
+            organicSplattersOpacityDisplay.textContent = organicSplattersOpacityInput.value;
+        });
+    }
+
+    if (neonWavesOpacityInput && neonWavesOpacityDisplay) {
+        neonWavesOpacityInput.addEventListener('input', () => {
+            neonWavesOpacityDisplay.textContent = neonWavesOpacityInput.value;
+        });
+    }
+
+    if (fractalLinesOpacityInput && fractalLinesOpacityDisplay) {
+        fractalLinesOpacityInput.addEventListener('input', () => {
+            fractalLinesOpacityDisplay.textContent = fractalLinesOpacityInput.value;
+        });
+    }
+
+    if (geometricGridOpacityInput && geometricGridOpacityDisplay) {
+        geometricGridOpacityInput.addEventListener('input', () => {
+            geometricGridOpacityDisplay.textContent = geometricGridOpacityInput.value;
+        });
+    }
+
+    if (particleSwarmOpacityInput && particleSwarmOpacityDisplay) {
+        particleSwarmOpacityInput.addEventListener('input', () => {
+            particleSwarmOpacityDisplay.textContent = particleSwarmOpacityInput.value;
+        });
+    }
+
+    if (organicNoiseOpacityInput && organicNoiseOpacityDisplay) {
+        organicNoiseOpacityInput.addEventListener('input', () => {
+            organicNoiseOpacityDisplay.textContent = organicNoiseOpacityInput.value;
+        });
+    }
+
+    if (glitchMosaicOpacityInput && glitchMosaicOpacityDisplay) {
+        glitchMosaicOpacityInput.addEventListener('input', () => {
+            glitchMosaicOpacityDisplay.textContent = glitchMosaicOpacityInput.value;
+        });
+    }
+
+    if (pixelSortOpacityInput && pixelSortOpacityDisplay) {
+        pixelSortOpacityInput.addEventListener('input', () => {
+            pixelSortOpacityDisplay.textContent = pixelSortOpacityInput.value;
+        });
+    }
+
+    // Layer density sliders
+    if (voronoiDensityInput && voronoiDensityDisplay) {
+        voronoiDensityInput.addEventListener('input', () => {
+            voronoiDensityDisplay.textContent = voronoiDensityInput.value;
+        });
+    }
+
+    if (organicSplattersDensityInput && organicSplattersDensityDisplay) {
+        organicSplattersDensityInput.addEventListener('input', () => {
+            organicSplattersDensityDisplay.textContent = organicSplattersDensityInput.value;
+        });
+    }
+
+    if (neonWavesDensityInput && neonWavesDensityDisplay) {
+        neonWavesDensityInput.addEventListener('input', () => {
+            neonWavesDensityDisplay.textContent = neonWavesDensityInput.value;
+        });
+    }
+
+    if (fractalLinesDensityInput && fractalLinesDensityDisplay) {
+        fractalLinesDensityInput.addEventListener('input', () => {
+            fractalLinesDensityDisplay.textContent = fractalLinesDensityInput.value;
         });
     }
 }
@@ -993,6 +1107,22 @@ export {
     animationToggle,
     animationSpeedInput,
     interactiveToggle,
+    // Layer opacity controls
+    voronoiOpacityInput,
+    organicSplattersOpacityInput,
+    neonWavesOpacityInput,
+    fractalLinesOpacityInput,
+    geometricGridOpacityInput,
+    particleSwarmOpacityInput,
+    organicNoiseOpacityInput,
+    glitchMosaicOpacityInput,
+    pixelSortOpacityInput,
+    // Layer density controls
+    voronoiDensityInput,
+    organicSplattersDensityInput,
+    neonWavesDensityInput,
+    fractalLinesDensityInput,
+    // Display elements
     numShapesDisplay,
     lineWidthDisplay,
     baseHueDisplay,
@@ -1000,8 +1130,6 @@ export {
     lightnessDisplay,
     animationSpeedDisplay,
     currentSeedDisplay,
-    currentStyleDisplaySpan,
-    styleSelector,
     settingsKey,
     setupUI,
     openGallery,

@@ -13,40 +13,91 @@ import { randomRange, randomInt } from './utils.js';
  * @param {Object} params - Additional parameters (canvas dimensions, etc.)
  */
 function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params = {}) {
-    const { width, height, frameCount = 0, mouseX = 0, mouseY = 0, isInteractive = false } = params;
+    const {
+        width,
+        height,
+        frameCount = 0,
+        mouseX = 0,
+        mouseY = 0,
+        isInteractive = false,
+        backgroundColor = 'rgb(10, 10, 15)',
+        colorTheme = 'random',
+        baseHue = 180,
+        saturation = 70,
+        lightness = 50,
+        // Layer opacity settings
+        voronoiOpacity = 0.4,
+        organicSplattersOpacity = 0.3,
+        neonWavesOpacity = 0.6,
+        fractalLinesOpacity = 0.7,
+        geometricGridOpacity = 0.6,
+        particleSwarmOpacity = 0.5,
+        organicNoiseOpacity = 0.3,
+        glitchMosaicOpacity = 0.15,
+        pixelSortOpacity = 0.2,
+        // Layer density settings
+        voronoiDensity = 15,
+        organicSplattersDensity = 10,
+        neonWavesDensity = 5,
+        fractalLinesDensity = 2
+    } = params;
 
-    // Create a layered composition by applying multiple styles with reduced opacity
+    // Create a layered composition by applying multiple styles with opacity from UI settings
 
-    // 1. Start with a dark background for contrast
-    ctx.fillStyle = 'rgb(10, 10, 15)';
+    // 1. Use background color from UI settings if available, otherwise use dark background for contrast
+    ctx.fillStyle = backgroundColor !== '#ffffff' ? backgroundColor : 'rgb(10, 10, 15)';
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Add Voronoi Cells as a base layer (reduced number and opacity)
-    drawVoronoiCellsLayer(ctx, palette, isAnimationFrame, params, 0.4);
+    // Only draw layers with opacity > 0
 
-    // 3. Add Organic Splatters for color blobs (reduced number and opacity)
-    drawOrganicSplattersLayer(ctx, palette, isAnimationFrame, params, 0.3);
+    // 2. Add Voronoi Cells as a base layer
+    if (voronoiOpacity > 0) {
+        const voronoiParams = { ...params, layerDensity: voronoiDensity };
+        drawVoronoiCellsLayer(ctx, palette, isAnimationFrame, voronoiParams, voronoiOpacity);
+    }
 
-    // 4. Add Neon Waves for glowing elements (reduced number)
-    drawNeonWavesLayer(ctx, palette, isAnimationFrame, params, 0.6);
+    // 3. Add Organic Splatters for color blobs
+    if (organicSplattersOpacity > 0) {
+        const splattersParams = { ...params, layerDensity: organicSplattersDensity };
+        drawOrganicSplattersLayer(ctx, palette, isAnimationFrame, splattersParams, organicSplattersOpacity);
+    }
 
-    // 5. Add Fractal Lines for structure (reduced number)
-    drawFractalLinesLayer(ctx, palette, isAnimationFrame, params, 0.7);
+    // 4. Add Neon Waves for glowing elements
+    if (neonWavesOpacity > 0) {
+        const neonParams = { ...params, layerDensity: neonWavesDensity };
+        drawNeonWavesLayer(ctx, palette, isAnimationFrame, neonParams, neonWavesOpacity);
+    }
 
-    // 6. Add Geometric Grid elements for balance (reduced number)
-    drawGeometricGridLayer(ctx, palette, isAnimationFrame, params, 0.6);
+    // 5. Add Fractal Lines for structure
+    if (fractalLinesOpacity > 0) {
+        const fractalParams = { ...params, layerDensity: fractalLinesDensity };
+        drawFractalLinesLayer(ctx, palette, isAnimationFrame, fractalParams, fractalLinesOpacity);
+    }
 
-    // 7. Add Particle Swarm for movement (reduced number)
-    drawParticleSwarmLayer(ctx, palette, isAnimationFrame, params, 0.5);
+    // 6. Add Geometric Grid elements for balance
+    if (geometricGridOpacity > 0) {
+        drawGeometricGridLayer(ctx, palette, isAnimationFrame, params, geometricGridOpacity);
+    }
+
+    // 7. Add Particle Swarm for movement
+    if (particleSwarmOpacity > 0) {
+        drawParticleSwarmLayer(ctx, palette, isAnimationFrame, params, particleSwarmOpacity);
+    }
 
     // 8. Add subtle Organic Noise for texture
-    drawOrganicNoiseLayer(ctx, palette, isAnimationFrame, params, 0.3);
+    if (organicNoiseOpacity > 0) {
+        drawOrganicNoiseLayer(ctx, palette, isAnimationFrame, params, organicNoiseOpacity);
+    }
 
-    // 9. Add Glitch Mosaic effects for contemporary feel (very subtle)
-    drawGlitchMosaicLayer(ctx, palette, isAnimationFrame, params, 0.15);
+    // 9. Add Glitch Mosaic effects for contemporary feel
+    if (glitchMosaicOpacity > 0) {
+        drawGlitchMosaicLayer(ctx, palette, isAnimationFrame, params, glitchMosaicOpacity);
+    }
 
-    // 10. Add Pixel Sort effects for digital aesthetic (very subtle)
-    drawPixelSortLayer(ctx, palette, isAnimationFrame, params, 0.2);
+    // 10. Add Pixel Sort effects for digital aesthetic
+    if (pixelSortOpacity > 0) {
+        drawPixelSortLayer(ctx, palette, isAnimationFrame, params, pixelSortOpacity);
+    }
 
     // Reset composite operation and global alpha
     ctx.globalCompositeOperation = 'source-over';
@@ -57,12 +108,12 @@ function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params =
  * Draw a reduced Voronoi Cells layer
  */
 function drawVoronoiCellsLayer(ctx, palette, isAnimationFrame, params, opacity = 1.0) {
-    const { width, height, frameCount = 0, mouseX = 0, mouseY = 0, isInteractive = false } = params;
+    const { width, height, frameCount = 0, mouseX = 0, mouseY = 0, isInteractive = false, layerDensity = 15 } = params;
 
     ctx.globalAlpha = opacity;
 
-    // Reduced number of cells
-    const numCells = 10 + Math.floor(Math.random() * 15);
+    // Use layer density from UI settings
+    const numCells = layerDensity;
 
     // Generate cell centers
     const cellCenters = [];
@@ -125,12 +176,12 @@ function drawVoronoiCellsLayer(ctx, palette, isAnimationFrame, params, opacity =
  * Draw a reduced Organic Splatters layer
  */
 function drawOrganicSplattersLayer(ctx, palette, isAnimationFrame, params, opacity = 1.0) {
-    const { width, height, frameCount = 0, mouseX = 0, mouseY = 0, isInteractive = false } = params;
+    const { width, height, frameCount = 0, mouseX = 0, mouseY = 0, isInteractive = false, layerDensity = 10 } = params;
 
     ctx.globalAlpha = opacity;
 
-    // Reduced number of splatters
-    const numSplatters = 5 + Math.floor(Math.random() * 10);
+    // Use layer density from UI settings
+    const numSplatters = layerDensity;
 
     for (let i = 0; i < numSplatters; i++) {
         let x = Math.random() * width;
@@ -172,12 +223,12 @@ function drawOrganicSplattersLayer(ctx, palette, isAnimationFrame, params, opaci
  * Draw a reduced Neon Waves layer
  */
 function drawNeonWavesLayer(ctx, palette, isAnimationFrame, params, opacity = 1.0) {
-    const { width, height, frameCount = 0, mouseX = 0, mouseY = 0, isInteractive = false } = params;
+    const { width, height, frameCount = 0, mouseX = 0, mouseY = 0, isInteractive = false, layerDensity = 5 } = params;
 
     ctx.globalAlpha = opacity;
 
-    // Reduced number of waves
-    const numWaves = 3 + Math.floor(Math.random() * 5);
+    // Use layer density from UI settings
+    const numWaves = layerDensity;
 
     for (let i = 0; i < numWaves; i++) {
         const color = palette[Math.floor(Math.random() * palette.length)];
@@ -243,13 +294,13 @@ function drawNeonWavesLayer(ctx, palette, isAnimationFrame, params, opacity = 1.
  * Draw a reduced Fractal Lines layer
  */
 function drawFractalLinesLayer(ctx, palette, isAnimationFrame, params, opacity = 1.0) {
-    const { width, height, frameCount = 0, mouseX = 0, mouseY = 0, isInteractive = false } = params;
+    const { width, height, frameCount = 0, mouseX = 0, mouseY = 0, isInteractive = false, layerDensity = 2 } = params;
 
     ctx.globalAlpha = opacity;
     ctx.lineWidth = 0.5 + Math.random() * 1.5;
 
-    // Reduced number of base lines
-    const numBaseLines = 1 + Math.floor(Math.random() * 2);
+    // Use layer density from UI settings
+    const numBaseLines = layerDensity;
     const maxDepth = 3 + Math.floor(Math.random() * 2);
 
     for (let i = 0; i < numBaseLines; i++) {

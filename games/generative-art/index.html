@@ -32,17 +32,9 @@
     <div id="controlsPanel">
         <button id="togglePanelButton" title="Toggle settings panel">Hide Settings</button>
 
-        <!-- Style Selection -->
+        <!-- Basic Controls -->
         <div class="control-section">
-            <h3>Style</h3>
-            <label for="styleSelector">Art Style:</label>
-            <select id="styleSelector"></select>
-            <div id="currentStyleDisplay">Current Style: <span></span></div>
-        </div>
-
-        <!-- Shape Controls -->
-        <div class="control-section">
-            <h3>Shape Controls</h3>
+            <h3>Basic Controls</h3>
             <label for="numShapes">Number of Shapes:</label>
             <input type="range" id="numShapes" min="10" max="1000" step="10" value="100">
             <span id="numShapesValue" class="slider-value">100</span>
@@ -50,6 +42,9 @@
             <label for="lineWidth">Line Width:</label>
             <input type="range" id="lineWidth" min="0.5" max="10" step="0.1" value="1">
             <span id="lineWidthValue" class="slider-value">1</span>
+
+            <label for="backgroundColorPicker">Background Color:</label>
+            <input type="color" id="backgroundColorPicker" value="#ffffff">
         </div>
 
         <!-- Color Controls -->
@@ -78,9 +73,68 @@
                 <input type="range" id="lightness" min="0" max="100" step="1" value="50">
                 <span id="lightnessValue" class="slider-value">50</span>
             </div>
+        </div>
 
-            <label for="backgroundColorPicker">Background Color:</label>
-            <input type="color" id="backgroundColorPicker" value="#ffffff">
+        <!-- Layer Controls -->
+        <div class="control-section">
+            <h3>Layer Controls</h3>
+            <div class="layer-controls">
+                <label for="voronoiOpacity">Voronoi Cells:</label>
+                <input type="range" id="voronoiOpacity" min="0" max="1" step="0.05" value="0.4">
+                <span id="voronoiOpacityValue" class="slider-value">0.4</span>
+
+                <label for="organicSplattersOpacity">Organic Splatters:</label>
+                <input type="range" id="organicSplattersOpacity" min="0" max="1" step="0.05" value="0.3">
+                <span id="organicSplattersOpacityValue" class="slider-value">0.3</span>
+
+                <label for="neonWavesOpacity">Neon Waves:</label>
+                <input type="range" id="neonWavesOpacity" min="0" max="1" step="0.05" value="0.6">
+                <span id="neonWavesOpacityValue" class="slider-value">0.6</span>
+
+                <label for="fractalLinesOpacity">Fractal Lines:</label>
+                <input type="range" id="fractalLinesOpacity" min="0" max="1" step="0.05" value="0.7">
+                <span id="fractalLinesOpacityValue" class="slider-value">0.7</span>
+
+                <label for="geometricGridOpacity">Geometric Grid:</label>
+                <input type="range" id="geometricGridOpacity" min="0" max="1" step="0.05" value="0.6">
+                <span id="geometricGridOpacityValue" class="slider-value">0.6</span>
+
+                <label for="particleSwarmOpacity">Particle Swarm:</label>
+                <input type="range" id="particleSwarmOpacity" min="0" max="1" step="0.05" value="0.5">
+                <span id="particleSwarmOpacityValue" class="slider-value">0.5</span>
+
+                <label for="organicNoiseOpacity">Organic Noise:</label>
+                <input type="range" id="organicNoiseOpacity" min="0" max="1" step="0.05" value="0.3">
+                <span id="organicNoiseOpacityValue" class="slider-value">0.3</span>
+
+                <label for="glitchMosaicOpacity">Glitch Mosaic:</label>
+                <input type="range" id="glitchMosaicOpacity" min="0" max="1" step="0.05" value="0.15">
+                <span id="glitchMosaicOpacityValue" class="slider-value">0.15</span>
+
+                <label for="pixelSortOpacity">Pixel Sort:</label>
+                <input type="range" id="pixelSortOpacity" min="0" max="1" step="0.05" value="0.2">
+                <span id="pixelSortOpacityValue" class="slider-value">0.2</span>
+            </div>
+        </div>
+
+        <!-- Layer Density Controls -->
+        <div class="control-section">
+            <h3>Layer Density</h3>
+            <label for="voronoiDensity">Voronoi Cells Density:</label>
+            <input type="range" id="voronoiDensity" min="5" max="50" step="1" value="15">
+            <span id="voronoiDensityValue" class="slider-value">15</span>
+
+            <label for="organicSplattersDensity">Organic Splatters Density:</label>
+            <input type="range" id="organicSplattersDensity" min="3" max="30" step="1" value="10">
+            <span id="organicSplattersDensityValue" class="slider-value">10</span>
+
+            <label for="neonWavesDensity">Neon Waves Count:</label>
+            <input type="range" id="neonWavesDensity" min="1" max="15" step="1" value="5">
+            <span id="neonWavesDensityValue" class="slider-value">5</span>
+
+            <label for="fractalLinesDensity">Fractal Lines Count:</label>
+            <input type="range" id="fractalLinesDensity" min="1" max="10" step="1" value="2">
+            <span id="fractalLinesDensityValue" class="slider-value">2</span>
         </div>
 
         <!-- Animation Controls -->

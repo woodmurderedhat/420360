@@ -46,7 +46,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 260px; /* Add fixed width for layout */
+    width: 300px; /* Increased width for more controls */
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 #controlsPanel label {
@@ -184,6 +186,29 @@ body {
     font-size: 14px;
     margin: 0 0 8px 0;
     color: var(--panel-text);
+}
+
+/* Layer Controls */
+.layer-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.layer-controls label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.layer-controls input[type="range"] {
+    width: 70%;
+}
+
+.layer-controls .slider-value {
+    width: 30px;
+    text-align: right;
 }
 
 .toggle-control {

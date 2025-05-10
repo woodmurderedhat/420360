@@ -5,10 +5,6 @@
 
 import { generatePalette } from './palette.js';
 import { artStyles } from './styles.js';
-import { drawGeometricGrid, drawOrganicNoise } from './styles.js';
-import { drawFractalLines, drawParticleSwarm, drawOrganicSplatters } from './styles-advanced.js';
-import { drawGlitchMosaic, drawNeonWaves, drawPixelSort } from './styles-experimental.js';
-import { drawVoronoiCells } from './styles-more.js';
 import { drawDefaultMasterpiece } from './styles-default.js';
 
 // Animation state
@@ -201,43 +197,34 @@ function animationLoop(canvas, ctx, style, settings = {}) {
         mouseY,
         isInteractive,
         lineWidth: settings.lineWidth || 1,
-        numShapes: settings.numShapes || 100
+        numShapes: settings.numShapes || 100,
+        backgroundColor: settings.backgroundColor || '#ffffff',
+        colorTheme: settings.colorTheme || 'random',
+        baseHue: settings.baseHue || 180,
+        saturation: settings.saturation || 70,
+        lightness: settings.lightness || 50,
+
+        // Layer opacity settings
+        voronoiOpacity: settings.voronoiOpacity || 0.4,
+        organicSplattersOpacity: settings.organicSplattersOpacity || 0.3,
+        neonWavesOpacity: settings.neonWavesOpacity || 0.6,
+        fractalLinesOpacity: settings.fractalLinesOpacity || 0.7,
+        geometricGridOpacity: settings.geometricGridOpacity || 0.6,
+        particleSwarmOpacity: settings.particleSwarmOpacity || 0.5,
+        organicNoiseOpacity: settings.organicNoiseOpacity || 0.3,
+        glitchMosaicOpacity: settings.glitchMosaicOpacity || 0.15,
+        pixelSortOpacity: settings.pixelSortOpacity || 0.2,
+
+        // Layer density settings
+        voronoiDensity: settings.voronoiDensity || 15,
+        organicSplattersDensity: settings.organicSplattersDensity || 10,
+        neonWavesDensity: settings.neonWavesDensity || 5,
+        fractalLinesDensity: settings.fractalLinesDensity || 2
     };
 
     try {
-        // Draw based on selected style
-        switch (style) {
-            case artStyles.DEFAULT:
-                drawDefaultMasterpiece(bufferCtx, palette, true, params);
-                break;
-            case artStyles.GEOMETRIC_GRID:
-                drawGeometricGrid(bufferCtx, palette, true, params);
-                break;
-            case artStyles.ORGANIC_NOISE:
-                drawOrganicNoise(bufferCtx, palette, true, params);
-                break;
-            case artStyles.FRACTAL_LINES:
-                drawFractalLines(bufferCtx, palette, true, params);
-                break;
-            case artStyles.PARTICLE_SWARM:
-                drawParticleSwarm(bufferCtx, palette, true, params);
-                break;
-            case artStyles.ORGANIC_SPLATTERS:
-                drawOrganicSplatters(bufferCtx, palette, true, params);
-                break;
-            case artStyles.GLITCH_MOSAIC:
-                drawGlitchMosaic(bufferCtx, palette, true, params);
-                break;
-            case artStyles.NEON_WAVES:
-                drawNeonWaves(bufferCtx, palette, true, params);
-                break;
-            case artStyles.PIXEL_SORT:
-                drawPixelSort(bufferCtx, palette, true, params);
-                break;
-            case artStyles.VORONOI_CELLS:
-                drawVoronoiCells(bufferCtx, palette, true, params);
-                break;
-        }
+        // Always draw the Default Masterpiece style
+        drawDefaultMasterpiece(bufferCtx, palette, true, params);
 
         // Copy buffer to main canvas
         ctx.clearRect(0, 0, width, height);

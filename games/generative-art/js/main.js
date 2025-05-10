@@ -4,10 +4,7 @@
  */
 
 import { generatePalette } from './palette.js';
-import { artStyles, drawGeometricGrid, drawOrganicNoise } from './styles.js';
-import { drawFractalLines, drawParticleSwarm, drawOrganicSplatters } from './styles-advanced.js';
-import { drawGlitchMosaic, drawNeonWaves, drawPixelSort } from './styles-experimental.js';
-import { drawVoronoiCells } from './styles-more.js';
+import { artStyles } from './styles.js';
 import { drawDefaultMasterpiece } from './styles-default.js';
 import { initAnimation } from './animation.js';
 import { saveToHistory, updateHistoryButtons } from './history.js';
@@ -44,14 +41,31 @@ import {
 
 // Application state
 const appState = {
-    currentArtStyle: artStyles.GEOMETRIC_GRID,
+    currentArtStyle: artStyles.DEFAULT,
     numShapes: +numShapesInput.value,
     lineWidth: +lineWidthInput.value,
     backgroundColor: backgroundColorPicker ? backgroundColorPicker.value : '#ffffff',
     colorTheme: colorThemeSelector ? colorThemeSelector.value : 'random',
     baseHue: baseHueInput ? +baseHueInput.value : 180,
     saturation: saturationInput ? +saturationInput.value : 70,
-    lightness: lightnessInput ? +lightnessInput.value : 50
+    lightness: lightnessInput ? +lightnessInput.value : 50,
+
+    // Layer opacity settings
+    voronoiOpacity: voronoiOpacityInput ? +voronoiOpacityInput.value : 0.4,
+    organicSplattersOpacity: organicSplattersOpacityInput ? +organicSplattersOpacityInput.value : 0.3,
+    neonWavesOpacity: neonWavesOpacityInput ? +neonWavesOpacityInput.value : 0.6,
+    fractalLinesOpacity: fractalLinesOpacityInput ? +fractalLinesOpacityInput.value : 0.7,
+    geometricGridOpacity: geometricGridOpacityInput ? +geometricGridOpacityInput.value : 0.6,
+    particleSwarmOpacity: particleSwarmOpacityInput ? +particleSwarmOpacityInput.value : 0.5,
+    organicNoiseOpacity: organicNoiseOpacityInput ? +organicNoiseOpacityInput.value : 0.3,
+    glitchMosaicOpacity: glitchMosaicOpacityInput ? +glitchMosaicOpacityInput.value : 0.15,
+    pixelSortOpacity: pixelSortOpacityInput ? +pixelSortOpacityInput.value : 0.2,
+
+    // Layer density settings
+    voronoiDensity: voronoiDensityInput ? +voronoiDensityInput.value : 15,
+    organicSplattersDensity: organicSplattersDensityInput ? +organicSplattersDensityInput.value : 10,
+    neonWavesDensity: neonWavesDensityInput ? +neonWavesDensityInput.value : 5,
+    fractalLinesDensity: fractalLinesDensityInput ? +fractalLinesDensityInput.value : 2
 };
 
 /**
@@ -121,42 +135,33 @@ function drawArtwork(style, showLoading = true) {
                 width,
                 height,
                 lineWidth: appState.lineWidth,
-                numShapes: appState.numShapes
+                numShapes: appState.numShapes,
+                backgroundColor: appState.backgroundColor,
+                colorTheme: appState.colorTheme,
+                baseHue: appState.baseHue,
+                saturation: appState.saturation,
+                lightness: appState.lightness,
+
+                // Layer opacity settings
+                voronoiOpacity: appState.voronoiOpacity,
+                organicSplattersOpacity: appState.organicSplattersOpacity,
+                neonWavesOpacity: appState.neonWavesOpacity,
+                fractalLinesOpacity: appState.fractalLinesOpacity,
+                geometricGridOpacity: appState.geometricGridOpacity,
+                particleSwarmOpacity: appState.particleSwarmOpacity,
+                organicNoiseOpacity: appState.organicNoiseOpacity,
+                glitchMosaicOpacity: appState.glitchMosaicOpacity,
+                pixelSortOpacity: appState.pixelSortOpacity,
+
+                // Layer density settings
+                voronoiDensity: appState.voronoiDensity,
+                organicSplattersDensity: appState.organicSplattersDensity,
+                neonWavesDensity: appState.neonWavesDensity,
+                fractalLinesDensity: appState.fractalLinesDensity
             };
 
-            // Draw based on selected style
-            switch (style) {
-                case artStyles.DEFAULT:
-                    drawDefaultMasterpiece(ctx, palette, false, params);
-                    break;
-                case artStyles.GEOMETRIC_GRID:
-                    drawGeometricGrid(ctx, palette, false, params);
-                    break;
-                case artStyles.ORGANIC_NOISE:
-                    drawOrganicNoise(ctx, palette, false, params);
-                    break;
-                case artStyles.FRACTAL_LINES:
-                    drawFractalLines(ctx, palette, false, params);
-                    break;
-                case artStyles.PARTICLE_SWARM:
-                    drawParticleSwarm(ctx, palette, false, params);
-                    break;
-                case artStyles.ORGANIC_SPLATTERS:
-                    drawOrganicSplatters(ctx, palette, false, params);
-                    break;
-                case artStyles.GLITCH_MOSAIC:
-                    drawGlitchMosaic(ctx, palette, false, params);
-                    break;
-                case artStyles.NEON_WAVES:
-                    drawNeonWaves(ctx, palette, false, params);
-                    break;
-                case artStyles.PIXEL_SORT:
-                    drawPixelSort(ctx, palette, false, params);
-                    break;
-                case artStyles.VORONOI_CELLS:
-                    drawVoronoiCells(ctx, palette, false, params);
-                    break;
-            }
+            // Always draw the Default Masterpiece style
+            drawDefaultMasterpiece(ctx, palette, false, params);
         } catch (error) {
             console.error('Error drawing artwork:', error);
         } finally {
@@ -187,7 +192,24 @@ function getCurrentAppState() {
         backgroundColor: backgroundColorPicker ? backgroundColorPicker.value : '#ffffff',
         isAnimating: animationToggle ? animationToggle.checked : false,
         animationSpeed: animationSpeedInput ? +animationSpeedInput.value : 50,
-        isInteractive: interactiveToggle ? interactiveToggle.checked : false
+        isInteractive: interactiveToggle ? interactiveToggle.checked : false,
+
+        // Layer opacity settings
+        voronoiOpacity: voronoiOpacityInput ? +voronoiOpacityInput.value : 0.4,
+        organicSplattersOpacity: organicSplattersOpacityInput ? +organicSplattersOpacityInput.value : 0.3,
+        neonWavesOpacity: neonWavesOpacityInput ? +neonWavesOpacityInput.value : 0.6,
+        fractalLinesOpacity: fractalLinesOpacityInput ? +fractalLinesOpacityInput.value : 0.7,
+        geometricGridOpacity: geometricGridOpacityInput ? +geometricGridOpacityInput.value : 0.6,
+        particleSwarmOpacity: particleSwarmOpacityInput ? +particleSwarmOpacityInput.value : 0.5,
+        organicNoiseOpacity: organicNoiseOpacityInput ? +organicNoiseOpacityInput.value : 0.3,
+        glitchMosaicOpacity: glitchMosaicOpacityInput ? +glitchMosaicOpacityInput.value : 0.15,
+        pixelSortOpacity: pixelSortOpacityInput ? +pixelSortOpacityInput.value : 0.2,
+
+        // Layer density settings
+        voronoiDensity: voronoiDensityInput ? +voronoiDensityInput.value : 15,
+        organicSplattersDensity: organicSplattersDensityInput ? +organicSplattersDensityInput.value : 10,
+        neonWavesDensity: neonWavesDensityInput ? +neonWavesDensityInput.value : 5,
+        fractalLinesDensity: fractalLinesDensityInput ? +fractalLinesDensityInput.value : 2
     };
 }
 
@@ -198,7 +220,7 @@ function getCurrentAppState() {
 function applyAppState(state) {
     if (!state) return;
 
-    // Update app state
+    // Update app state - basic settings
     if (state.style && Object.values(artStyles).includes(state.style)) {
         appState.currentArtStyle = state.style;
     }
@@ -211,6 +233,7 @@ function applyAppState(state) {
         appState.lineWidth = +state.lineWidth;
     }
 
+    // Update color settings
     if (state.colorTheme) {
         appState.colorTheme = state.colorTheme;
     }
@@ -229,6 +252,60 @@ function applyAppState(state) {
 
     if (state.backgroundColor) {
         appState.backgroundColor = state.backgroundColor;
+    }
+
+    // Update layer opacity settings
+    if (state.voronoiOpacity !== undefined) {
+        appState.voronoiOpacity = +state.voronoiOpacity;
+    }
+
+    if (state.organicSplattersOpacity !== undefined) {
+        appState.organicSplattersOpacity = +state.organicSplattersOpacity;
+    }
+
+    if (state.neonWavesOpacity !== undefined) {
+        appState.neonWavesOpacity = +state.neonWavesOpacity;
+    }
+
+    if (state.fractalLinesOpacity !== undefined) {
+        appState.fractalLinesOpacity = +state.fractalLinesOpacity;
+    }
+
+    if (state.geometricGridOpacity !== undefined) {
+        appState.geometricGridOpacity = +state.geometricGridOpacity;
+    }
+
+    if (state.particleSwarmOpacity !== undefined) {
+        appState.particleSwarmOpacity = +state.particleSwarmOpacity;
+    }
+
+    if (state.organicNoiseOpacity !== undefined) {
+        appState.organicNoiseOpacity = +state.organicNoiseOpacity;
+    }
+
+    if (state.glitchMosaicOpacity !== undefined) {
+        appState.glitchMosaicOpacity = +state.glitchMosaicOpacity;
+    }
+
+    if (state.pixelSortOpacity !== undefined) {
+        appState.pixelSortOpacity = +state.pixelSortOpacity;
+    }
+
+    // Update layer density settings
+    if (state.voronoiDensity !== undefined) {
+        appState.voronoiDensity = +state.voronoiDensity;
+    }
+
+    if (state.organicSplattersDensity !== undefined) {
+        appState.organicSplattersDensity = +state.organicSplattersDensity;
+    }
+
+    if (state.neonWavesDensity !== undefined) {
+        appState.neonWavesDensity = +state.neonWavesDensity;
+    }
+
+    if (state.fractalLinesDensity !== undefined) {
+        appState.fractalLinesDensity = +state.fractalLinesDensity;
     }
 }
 

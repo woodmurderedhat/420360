@@ -54,14 +54,26 @@ export const lightnessDisplay = document.getElementById('lightnessValue');
 export const animationSpeedDisplay = document.getElementById('animationSpeedValue');
 
 // Application state
-export let currentArtStyle = artStyles.GEOMETRIC_GRID;
-export let numShapes = +numShapesInput.value;
-export let lineWidth = +lineWidthInput.value;
-export let backgroundColor = backgroundColorPicker ? backgroundColorPicker.value : '#ffffff';
-export let colorTheme = colorThemeSelector ? colorThemeSelector.value : 'random';
-export let baseHue = baseHueInput ? +baseHueInput.value : 180;
-export let saturation = saturationInput ? +saturationInput.value : 70;
-export let lightness = lightnessInput ? +lightnessInput.value : 50;
+let currentArtStyle = artStyles.GEOMETRIC_GRID;
+let numShapes = +numShapesInput.value;
+let lineWidth = +lineWidthInput.value;
+let backgroundColor = backgroundColorPicker ? backgroundColorPicker.value : '#ffffff';
+let colorTheme = colorThemeSelector ? colorThemeSelector.value : 'random';
+let baseHue = baseHueInput ? +baseHueInput.value : 180;
+let saturation = saturationInput ? +saturationInput.value : 70;
+let lightness = lightnessInput ? +lightnessInput.value : 50;
+
+// Export mutable state variables
+export {
+    currentArtStyle,
+    numShapes,
+    lineWidth,
+    backgroundColor,
+    colorTheme,
+    baseHue,
+    saturation,
+    lightness
+};
 
 // Local storage key for settings
 export const settingsKey = 'generativeArtSettings';

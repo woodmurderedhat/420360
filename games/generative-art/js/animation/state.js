@@ -36,7 +36,8 @@ export {
     mouseX,
     mouseY,
     lastMouseMoveTime,
-    mouseMoveThrottle,
-    bufferCanvas,
-    bufferCtx
+    mouseMoveThrottle
 };
+
+// Export mutable buffer references
+export { bufferCanvas, bufferCtx };

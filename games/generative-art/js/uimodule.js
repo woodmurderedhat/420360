@@ -4,12 +4,15 @@
  */
 
 import { artStyles } from './styles.js';
-import { setSeed, debounce } from './utils.js';
+import { setSeed, debounce, throttle } from './utils.js';
 import {
     startAnimation,
     stopAnimation,
     setAnimationSpeed,
-    setInteractiveMode
+    setInteractiveMode,
+    setAdaptiveQuality,
+    currentFps,
+    qualityLevel
 } from './animation.js';
 import {
     saveToGallery,
@@ -57,6 +60,8 @@ const backgroundColorPicker = document.getElementById('backgroundColorPicker');
 const animationToggle = document.getElementById('animationToggle');
 const animationSpeedInput = document.getElementById('animationSpeed');
 const interactiveToggle = document.getElementById('interactiveToggle');
+const adaptiveQualityToggle = document.getElementById('adaptiveQualityToggle');
+const fpsDisplay = document.getElementById('fpsDisplay');
 
 // Layer opacity controls
 const voronoiOpacityInput = document.getElementById('voronoiOpacity');
@@ -69,11 +74,29 @@ const organicNoiseOpacityInput = document.getElementById('organicNoiseOpacity');
 const glitchMosaicOpacityInput = document.getElementById('glitchMosaicOpacity');
 const pixelSortOpacityInput = document.getElementById('pixelSortOpacity');
 
+// New layer opacity controls
+const gradientOverlayOpacityInput = document.getElementById('gradientOverlayOpacity');
+const dotMatrixOpacityInput = document.getElementById('dotMatrixOpacity');
+const textureOverlayOpacityInput = document.getElementById('textureOverlayOpacity');
+const symmetricalPatternsOpacityInput = document.getElementById('symmetricalPatternsOpacity');
+const flowingLinesOpacityInput = document.getElementById('flowingLinesOpacity');
+
 // Layer density controls
 const voronoiDensityInput = document.getElementById('voronoiDensity');
 const organicSplattersDensityInput = document.getElementById('organicSplattersDensity');
 const neonWavesDensityInput = document.getElementById('neonWavesDensity');
 const fractalLinesDensityInput = document.getElementById('fractalLinesDensity');
+
+// New layer density controls
+const dotMatrixDensityInput = document.getElementById('dotMatrixDensity');
+const flowingLinesDensityInput = document.getElementById('flowingLinesDensity');
+const symmetricalPatternsDensityInput = document.getElementById('symmetricalPatternsDensity');
+
+// Advanced controls
+const blendModeSelector = document.getElementById('blendModeSelector');
+const colorShiftAmountInput = document.getElementById('colorShiftAmount');
+const scaleAmountInput = document.getElementById('scaleAmount');
+const rotationAmountInput = document.getElementById('rotationAmount');
 
 // Gallery modal elements
 const galleryModal = document.getElementById('galleryModal');
@@ -99,11 +122,28 @@ const organicNoiseOpacityDisplay = document.getElementById('organicNoiseOpacityV
 const glitchMosaicOpacityDisplay = document.getElementById('glitchMosaicOpacityValue');
 const pixelSortOpacityDisplay = document.getElementById('pixelSortOpacityValue');
 
+// Display elements for new layer opacity values
+const gradientOverlayOpacityDisplay = document.getElementById('gradientOverlayOpacityValue');
+const dotMatrixOpacityDisplay = document.getElementById('dotMatrixOpacityValue');
+const textureOverlayOpacityDisplay = document.getElementById('textureOverlayOpacityValue');
+const symmetricalPatternsOpacityDisplay = document.getElementById('symmetricalPatternsOpacityValue');
+const flowingLinesOpacityDisplay = document.getElementById('flowingLinesOpacityValue');
+
 // Display elements for layer density values
 const voronoiDensityDisplay = document.getElementById('voronoiDensityValue');
 const organicSplattersDensityDisplay = document.getElementById('organicSplattersDensityValue');
 const neonWavesDensityDisplay = document.getElementById('neonWavesDensityValue');
 const fractalLinesDensityDisplay = document.getElementById('fractalLinesDensityValue');
+
+// Display elements for new layer density values
+const dotMatrixDensityDisplay = document.getElementById('dotMatrixDensityValue');
+const flowingLinesDensityDisplay = document.getElementById('flowingLinesDensityValue');
+const symmetricalPatternsDensityDisplay = document.getElementById('symmetricalPatternsDensityValue');
+
+// Display elements for advanced controls
+const colorShiftAmountDisplay = document.getElementById('colorShiftAmountValue');
+const scaleAmountDisplay = document.getElementById('scaleAmountValue');
+const rotationAmountDisplay = document.getElementById('rotationAmountValue');
 
 // Local storage key for settings
 const settingsKey = 'generativeArtSettings';
@@ -228,6 +268,7 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
 
         // Update layer opacity settings if the elements exist
         if (document.getElementById('voronoiOpacity')) {
+            // Original layer opacity settings
             appState.voronoiOpacity = +voronoiOpacityInput.value;
             appState.organicSplattersOpacity = +organicSplattersOpacityInput.value;
             appState.neonWavesOpacity = +neonWavesOpacityInput.value;
@@ -237,14 +278,35 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
             appState.organicNoiseOpacity = +organicNoiseOpacityInput.value;
             appState.glitchMosaicOpacity = +glitchMosaicOpacityInput.value;
             appState.pixelSortOpacity = +pixelSortOpacityInput.value;
+
+            // New layer opacity settings
+            appState.gradientOverlayOpacity = +gradientOverlayOpacityInput.value;
+            appState.dotMatrixOpacity = +dotMatrixOpacityInput.value;
+            appState.textureOverlayOpacity = +textureOverlayOpacityInput.value;
+            appState.symmetricalPatternsOpacity = +symmetricalPatternsOpacityInput.value;
+            appState.flowingLinesOpacity = +flowingLinesOpacityInput.value;
         }
 
         // Update layer density settings if the elements exist
         if (document.getElementById('voronoiDensity')) {
+            // Original layer density settings
             appState.voronoiDensity = +voronoiDensityInput.value;
             appState.organicSplattersDensity = +organicSplattersDensityInput.value;
             appState.neonWavesDensity = +neonWavesDensityInput.value;
             appState.fractalLinesDensity = +fractalLinesDensityInput.value;
+
+            // New layer density settings
+            appState.dotMatrixDensity = +dotMatrixDensityInput.value;
+            appState.flowingLinesDensity = +flowingLinesDensityInput.value;
+            appState.symmetricalPatternsDensity = +symmetricalPatternsDensityInput.value;
+        }
+
+        // Update advanced settings if the elements exist
+        if (document.getElementById('colorShiftAmount')) {
+            appState.blendMode = blendModeSelector.value;
+            appState.colorShiftAmount = +colorShiftAmountInput.value;
+            appState.scaleAmount = +scaleAmountInput.value;
+            appState.rotationAmount = +rotationAmountInput.value;
         }
 
         // Update animation settings
@@ -749,7 +811,7 @@ function applyUrlParams(_, applyAppState, getCurrentAppState) {
 }
 
 /**
- * Set up keyboard shortcuts
+ * Set up keyboard shortcuts using a more efficient approach
  * @param {Object} appState - The application state
  * @param {Function} drawArtwork - Function to draw artwork
  * @param {HTMLElement} regenerateButton - The regenerate button
@@ -759,59 +821,86 @@ function applyUrlParams(_, applyAppState, getCurrentAppState) {
  * @param {HTMLElement} redoButton - The redo button
  */
 function setupKeyboardShortcuts(appState, drawArtwork, regenerateButton, exportButton, galleryButton, undoButton, redoButton) {
-    document.addEventListener('keydown', (event) => {
-        // Regenerate (R)
-        if (event.key.toUpperCase() === 'R') {
-            regenerateButton.click();
-        }
-
-        // Export (E)
-        if (event.key.toUpperCase() === 'E') {
-            exportButton.click();
-        }
-
-        // Gallery (G)
-        if (event.key.toUpperCase() === 'G' && galleryButton) {
-            galleryButton.click();
-        }
-
-        // Toggle Animation (Space)
-        if (event.key === ' ' && animationToggle) {
-            animationToggle.checked = !animationToggle.checked;
-            animationToggle.dispatchEvent(new Event('change'));
-            event.preventDefault(); // Prevent page scrolling
-        }
-
-        // Fullscreen (F)
-        if (event.key.toUpperCase() === 'F') {
+    // Create a map of key combinations to handler functions
+    const keyHandlers = {
+        // Single key shortcuts (no modifiers)
+        'r': () => regenerateButton.click(),
+        'e': () => exportButton.click(),
+        'g': () => galleryButton && galleryButton.click(),
+        'f': (e) => {
             toggleFullscreen();
-            event.preventDefault();
-        }
+            e.preventDefault();
+        },
+        ' ': (e) => {
+            if (animationToggle) {
+                animationToggle.checked = !animationToggle.checked;
+                animationToggle.dispatchEvent(new Event('change'));
+                e.preventDefault(); // Prevent page scrolling
+            }
+        },
 
-        // Undo (Ctrl+Z)
-        if (event.key.toUpperCase() === 'Z' && (event.ctrlKey || event.metaKey) && undoButton) {
-            undoButton.click();
-            event.preventDefault();
-        }
-
-        // Redo (Ctrl+Y or Ctrl+Shift+Z)
-        if ((event.key.toUpperCase() === 'Y' && (event.ctrlKey || event.metaKey)) ||
-            (event.key.toUpperCase() === 'Z' && (event.ctrlKey || event.metaKey) && event.shiftKey)) {
+        // Modifier key combinations
+        'ctrl+z': (e) => {
+            if (undoButton) {
+                undoButton.click();
+                e.preventDefault();
+            }
+        },
+        'ctrl+y': (e) => {
             if (redoButton) {
                 redoButton.click();
-                event.preventDefault();
+                e.preventDefault();
+            }
+        },
+        'ctrl+shift+z': (e) => {
+            if (redoButton) {
+                redoButton.click();
+                e.preventDefault();
             }
         }
+    };
 
-        // Number keys 1-9 will regenerate the artwork
-        if (event.key >= '1' && event.key <= '9') {
+    // Add number key handlers (1-9)
+    for (let i = 1; i <= 9; i++) {
+        keyHandlers[i.toString()] = () => {
             // Always use Default art style
             appState.currentArtStyle = artStyles.DEFAULT;
             // Regenerate with new seed
             setSeed(null);
             drawArtwork(appState.currentArtStyle);
+        };
+    }
+
+    // Throttled keydown handler
+    const handleKeyDown = throttle((event) => {
+        // Get the normalized key (lowercase)
+        const key = event.key.toLowerCase();
+
+        // Build the key combination string
+        let combo = '';
+        if (event.ctrlKey || event.metaKey) combo += 'ctrl+';
+        if (event.shiftKey) combo += 'shift+';
+        if (event.altKey) combo += 'alt+';
+        combo += key;
+
+        // Check for single key (without modifiers)
+        if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+            const handler = keyHandlers[key];
+            if (handler) {
+                handler(event);
+                return;
+            }
         }
-    });
+
+        // Check for key combination
+        const comboHandler = keyHandlers[combo];
+        if (comboHandler) {
+            comboHandler(event);
+        }
+    }, 16); // Throttle to ~60fps
+
+    // Add the event listener
+    document.addEventListener('keydown', handleKeyDown);
 }
 
 /**
@@ -887,6 +976,11 @@ function setupAnimationControls(appState, drawArtwork) {
                     lineWidth: appState.lineWidth,
                     numShapes: appState.numShapes
                 });
+
+                // Start FPS display update
+                if (fpsDisplay) {
+                    startFpsMonitoring();
+                }
             } else {
                 // Disable animation speed slider
                 if (animationSpeedInput) animationSpeedInput.disabled = true;
@@ -896,6 +990,12 @@ function setupAnimationControls(appState, drawArtwork) {
 
                 // Redraw static artwork
                 drawArtwork(appState.currentArtStyle);
+
+                // Stop FPS display update
+                if (fpsDisplay) {
+                    stopFpsMonitoring();
+                    fpsDisplay.textContent = '-';
+                }
             }
         });
     }
@@ -916,98 +1016,107 @@ function setupAnimationControls(appState, drawArtwork) {
             setInteractiveMode(interactiveToggle.checked);
         });
     }
+
+    // Adaptive quality toggle
+    if (adaptiveQualityToggle) {
+        adaptiveQualityToggle.addEventListener('change', () => {
+            setAdaptiveQuality(adaptiveQualityToggle.checked);
+        });
+    }
+
+    // FPS monitoring
+    let fpsMonitoringInterval = null;
+
+    function startFpsMonitoring() {
+        if (fpsMonitoringInterval) {
+            clearInterval(fpsMonitoringInterval);
+        }
+
+        fpsMonitoringInterval = setInterval(() => {
+            if (fpsDisplay) {
+                fpsDisplay.textContent = currentFps;
+
+                // Update quality level display if it exists
+                const qualityDisplay = document.getElementById('qualityLevelDisplay');
+                if (qualityDisplay) {
+                    qualityDisplay.textContent = Math.round(qualityLevel * 100) + '%';
+                }
+            }
+        }, 500);
+    }
+
+    function stopFpsMonitoring() {
+        if (fpsMonitoringInterval) {
+            clearInterval(fpsMonitoringInterval);
+            fpsMonitoringInterval = null;
+        }
+    }
 }
 
 /**
- * Set up slider value displays
+ * Set up slider value displays using event delegation and throttling
  */
 function setupSliderDisplays() {
-    // Basic sliders
-    numShapesInput.addEventListener('input', () => {
-        numShapesDisplay.textContent = numShapesInput.value;
+    // Create a mapping of input IDs to their corresponding display elements
+    const sliderMap = {
+        // Basic sliders
+        'numShapes': numShapesDisplay,
+        'lineWidth': lineWidthDisplay,
+
+        // Color sliders
+        'baseHue': baseHueDisplay,
+        'saturation': saturationDisplay,
+        'lightness': lightnessDisplay,
+
+        // Layer opacity sliders
+        'voronoiOpacity': voronoiOpacityDisplay,
+        'organicSplattersOpacity': organicSplattersOpacityDisplay,
+        'neonWavesOpacity': neonWavesOpacityDisplay,
+        'fractalLinesOpacity': fractalLinesOpacityDisplay,
+        'geometricGridOpacity': geometricGridOpacityDisplay,
+        'particleSwarmOpacity': particleSwarmOpacityDisplay,
+        'organicNoiseOpacity': organicNoiseOpacityDisplay,
+        'glitchMosaicOpacity': glitchMosaicOpacityDisplay,
+        'pixelSortOpacity': pixelSortOpacityDisplay,
+        'gradientOverlayOpacity': gradientOverlayOpacityDisplay,
+        'dotMatrixOpacity': dotMatrixOpacityDisplay,
+        'textureOverlayOpacity': textureOverlayOpacityDisplay,
+        'symmetricalPatternsOpacity': symmetricalPatternsOpacityDisplay,
+        'flowingLinesOpacity': flowingLinesOpacityDisplay,
+
+        // Layer density sliders
+        'voronoiDensity': voronoiDensityDisplay,
+        'organicSplattersDensity': organicSplattersDensityDisplay,
+        'neonWavesDensity': neonWavesDensityDisplay,
+        'fractalLinesDensity': fractalLinesDensityDisplay,
+        'dotMatrixDensity': dotMatrixDensityDisplay,
+        'flowingLinesDensity': flowingLinesDensityDisplay,
+        'symmetricalPatternsDensity': symmetricalPatternsDensityDisplay,
+
+        // Advanced controls
+        'colorShiftAmount': colorShiftAmountDisplay,
+        'scaleAmount': scaleAmountDisplay,
+        'rotationAmount': rotationAmountDisplay
+    };
+
+    // Get all control sections that contain sliders
+    const controlSections = document.querySelectorAll('.control-section');
+
+    // Create a throttled handler for input events
+    const handleSliderInput = throttle((event) => {
+        // Only process range inputs
+        if (event.target.type === 'range') {
+            const displayElement = sliderMap[event.target.id];
+            if (displayElement) {
+                displayElement.textContent = event.target.value;
+            }
+        }
+    }, 16); // Throttle to ~60fps
+
+    // Add event delegation to each control section
+    controlSections.forEach(section => {
+        section.addEventListener('input', handleSliderInput);
     });
-
-    lineWidthInput.addEventListener('input', () => {
-        lineWidthDisplay.textContent = lineWidthInput.value;
-    });
-
-    // Color sliders
-    if (baseHueInput && baseHueDisplay) {
-        baseHueInput.addEventListener('input', () => {
-            baseHueDisplay.textContent = baseHueInput.value;
-        });
-    }
-
-    if (saturationInput && saturationDisplay) {
-        saturationInput.addEventListener('input', () => {
-            saturationDisplay.textContent = saturationInput.value;
-        });
-    }
-
-    if (lightnessInput && lightnessDisplay) {
-        lightnessInput.addEventListener('input', () => {
-            lightnessDisplay.textContent = lightnessInput.value;
-        });
-    }
-
-    // Layer opacity sliders - only set up if elements exist
-    if (document.getElementById('voronoiOpacity')) {
-        // Set up layer opacity sliders
-        voronoiOpacityInput.addEventListener('input', () => {
-            voronoiOpacityDisplay.textContent = voronoiOpacityInput.value;
-        });
-
-        organicSplattersOpacityInput.addEventListener('input', () => {
-            organicSplattersOpacityDisplay.textContent = organicSplattersOpacityInput.value;
-        });
-
-        neonWavesOpacityInput.addEventListener('input', () => {
-            neonWavesOpacityDisplay.textContent = neonWavesOpacityInput.value;
-        });
-
-        fractalLinesOpacityInput.addEventListener('input', () => {
-            fractalLinesOpacityDisplay.textContent = fractalLinesOpacityInput.value;
-        });
-
-        geometricGridOpacityInput.addEventListener('input', () => {
-            geometricGridOpacityDisplay.textContent = geometricGridOpacityInput.value;
-        });
-
-        particleSwarmOpacityInput.addEventListener('input', () => {
-            particleSwarmOpacityDisplay.textContent = particleSwarmOpacityInput.value;
-        });
-
-        organicNoiseOpacityInput.addEventListener('input', () => {
-            organicNoiseOpacityDisplay.textContent = organicNoiseOpacityInput.value;
-        });
-
-        glitchMosaicOpacityInput.addEventListener('input', () => {
-            glitchMosaicOpacityDisplay.textContent = glitchMosaicOpacityInput.value;
-        });
-
-        pixelSortOpacityInput.addEventListener('input', () => {
-            pixelSortOpacityDisplay.textContent = pixelSortOpacityInput.value;
-        });
-    }
-
-    // Layer density sliders - only set up if elements exist
-    if (document.getElementById('voronoiDensity')) {
-        voronoiDensityInput.addEventListener('input', () => {
-            voronoiDensityDisplay.textContent = voronoiDensityInput.value;
-        });
-
-        organicSplattersDensityInput.addEventListener('input', () => {
-            organicSplattersDensityDisplay.textContent = organicSplattersDensityInput.value;
-        });
-
-        neonWavesDensityInput.addEventListener('input', () => {
-            neonWavesDensityDisplay.textContent = neonWavesDensityInput.value;
-        });
-
-        fractalLinesDensityInput.addEventListener('input', () => {
-            fractalLinesDensityDisplay.textContent = fractalLinesDensityInput.value;
-        });
-    }
 }
 
 /**
@@ -1108,6 +1217,8 @@ export {
     animationToggle,
     animationSpeedInput,
     interactiveToggle,
+    adaptiveQualityToggle,
+    fpsDisplay,
     // Layer opacity controls
     voronoiOpacityInput,
     organicSplattersOpacityInput,
@@ -1118,11 +1229,26 @@ export {
     organicNoiseOpacityInput,
     glitchMosaicOpacityInput,
     pixelSortOpacityInput,
+    // New layer opacity controls
+    gradientOverlayOpacityInput,
+    dotMatrixOpacityInput,
+    textureOverlayOpacityInput,
+    symmetricalPatternsOpacityInput,
+    flowingLinesOpacityInput,
     // Layer density controls
     voronoiDensityInput,
     organicSplattersDensityInput,
     neonWavesDensityInput,
     fractalLinesDensityInput,
+    // New layer density controls
+    dotMatrixDensityInput,
+    flowingLinesDensityInput,
+    symmetricalPatternsDensityInput,
+    // Advanced controls
+    blendModeSelector,
+    colorShiftAmountInput,
+    scaleAmountInput,
+    rotationAmountInput,
     // Display elements
     numShapesDisplay,
     lineWidthDisplay,

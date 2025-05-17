@@ -218,6 +218,26 @@ body {
     margin-bottom: 10px;
 }
 
+.performance-info {
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.performance-info div {
+    display: flex;
+    align-items: center;
+}
+
+.performance-info span {
+    font-weight: bold;
+    margin-left: 5px;
+}
+
 .buttons-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -273,10 +293,46 @@ body {
 }
 
 .gallery-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.gallery-items-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
-    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.gallery-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.gallery-pagination button {
+    padding: 5px 10px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.gallery-pagination button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.page-indicator {
+    font-weight: bold;
 }
 
 .gallery-item {
@@ -439,8 +495,13 @@ body {
         margin: 2% auto;
     }
 
-    .gallery-container {
+    .gallery-items-container {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .gallery-pagination {
+        flex-direction: column;
+        gap: 10px;
     }
 }
 

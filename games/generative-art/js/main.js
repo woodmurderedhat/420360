@@ -7,6 +7,7 @@ import { generatePalette } from './palette.js';
 import { artStyles } from './styles.js';
 import { drawDefaultMasterpiece } from './styles-default.js';
 import { initAnimation } from './animation.js';
+import { initWorkers } from './worker-manager.js';
 import { saveToHistory, updateHistoryButtons } from './history.js';
 import {
     canvas,
@@ -61,11 +62,29 @@ const appState = {
     glitchMosaicOpacity: 0.15,
     pixelSortOpacity: 0.2,
 
+    // New layer opacity settings - default values
+    gradientOverlayOpacity: 0.3,
+    dotMatrixOpacity: 0.4,
+    textureOverlayOpacity: 0.2,
+    symmetricalPatternsOpacity: 0.5,
+    flowingLinesOpacity: 0.4,
+
     // Layer density settings - default values
     voronoiDensity: 15,
     organicSplattersDensity: 10,
     neonWavesDensity: 5,
-    fractalLinesDensity: 2
+    fractalLinesDensity: 2,
+
+    // New layer density settings - default values
+    dotMatrixDensity: 20,
+    flowingLinesDensity: 8,
+    symmetricalPatternsDensity: 6,
+
+    // Advanced settings - default values
+    blendMode: 'source-over',
+    colorShiftAmount: 0,
+    scaleAmount: 1.0,
+    rotationAmount: 0
 };
 
 /**
@@ -153,11 +172,29 @@ function drawArtwork(style, showLoading = true) {
                 glitchMosaicOpacity: appState.glitchMosaicOpacity,
                 pixelSortOpacity: appState.pixelSortOpacity,
 
+                // New layer opacity settings
+                gradientOverlayOpacity: appState.gradientOverlayOpacity,
+                dotMatrixOpacity: appState.dotMatrixOpacity,
+                textureOverlayOpacity: appState.textureOverlayOpacity,
+                symmetricalPatternsOpacity: appState.symmetricalPatternsOpacity,
+                flowingLinesOpacity: appState.flowingLinesOpacity,
+
                 // Layer density settings
                 voronoiDensity: appState.voronoiDensity,
                 organicSplattersDensity: appState.organicSplattersDensity,
                 neonWavesDensity: appState.neonWavesDensity,
-                fractalLinesDensity: appState.fractalLinesDensity
+                fractalLinesDensity: appState.fractalLinesDensity,
+
+                // New layer density settings
+                dotMatrixDensity: appState.dotMatrixDensity,
+                flowingLinesDensity: appState.flowingLinesDensity,
+                symmetricalPatternsDensity: appState.symmetricalPatternsDensity,
+
+                // Advanced settings
+                blendMode: appState.blendMode,
+                colorShiftAmount: appState.colorShiftAmount,
+                scaleAmount: appState.scaleAmount,
+                rotationAmount: appState.rotationAmount
             };
 
             // Always draw the Default Masterpiece style
@@ -328,6 +365,9 @@ window.addEventListener('load', () => {
 
     // Initialize animation
     initAnimation(canvas);
+
+    // Initialize web workers for background processing
+    initWorkers();
 
     // Load settings
     loadSettings(appState);

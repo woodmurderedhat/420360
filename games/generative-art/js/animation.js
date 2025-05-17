@@ -16,6 +16,10 @@ let animationSpeed = 50;
 let fpsLimit = 60; // Maximum FPS
 let fpsInterval = 1000 / fpsLimit;
 
+// Canvas buffers
+let bufferCanvas = null;
+let bufferCtx = null;
+
 // Performance monitoring
 let fpsHistory = [];
 let lastFpsUpdateTime = 0;

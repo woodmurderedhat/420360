@@ -5,12 +5,15 @@
 
 import { artStyles } from './styles.js';
 import { setSeed, debounce, throttle } from './utils.js';
+import { clearPaletteCache } from './palette.js';
 import {
     startAnimation,
     stopAnimation,
+    toggleAnimation,
     setAnimationSpeed,
     setInteractiveMode,
     setAdaptiveQuality,
+    cleanupAnimationResources,
     currentFps,
     qualityLevel
 } from './animation.js';
@@ -25,6 +28,15 @@ import {
     undo,
     redo
 } from './history.js';
+import {
+    setupLazyLoadingSections,
+    initializeComponent
+} from './ui-lazy-loader.js';
+import {
+    handleError,
+    ErrorType,
+    ErrorSeverity
+} from './error-service.js';
 
 // DOM Elements
 const canvas = document.getElementById('artCanvas');
@@ -157,34 +169,36 @@ const settingsKey = 'generativeArtSettings';
  * @param {Function} applyAppState - Function to apply app state
  */
 function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyAppState) {
-    // Initialize layer opacity controls if they exist
-    if (document.getElementById('voronoiOpacity')) {
-        voronoiOpacityInput.value = appState.voronoiOpacity;
-        organicSplattersOpacityInput.value = appState.organicSplattersOpacity;
-        neonWavesOpacityInput.value = appState.neonWavesOpacity;
-        fractalLinesOpacityInput.value = appState.fractalLinesOpacity;
-        geometricGridOpacityInput.value = appState.geometricGridOpacity;
-        particleSwarmOpacityInput.value = appState.particleSwarmOpacity;
-        organicNoiseOpacityInput.value = appState.organicNoiseOpacity;
-        glitchMosaicOpacityInput.value = appState.glitchMosaicOpacity;
-        pixelSortOpacityInput.value = appState.pixelSortOpacity;
-    }
+    try {
+        // Set up lazy loading for UI components
+        setupLazyLoadingSections(appState);
 
-    // Initialize layer density controls if they exist
-    if (document.getElementById('voronoiDensity')) {
-        voronoiDensityInput.value = appState.voronoiDensity;
-        organicSplattersDensityInput.value = appState.organicSplattersDensity;
-        neonWavesDensityInput.value = appState.neonWavesDensity;
-        fractalLinesDensityInput.value = appState.fractalLinesDensity;
+        // Initialize only the essential UI components immediately
+        // Other components will be initialized when their sections are expanded
+
+        // Initialize basic controls (always needed)
+        numShapesInput.value = appState.numShapes;
+        lineWidthInput.value = appState.lineWidth;
+        if (numShapesDisplay) numShapesDisplay.textContent = appState.numShapes;
+        if (lineWidthDisplay) lineWidthDisplay.textContent = appState.lineWidth;
+        if (backgroundColorPicker) backgroundColorPicker.value = appState.backgroundColor;
+    } catch (error) {
+        handleError(error, ErrorType.UI, ErrorSeverity.ERROR, {
+            component: 'setupUI',
+            message: 'Error initializing UI components'
+        });
     }
 
     // Regenerate button
     regenerateButton.addEventListener('click', () => {
-        // Stop animation if running
+        // Stop animation if running with full cleanup
         if (animationToggle && animationToggle.checked) {
-            stopAnimation();
+            stopAnimation(true); // Full cleanup
             animationToggle.checked = false;
         }
+
+        // Ensure resources are cleaned up before regenerating
+        cleanupAnimationResources();
 
         drawArtwork(appState.currentArtStyle);
     });
@@ -394,6 +408,9 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
             if (lightnessInput) lightnessInput.value = 50;
             if (backgroundColorPicker) backgroundColorPicker.value = '#ffffff';
 
+            // Clear palette cache when resetting settings
+            clearPaletteCache();
+
             // Reset animation settings
             if (animationToggle) animationToggle.checked = false;
             if (animationSpeedInput) animationSpeedInput.value = 50;
@@ -402,8 +419,11 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
             // Reset random
             setSeed(null);
 
-            // Stop animation if running
-            stopAnimation();
+            // Stop animation with full cleanup
+            stopAnimation(true);
+
+            // Ensure all resources are properly cleaned up
+            cleanupAnimationResources();
 
             // Reinitialize canvas
             initCanvas();
@@ -418,12 +438,35 @@ function setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyApp
  * @param {Function} applyAppState - Function to apply app state
  */
 function openGallery(appState, applySettingsBtn, applyAppState) {
-    if (!galleryModal || !galleryContainer) return;
+    try {
+        if (!galleryModal || !galleryContainer) {
+            handleError(
+                new Error('Gallery modal or container not found'),
+                ErrorType.UI,
+                ErrorSeverity.WARNING,
+                { component: 'openGallery', message: 'Gallery elements not found in the DOM' }
+            );
+            return;
+        }
 
-    galleryModal.style.display = 'block';
+        galleryModal.style.display = 'block';
 
-    // Populate gallery
-    populateGallery(galleryContainer,
+        // Add error event listener if not already added
+        if (!window._galleryErrorListenerAdded) {
+            window.addEventListener('galleryError', (event) => {
+                const { action, id, error } = event.detail;
+                handleError(
+                    new Error(`Gallery ${action} error: ${error}`),
+                    ErrorType.STORAGE,
+                    ErrorSeverity.WARNING,
+                    { component: 'gallery', action, itemId: id }
+                );
+            });
+            window._galleryErrorListenerAdded = true;
+        }
+
+        // Populate gallery
+        populateGallery(galleryContainer,
         // On select callback
         (item) => {
             // Load settings from gallery item
@@ -488,85 +531,52 @@ function openGallery(appState, applySettingsBtn, applyAppState) {
             // Close gallery
             galleryModal.style.display = 'none';
         },
-        // On delete callback
+        // On delete callback - simplified to avoid recursive refreshes
         (id) => {
-            // Remove from storage
-            deleteFromGallery(id);
-            // Re-render gallery UI
-            populateGallery(galleryContainer,
-                // Reuse the same select callback
-                (item) => {
-                    // Load settings from gallery item
-                    if (item.settings) {
-                        if (item.settings.style) {
-                            appState.currentArtStyle = artStyles.DEFAULT;
-                        }
+            // The actual deletion is handled in the gallery.js module
+            // This callback is just for any UI-specific actions after deletion
 
-                        if (item.settings.numShapes) {
-                            numShapesInput.value = item.settings.numShapes;
-                            appState.numShapes = +item.settings.numShapes;
-                            numShapesDisplay.textContent = item.settings.numShapes;
-                        }
+            // We don't need to call deleteFromGallery here as it's already called in the gallery item's delete button handler
 
-                        if (item.settings.lineWidth) {
-                            lineWidthInput.value = item.settings.lineWidth;
-                            appState.lineWidth = +item.settings.lineWidth;
-                            lineWidthDisplay.textContent = item.settings.lineWidth;
-                        }
+            // We also don't need to manually refresh the gallery as the pagination and empty state
+            // are now handled by the improved populateGallery function
 
-                        if (item.settings.seed) {
-                            seedInput.value = item.settings.seed;
-                            currentSeedDisplay.textContent = item.settings.seed;
-                        }
+            // Log deletion for debugging
+            console.log(`Gallery item ${id} deleted`);
 
-                        if (item.settings.colorTheme && colorThemeSelector) {
-                            colorThemeSelector.value = item.settings.colorTheme;
-                            appState.colorTheme = item.settings.colorTheme;
+            // Add a listener for the gallery deletion event if not already added
+            if (!window._galleryDeletionListenerAdded) {
+                window.addEventListener('galleryItemDeleted', (event) => {
+                    const { remainingCount } = event.detail;
+                    console.log(`Gallery item deleted. Remaining items: ${remainingCount}`);
 
-                            if (customColorControls) {
-                                customColorControls.style.display = appState.colorTheme === 'custom' ? 'block' : 'none';
-                            }
-                        }
-
-                        if (item.settings.baseHue && baseHueInput) {
-                            baseHueInput.value = item.settings.baseHue;
-                            appState.baseHue = +item.settings.baseHue;
-                            if (baseHueDisplay) baseHueDisplay.textContent = item.settings.baseHue;
-                        }
-
-                        if (item.settings.saturation && saturationInput) {
-                            saturationInput.value = item.settings.saturation;
-                            appState.saturation = +item.settings.saturation;
-                            if (saturationDisplay) saturationDisplay.textContent = item.settings.saturation;
-                        }
-
-                        if (item.settings.lightness && lightnessInput) {
-                            lightnessInput.value = item.settings.lightness;
-                            appState.lightness = +item.settings.lightness;
-                            if (lightnessDisplay) lightnessDisplay.textContent = item.settings.lightness;
-                        }
-
-                        if (item.settings.backgroundColor && backgroundColorPicker) {
-                            backgroundColorPicker.value = item.settings.backgroundColor;
-                            appState.backgroundColor = item.settings.backgroundColor;
-                        }
-
-                        // Apply settings
-                        applySettingsBtn.click();
+                    // If all items are deleted, you might want to show a notification
+                    if (remainingCount === 0) {
+                        // This could be a toast notification or other UI feedback
+                        console.log('Gallery is now empty');
                     }
+                });
 
-                    // Close gallery
-                    galleryModal.style.display = 'none';
-                },
-                // Simplified delete callback
-                (id) => {
-                    deleteFromGallery(id);
-                    // Refresh gallery after deletion
-                    openGallery(appState, applySettingsBtn, applyAppState);
-                }
-            );
+                window._galleryDeletionListenerAdded = true;
+            }
         }
     );
+    } catch (error) {
+        handleError(error, ErrorType.UI, ErrorSeverity.ERROR, {
+            component: 'openGallery',
+            message: 'Error opening gallery'
+        });
+
+        // Ensure gallery is displayed even if there's an error
+        if (galleryModal) {
+            galleryModal.style.display = 'block';
+
+            // Show error message in gallery container
+            if (galleryContainer) {
+                galleryContainer.innerHTML = '<p class="gallery-error">Error loading gallery. Please try again.</p>';
+            }
+        }
+    }
 }
 
 /**
@@ -615,24 +625,31 @@ function handleFullscreenChange(initCanvas) {
  * @param {Object} appState - The application state
  */
 function saveSettings(appState) {
-    const settings = {
-        numShapes: appState.numShapes,
-        lineWidth: appState.lineWidth,
-        canvasWidth: canvasWidthInput.value,
-        canvasHeight: canvasHeightInput.value,
-        seed: seedInput.value || null,
-        style: appState.currentArtStyle,
-        colorTheme: appState.colorTheme,
-        baseHue: appState.baseHue,
-        saturation: appState.saturation,
-        lightness: appState.lightness,
-        backgroundColor: appState.backgroundColor,
-        isAnimating: animationToggle ? animationToggle.checked : false,
-        animationSpeed: animationSpeedInput ? +animationSpeedInput.value : 50,
-        isInteractive: interactiveToggle ? interactiveToggle.checked : false
-    };
+    try {
+        const settings = {
+            numShapes: appState.numShapes,
+            lineWidth: appState.lineWidth,
+            canvasWidth: canvasWidthInput.value,
+            canvasHeight: canvasHeightInput.value,
+            seed: seedInput.value || null,
+            style: appState.currentArtStyle,
+            colorTheme: appState.colorTheme,
+            baseHue: appState.baseHue,
+            saturation: appState.saturation,
+            lightness: appState.lightness,
+            backgroundColor: appState.backgroundColor,
+            isAnimating: animationToggle ? animationToggle.checked : false,
+            animationSpeed: animationSpeedInput ? +animationSpeedInput.value : 50,
+            isInteractive: interactiveToggle ? interactiveToggle.checked : false
+        };
 
-    localStorage.setItem(settingsKey, JSON.stringify(settings));
+        localStorage.setItem(settingsKey, JSON.stringify(settings));
+    } catch (error) {
+        handleError(error, ErrorType.STORAGE, ErrorSeverity.WARNING, {
+            component: 'saveSettings',
+            message: 'Error saving settings to localStorage'
+        });
+    }
 }
 
 /**
@@ -640,46 +657,48 @@ function saveSettings(appState) {
  * @param {Object} appState - The application state
  */
 function loadSettings(appState) {
-    const saved = localStorage.getItem(settingsKey);
-    if (saved) {
-        try {
-            const s = JSON.parse(saved);
+    try {
+        const saved = localStorage.getItem(settingsKey);
+        if (!saved) return;
 
-            // Load basic settings
-            if (s.numShapes) {
-                numShapesInput.value = s.numShapes;
-                appState.numShapes = +s.numShapes;
-                numShapesDisplay.textContent = s.numShapes;
-            }
+        const s = JSON.parse(saved);
 
-            if (s.lineWidth) {
-                lineWidthInput.value = s.lineWidth;
-                appState.lineWidth = +s.lineWidth;
-                lineWidthDisplay.textContent = s.lineWidth;
-            }
+        // Load basic settings (always needed)
+        if (s.numShapes) {
+            numShapesInput.value = s.numShapes;
+            appState.numShapes = +s.numShapes;
+            if (numShapesDisplay) numShapesDisplay.textContent = s.numShapes;
+        }
 
-            if (s.canvasWidth) canvasWidthInput.value = s.canvasWidth;
-            if (s.canvasHeight) canvasHeightInput.value = s.canvasHeight;
+        if (s.lineWidth) {
+            lineWidthInput.value = s.lineWidth;
+            appState.lineWidth = +s.lineWidth;
+            if (lineWidthDisplay) lineWidthDisplay.textContent = s.lineWidth;
+        }
 
-            // Load seed
-            if (s.seed) {
-                seedInput.value = s.seed;
-                setSeed(s.seed);
-                currentSeedDisplay.textContent = s.seed;
-            } else {
-                seedInput.value = '';
-                setSeed(null);
-                currentSeedDisplay.textContent = 'random';
-            }
+        if (s.canvasWidth) canvasWidthInput.value = s.canvasWidth;
+        if (s.canvasHeight) canvasHeightInput.value = s.canvasHeight;
 
-            // Load style
-            if (s.style && Object.values(artStyles).includes(s.style)) {
-                appState.currentArtStyle = artStyles.DEFAULT;
-            }
+        // Load seed
+        if (s.seed) {
+            seedInput.value = s.seed;
+            setSeed(s.seed);
+            if (currentSeedDisplay) currentSeedDisplay.textContent = s.seed;
+        } else {
+            seedInput.value = '';
+            setSeed(null);
+            if (currentSeedDisplay) currentSeedDisplay.textContent = 'random';
+        }
 
-            // Load color settings
-            if (s.colorTheme && colorThemeSelector) {
-                appState.colorTheme = s.colorTheme;
+        // Load style
+        if (s.style && Object.values(artStyles).includes(s.style)) {
+            appState.currentArtStyle = artStyles.DEFAULT;
+        }
+
+        // Load color settings - these will be initialized when the color section is expanded
+        if (s.colorTheme) {
+            appState.colorTheme = s.colorTheme;
+            if (colorThemeSelector) {
                 colorThemeSelector.value = appState.colorTheme;
 
                 // Show/hide custom color controls
@@ -687,49 +706,58 @@ function loadSettings(appState) {
                     customColorControls.style.display = appState.colorTheme === 'custom' ? 'block' : 'none';
                 }
             }
+        }
 
-            if (s.baseHue && baseHueInput) {
-                appState.baseHue = s.baseHue;
-                baseHueInput.value = appState.baseHue;
-                if (baseHueDisplay) baseHueDisplay.textContent = appState.baseHue;
-            }
+        if (s.baseHue !== undefined) {
+            appState.baseHue = +s.baseHue;
+            if (baseHueInput) baseHueInput.value = appState.baseHue;
+            if (baseHueDisplay) baseHueDisplay.textContent = appState.baseHue;
+        }
 
-            if (s.saturation && saturationInput) {
-                appState.saturation = s.saturation;
-                saturationInput.value = appState.saturation;
-                if (saturationDisplay) saturationDisplay.textContent = appState.saturation;
-            }
+        if (s.saturation !== undefined) {
+            appState.saturation = +s.saturation;
+            if (saturationInput) saturationInput.value = appState.saturation;
+            if (saturationDisplay) saturationDisplay.textContent = appState.saturation;
+        }
 
-            if (s.lightness && lightnessInput) {
-                appState.lightness = s.lightness;
-                lightnessInput.value = appState.lightness;
-                if (lightnessDisplay) lightnessDisplay.textContent = appState.lightness;
-            }
+        if (s.lightness !== undefined) {
+            appState.lightness = +s.lightness;
+            if (lightnessInput) lightnessInput.value = appState.lightness;
+            if (lightnessDisplay) lightnessDisplay.textContent = appState.lightness;
+        }
 
-            if (s.backgroundColor && backgroundColorPicker) {
-                appState.backgroundColor = s.backgroundColor;
-                backgroundColorPicker.value = appState.backgroundColor;
-            }
+        if (s.backgroundColor) {
+            appState.backgroundColor = s.backgroundColor;
+            if (backgroundColorPicker) backgroundColorPicker.value = appState.backgroundColor;
+        }
 
-            // Load animation settings
-            if (s.isAnimating !== undefined && animationToggle) {
-                animationToggle.checked = s.isAnimating;
-            }
+        // Load animation settings - these will be initialized when the animation section is expanded
+        if (s.isAnimating !== undefined) {
+            appState.animationEnabled = s.isAnimating;
+            if (animationToggle) animationToggle.checked = s.isAnimating;
+        }
 
-            if (s.animationSpeed !== undefined && animationSpeedInput) {
+        if (s.animationSpeed !== undefined) {
+            appState.animationSpeed = +s.animationSpeed;
+            if (animationSpeedInput) {
                 animationSpeedInput.value = s.animationSpeed;
                 if (animationSpeedDisplay) animationSpeedDisplay.textContent = s.animationSpeed;
                 setAnimationSpeed(s.animationSpeed);
             }
+        }
 
-            if (s.isInteractive !== undefined && interactiveToggle) {
+        if (s.isInteractive !== undefined) {
+            appState.interactiveMode = s.isInteractive;
+            if (interactiveToggle) {
                 interactiveToggle.checked = s.isInteractive;
                 setInteractiveMode(s.isInteractive);
             }
-
-        } catch (e) {
-            console.error('Error loading settings:', e);
         }
+    } catch (error) {
+        handleError(error, ErrorType.STORAGE, ErrorSeverity.WARNING, {
+            component: 'loadSettings',
+            message: 'Error loading settings from localStorage'
+        });
     }
 }
 
@@ -740,73 +768,82 @@ function loadSettings(appState) {
  * @param {Function} getCurrentAppState - Function to get current app state
  */
 function applyUrlParams(_, applyAppState, getCurrentAppState) {
-    const params = new URLSearchParams(window.location.search);
-    let updated = false;
-    const state = {};
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.size === 0) return;
 
-    if (params.has('style')) {
-        const style = params.get('style');
-        if (Object.values(artStyles).includes(style)) {
-            state.style = style;
+        let updated = false;
+        const state = {};
+
+        if (params.has('style')) {
+            const style = params.get('style');
+            if (Object.values(artStyles).includes(style)) {
+                state.style = style;
+                updated = true;
+            }
+        }
+
+        if (params.has('numShapes')) {
+            state.numShapes = params.get('numShapes');
             updated = true;
         }
-    }
 
-    if (params.has('numShapes')) {
-        state.numShapes = params.get('numShapes');
-        updated = true;
-    }
+        if (params.has('lineWidth')) {
+            state.lineWidth = params.get('lineWidth');
+            updated = true;
+        }
 
-    if (params.has('lineWidth')) {
-        state.lineWidth = params.get('lineWidth');
-        updated = true;
-    }
+        if (params.has('width')) {
+            state.canvasWidth = params.get('width');
+            updated = true;
+        }
 
-    if (params.has('width')) {
-        state.canvasWidth = params.get('width');
-        updated = true;
-    }
+        if (params.has('height')) {
+            state.canvasHeight = params.get('height');
+            updated = true;
+        }
 
-    if (params.has('height')) {
-        state.canvasHeight = params.get('height');
-        updated = true;
-    }
+        if (params.has('seed')) {
+            state.seed = params.get('seed');
+            updated = true;
+        }
 
-    if (params.has('seed')) {
-        state.seed = params.get('seed');
-        updated = true;
-    }
+        if (params.has('colorTheme')) {
+            state.colorTheme = params.get('colorTheme');
+            updated = true;
+        }
 
-    if (params.has('colorTheme') && colorThemeSelector) {
-        state.colorTheme = params.get('colorTheme');
-        updated = true;
-    }
+        if (params.has('baseHue')) {
+            state.baseHue = params.get('baseHue');
+            updated = true;
+        }
 
-    if (params.has('baseHue') && baseHueInput) {
-        state.baseHue = params.get('baseHue');
-        updated = true;
-    }
+        if (params.has('saturation')) {
+            state.saturation = params.get('saturation');
+            updated = true;
+        }
 
-    if (params.has('saturation') && saturationInput) {
-        state.saturation = params.get('saturation');
-        updated = true;
-    }
+        if (params.has('lightness')) {
+            state.lightness = params.get('lightness');
+            updated = true;
+        }
 
-    if (params.has('lightness') && lightnessInput) {
-        state.lightness = params.get('lightness');
-        updated = true;
-    }
+        if (params.has('bg')) {
+            state.backgroundColor = '#' + params.get('bg');
+            updated = true;
+        }
 
-    if (params.has('bg') && backgroundColorPicker) {
-        state.backgroundColor = '#' + params.get('bg');
-        updated = true;
-    }
+        if (updated) {
+            applyAppState(state);
 
-    if (updated) {
-        applyAppState(state);
-
-        // Save initial state to history
-        saveToHistory(getCurrentAppState());
+            // Save initial state to history
+            saveToHistory(getCurrentAppState());
+        }
+    } catch (error) {
+        handleError(error, ErrorType.UI, ErrorSeverity.WARNING, {
+            component: 'applyUrlParams',
+            message: 'Error applying URL parameters'
+        });
     }
 }
 
@@ -945,10 +982,29 @@ function setupShareLink(appState) {
 function setupColorThemeControls(appState) {
     if (colorThemeSelector && customColorControls) {
         colorThemeSelector.addEventListener('change', () => {
+            // Update state
             appState.colorTheme = colorThemeSelector.value;
+
+            // Show/hide custom color controls
             customColorControls.style.display = appState.colorTheme === 'custom' ? 'block' : 'none';
+
+            // Clear palette cache when theme changes
+            clearPaletteCache();
         });
     }
+
+    // Add event listeners for custom color controls to clear cache when changed
+    const colorControls = [baseHueInput, saturationInput, lightnessInput];
+    colorControls.forEach(control => {
+        if (control) {
+            control.addEventListener('change', () => {
+                // Only clear cache if we're using custom colors
+                if (colorThemeSelector && colorThemeSelector.value === 'custom') {
+                    clearPaletteCache();
+                }
+            });
+        }
+    });
 }
 
 /**
@@ -985,8 +1041,11 @@ function setupAnimationControls(appState, drawArtwork) {
                 // Disable animation speed slider
                 if (animationSpeedInput) animationSpeedInput.disabled = true;
 
-                // Stop animation
-                stopAnimation();
+                // Stop animation with full cleanup
+                stopAnimation(true);
+
+                // Ensure all resources are properly cleaned up
+                cleanupAnimationResources();
 
                 // Redraw static artwork
                 drawArtwork(appState.currentArtStyle);

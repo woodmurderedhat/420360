@@ -97,17 +97,61 @@ function loadGallery() {
  * @returns {boolean} Whether the deletion was successful
  */
 function deleteFromGallery(id) {
-    const gallery = loadGallery();
-    const initialLength = gallery.length;
+    try {
+        // Load the current gallery
+        const gallery = loadGallery();
+        const initialLength = gallery.length;
 
-    const filteredGallery = gallery.filter(item => item.id !== id);
+        // Find the item to be deleted (for event dispatching)
+        const deletedItem = gallery.find(item => item.id === id);
 
-    if (filteredGallery.length < initialLength) {
-        localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(filteredGallery));
-        return true;
+        // Filter out the item with the given ID
+        const filteredGallery = gallery.filter(item => item.id !== id);
+
+        // Check if an item was actually removed
+        if (filteredGallery.length < initialLength) {
+            // Save the updated gallery
+            localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(filteredGallery));
+
+            // Dispatch a custom event to notify listeners of the deletion
+            if (typeof window !== 'undefined') {
+                const event = new CustomEvent('galleryItemDeleted', {
+                    detail: {
+                        id,
+                        item: deletedItem,
+                        remainingCount: filteredGallery.length
+                    }
+                });
+                window.dispatchEvent(event);
+            }
+
+            return true;
+        }
+
+        return false;
+    } catch (error) {
+        console.error('Error deleting from gallery:', error);
+
+        // Try to handle the error gracefully
+        try {
+            // Attempt to dispatch an error event
+            if (typeof window !== 'undefined') {
+                const event = new CustomEvent('galleryError', {
+                    detail: {
+                        action: 'delete',
+                        id,
+                        error: error.message
+                    }
+                });
+                window.dispatchEvent(event);
+            }
+        } catch (e) {
+            // If even that fails, just log it
+            console.error('Failed to dispatch gallery error event:', e);
+        }
+
+        return false;
     }
-
-    return false;
 }
 
 /**
@@ -177,23 +221,26 @@ function createGalleryItemElement(item, onSelect, onDelete) {
     deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (confirm('Are you sure you want to delete this artwork?')) {
-            deleteFromGallery(item.id);
+            // First add the removing class for animation
             galleryItem.classList.add('removing');
 
-            // Animate removal
+            // Set a timeout for the animation to complete
             setTimeout(() => {
-                galleryItem.remove();
+                // Actually delete from storage
+                const success = deleteFromGallery(item.id);
 
-                // Check if gallery is now empty
-                if (loadGallery().length === 0) {
-                    const galleryContainer = document.getElementById('galleryContainer');
-                    if (galleryContainer) {
-                        galleryContainer.innerHTML = '<p class="gallery-empty">Your gallery is empty. Create and save some artwork!</p>';
+                if (success) {
+                    // Remove the element from DOM
+                    galleryItem.remove();
+
+                    // Call the onDelete callback if provided
+                    if (typeof onDelete === 'function') {
+                        onDelete(item.id);
                     }
-                }
-
-                if (typeof onDelete === 'function') {
-                    onDelete(item.id);
+                } else {
+                    // If deletion failed, remove the animation class
+                    galleryItem.classList.remove('removing');
+                    alert('Failed to delete the artwork. Please try again.');
                 }
             }, 300);
         }
@@ -287,6 +334,12 @@ function createPaginationControls(container, currentPage, totalPages, onPageChan
  * @param {number} page - The page to display (1-based)
  */
 function populateGallery(container, onSelect, onDelete, page = 1) {
+    // Ensure container exists
+    if (!container) {
+        console.error('Gallery container not found');
+        return;
+    }
+
     try {
         // Show loading state
         container.innerHTML = '<div class="gallery-loading">Loading gallery...</div>';
@@ -322,10 +375,42 @@ function populateGallery(container, onSelect, onDelete, page = 1) {
                 // Create gallery items container
                 const itemsContainer = document.createElement('div');
                 itemsContainer.className = 'gallery-items-container';
+                itemsContainer.id = 'galleryItemsContainer';
 
                 // Create gallery items
                 pageItems.forEach(item => {
-                    const galleryItem = createGalleryItemElement(item, onSelect, onDelete);
+                    const galleryItem = createGalleryItemElement(item, onSelect,
+                        // Wrap onDelete to handle pagination updates
+                        (id) => {
+                            // Call original onDelete if provided
+                            if (typeof onDelete === 'function') {
+                                onDelete(id);
+                            }
+
+                            // Check if we need to update pagination after deletion
+                            const updatedGallery = loadGallery();
+                            const updatedTotalPages = Math.ceil(updatedGallery.length / ITEMS_PER_PAGE);
+
+                            // If current page is now invalid, go to last page
+                            if (page > updatedTotalPages && updatedTotalPages > 0) {
+                                populateGallery(container, onSelect, onDelete, updatedTotalPages);
+                                return;
+                            }
+
+                            // If this page is now empty but there are still items, refresh the current page
+                            const currentPageItems = updatedGallery.slice(startIndex, endIndex);
+                            if (currentPageItems.length === 0 && updatedGallery.length > 0) {
+                                populateGallery(container, onSelect, onDelete, page);
+                                return;
+                            }
+
+                            // If gallery is completely empty, show empty message
+                            if (updatedGallery.length === 0) {
+                                container.innerHTML = '<p class="gallery-empty">Your gallery is empty. Create and save some artwork!</p>';
+                                return;
+                            }
+                        }
+                    );
                     itemsContainer.appendChild(galleryItem);
                 });
 
@@ -335,6 +420,22 @@ function populateGallery(container, onSelect, onDelete, page = 1) {
                 createPaginationControls(container, page, totalPages, (newPage) => {
                     populateGallery(container, onSelect, onDelete, newPage);
                 });
+
+                // Add event listener for gallery item deletion events
+                const galleryDeleteListener = (event) => {
+                    const { remainingCount } = event.detail;
+
+                    // If gallery is now empty, show empty message
+                    if (remainingCount === 0) {
+                        container.innerHTML = '<p class="gallery-empty">Your gallery is empty. Create and save some artwork!</p>';
+                    }
+                };
+
+                // Remove any existing listener to prevent duplicates
+                window.removeEventListener('galleryItemDeleted', galleryDeleteListener);
+
+                // Add the listener
+                window.addEventListener('galleryItemDeleted', galleryDeleteListener);
 
             } catch (error) {
                 console.error('Error populating gallery:', error);
@@ -351,15 +452,16 @@ function populateGallery(container, onSelect, onDelete, page = 1) {
  * Export artwork as PNG
  * @param {HTMLCanvasElement} canvas - The canvas element
  * @param {string} style - The art style name
- * @param {Object} options - Export options
+ * @param {Object} options - Export options (optional)
  * @returns {string} The data URL of the exported image
  */
 function exportAsPNG(canvas, style, options = {}) {
     // Default to high quality PNG
     const dataURL = canvas.toDataURL('image/png');
 
-    // Create filename
-    const filename = `generative-art-${style.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.png`;
+    // Create filename with optional prefix from options
+    const prefix = options.filenamePrefix || 'generative-art';
+    const filename = `${prefix}-${style.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.png`;
 
     // Create download link
     const link = document.createElement('a');
@@ -368,6 +470,18 @@ function exportAsPNG(canvas, style, options = {}) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // Dispatch event for analytics if enabled in options
+    if (options.trackExport && typeof window !== 'undefined') {
+        const event = new CustomEvent('artworkExported', {
+            detail: {
+                format: 'png',
+                style,
+                timestamp: new Date().toISOString()
+            }
+        });
+        window.dispatchEvent(event);
+    }
 
     return dataURL;
 }

@@ -29,6 +29,7 @@
 </head>
 <body>
     <canvas id="artCanvas"></canvas>
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
     <div id="controlsPanel">
         <button id="togglePanelButton" title="Toggle settings panel">Hide Settings</button>
 
@@ -293,6 +294,18 @@
         <div class="spinner"></div>
         <div class="loading-text">Generating artwork...</div>
     </div>
+
+    <!-- Mobile Action Buttons -->
+    <div class="mobile-action-buttons">
+        <button id="mobileRegenerateButton" title="Regenerate (R)">↻</button>
+        <button id="mobileExportButton" title="Export (E)">⬇</button>
+        <button id="mobileGalleryButton" title="Gallery (G)">🖼️</button>
+        <button id="mobileFullscreenButton" title="Fullscreen (F)">⛶</button>
+    </div>
+
+    <!-- Error Container -->
+    <div id="errorContainer" style="display: none;"></div>
+
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

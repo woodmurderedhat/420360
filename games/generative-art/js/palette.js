@@ -5,9 +5,61 @@
 
 import { randomRange, hslToString } from './utils.js';
 import { artStyles } from './styles.js';
+import { handleError, ErrorType, ErrorSeverity } from './error-service.js';
+
+// Palette cache to store recently generated palettes
+// Structure: { cacheKey: { palette: Array<string>, timestamp: number, hits: number } }
+const paletteCache = new Map();
+const MAX_CACHE_SIZE = 50; // Maximum number of palettes to cache
+let cacheHits = 0;
+let cacheMisses = 0;
+
+/**
+ * Generate a cache key for a palette
+ * @param {string} style - The art style
+ * @param {string} colorTheme - The color theme
+ * @param {number} baseHue - Base hue value
+ * @param {number} saturation - Saturation value
+ * @param {number} lightness - Lightness value
+ * @returns {string} A unique cache key
+ */
+function generateCacheKey(style, colorTheme, baseHue, saturation, lightness) {
+    // For random themes, don't use a cache key since we want a new palette each time
+    if (colorTheme === 'random') {
+        return null;
+    }
+
+    // For custom themes, include all parameters in the key
+    return `${style}|${colorTheme}|${baseHue}|${saturation}|${lightness}`;
+}
+
+/**
+ * Clear old entries from the palette cache
+ * @private
+ */
+function pruneCache() {
+    // If cache is under the limit, no need to prune
+    if (paletteCache.size <= MAX_CACHE_SIZE) {
+        return;
+    }
+
+    // Convert to array for sorting
+    const entries = Array.from(paletteCache.entries());
+
+    // Sort by last access time (oldest first)
+    entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+
+    // Remove oldest entries until we're under the limit
+    const entriesToRemove = entries.slice(0, entries.length - MAX_CACHE_SIZE);
+    entriesToRemove.forEach(entry => {
+        paletteCache.delete(entry[0]);
+    });
+}
 
 /**
  * Generates a color palette based on the selected art style and color theme.
+ * Uses a caching system to improve performance for repeated palette generation.
+ *
  * @param {string} style - The current art style.
  * @param {string} colorTheme - The color theme to use
  * @param {number} baseHue - Base hue for custom themes (0-360)
@@ -16,6 +68,24 @@ import { artStyles } from './styles.js';
  * @returns {Array<string>} An array of color strings.
  */
 function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation = 70, lightness = 50) {
+    try {
+        // Generate cache key
+        const cacheKey = generateCacheKey(style, colorTheme, baseHue, saturation, lightness);
+
+        // Check cache for non-random themes
+        if (cacheKey && paletteCache.has(cacheKey)) {
+            // Update cache entry timestamp and hit count
+            const cacheEntry = paletteCache.get(cacheKey);
+            cacheEntry.timestamp = Date.now();
+            cacheEntry.hits++;
+            cacheHits++;
+
+            // Return cached palette
+            return [...cacheEntry.palette]; // Return a copy to prevent modification
+        }
+
+        // Cache miss, generate a new palette
+        cacheMisses++;
     // Use custom color settings if selected
     let paletteBaseHue = colorTheme === 'custom' ? baseHue : Math.random() * 360;
     let paletteSaturation = colorTheme === 'custom' ? saturation : 70 + Math.random() * 30;
@@ -187,7 +257,59 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
             }
     }
 
+    // Store in cache if we have a cache key
+    if (cacheKey) {
+        // Prune cache if needed
+        pruneCache();
+
+        // Store the new palette
+        paletteCache.set(cacheKey, {
+            palette: [...palette], // Store a copy to prevent modification
+            timestamp: Date.now(),
+            hits: 1
+        });
+    }
+
     return palette;
+    } catch (error) {
+        handleError(error, ErrorType.RENDERING, ErrorSeverity.WARNING, {
+            component: 'palette',
+            message: 'Error generating color palette'
+        });
+
+        // Return a simple fallback palette
+        return [
+            'rgb(200, 50, 50)',
+            'rgb(50, 200, 50)',
+            'rgb(50, 50, 200)',
+            'rgb(200, 200, 50)',
+            'rgb(200, 50, 200)'
+        ];
+    }
+}
+
+/**
+ * Clear the palette cache
+ * Useful when changing themes or when palette generation logic changes
+ */
+export function clearPaletteCache() {
+    paletteCache.clear();
+    cacheHits = 0;
+    cacheMisses = 0;
+}
+
+/**
+ * Get statistics about the palette cache
+ * @returns {Object} Cache statistics
+ */
+export function getPaletteCacheStats() {
+    return {
+        size: paletteCache.size,
+        maxSize: MAX_CACHE_SIZE,
+        hits: cacheHits,
+        misses: cacheMisses,
+        hitRate: cacheHits + cacheMisses > 0 ? cacheHits / (cacheHits + cacheMisses) : 0
+    };
 }
 
 export { generatePalette };

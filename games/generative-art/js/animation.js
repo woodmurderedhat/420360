@@ -6,6 +6,7 @@
 import { generatePalette } from './palette.js';
 import { artStyles } from './styles.js';
 import { drawDefaultMasterpiece } from './styles-default.js';
+import { handleError, ErrorType, ErrorSeverity } from './error-service.js';
 
 // Animation state
 let isAnimating = false;
@@ -40,11 +41,18 @@ let dynamicCtx = null;
 let staticLayersDirty = true; // Flag to indicate if static layers need redrawing
 let lastStaticParams = null; // Store parameters to detect changes
 
+// Event listener tracking for proper cleanup
+let eventListeners = [];
+let resizeObserver = null;
+
 /**
  * Initialize animation and interactive features
  * @param {HTMLCanvasElement} canvas - The canvas element
  */
 function initAnimation(canvas) {
+    // Clean up any existing resources first
+    cleanupAnimationResources();
+
     // Create buffer canvas for smoother rendering
     bufferCanvas = document.createElement('canvas');
     bufferCanvas.width = canvas.width;
@@ -94,19 +102,23 @@ function initAnimation(canvas) {
     };
 
     // Set up mouse tracking for interactive mode
-    canvas.addEventListener('mousemove', (event) => {
+    const mouseMoveHandler = (event) => {
         schedulePointerUpdate(event.clientX, event.clientY);
-    });
+    };
+    canvas.addEventListener('mousemove', mouseMoveHandler);
+    eventListeners.push({ element: canvas, type: 'mousemove', handler: mouseMoveHandler });
 
     // Set up touch tracking for mobile
-    canvas.addEventListener('touchmove', (event) => {
+    const touchMoveHandler = (event) => {
         event.preventDefault();
         const touch = event.touches[0];
         schedulePointerUpdate(touch.clientX, touch.clientY);
-    });
+    };
+    canvas.addEventListener('touchmove', touchMoveHandler);
+    eventListeners.push({ element: canvas, type: 'touchmove', handler: touchMoveHandler });
 
     // Handle canvas resize
-    window.addEventListener('resize', () => {
+    const resizeHandler = () => {
         if (bufferCanvas) {
             bufferCanvas.width = canvas.width;
             bufferCanvas.height = canvas.height;
@@ -123,10 +135,90 @@ function initAnimation(canvas) {
             dynamicCanvas.width = canvas.width;
             dynamicCanvas.height = canvas.height;
         }
-    });
+    };
+    window.addEventListener('resize', resizeHandler);
+    eventListeners.push({ element: window, type: 'resize', handler: resizeHandler });
+
+    // Use ResizeObserver for more reliable canvas size monitoring
+    if (window.ResizeObserver) {
+        resizeObserver = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                if (entry.target === canvas) {
+                    resizeHandler();
+                    break;
+                }
+            }
+        });
+        resizeObserver.observe(canvas);
+    }
 
     // Initialize FPS monitoring
     lastFpsUpdateTime = performance.now();
+}
+
+/**
+ * Clean up animation resources to prevent memory leaks
+ */
+function cleanupAnimationResources() {
+    // Cancel any ongoing animation
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+
+    // Remove all event listeners
+    eventListeners.forEach(({ element, type, handler }) => {
+        element.removeEventListener(type, handler);
+    });
+    eventListeners = [];
+
+    // Disconnect ResizeObserver if it exists
+    if (resizeObserver) {
+        resizeObserver.disconnect();
+        resizeObserver = null;
+    }
+
+    // Release canvas references
+    if (bufferCtx) {
+        bufferCtx = null;
+    }
+    if (bufferCanvas) {
+        bufferCanvas.width = 1;
+        bufferCanvas.height = 1;
+        bufferCanvas = null;
+    }
+
+    if (staticCtx) {
+        staticCtx = null;
+    }
+    if (staticCanvas) {
+        staticCanvas.width = 1;
+        staticCanvas.height = 1;
+        staticCanvas = null;
+    }
+
+    if (dynamicCtx) {
+        dynamicCtx = null;
+    }
+    if (dynamicCanvas) {
+        dynamicCanvas.width = 1;
+        dynamicCanvas.height = 1;
+        dynamicCanvas = null;
+    }
+
+    // Reset animation state
+    isAnimating = false;
+    lastFrameTime = 0;
+    frameCount = 0;
+
+    // Reset performance monitoring
+    fpsHistory = [];
+    lastFpsUpdateTime = 0;
+    currentFps = 0;
+
+    // Reset layer caching
+    staticLayersDirty = true;
+    lastStaticParams = null;
 }
 
 /**
@@ -160,9 +252,10 @@ function startAnimation(canvas, ctx, style, settings = {}) {
 
 /**
  * Stop the animation loop
+ * @param {boolean} fullCleanup - Whether to perform a full cleanup of resources
  */
-function stopAnimation() {
-    if (!isAnimating) return;
+function stopAnimation(fullCleanup = false) {
+    if (!isAnimating && !fullCleanup) return;
 
     isAnimating = false;
     if (animationFrameId) {
@@ -172,6 +265,11 @@ function stopAnimation() {
 
     // Clear FPS history when animation stops
     fpsHistory = [];
+
+    // If full cleanup requested, release all resources
+    if (fullCleanup) {
+        cleanupAnimationResources();
+    }
 }
 
 /**
@@ -184,7 +282,7 @@ function stopAnimation() {
  */
 function toggleAnimation(canvas, ctx, style, settings = {}) {
     if (isAnimating) {
-        stopAnimation();
+        stopAnimation(false); // Don't do full cleanup on toggle
     } else {
         startAnimation(canvas, ctx, style, settings);
     }
@@ -438,7 +536,19 @@ function animationLoop(canvas, ctx, style, settings = {}) {
         ctx.drawImage(bufferCanvas, 0, 0);
     } catch (error) {
         console.error('Animation error:', error);
-        stopAnimation(); // Stop animation on error
+        // Stop animation with full cleanup on error
+        stopAnimation(true);
+
+        // Show error to user using error service
+        try {
+            handleError(error, ErrorType.ANIMATION, ErrorSeverity.ERROR, {
+                component: 'animationLoop',
+                message: 'Error in animation loop'
+            });
+        } catch (e) {
+            // Fallback if error service fails
+            console.error('Failed to handle animation error:', e);
+        }
     }
 }
 
@@ -451,6 +561,7 @@ export {
     setAnimationSpeed,
     setInteractiveMode,
     setAdaptiveQuality,
+    cleanupAnimationResources,
     isAnimating,
     isInteractive,
     currentFps,

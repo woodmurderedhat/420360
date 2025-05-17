@@ -3,114 +3,77 @@
  * Handles initialization and core functionality
  */
 
-import { generatePalette } from './palette.js';
+import { generatePalette, clearPaletteCache, getPaletteCacheStats } from './palette.js';
 import { artStyles } from './styles.js';
 import { drawDefaultMasterpiece } from './styles-default.js';
 import { initAnimation } from './animation.js';
 import { initWorkers } from './worker-manager.js';
 import { saveToHistory, updateHistoryButtons } from './history.js';
+import { handleError, ErrorType, ErrorSeverity } from './error-service.js';
 import {
-    canvas,
-    ctx,
-    numShapesInput,
-    lineWidthInput,
-    canvasWidthInput,
-    canvasHeightInput,
-    seedInput,
-    colorThemeSelector,
-    baseHueInput,
-    saturationInput,
-    lightnessInput,
-    backgroundColorPicker,
-    animationToggle,
-    animationSpeedInput,
-    interactiveToggle,
-    setupUI,
-    loadSettings,
-    applyUrlParams,
-    setupKeyboardShortcuts,
-    setupShareLink,
-    setupColorThemeControls,
-    setupAnimationControls,
-    setupSliderDisplays,
-    setupGalleryModalControls,
-    setupFullscreenButton,
-    setupHistoryControls,
-    setupWindowResize,
-    setupFullscreenChangeListeners
-} from './uimodule.js';
+    getState,
+    updateState,
+    resetState,
+    loadStateFromStorage,
+    applyStateFromUrlParams
+} from './state.js';
 
-// Application state
-const appState = {
-    currentArtStyle: artStyles.DEFAULT,
-    numShapes: numShapesInput ? +numShapesInput.value : 100,
-    lineWidth: lineWidthInput ? +lineWidthInput.value : 1,
-    backgroundColor: backgroundColorPicker ? backgroundColorPicker.value : '#ffffff',
-    colorTheme: colorThemeSelector ? colorThemeSelector.value : 'random',
-    baseHue: baseHueInput ? +baseHueInput.value : 180,
-    saturation: saturationInput ? +saturationInput.value : 70,
-    lightness: lightnessInput ? +lightnessInput.value : 50,
+// Import the new UI module
+import * as UI from './ui/index.js';
 
-    // Layer opacity settings - default values
-    voronoiOpacity: 0.4,
-    organicSplattersOpacity: 0.3,
-    neonWavesOpacity: 0.6,
-    fractalLinesOpacity: 0.7,
-    geometricGridOpacity: 0.6,
-    particleSwarmOpacity: 0.5,
-    organicNoiseOpacity: 0.3,
-    glitchMosaicOpacity: 0.15,
-    pixelSortOpacity: 0.2,
-
-    // New layer opacity settings - default values
-    gradientOverlayOpacity: 0.3,
-    dotMatrixOpacity: 0.4,
-    textureOverlayOpacity: 0.2,
-    symmetricalPatternsOpacity: 0.5,
-    flowingLinesOpacity: 0.4,
-
-    // Layer density settings - default values
-    voronoiDensity: 15,
-    organicSplattersDensity: 10,
-    neonWavesDensity: 5,
-    fractalLinesDensity: 2,
-
-    // New layer density settings - default values
-    dotMatrixDensity: 20,
-    flowingLinesDensity: 8,
-    symmetricalPatternsDensity: 6,
-
-    // Advanced settings - default values
-    blendMode: 'source-over',
-    colorShiftAmount: 0,
-    scaleAmount: 1.0,
-    rotationAmount: 0
-};
+// Use centralized state management instead of local appState object
 
 /**
  * Initialize the canvas dimensions and sets up event listeners.
  */
 function initCanvas() {
-    // Reset any existing transformations to avoid cumulative scaling
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    const dpr = window.devicePixelRatio || 1;
+    try {
+        // Get canvas and context from UI module
+        const canvas = UI.getElement('canvas');
+        const ctx = UI.getElement('ctx');
 
-    // Use custom dimensions if provided, otherwise fill viewport
-    const w = +canvasWidthInput.value || window.innerWidth;
-    const h = +canvasHeightInput.value || window.innerHeight;
+        if (!canvas || !ctx) {
+            handleError(
+                new Error('Canvas or context not found'),
+                ErrorType.RENDERING,
+                ErrorSeverity.ERROR,
+                { component: 'initCanvas', message: 'Canvas elements not found in the DOM' }
+            );
+            return;
+        }
 
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${h}px`;
+        // Reset any existing transformations to avoid cumulative scaling
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        const dpr = window.devicePixelRatio || 1;
 
-    ctx.scale(dpr, dpr);
+        // Get current state
+        const state = getState();
 
-    // Set background color
-    ctx.fillStyle = appState.backgroundColor;
-    ctx.fillRect(0, 0, w, h);
+        // Use custom dimensions if provided, otherwise fill viewport
+        const canvasWidthInput = UI.getElement('canvasWidthInput');
+        const canvasHeightInput = UI.getElement('canvasHeightInput');
 
-    drawArtwork(appState.currentArtStyle);
+        const w = (canvasWidthInput && +canvasWidthInput.value) || window.innerWidth;
+        const h = (canvasHeightInput && +canvasHeightInput.value) || window.innerHeight;
+
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+
+        ctx.scale(dpr, dpr);
+
+        // Set background color
+        ctx.fillStyle = state.backgroundColor;
+        ctx.fillRect(0, 0, w, h);
+
+        drawArtwork(state.currentArtStyle);
+    } catch (error) {
+        handleError(error, ErrorType.RENDERING, ErrorSeverity.ERROR, {
+            component: 'initCanvas',
+            message: 'Error initializing canvas'
+        });
+    }
 }
 
 /**
@@ -119,95 +82,89 @@ function initCanvas() {
  * @param {boolean} showLoading - Whether to show loading indicator
  */
 function drawArtwork(style, showLoading = true) {
-    // Show loading indicator for complex styles
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    if (showLoading && loadingIndicator) {
-        loadingIndicator.style.display = 'flex';
-    }
-
-    // Use requestAnimationFrame to ensure loading indicator is displayed
-    requestAnimationFrame(() => {
-        try {
-            // Get canvas dimensions
-            const width = canvas.width / (window.devicePixelRatio || 1);
-            const height = canvas.height / (window.devicePixelRatio || 1);
-
-            // Clear canvas and set background
-            ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = appState.backgroundColor;
-            ctx.fillRect(0, 0, width, height);
-
-            // Apply global line width
-            ctx.lineWidth = appState.lineWidth;
-
-            // Generate palette
-            const palette = generatePalette(
-                style,
-                appState.colorTheme,
-                appState.baseHue,
-                appState.saturation,
-                appState.lightness
-            );
-
-            // Common parameters for all styles
-            const params = {
-                width,
-                height,
-                lineWidth: appState.lineWidth,
-                numShapes: appState.numShapes,
-                backgroundColor: appState.backgroundColor,
-                colorTheme: appState.colorTheme,
-                baseHue: appState.baseHue,
-                saturation: appState.saturation,
-                lightness: appState.lightness,
-
-                // Layer opacity settings
-                voronoiOpacity: appState.voronoiOpacity,
-                organicSplattersOpacity: appState.organicSplattersOpacity,
-                neonWavesOpacity: appState.neonWavesOpacity,
-                fractalLinesOpacity: appState.fractalLinesOpacity,
-                geometricGridOpacity: appState.geometricGridOpacity,
-                particleSwarmOpacity: appState.particleSwarmOpacity,
-                organicNoiseOpacity: appState.organicNoiseOpacity,
-                glitchMosaicOpacity: appState.glitchMosaicOpacity,
-                pixelSortOpacity: appState.pixelSortOpacity,
-
-                // New layer opacity settings
-                gradientOverlayOpacity: appState.gradientOverlayOpacity,
-                dotMatrixOpacity: appState.dotMatrixOpacity,
-                textureOverlayOpacity: appState.textureOverlayOpacity,
-                symmetricalPatternsOpacity: appState.symmetricalPatternsOpacity,
-                flowingLinesOpacity: appState.flowingLinesOpacity,
-
-                // Layer density settings
-                voronoiDensity: appState.voronoiDensity,
-                organicSplattersDensity: appState.organicSplattersDensity,
-                neonWavesDensity: appState.neonWavesDensity,
-                fractalLinesDensity: appState.fractalLinesDensity,
-
-                // New layer density settings
-                dotMatrixDensity: appState.dotMatrixDensity,
-                flowingLinesDensity: appState.flowingLinesDensity,
-                symmetricalPatternsDensity: appState.symmetricalPatternsDensity,
-
-                // Advanced settings
-                blendMode: appState.blendMode,
-                colorShiftAmount: appState.colorShiftAmount,
-                scaleAmount: appState.scaleAmount,
-                rotationAmount: appState.rotationAmount
-            };
-
-            // Always draw the Default Masterpiece style
-            drawDefaultMasterpiece(ctx, palette, false, params);
-        } catch (error) {
-            console.error('Error drawing artwork:', error);
-        } finally {
-            // Hide loading indicator
-            if (loadingIndicator) {
-                loadingIndicator.style.display = 'none';
-            }
+    try {
+        // Clear palette cache when style changes from the current one
+        const currentState = getState();
+        if (currentState.currentArtStyle !== style) {
+            clearPaletteCache();
         }
-    });
+
+        // Show loading indicator for complex styles
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        if (showLoading && loadingIndicator) {
+            loadingIndicator.style.display = 'flex';
+        }
+
+        // Use requestAnimationFrame to ensure loading indicator is displayed
+        requestAnimationFrame(() => {
+            try {
+                // Get canvas and context from UI module
+                const canvas = UI.getElement('canvas');
+                const ctx = UI.getElement('ctx');
+
+                if (!canvas || !ctx) {
+                    throw new Error('Canvas or context not found');
+                }
+
+                // Get current state
+                const state = getState();
+
+                // Get canvas dimensions
+                const width = canvas.width / (window.devicePixelRatio || 1);
+                const height = canvas.height / (window.devicePixelRatio || 1);
+
+                // Clear canvas and set background
+                ctx.clearRect(0, 0, width, height);
+                ctx.fillStyle = state.backgroundColor;
+                ctx.fillRect(0, 0, width, height);
+
+                // Apply global line width
+                ctx.lineWidth = state.lineWidth;
+
+                // Generate palette
+                const palette = generatePalette(
+                    style,
+                    state.colorTheme,
+                    state.baseHue,
+                    state.saturation,
+                    state.lightness
+                );
+
+                // Common parameters for all styles - pass the entire state as params
+                // This simplifies the code and ensures all parameters are available
+                const params = {
+                    ...state,
+                    width,
+                    height
+                };
+
+                // Always draw the Default Masterpiece style
+                drawDefaultMasterpiece(ctx, palette, false, params);
+
+                // Update state with the current art style
+                if (currentState.currentArtStyle !== style) {
+                    updateState({ currentArtStyle: style });
+                }
+            } catch (error) {
+                handleError(error, ErrorType.RENDERING, ErrorSeverity.ERROR, {
+                    component: 'drawArtwork',
+                    style,
+                    message: 'Error drawing artwork'
+                });
+            } finally {
+                // Hide loading indicator
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+        });
+    } catch (error) {
+        handleError(error, ErrorType.RENDERING, ErrorSeverity.ERROR, {
+            component: 'drawArtwork',
+            style,
+            message: 'Error preparing to draw artwork'
+        });
+    }
 }
 
 /**
@@ -215,39 +172,37 @@ function drawArtwork(style, showLoading = true) {
  * @returns {Object} The current state
  */
 function getCurrentAppState() {
-    return {
-        style: appState.currentArtStyle,
-        numShapes: numShapesInput ? +numShapesInput.value : appState.numShapes,
-        lineWidth: lineWidthInput ? +lineWidthInput.value : appState.lineWidth,
-        canvasWidth: canvasWidthInput ? canvasWidthInput.value : '',
-        canvasHeight: canvasHeightInput ? canvasHeightInput.value : '',
-        seed: seedInput ? seedInput.value : '',
-        colorTheme: colorThemeSelector ? colorThemeSelector.value : appState.colorTheme,
-        baseHue: baseHueInput ? +baseHueInput.value : appState.baseHue,
-        saturation: saturationInput ? +saturationInput.value : appState.saturation,
-        lightness: lightnessInput ? +lightnessInput.value : appState.lightness,
-        backgroundColor: backgroundColorPicker ? backgroundColorPicker.value : appState.backgroundColor,
-        isAnimating: animationToggle ? animationToggle.checked : false,
-        animationSpeed: animationSpeedInput ? +animationSpeedInput.value : 50,
-        isInteractive: interactiveToggle ? interactiveToggle.checked : false,
+    try {
+        // Get the base state from our state management
+        const state = getState();
 
-        // Layer opacity settings - use appState values
-        voronoiOpacity: appState.voronoiOpacity,
-        organicSplattersOpacity: appState.organicSplattersOpacity,
-        neonWavesOpacity: appState.neonWavesOpacity,
-        fractalLinesOpacity: appState.fractalLinesOpacity,
-        geometricGridOpacity: appState.geometricGridOpacity,
-        particleSwarmOpacity: appState.particleSwarmOpacity,
-        organicNoiseOpacity: appState.organicNoiseOpacity,
-        glitchMosaicOpacity: appState.glitchMosaicOpacity,
-        pixelSortOpacity: appState.pixelSortOpacity,
+        // Override with any current UI values that might not be in state yet
+        return {
+            ...state,
+            style: state.currentArtStyle,
+            numShapes: UI.getValue('numShapesInput') ?? state.numShapes,
+            lineWidth: UI.getValue('lineWidthInput') ?? state.lineWidth,
+            canvasWidth: UI.getValue('canvasWidthInput') ?? state.canvasWidth,
+            canvasHeight: UI.getValue('canvasHeightInput') ?? state.canvasHeight,
+            seed: UI.getValue('seedInput') ?? state.seed,
+            colorTheme: UI.getValue('colorThemeSelector') ?? state.colorTheme,
+            baseHue: UI.getValue('baseHueInput') ?? state.baseHue,
+            saturation: UI.getValue('saturationInput') ?? state.saturation,
+            lightness: UI.getValue('lightnessInput') ?? state.lightness,
+            backgroundColor: UI.getValue('backgroundColorPicker') ?? state.backgroundColor,
+            isAnimating: UI.getValue('animationToggle') ?? state.animationEnabled,
+            animationSpeed: UI.getValue('animationSpeedInput') ?? state.animationSpeed,
+            isInteractive: UI.getValue('interactiveToggle') ?? state.interactiveMode
+        };
+    } catch (error) {
+        handleError(error, ErrorType.STATE, ErrorSeverity.WARNING, {
+            component: 'getCurrentAppState',
+            message: 'Error getting current application state'
+        });
 
-        // Layer density settings - use appState values
-        voronoiDensity: appState.voronoiDensity,
-        organicSplattersDensity: appState.organicSplattersDensity,
-        neonWavesDensity: appState.neonWavesDensity,
-        fractalLinesDensity: appState.fractalLinesDensity
-    };
+        // Return the base state if there's an error
+        return getState();
+    }
 }
 
 /**
@@ -257,128 +212,146 @@ function getCurrentAppState() {
 function applyAppState(state) {
     if (!state) return;
 
-    // Update app state - basic settings
+    // Create a new state object with properly typed values
+    const newState = {};
+
+    // Map style to currentArtStyle if needed
     if (state.style && Object.values(artStyles).includes(state.style)) {
-        appState.currentArtStyle = state.style;
+        newState.currentArtStyle = state.style;
     }
 
-    if (state.numShapes) {
-        appState.numShapes = +state.numShapes;
+    // Process numeric values
+    const numericProps = [
+        'numShapes', 'lineWidth', 'baseHue', 'saturation', 'lightness',
+        'voronoiOpacity', 'organicSplattersOpacity', 'neonWavesOpacity',
+        'fractalLinesOpacity', 'geometricGridOpacity', 'particleSwarmOpacity',
+        'organicNoiseOpacity', 'glitchMosaicOpacity', 'pixelSortOpacity',
+        'gradientOverlayOpacity', 'dotMatrixOpacity', 'textureOverlayOpacity',
+        'symmetricalPatternsOpacity', 'flowingLinesOpacity',
+        'voronoiDensity', 'organicSplattersDensity', 'neonWavesDensity',
+        'fractalLinesDensity', 'dotMatrixDensity', 'flowingLinesDensity',
+        'symmetricalPatternsDensity', 'colorShiftAmount', 'scaleAmount',
+        'rotationAmount', 'animationSpeed'
+    ];
+
+    numericProps.forEach(prop => {
+        if (state[prop] !== undefined) {
+            newState[prop] = +state[prop];
+        }
+    });
+
+    // Process string values
+    const stringProps = [
+        'colorTheme', 'backgroundColor', 'blendMode'
+    ];
+
+    stringProps.forEach(prop => {
+        if (state[prop] !== undefined) {
+            newState[prop] = state[prop];
+        }
+    });
+
+    // Process boolean values
+    if (state.isAnimating !== undefined) {
+        newState.animationEnabled = state.isAnimating === true || state.isAnimating === 'true';
     }
 
-    if (state.lineWidth) {
-        appState.lineWidth = +state.lineWidth;
+    if (state.isInteractive !== undefined) {
+        newState.interactiveMode = state.isInteractive === true || state.isInteractive === 'true';
     }
 
-    // Update color settings
-    if (state.colorTheme) {
-        appState.colorTheme = state.colorTheme;
+    if (state.adaptiveQuality !== undefined) {
+        newState.adaptiveQuality = state.adaptiveQuality === true || state.adaptiveQuality === 'true';
     }
 
-    if (state.baseHue !== undefined) {
-        appState.baseHue = +state.baseHue;
-    }
-
-    if (state.saturation !== undefined) {
-        appState.saturation = +state.saturation;
-    }
-
-    if (state.lightness !== undefined) {
-        appState.lightness = +state.lightness;
-    }
-
-    if (state.backgroundColor) {
-        appState.backgroundColor = state.backgroundColor;
-    }
-
-    // Update layer opacity settings
-    if (state.voronoiOpacity !== undefined) {
-        appState.voronoiOpacity = +state.voronoiOpacity;
-    }
-
-    if (state.organicSplattersOpacity !== undefined) {
-        appState.organicSplattersOpacity = +state.organicSplattersOpacity;
-    }
-
-    if (state.neonWavesOpacity !== undefined) {
-        appState.neonWavesOpacity = +state.neonWavesOpacity;
-    }
-
-    if (state.fractalLinesOpacity !== undefined) {
-        appState.fractalLinesOpacity = +state.fractalLinesOpacity;
-    }
-
-    if (state.geometricGridOpacity !== undefined) {
-        appState.geometricGridOpacity = +state.geometricGridOpacity;
-    }
-
-    if (state.particleSwarmOpacity !== undefined) {
-        appState.particleSwarmOpacity = +state.particleSwarmOpacity;
-    }
-
-    if (state.organicNoiseOpacity !== undefined) {
-        appState.organicNoiseOpacity = +state.organicNoiseOpacity;
-    }
-
-    if (state.glitchMosaicOpacity !== undefined) {
-        appState.glitchMosaicOpacity = +state.glitchMosaicOpacity;
-    }
-
-    if (state.pixelSortOpacity !== undefined) {
-        appState.pixelSortOpacity = +state.pixelSortOpacity;
-    }
-
-    // Update layer density settings
-    if (state.voronoiDensity !== undefined) {
-        appState.voronoiDensity = +state.voronoiDensity;
-    }
-
-    if (state.organicSplattersDensity !== undefined) {
-        appState.organicSplattersDensity = +state.organicSplattersDensity;
-    }
-
-    if (state.neonWavesDensity !== undefined) {
-        appState.neonWavesDensity = +state.neonWavesDensity;
-    }
-
-    if (state.fractalLinesDensity !== undefined) {
-        appState.fractalLinesDensity = +state.fractalLinesDensity;
-    }
+    // Update the state
+    updateState(newState);
 }
+
+/**
+ * Log palette cache statistics to the console
+ * Useful for debugging and performance monitoring
+ */
+function logPaletteCacheStats() {
+    const stats = getPaletteCacheStats();
+    console.log('Palette Cache Statistics:', stats);
+    console.log(`Cache Hit Rate: ${(stats.hitRate * 100).toFixed(2)}%`);
+    console.log(`Cache Size: ${stats.size}/${stats.maxSize}`);
+    console.log(`Hits: ${stats.hits}, Misses: ${stats.misses}`);
+}
+
+// Add palette cache stats to window for debugging
+window.logPaletteCacheStats = logPaletteCacheStats;
 
 // Initialize the application
 window.addEventListener('load', () => {
-    // Set up UI
-    setupUI(appState, drawArtwork, initCanvas, getCurrentAppState, applyAppState);
+    try {
+        // Initialize UI module
+        const uiInitialized = UI.initialize({
+            drawArtwork,
+            initCanvas,
+            getCurrentAppState,
+            applyAppState
+        });
 
-    // Set up additional UI components
-    const { undoButton, redoButton } = setupHistoryControls(applyAppState);
-    setupKeyboardShortcuts(appState, drawArtwork, regenerateButton, exportButton, galleryButton, undoButton, redoButton);
-    setupShareLink(appState);
-    setupColorThemeControls(appState);
-    setupAnimationControls(appState, drawArtwork);
-    setupSliderDisplays();
-    setupGalleryModalControls();
-    setupFullscreenButton();
-    setupWindowResize(initCanvas);
-    setupFullscreenChangeListeners(initCanvas);
+        if (!uiInitialized) {
+            throw new Error('Failed to initialize UI module');
+        }
 
-    // Initialize animation
-    initAnimation(canvas);
+        // Get canvas element
+        const canvas = UI.getElement('canvas');
+        if (!canvas) {
+            throw new Error('Canvas element not found');
+        }
 
-    // Initialize web workers for background processing
-    initWorkers();
+        // Initialize animation
+        initAnimation(canvas);
 
-    // Load settings
-    loadSettings(appState);
+        // Initialize web workers for background processing
+        initWorkers();
 
-    // Apply URL parameters
-    applyUrlParams(appState, applyAppState, getCurrentAppState);
+        // Load settings from storage
+        loadStateFromStorage();
 
-    // Initialize canvas
-    initCanvas();
+        // Apply URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.size > 0) {
+            applyStateFromUrlParams(urlParams);
+        }
 
-    // Save initial state to history
-    saveToHistory(getCurrentAppState());
-    updateHistoryButtons();
+        // Initialize canvas
+        initCanvas();
+
+        // Save initial state to history
+        saveToHistory(getCurrentAppState());
+        updateHistoryButtons();
+
+        // Register event handlers for UI events
+        UI.triggerEvent('registerHandlers', {
+            drawArtwork,
+            initCanvas,
+            getCurrentAppState,
+            applyAppState
+        });
+
+        console.log('Application initialized successfully');
+    } catch (error) {
+        handleError(error, ErrorType.INITIALIZATION, ErrorSeverity.CRITICAL, {
+            component: 'main',
+            message: 'Error initializing application'
+        });
+
+        // Show error message to user
+        const errorContainer = document.getElementById('errorContainer');
+        if (errorContainer) {
+            errorContainer.innerHTML = `
+                <div class="error-message">
+                    <h3>Error Initializing Application</h3>
+                    <p>${error.message}</p>
+                    <p>Please try refreshing the page. If the problem persists, contact support.</p>
+                </div>
+            `;
+            errorContainer.style.display = 'block';
+        }
+    }
 });

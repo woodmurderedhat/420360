@@ -6,14 +6,14 @@
 // Private module state
 const _elements = {
     // Main canvas
-    canvas: document.getElementById('canvas'),
-    
+    canvas: document.getElementById('artCanvas'),
+
     // Control buttons
     regenerateButton: document.getElementById('regenerateButton'),
     exportButton: document.getElementById('exportButton'),
     galleryButton: document.getElementById('galleryButton'),
     saveToGalleryButton: document.getElementById('saveToGalleryButton'),
-    
+
     // Control panel elements
     numShapesInput: document.getElementById('numShapes'),
     lineWidthInput: document.getElementById('lineWidth'),
@@ -25,7 +25,7 @@ const _elements = {
     togglePanelButton: document.getElementById('togglePanelButton'),
     controlsPanel: document.getElementById('controlsPanel'),
     currentSeedDisplay: document.querySelector('#currentSeedDisplay span'),
-    
+
     // Color controls
     colorThemeSelector: document.getElementById('colorThemeSelector'),
     baseHueInput: document.getElementById('baseHue'),
@@ -33,14 +33,14 @@ const _elements = {
     lightnessInput: document.getElementById('lightness'),
     backgroundColorPicker: document.getElementById('backgroundColor'),
     customColorControls: document.getElementById('customColorControls'),
-    
+
     // Animation controls
     animationToggle: document.getElementById('animationToggle'),
     animationSpeedInput: document.getElementById('animationSpeed'),
     interactiveToggle: document.getElementById('interactiveToggle'),
     adaptiveQualityToggle: document.getElementById('adaptiveQualityToggle'),
     fpsDisplay: document.getElementById('fpsDisplay'),
-    
+
     // Layer opacity controls
     voronoiOpacityInput: document.getElementById('voronoiOpacity'),
     organicSplattersOpacityInput: document.getElementById('organicSplattersOpacity'),
@@ -51,31 +51,31 @@ const _elements = {
     organicNoiseOpacityInput: document.getElementById('organicNoiseOpacity'),
     glitchMosaicOpacityInput: document.getElementById('glitchMosaicOpacity'),
     pixelSortOpacityInput: document.getElementById('pixelSortOpacity'),
-    
+
     // New layer opacity controls
     gradientOverlayOpacityInput: document.getElementById('gradientOverlayOpacity'),
     dotMatrixOpacityInput: document.getElementById('dotMatrixOpacity'),
     textureOverlayOpacityInput: document.getElementById('textureOverlayOpacity'),
     symmetricalPatternsOpacityInput: document.getElementById('symmetricalPatternsOpacity'),
     flowingLinesOpacityInput: document.getElementById('flowingLinesOpacity'),
-    
+
     // Layer density controls
     voronoiDensityInput: document.getElementById('voronoiDensity'),
     organicSplattersDensityInput: document.getElementById('organicSplattersDensity'),
     neonWavesDensityInput: document.getElementById('neonWavesDensity'),
     fractalLinesDensityInput: document.getElementById('fractalLinesDensity'),
-    
+
     // New layer density controls
     dotMatrixDensityInput: document.getElementById('dotMatrixDensity'),
     flowingLinesDensityInput: document.getElementById('flowingLinesDensity'),
     symmetricalPatternsDensityInput: document.getElementById('symmetricalPatternsDensity'),
-    
+
     // Advanced controls
     blendModeSelector: document.getElementById('blendModeSelector'),
     colorShiftAmountInput: document.getElementById('colorShiftAmount'),
     scaleAmountInput: document.getElementById('scaleAmount'),
     rotationAmountInput: document.getElementById('rotationAmount'),
-    
+
     // Display elements
     numShapesDisplay: document.getElementById('numShapesValue'),
     lineWidthDisplay: document.getElementById('lineWidthValue'),
@@ -83,12 +83,12 @@ const _elements = {
     saturationDisplay: document.getElementById('saturationValue'),
     lightnessDisplay: document.getElementById('lightnessValue'),
     animationSpeedDisplay: document.getElementById('animationSpeedValue'),
-    
+
     // Gallery modal elements
     galleryModal: document.getElementById('galleryModal'),
     galleryContainer: document.getElementById('galleryContainer'),
     closeButton: document.querySelector('.close-button'),
-    
+
     // History controls
     undoButton: document.getElementById('undoButton'),
     redoButton: document.getElementById('redoButton'),
@@ -140,7 +140,7 @@ function hasRequiredElements(requiredKeys) {
 function addListener(elementKey, eventType, handler) {
     const element = _elements[elementKey];
     if (!element) return false;
-    
+
     element.addEventListener(eventType, handler);
     return true;
 }
@@ -154,7 +154,7 @@ function addListener(elementKey, eventType, handler) {
 function setValue(elementKey, value) {
     const element = _elements[elementKey];
     if (!element) return false;
-    
+
     if (element.type === 'checkbox') {
         element.checked = !!value;
     } else {
@@ -171,7 +171,7 @@ function setValue(elementKey, value) {
 function getValue(elementKey) {
     const element = _elements[elementKey];
     if (!element) return null;
-    
+
     if (element.type === 'checkbox') {
         return element.checked;
     } else if (element.type === 'number') {

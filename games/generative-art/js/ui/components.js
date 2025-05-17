@@ -181,6 +181,49 @@ function getValue(elementKey) {
     }
 }
 
+/**
+ * Get values of multiple input elements
+ * @param {Array<string>} elementKeys - Array of element keys
+ * @returns {Object} Object with element values
+ */
+function getValues(elementKeys) {
+    const result = {};
+    elementKeys.forEach(key => {
+        result[key] = getValue(key);
+    });
+    return result;
+}
+
+/**
+ * Get all layer opacity values
+ * @returns {Object} Object with all layer opacity values
+ */
+function getLayerOpacityValues() {
+    const opacityKeys = [
+        'voronoiOpacity', 'organicSplattersOpacity', 'neonWavesOpacity',
+        'fractalLinesOpacity', 'geometricGridOpacity', 'particleSwarmOpacity',
+        'organicNoiseOpacity', 'glitchMosaicOpacity', 'pixelSortOpacity',
+        'gradientOverlayOpacity', 'dotMatrixOpacity', 'textureOverlayOpacity',
+        'symmetricalPatternsOpacity', 'flowingLinesOpacity'
+    ];
+
+    return getValues(opacityKeys);
+}
+
+/**
+ * Get all layer density values
+ * @returns {Object} Object with all layer density values
+ */
+function getLayerDensityValues() {
+    const densityKeys = [
+        'voronoiDensity', 'organicSplattersDensity', 'neonWavesDensity',
+        'fractalLinesDensity', 'dotMatrixDensity', 'flowingLinesDensity',
+        'symmetricalPatternsDensity'
+    ];
+
+    return getValues(densityKeys);
+}
+
 // Public API
 export {
     getElement,
@@ -188,5 +231,8 @@ export {
     hasRequiredElements,
     addListener,
     setValue,
-    getValue
+    getValue,
+    getValues,
+    getLayerOpacityValues,
+    getLayerDensityValues
 };

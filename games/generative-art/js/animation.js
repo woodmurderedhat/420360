@@ -432,59 +432,56 @@ function animationLoop(canvas, ctx, style, settings = {}) {
         settings.lightness || 50
     );
 
-    // Common parameters for all styles
+    // Common parameters for all styles - use default values from state.js if settings not provided
     const params = {
+        // Animation-specific parameters
         width,
         height,
         frameCount,
         mouseX,
         mouseY,
         isInteractive,
-        lineWidth: settings.lineWidth || 1,
-        numShapes: settings.numShapes || 100,
+        qualityLevel,
+
+        // Basic settings
+        lineWidth: settings.lineWidth !== undefined ? settings.lineWidth : 1,
+        numShapes: settings.numShapes !== undefined ? settings.numShapes : 100,
         backgroundColor: settings.backgroundColor || '#ffffff',
         colorTheme: settings.colorTheme || 'random',
-        baseHue: settings.baseHue || 180,
-        saturation: settings.saturation || 70,
-        lightness: settings.lightness || 50,
+        baseHue: settings.baseHue !== undefined ? settings.baseHue : 180,
+        saturation: settings.saturation !== undefined ? settings.saturation : 70,
+        lightness: settings.lightness !== undefined ? settings.lightness : 50,
 
-        // Layer opacity settings
-        voronoiOpacity: settings.voronoiOpacity || 0.4,
-        organicSplattersOpacity: settings.organicSplattersOpacity || 0.3,
-        neonWavesOpacity: settings.neonWavesOpacity || 0.6,
-        fractalLinesOpacity: settings.fractalLinesOpacity || 0.7,
-        geometricGridOpacity: settings.geometricGridOpacity || 0.6,
-        particleSwarmOpacity: settings.particleSwarmOpacity || 0.5,
-        organicNoiseOpacity: settings.organicNoiseOpacity || 0.3,
-        glitchMosaicOpacity: settings.glitchMosaicOpacity || 0.15,
-        pixelSortOpacity: settings.pixelSortOpacity || 0.2,
-
-        // New layer opacity settings
-        gradientOverlayOpacity: settings.gradientOverlayOpacity || 0.3,
-        dotMatrixOpacity: settings.dotMatrixOpacity || 0.4,
-        textureOverlayOpacity: settings.textureOverlayOpacity || 0.2,
-        symmetricalPatternsOpacity: settings.symmetricalPatternsOpacity || 0.5,
-        flowingLinesOpacity: settings.flowingLinesOpacity || 0.4,
+        // Layer opacity settings - use settings values if provided, otherwise use defaults
+        voronoiOpacity: settings.voronoiOpacity !== undefined ? settings.voronoiOpacity : 0.7,
+        organicSplattersOpacity: settings.organicSplattersOpacity !== undefined ? settings.organicSplattersOpacity : 0.6,
+        neonWavesOpacity: settings.neonWavesOpacity !== undefined ? settings.neonWavesOpacity : 0.5,
+        fractalLinesOpacity: settings.fractalLinesOpacity !== undefined ? settings.fractalLinesOpacity : 0.6,
+        geometricGridOpacity: settings.geometricGridOpacity !== undefined ? settings.geometricGridOpacity : 0.7,
+        particleSwarmOpacity: settings.particleSwarmOpacity !== undefined ? settings.particleSwarmOpacity : 0.7,
+        organicNoiseOpacity: settings.organicNoiseOpacity !== undefined ? settings.organicNoiseOpacity : 0.5,
+        glitchMosaicOpacity: settings.glitchMosaicOpacity !== undefined ? settings.glitchMosaicOpacity : 0.6,
+        pixelSortOpacity: settings.pixelSortOpacity !== undefined ? settings.pixelSortOpacity : 0.7,
+        gradientOverlayOpacity: settings.gradientOverlayOpacity !== undefined ? settings.gradientOverlayOpacity : 0.3,
+        dotMatrixOpacity: settings.dotMatrixOpacity !== undefined ? settings.dotMatrixOpacity : 0.6,
+        textureOverlayOpacity: settings.textureOverlayOpacity !== undefined ? settings.textureOverlayOpacity : 0.4,
+        symmetricalPatternsOpacity: settings.symmetricalPatternsOpacity !== undefined ? settings.symmetricalPatternsOpacity : 0.7,
+        flowingLinesOpacity: settings.flowingLinesOpacity !== undefined ? settings.flowingLinesOpacity : 0.6,
 
         // Layer density settings - apply quality level for adaptive performance
-        voronoiDensity: Math.round((settings.voronoiDensity || 15) * qualityLevel),
-        organicSplattersDensity: Math.round((settings.organicSplattersDensity || 10) * qualityLevel),
-        neonWavesDensity: Math.round((settings.neonWavesDensity || 5) * qualityLevel),
-        fractalLinesDensity: Math.round((settings.fractalLinesDensity || 2) * qualityLevel),
-
-        // New layer density settings - apply quality level for adaptive performance
-        dotMatrixDensity: Math.round((settings.dotMatrixDensity || 20) * qualityLevel),
-        flowingLinesDensity: Math.round((settings.flowingLinesDensity || 8) * qualityLevel),
-        symmetricalPatternsDensity: Math.round((settings.symmetricalPatternsDensity || 6) * qualityLevel),
+        voronoiDensity: Math.round((settings.voronoiDensity !== undefined ? settings.voronoiDensity : 50) * qualityLevel),
+        organicSplattersDensity: Math.round((settings.organicSplattersDensity !== undefined ? settings.organicSplattersDensity : 50) * qualityLevel),
+        neonWavesDensity: Math.round((settings.neonWavesDensity !== undefined ? settings.neonWavesDensity : 50) * qualityLevel),
+        fractalLinesDensity: Math.round((settings.fractalLinesDensity !== undefined ? settings.fractalLinesDensity : 50) * qualityLevel),
+        dotMatrixDensity: Math.round((settings.dotMatrixDensity !== undefined ? settings.dotMatrixDensity : 50) * qualityLevel),
+        flowingLinesDensity: Math.round((settings.flowingLinesDensity !== undefined ? settings.flowingLinesDensity : 50) * qualityLevel),
+        symmetricalPatternsDensity: Math.round((settings.symmetricalPatternsDensity !== undefined ? settings.symmetricalPatternsDensity : 50) * qualityLevel),
 
         // Advanced settings
-        blendMode: settings.blendMode || 'source-over',
-        colorShiftAmount: settings.colorShiftAmount || 0,
-        scaleAmount: settings.scaleAmount || 1.0,
-        rotationAmount: settings.rotationAmount || 0,
-
-        // Add quality level to params
-        qualityLevel: qualityLevel
+        blendMode: settings.blendMode || 'normal',
+        colorShiftAmount: settings.colorShiftAmount !== undefined ? settings.colorShiftAmount : 0,
+        scaleAmount: settings.scaleAmount !== undefined ? settings.scaleAmount : 1.0,
+        rotationAmount: settings.rotationAmount !== undefined ? settings.rotationAmount : 0
     };
 
     try {

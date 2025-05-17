@@ -3,7 +3,7 @@
  * Coordinates UI components and provides a unified interface
  */
 
-import { getElement, getElements, hasRequiredElements, addListener, setValue, getValue } from './components.js';
+import { getElement, getElements, hasRequiredElements, addListener, setValue, getValue, getValues, getLayerOpacityValues, getLayerDensityValues } from './components.js';
 import { registerHandler, triggerEvent, setupKeyboardShortcuts, setupWindowResize, setupFullscreenChangeListeners, cleanupEventListeners } from './events.js';
 import { SETTINGS_KEY, setupColorThemeControls, setupAnimationControls, setupSliderDisplays } from './controls.js';
 import { setupGalleryModalControls, openGallery } from './gallery-ui.js';
@@ -197,6 +197,37 @@ function setupEventHandlers() {
 
         const backgroundColorPicker = getElement('backgroundColorPicker');
         if (backgroundColorPicker) newState.backgroundColor = backgroundColorPicker.value;
+
+        // Update layer opacity settings using helper function
+        const opacityValues = getLayerOpacityValues();
+        Object.entries(opacityValues).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+                newState[key] = +value;
+            }
+        });
+
+        // Update layer density settings using helper function
+        const densityValues = getLayerDensityValues();
+        Object.entries(densityValues).forEach(([key, value]) => {
+            if (value !== null && value !== undefined) {
+                newState[key] = +value;
+            }
+        });
+
+        // Update advanced settings
+        const advancedInputs = [
+            'colorShiftAmount', 'scaleAmount', 'rotationAmount'
+        ];
+
+        advancedInputs.forEach(inputId => {
+            const value = getValue(inputId);
+            if (value !== null && value !== undefined) {
+                newState[inputId] = +value;
+            }
+        });
+
+        const blendModeSelector = getElement('blendModeSelector');
+        if (blendModeSelector) newState.blendMode = blendModeSelector.value;
 
         // Update state
         updateState(newState);

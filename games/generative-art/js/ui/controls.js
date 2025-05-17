@@ -28,21 +28,21 @@ const SETTINGS_KEY = 'generativeArtSettings';
 function setupColorThemeControls() {
     const colorThemeSelector = getElement('colorThemeSelector');
     const customColorControls = getElement('customColorControls');
-    
+
     if (colorThemeSelector && customColorControls) {
         addListener('colorThemeSelector', 'change', () => {
             // Update state
             const colorTheme = getValue('colorThemeSelector');
             updateState({ colorTheme });
-            
+
             // Show/hide custom color controls
             customColorControls.style.display = colorTheme === 'custom' ? 'block' : 'none';
-            
+
             // Clear palette cache when theme changes
             clearPaletteCache();
         });
     }
-    
+
     // Add event listeners for custom color controls to clear cache when changed
     const colorControls = ['baseHueInput', 'saturationInput', 'lightnessInput'];
     colorControls.forEach(control => {
@@ -70,24 +70,25 @@ function setupAnimationControls(drawArtwork) {
     const fpsDisplay = getElement('fpsDisplay');
     const canvas = getElement('canvas');
     const ctx = getElement('ctx');
-    
+
     if (!animationToggle || !canvas || !ctx) return;
-    
+
     // Animation toggle
     addListener('animationToggle', 'change', () => {
         const isAnimating = getValue('animationToggle');
-        
+
         if (isAnimating) {
             // Enable animation speed slider
             if (animationSpeedInput) {
                 animationSpeedInput.disabled = false;
             }
-            
+
             // Get current state
             const state = getState();
-            
-            // Start animation
+
+            // Start animation with all state parameters
             startAnimation(canvas, ctx, state.currentArtStyle, {
+                // Basic settings
                 animationSpeed: getValue('animationSpeedInput') || 50,
                 isInteractive: getValue('interactiveToggle') || false,
                 backgroundColor: state.backgroundColor,
@@ -96,9 +97,40 @@ function setupAnimationControls(drawArtwork) {
                 saturation: state.saturation,
                 lightness: state.lightness,
                 lineWidth: state.lineWidth,
-                numShapes: state.numShapes
+                numShapes: state.numShapes,
+
+                // Layer opacity settings
+                voronoiOpacity: state.voronoiOpacity,
+                organicSplattersOpacity: state.organicSplattersOpacity,
+                neonWavesOpacity: state.neonWavesOpacity,
+                fractalLinesOpacity: state.fractalLinesOpacity,
+                geometricGridOpacity: state.geometricGridOpacity,
+                particleSwarmOpacity: state.particleSwarmOpacity,
+                organicNoiseOpacity: state.organicNoiseOpacity,
+                glitchMosaicOpacity: state.glitchMosaicOpacity,
+                pixelSortOpacity: state.pixelSortOpacity,
+                gradientOverlayOpacity: state.gradientOverlayOpacity,
+                dotMatrixOpacity: state.dotMatrixOpacity,
+                textureOverlayOpacity: state.textureOverlayOpacity,
+                symmetricalPatternsOpacity: state.symmetricalPatternsOpacity,
+                flowingLinesOpacity: state.flowingLinesOpacity,
+
+                // Layer density settings
+                voronoiDensity: state.voronoiDensity,
+                organicSplattersDensity: state.organicSplattersDensity,
+                neonWavesDensity: state.neonWavesDensity,
+                fractalLinesDensity: state.fractalLinesDensity,
+                dotMatrixDensity: state.dotMatrixDensity,
+                flowingLinesDensity: state.flowingLinesDensity,
+                symmetricalPatternsDensity: state.symmetricalPatternsDensity,
+
+                // Advanced settings
+                blendMode: state.blendMode,
+                colorShiftAmount: state.colorShiftAmount,
+                scaleAmount: state.scaleAmount,
+                rotationAmount: state.rotationAmount
             });
-            
+
             // Start FPS display update
             if (fpsDisplay) {
                 startFpsMonitoring();
@@ -108,18 +140,18 @@ function setupAnimationControls(drawArtwork) {
             if (animationSpeedInput) {
                 animationSpeedInput.disabled = true;
             }
-            
+
             // Stop animation with full cleanup
             stopAnimation(true);
-            
+
             // Ensure all resources are properly cleaned up
             cleanupAnimationResources();
-            
+
             // Redraw static artwork
             if (drawArtwork) {
                 drawArtwork(getState().currentArtStyle);
             }
-            
+
             // Stop FPS display update
             if (fpsDisplay) {
                 stopFpsMonitoring();
@@ -127,50 +159,50 @@ function setupAnimationControls(drawArtwork) {
             }
         }
     });
-    
+
     // Animation speed slider
     if (animationSpeedInput) {
         addListener('animationSpeedInput', 'input', () => {
             const animationSpeed = getValue('animationSpeedInput');
             const animationSpeedDisplay = getElement('animationSpeedDisplay');
-            
+
             if (animationSpeedDisplay) {
                 animationSpeedDisplay.textContent = animationSpeed;
             }
-            
+
             setAnimationSpeed(animationSpeed);
         });
     }
-    
+
     // Interactive mode toggle
     if (interactiveToggle) {
         addListener('interactiveToggle', 'change', () => {
             setInteractiveMode(getValue('interactiveToggle'));
         });
     }
-    
+
     // Adaptive quality toggle
     if (adaptiveQualityToggle) {
         addListener('adaptiveQualityToggle', 'change', () => {
             setAdaptiveQuality(getValue('adaptiveQualityToggle'));
         });
     }
-    
+
     // FPS monitoring
     let fpsMonitoringInterval = null;
-    
+
     function startFpsMonitoring() {
         if (fpsMonitoringInterval) {
             clearInterval(fpsMonitoringInterval);
         }
-        
+
         fpsMonitoringInterval = setInterval(() => {
             if (fpsDisplay) {
                 // Import these dynamically to avoid circular dependencies
                 const { currentFps, qualityLevel } = require('../animation.js');
-                
+
                 fpsDisplay.textContent = currentFps;
-                
+
                 // Update quality level display if it exists
                 const qualityDisplay = document.getElementById('qualityLevelDisplay');
                 if (qualityDisplay) {
@@ -179,14 +211,14 @@ function setupAnimationControls(drawArtwork) {
             }
         }, 500);
     }
-    
+
     function stopFpsMonitoring() {
         if (fpsMonitoringInterval) {
             clearInterval(fpsMonitoringInterval);
             fpsMonitoringInterval = null;
         }
     }
-    
+
     // Register animation event handlers
     registerHandler('toggleAnimation', () => {
         if (animationToggle) {
@@ -202,14 +234,45 @@ function setupAnimationControls(drawArtwork) {
 function setupSliderDisplays() {
     // Map of input IDs to display elements
     const sliderDisplayMap = {
+        // Basic controls
         'numShapes': getElement('numShapesDisplay'),
         'lineWidth': getElement('lineWidthDisplay'),
         'baseHue': getElement('baseHueDisplay'),
         'saturation': getElement('saturationDisplay'),
         'lightness': getElement('lightnessDisplay'),
-        'animationSpeed': getElement('animationSpeedDisplay')
+        'animationSpeed': getElement('animationSpeedDisplay'),
+
+        // Layer opacity controls
+        'voronoiOpacity': getElement('voronoiOpacityDisplay'),
+        'organicSplattersOpacity': getElement('organicSplattersOpacityDisplay'),
+        'neonWavesOpacity': getElement('neonWavesOpacityDisplay'),
+        'fractalLinesOpacity': getElement('fractalLinesOpacityDisplay'),
+        'geometricGridOpacity': getElement('geometricGridOpacityDisplay'),
+        'particleSwarmOpacity': getElement('particleSwarmOpacityDisplay'),
+        'organicNoiseOpacity': getElement('organicNoiseOpacityDisplay'),
+        'glitchMosaicOpacity': getElement('glitchMosaicOpacityDisplay'),
+        'pixelSortOpacity': getElement('pixelSortOpacityDisplay'),
+        'gradientOverlayOpacity': getElement('gradientOverlayOpacityDisplay'),
+        'dotMatrixOpacity': getElement('dotMatrixOpacityDisplay'),
+        'textureOverlayOpacity': getElement('textureOverlayOpacityDisplay'),
+        'symmetricalPatternsOpacity': getElement('symmetricalPatternsOpacityDisplay'),
+        'flowingLinesOpacity': getElement('flowingLinesOpacityDisplay'),
+
+        // Layer density controls
+        'voronoiDensity': getElement('voronoiDensityDisplay'),
+        'organicSplattersDensity': getElement('organicSplattersDensityDisplay'),
+        'neonWavesDensity': getElement('neonWavesDensityDisplay'),
+        'fractalLinesDensity': getElement('fractalLinesDensityDisplay'),
+        'dotMatrixDensity': getElement('dotMatrixDensityDisplay'),
+        'flowingLinesDensity': getElement('flowingLinesDensityDisplay'),
+        'symmetricalPatternsDensity': getElement('symmetricalPatternsDensityDisplay'),
+
+        // Advanced controls
+        'colorShiftAmount': getElement('colorShiftAmountDisplay'),
+        'scaleAmount': getElement('scaleAmountDisplay'),
+        'rotationAmount': getElement('rotationAmountDisplay')
     };
-    
+
     // Set up input event listeners
     Object.entries(sliderDisplayMap).forEach(([inputId, displayElement]) => {
         const inputElement = document.getElementById(inputId);

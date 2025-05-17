@@ -135,10 +135,12 @@ function drawArtwork(style, showLoading = true) {
                 const params = {
                     ...state,
                     width,
-                    height
+                    height,
+                    isAnimationFrame: false
                 };
 
                 // Always draw the Default Masterpiece style
+                // Pass all parameters to ensure all UI settings affect the style
                 drawDefaultMasterpiece(ctx, palette, false, params);
 
                 // Update state with the current art style

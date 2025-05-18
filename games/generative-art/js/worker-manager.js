@@ -31,7 +31,7 @@ function initWorkers() {
     const workerCount = Math.min(MAX_WORKERS, 4); // Limit to 4 workers max
     for (let i = 0; i < workerCount; i++) {
         try {
-            const worker = new Worker('./js/worker.js');
+            const worker = new Worker('js/worker.js'); // Adjusted path for GitHub Pages
             
             // Set up message handler
             worker.onmessage = handleWorkerMessage;

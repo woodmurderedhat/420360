@@ -12,15 +12,14 @@ import { drawGeometricGridLayer } from './layers/geometric-grid.js';
 import { drawParticleSwarmLayer } from './layers/particle-swarm.js';
 import { drawOrganicNoiseLayer } from './layers/organic-noise.js';
 import { drawGlitchMosaicLayer } from './layers/glitch-mosaic.js';
+import { drawPixelSortLayer } from './layers/pixel-sort.js';
+import { drawGradientOverlayLayer } from './layers/gradient-overlay.js';
+import { drawDotMatrixLayer } from './layers/dot-matrix.js';
+import { drawTextureOverlayLayer } from './layers/texture-overlay.js';
+import { drawSymmetricalPatternsLayer } from './layers/symmetrical-patterns.js';
+import { drawFlowingLinesLayer } from './layers/flowing-lines.js';
 
-// TODO: The following layers are defined in state.js but not yet implemented
-// These will be implemented in future updates:
-// - pixel-sort.js: Pixel sorting algorithms for interesting visual effects
-// - gradient-overlay.js: Gradient overlay effects
-// - dot-matrix.js: Dot matrix patterns reminiscent of old printers
-// - texture-overlay.js: Texture overlay effects
-// - symmetrical-patterns.js: Symmetrical and mandala-like patterns
-// - flowing-lines.js: Flowing, organic line patterns
+// All layers have now been implemented
 
 /**
  * Draw the Default Masterpiece style - combines all other art styles
@@ -41,13 +40,12 @@ function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params =
         particleSwarmOpacity = 0,
         organicNoiseOpacity = 0,
         glitchMosaicOpacity = 0,
-        // The following are not yet implemented but defined in state.js
-        // pixelSortOpacity = 0,
-        // gradientOverlayOpacity = 0,
-        // dotMatrixOpacity = 0,
-        // textureOverlayOpacity = 0,
-        // symmetricalPatternsOpacity = 0,
-        // flowingLinesOpacity = 0
+        pixelSortOpacity = 0,
+        gradientOverlayOpacity = 0,
+        dotMatrixOpacity = 0,
+        textureOverlayOpacity = 0,
+        symmetricalPatternsOpacity = 0,
+        flowingLinesOpacity = 0
     } = params;
 
     // Helper to create layer-specific params
@@ -103,18 +101,51 @@ function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params =
         drawGlitchMosaicLayer(ctx, palette, isAnimationFrame, createLayerParams('glitchMosaicDensity'), glitchMosaicOpacity);
     }
 
-    // TODO: Add calls for other layers (Pixel Sort, Gradient Overlay, etc.)
-    // following the same pattern once their modules and drawing functions are available and imported.
+    // Draw Pixel Sort Layer
+    if (pixelSortOpacity > 0 && typeof drawPixelSortLayer === 'function') {
+        drawPixelSortLayer(ctx, palette, isAnimationFrame, createLayerParams('pixelSortDensity'), pixelSortOpacity);
+    }
 
-    // ... (calls for other layers like Dot Matrix, Flowing Lines, Symmetrical Patterns)
+    // Draw Gradient Overlay Layer
+    if (gradientOverlayOpacity > 0 && typeof drawGradientOverlayLayer === 'function') {
+        const gradientParams = {
+            canvasWidth,
+            canvasHeight,
+            seed,
+            blendMode: params.blendMode || 'overlay'
+        };
+        drawGradientOverlayLayer(ctx, palette, isAnimationFrame, gradientParams, gradientOverlayOpacity);
+    }
 
-    // Layers like Gradient Overlay or Texture Overlay might not have "density"
-    // and might take different parameters.
-    // Example for Gradient Overlay:
-    // if (params.gradientOverlayOpacity > 0 && typeof drawGradientOverlayLayer === 'function') {
-    //     const gradientParams = { canvasWidth, canvasHeight, /* other relevant params */ };
-    //     drawGradientOverlayLayer(ctx, palette, isAnimationFrame, gradientParams, params.gradientOverlayOpacity);
-    // }
+    // Draw Dot Matrix Layer
+    if (dotMatrixOpacity > 0 && typeof drawDotMatrixLayer === 'function') {
+        drawDotMatrixLayer(ctx, palette, isAnimationFrame, createLayerParams('dotMatrixDensity'), dotMatrixOpacity);
+    }
+
+    // Draw Texture Overlay Layer
+    if (textureOverlayOpacity > 0 && typeof drawTextureOverlayLayer === 'function') {
+        const textureParams = {
+            ...createLayerParams('textureOverlayDensity'),
+            blendMode: params.blendMode || 'overlay'
+        };
+        drawTextureOverlayLayer(ctx, palette, isAnimationFrame, textureParams, textureOverlayOpacity);
+    }
+
+    // Draw Symmetrical Patterns Layer
+    if (symmetricalPatternsOpacity > 0 && typeof drawSymmetricalPatternsLayer === 'function') {
+        drawSymmetricalPatternsLayer(ctx, palette, isAnimationFrame, createLayerParams('symmetricalPatternsDensity'), symmetricalPatternsOpacity);
+    }
+
+    // Draw Flowing Lines Layer
+    if (flowingLinesOpacity > 0 && typeof drawFlowingLinesLayer === 'function') {
+        const flowingParams = {
+            ...createLayerParams('flowingLinesDensity'),
+            lineWidth: params.lineWidth || 2
+        };
+        drawFlowingLinesLayer(ctx, palette, isAnimationFrame, flowingParams, flowingLinesOpacity);
+    }
+
+    // All layers have now been implemented and integrated into the default masterpiece style
 }
 
 // Export the default masterpiece drawing function

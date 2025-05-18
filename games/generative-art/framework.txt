@@ -1,0 +1,88 @@
+# Generative Art Application Framework
+
+```
+index.html
+├── styles.css (Main stylesheet)
+├── js/main.js (Entry point)
+│   ├── js/styles.js (Art style definitions)
+│   │   └── js/styles-default.js (Default masterpiece style)
+│   ├── js/animation.js (Animation functionality)
+│   ├── js/palette.js (Color palette generation)
+│   ├── js/state.js (State management)
+│   ├── js/gallery.js (Gallery functionality)
+│   ├── js/history.js (Undo/redo functionality)
+│   ├── js/error-service.js (Error handling)
+│   ├── js/utils.js (Utility functions)
+│   ├── js/worker-manager.js (Web worker management)
+│   ├── js/webgl-renderer.js (WebGL rendering)
+│   └── js/ui/index.js (UI module entry point)
+│       ├── js/ui/components.js (UI component management)
+│       ├── js/ui/events.js (Event handling)
+│       ├── js/ui/gallery-ui.js (Gallery UI)
+│       ├── js/ui/responsive.js (Responsive UI)
+│       ├── js/ui/color-controls.js (Color controls)
+│       ├── js/ui/animation-controls.js (Animation controls)
+│       ├── js/ui/canvas-controls.js (Canvas controls)
+│       └── js/ui/layer-controls.js (Layer controls)
+├── js/layers/ (Layer modules)
+│   ├── js/layers/dot-matrix.js
+│   ├── js/layers/flowing-lines.js
+│   ├── js/layers/fractal-lines.js
+│   ├── js/layers/geometric-grid.js
+│   ├── js/layers/glitch-mosaic.js
+│   ├── js/layers/gradient-overlay.js
+│   ├── js/layers/neon-waves.js
+│   ├── js/layers/organic-noise.js
+│   ├── js/layers/organic-splatters.js
+│   ├── js/layers/particle-swarm.js
+│   ├── js/layers/pixel-sort.js
+│   ├── js/layers/symmetrical-patterns.js
+│   ├── js/layers/texture-overlay.js
+│   └── js/layers/voronoi.js
+├── test-console.js (Basic tests)
+├── test-functionality.js (Comprehensive tests)
+└── test-todo-items.js (Todo item tests)
+```
+
+## Data Flow
+
+1. **Initialization Flow**:
+   - `index.html` loads `js/main.js` as a module
+   - `main.js` imports modules and initializes the application
+   - UI components are initialized through `js/ui/index.js`
+   - Event listeners are set up for user interactions
+   - Initial artwork is generated
+
+2. **Rendering Flow**:
+   - User selects art style or adjusts parameters
+   - State is updated in `state.js`
+   - `drawArtwork()` function in `main.js` is called
+   - Appropriate style rendering function is called from `styles.js`
+   - For default masterpiece style, layers are rendered in sequence from `js/layers/`
+   - Canvas is updated with the new artwork
+
+3. **Animation Flow**:
+   - Animation is controlled by `animation.js`
+   - When enabled, animation loop updates parameters
+   - Each frame calls the appropriate rendering function
+   - Performance is monitored and quality is adjusted if needed
+
+4. **Gallery Flow**:
+   - Artwork can be saved to gallery using `gallery.js`
+   - Gallery UI is managed by `js/ui/gallery-ui.js`
+   - Saved artworks are stored in localStorage
+   - Gallery items can be loaded, viewed, and deleted
+
+5. **History Flow**:
+   - State changes are recorded in `history.js`
+   - Undo/redo functionality allows navigating through state history
+   - History is maintained for the current session only
+
+## GitHub Pages Compatibility
+
+The application is designed to be compatible with GitHub Pages hosting:
+- All file paths use relative URLs (e.g., `./js/main.js` instead of `/js/main.js`)
+- No server-side dependencies or code
+- All resources are loaded using client-side JavaScript
+- Application state is stored in localStorage
+- All functionality works in a static hosting environment

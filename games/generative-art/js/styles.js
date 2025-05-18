@@ -13,12 +13,14 @@ import { drawGeometricGridLayer } from './layers/geometric-grid.js';
 import { drawParticleSwarmLayer } from './layers/particle-swarm.js';
 import { drawOrganicNoiseLayer } from './layers/organic-noise.js';
 import { drawGlitchMosaicLayer } from './layers/glitch-mosaic.js';
+import { drawPixelSortLayer } from './layers/pixel-sort.js';
+import { drawGradientOverlayLayer } from './layers/gradient-overlay.js';
+import { drawDotMatrixLayer } from './layers/dot-matrix.js';
+import { drawTextureOverlayLayer } from './layers/texture-overlay.js';
+import { drawSymmetricalPatternsLayer } from './layers/symmetrical-patterns.js';
+import { drawFlowingLinesLayer } from './layers/flowing-lines.js';
 
-// TODO: The following styles are defined in artStyles but not yet implemented as separate modules:
-// - pixel-sort.js: Pixel sorting algorithms for interesting visual effects
-// - dot-matrix.js: Dot matrix patterns reminiscent of old printers
-// - flowing-lines.js: Flowing, organic line patterns
-// - symmetrical-patterns.js: Symmetrical and mandala-like patterns
+// All art styles have now been implemented as separate modules
 
 // Art style constants
 export const artStyles = {
@@ -32,9 +34,11 @@ export const artStyles = {
     ORGANIC_NOISE: 'organic-noise',
     GLITCH_MOSAIC: 'glitch-mosaic',
     PIXEL_SORT: 'pixel-sort',
+    GRADIENT_OVERLAY: 'gradient-overlay',
     DOT_MATRIX: 'dot-matrix',
     FLOWING_LINES: 'flowing-lines',
-    SYMMETRICAL_PATTERNS: 'symmetrical-patterns'
+    SYMMETRICAL_PATTERNS: 'symmetrical-patterns',
+    TEXTURE_OVERLAY: 'texture-overlay'
 };
 
 /**
@@ -113,9 +117,54 @@ export function drawArtwork(ctx, style, palette, isAnimationFrame = false, param
                 drawGlitchMosaicLayer(ctx, palette, isAnimationFrame, createLayerParams('glitchMosaicDensity', params.glitchMosaicDensity || 50), 1.0);
             }
             break;
-        // TODO: Add cases for other individual art styles
-        // These might call their own dedicated drawing functions (e.g., drawPixelSortStyle)
-        // or reuse layer functions if the style is simple enough.
+        case artStyles.PIXEL_SORT:
+            if (typeof drawPixelSortLayer === 'function') {
+                drawPixelSortLayer(ctx, palette, isAnimationFrame, createLayerParams('pixelSortDensity', params.pixelSortDensity || 50), 1.0);
+            }
+            break;
+        case artStyles.GRADIENT_OVERLAY:
+            if (typeof drawGradientOverlayLayer === 'function') {
+                // Gradient overlay doesn't use density, so we pass a simpler params object
+                const gradientParams = {
+                    canvasWidth,
+                    canvasHeight,
+                    seed,
+                    blendMode: params.blendMode || 'overlay'
+                };
+                drawGradientOverlayLayer(ctx, palette, isAnimationFrame, gradientParams, 1.0);
+            }
+            break;
+        case artStyles.DOT_MATRIX:
+            if (typeof drawDotMatrixLayer === 'function') {
+                drawDotMatrixLayer(ctx, palette, isAnimationFrame, createLayerParams('dotMatrixDensity', params.dotMatrixDensity || 50), 1.0);
+            }
+            break;
+        case artStyles.TEXTURE_OVERLAY:
+            if (typeof drawTextureOverlayLayer === 'function') {
+                const textureParams = {
+                    canvasWidth,
+                    canvasHeight,
+                    seed,
+                    textureOverlayDensity: params.textureOverlayDensity || 50,
+                    blendMode: params.blendMode || 'overlay'
+                };
+                drawTextureOverlayLayer(ctx, palette, isAnimationFrame, textureParams, 1.0);
+            }
+            break;
+        case artStyles.SYMMETRICAL_PATTERNS:
+            if (typeof drawSymmetricalPatternsLayer === 'function') {
+                drawSymmetricalPatternsLayer(ctx, palette, isAnimationFrame, createLayerParams('symmetricalPatternsDensity', params.symmetricalPatternsDensity || 50), 1.0);
+            }
+            break;
+        case artStyles.FLOWING_LINES:
+            if (typeof drawFlowingLinesLayer === 'function') {
+                const flowingParams = {
+                    ...createLayerParams('flowingLinesDensity', params.flowingLinesDensity || 50),
+                    lineWidth: params.lineWidth || 2
+                };
+                drawFlowingLinesLayer(ctx, palette, isAnimationFrame, flowingParams, 1.0);
+            }
+            break;
         default:
             console.warn(`Art style "${style}" not yet implemented. Drawing default.`);
             drawDefaultMasterpiece(ctx, palette, isAnimationFrame, params);
@@ -140,9 +189,11 @@ export function getStyleDisplayName(style) {
         case artStyles.ORGANIC_NOISE: return 'Organic Noise';
         case artStyles.GLITCH_MOSAIC: return 'Glitch Mosaic';
         case artStyles.PIXEL_SORT: return 'Pixel Sort';
+        case artStyles.GRADIENT_OVERLAY: return 'Gradient Overlay';
         case artStyles.DOT_MATRIX: return 'Dot Matrix';
         case artStyles.FLOWING_LINES: return 'Flowing Lines';
         case artStyles.SYMMETRICAL_PATTERNS: return 'Symmetrical Patterns';
+        case artStyles.TEXTURE_OVERLAY: return 'Texture Overlay';
         default:
             return style.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }

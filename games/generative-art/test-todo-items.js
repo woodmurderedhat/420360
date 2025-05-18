@@ -9,7 +9,7 @@ window.addEventListener('load', () => {
 
 function checkTodoItems() {
     console.log('Checking remaining todo items...');
-    
+
     // List of todo items to check
     const todoItems = [
         {
@@ -93,14 +93,14 @@ function checkTodoItems() {
             test: testWebGLOptimization
         }
     ];
-    
+
     // Run tests for each todo item
     todoItems.forEach(item => {
         console.log(`Testing todo item #${item.id}: ${item.description}`);
         const result = item.test();
         console.log(`Result: ${result ? 'IMPLEMENTED' : 'NOT IMPLEMENTED'}`);
     });
-    
+
     console.log('Todo item checks completed!');
 }
 
@@ -112,7 +112,7 @@ function testLayerModules() {
         // Look for layer-specific JS files
         const scripts = document.querySelectorAll('script');
         for (const script of scripts) {
-            if (script.src && script.src.includes('/layers/')) {
+            if (script.src && script.src.includes('layers/')) {
                 return true;
             }
         }
@@ -162,8 +162,8 @@ function testUnitTests() {
         const scripts = document.querySelectorAll('script');
         for (const script of scripts) {
             if (script.src && (script.src.includes('test') || script.src.includes('spec'))) {
-                if (!script.src.includes('test-console.js') && 
-                    !script.src.includes('test-functionality.js') && 
+                if (!script.src.includes('test-console.js') &&
+                    !script.src.includes('test-functionality.js') &&
                     !script.src.includes('test-todo-items.js')) {
                     return true;
                 }
@@ -181,7 +181,7 @@ function testStyleSwitching() {
     try {
         const animationToggle = document.getElementById('animationToggle');
         if (!animationToggle) return false;
-        
+
         // This is hard to test automatically, but we can check if the animation module has a transition function
         if (window.styleTransition) {
             return true;

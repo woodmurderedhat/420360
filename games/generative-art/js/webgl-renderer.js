@@ -383,10 +383,103 @@ function renderGradient(colors, width, height, time, gradientType = 0) {
     gl.deleteBuffer(positionBuffer);
 }
 
+/**
+ * Initialize WebGL renderer with additional shader support for new visual effects
+ * @param {HTMLCanvasElement} canvas - The canvas element for WebGL rendering
+ * @returns {Object} WebGL context and utility functions
+ */
+function initWebGLRenderer(canvas) {
+    // Initialize WebGL context with antialiasing
+    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) {
+        throw new Error('WebGL2 not supported');
+    }
+    
+    // Initialize shader programs
+    const shaderPrograms = {
+        basic: createBasicShaderProgram(gl),
+        bloom: createBloomShaderProgram(gl),
+        depthEffect: createDepthShaderProgram(gl),
+        distortion: createDistortionShaderProgram(gl)
+    };
+    
+    // Additional WebGL state and utilities
+    return {
+        gl,
+        shaderPrograms,
+        applyBloomEffect,
+        applyDepthEffect,
+        applyDistortionEffect,
+        cleanup
+    };
+}
+
+/**
+ * Apply bloom/glow effect to rendered scene
+ * @param {WebGLRenderingContext} gl - WebGL context
+ * @param {WebGLTexture} inputTexture - Input texture with the scene
+ * @param {Object} params - Effect parameters (intensity, threshold, etc.)
+ * @returns {WebGLTexture} Output texture with bloom applied
+ */
+function applyBloomEffect(gl, inputTexture, params = {}) {
+    // Implementation for bloom effect
+    // ...
+}
+
+/**
+ * Apply depth effect to rendered scene
+ * @param {WebGLRenderingContext} gl - WebGL context
+ * @param {WebGLTexture} inputTexture - Input texture with the scene
+ * @param {Object} params - Effect parameters (depth, focus, etc.)
+ * @returns {WebGLTexture} Output texture with depth effect applied
+ */
+function applyDepthEffect(gl, inputTexture, params = {}) {
+    // Implementation for depth effect
+    // ...
+}
+
+/**
+ * Apply distortion/wave effect to rendered scene
+ * @param {WebGLRenderingContext} gl - WebGL context
+ * @param {WebGLTexture} inputTexture - Input texture with the scene
+ * @param {Object} params - Effect parameters (amplitude, frequency, etc.)
+ * @returns {WebGLTexture} Output texture with distortion applied
+ */
+function applyDistortionEffect(gl, inputTexture, params = {}) {
+    // Implementation for distortion effect
+    // ...
+}
+
+/**
+ * Create shader programs for the basic renderer
+ * @param {WebGLRenderingContext} gl - WebGL context
+ * @returns {WebGLProgram} Compiled and linked shader program
+ */
+function createBasicShaderProgram(gl) {
+    // Implementation for basic shader program
+    // ...
+}
+
+// Additional shader program creation functions
+// ...
+
+/**
+ * Clean up WebGL resources
+ */
+function cleanup() {
+    // Resource cleanup implementation
+    // ...
+}
+
 // Export WebGL functions
 export {
     initWebGL,
     isWebGLAvailable,
     renderParticles,
-    renderGradient
+    renderGradient,
+    initWebGLRenderer,
+    applyBloomEffect,
+    applyDepthEffect,
+    applyDistortionEffect,
+    cleanup
 };

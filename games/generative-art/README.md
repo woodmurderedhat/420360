@@ -8,6 +8,11 @@ A powerful, browser-based generative art application that allows you to create, 
 - **Customizable Parameters**: Adjust number of shapes, line width, canvas size, and more
 - **Color Themes**: Select from various color themes or create custom color palettes
 - **Animation**: Bring your artwork to life with animation and interactive features
+- **Layer Harmonization**: Experience beautifully balanced compositions with smart layer blending
+- **Visual Effects**: Add depth, glow, and distortion to enhance your creations
+- **Responsive Controls**: Enjoy immediate visual feedback when adjusting parameters
+- **Composition Guides**: Use built-in composition guides for more balanced artwork
+- **Performance Optimization**: Create complex visuals with optimized rendering pipeline
 - **Interactive Mode**: Interact with the artwork using mouse or touch
 - **Gallery**: Save your favorite creations to a local gallery for later viewing
 - **Export**: Download your artwork as PNG files

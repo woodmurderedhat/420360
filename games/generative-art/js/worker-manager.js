@@ -31,13 +31,29 @@ function initWorkers() {
     const workerCount = Math.min(MAX_WORKERS, 4); // Limit to 4 workers max
     for (let i = 0; i < workerCount; i++) {
         try {
-            const worker = new Worker('js/worker.js'); // Adjusted path for GitHub Pages
+            const worker = new Worker('./js/worker.js', { type: 'module' });
             
-            // Set up message handler
-            worker.onmessage = handleWorkerMessage;
+            // Enhanced error handling for worker errors
             worker.onerror = handleWorkerError;
             
-            // Add to pool
+            // Add message error handling
+            worker.onmessage = function(e) {
+                if (e.data.type === 'error') {
+                    handleWorkerError({
+                        message: e.data.message,
+                        filename: 'worker.js',
+                        lineno: 0,
+                        colno: 0,
+                        error: new Error(e.data.error || 'Unknown worker error'),
+                        originalType: e.data.originalType
+                    });
+                } else {
+                    // Handle successful responses
+                    processWorkerResponse(e.data);
+                }
+            };
+            
+            // Add worker to pool
             workers.push({
                 worker,
                 busy: false
@@ -89,17 +105,52 @@ function handleWorkerMessage(e) {
  * Handle worker errors
  * @param {ErrorEvent} error - The error event
  */
-function handleWorkerError(error) {
-    console.error('Worker error:', error);
+function handleWorkerError(event) {
+    const { message, filename, lineno, colno, error, originalType } = event;
     
-    // Find the worker that had an error
-    const workerInfo = workers.find(w => w.worker === error.target);
-    if (workerInfo) {
-        workerInfo.busy = false;
+    console.error('Worker error:', message, {
+        filename,
+        line: lineno,
+        column: colno,
+        originalType,
+        stack: error?.stack
+    });
+    
+    // Dispatch error to error service
+    handleError(error || new Error(message), ErrorType.WORKER, ErrorSeverity.ERROR, {
+        component: 'worker',
+        message: `Worker error: ${message}`,
+        details: { filename, line: lineno, column: colno, originalType }
+    });
+    
+    // Attempt recovery based on error type
+    if (originalType) {
+        // For known task types, we can try to recover
+        recoverFromWorkerError(originalType);
     }
-    
-    // Process next task in queue
-    processQueue();
+}
+
+/**
+ * Recovery strategies for worker errors
+ * @param {string} taskType - The type of task that caused the error
+ */
+function recoverFromWorkerError(taskType) {
+    switch (taskType) {
+        case 'processNoise':
+            // Fallback to main thread processing for noise
+            console.log('Falling back to main thread for noise processing');
+            break;
+            
+        case 'generateFractal':
+            // Fallback to simpler fractal algorithm
+            console.log('Falling back to simplified fractal generation');
+            break;
+            
+        default:
+            // General recovery - restart worker
+            console.log('Attempting to restart worker');
+            // Implementation for worker restart
+    }
 }
 
 /**

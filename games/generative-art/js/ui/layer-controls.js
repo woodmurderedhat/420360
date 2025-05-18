@@ -35,7 +35,8 @@ const layerDensityControls = [
     { id: 'fractalLinesDensity', stateKey: 'fractalLinesDensity', defaultValue: 50 },
     { id: 'dotMatrixDensity', stateKey: 'dotMatrixDensity', defaultValue: 50 },
     { id: 'flowingLinesDensity', stateKey: 'flowingLinesDensity', defaultValue: 50 },
-    { id: 'symmetricalPatternsDensity', stateKey: 'symmetricalPatternsDensity', defaultValue: 50 }
+    { id: 'symmetricalPatternsDensity', stateKey: 'symmetricalPatternsDensity', defaultValue: 50 },
+    { id: 'organicNoiseDensity', stateKey: 'organicNoiseDensity', defaultValue: 50 }
 ];
 
 /**

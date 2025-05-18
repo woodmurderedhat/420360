@@ -7,7 +7,7 @@
    - Description: Natural noise patterns and textures (like Perlin noise)
    - Parameters:
      - organicNoiseOpacity (from state.js)
-     - Add appropriate density parameter
+     - organicNoiseDensity (0-100)
    - Implementation notes:
      - Consider using Perlin or Simplex noise algorithms
      - Create natural, flowing textures

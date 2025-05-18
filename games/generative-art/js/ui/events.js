@@ -11,6 +11,7 @@ import { debounce, throttle } from '../utils.js';
 // Private module state
 const _eventHandlers = new Map();
 const _eventListeners = [];
+const _observedElements = new Map();
 
 /**
  * Register an event handler
@@ -34,9 +35,9 @@ function triggerEvent(eventName, data = {}) {
             return handler(data);
         } catch (error) {
             handleError(error, ErrorType.UI, ErrorSeverity.ERROR, {
-                component: 'events',
-                event: eventName,
-                message: `Error in event handler for ${eventName}`
+                component: 'triggerEvent',
+                eventName,
+                message: `Error triggering event "${eventName}"`
             });
         }
     }
@@ -53,63 +54,154 @@ function setupKeyboardShortcuts(options = {}) {
         'e': () => triggerEvent('export'),
         'g': () => triggerEvent('openGallery'),
         'f': (e) => {
-            triggerEvent('toggleFullscreen');
             e.preventDefault();
+            triggerEvent('toggleFullscreen');
         },
         ' ': (e) => {
+            e.preventDefault();
             triggerEvent('toggleAnimation');
-            e.preventDefault(); // Prevent page scrolling
         },
         'ctrl+z': (e) => {
-            triggerEvent('undo');
             e.preventDefault();
+            triggerEvent('undo');
         },
         'ctrl+y': (e) => {
-            triggerEvent('redo');
             e.preventDefault();
+            triggerEvent('redo');
         },
         'ctrl+shift+z': (e) => {
-            triggerEvent('redo');
             e.preventDefault();
-        }
+            triggerEvent('redo');
+        },
+        'c': () => triggerEvent('toggleCompositionGuides'),
+        'p': () => triggerEvent('showPresets'),
+        'h': () => triggerEvent('toggleHelp'),
+        'esc': () => triggerEvent('closeAllModals')
     };
-
-    // Add number key handlers (1-9)
+    
+    // Add number keys for styles
     for (let i = 1; i <= 9; i++) {
-        keyHandlers[i.toString()] = () => {
-            triggerEvent('quickGenerate', { preset: i });
-        };
+        keyHandlers[`${i}`] = () => triggerEvent('selectStyle', { index: i - 1 });
     }
-
-    // Add custom handlers from options
-    if (options.customHandlers) {
-        Object.entries(options.customHandlers).forEach(([key, handler]) => {
-            keyHandlers[key] = handler;
-        });
-    }
-
-    // Handle keydown events
-    const handleKeyDown = (event) => {
-        // Skip if user is typing in an input
-        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+    
+    // Handler for keyboard shortcuts
+    const handleKeyDown = (e) => {
+        // Skip if user is typing in an input field
+        if (
+            document.activeElement.tagName === 'INPUT' || 
+            document.activeElement.tagName === 'TEXTAREA' || 
+            document.activeElement.tagName === 'SELECT' ||
+            document.activeElement.isContentEditable
+        ) {
             return;
         }
-
-        // Get key combination
-        let key = event.key.toLowerCase();
-        if (event.ctrlKey) key = 'ctrl+' + key;
-        if (event.shiftKey && key !== 'ctrl+z') key = 'shift+' + key;
-
-        // Execute handler if exists
+        
+        let key = e.key.toLowerCase();
+        
+        // Create shortcut string with modifiers
+        if (e.ctrlKey) key = 'ctrl+' + key;
+        if (e.shiftKey) key = key.includes('ctrl+') ? key.replace('ctrl+', 'ctrl+shift+') : 'shift+' + key;
+        
+        // Check for escape key
+        if (e.key === 'Escape') key = 'esc';
+        
+        // Execute handler if found
         const handler = keyHandlers[key];
         if (handler) {
-            handler(event);
+            handler(e);
+            
+            // Show visual feedback for the shortcut
+            showShortcutFeedback(key);
         }
     };
-
-    // Add event listener
+    
     document.addEventListener('keydown', handleKeyDown);
     _eventListeners.push({ element: document, type: 'keydown', handler: handleKeyDown });
+}
+
+/**
+ * Show visual feedback when a keyboard shortcut is used
+ * @param {string} key - The key combination
+ */
+function showShortcutFeedback(key) {
+    // Create or get feedback element
+    let feedback = document.getElementById('shortcut-feedback');
+    if (!feedback) {
+        feedback = document.createElement('div');
+        feedback.id = 'shortcut-feedback';
+        document.body.appendChild(feedback);
+    }
+    
+    // Format key for display
+    const displayKey = key
+        .replace('ctrl+', 'Ctrl + ')
+        .replace('shift+', 'Shift + ')
+        .replace(' ', 'Space');
+    
+    // Add descriptive text based on the shortcut
+    let action = 'Unknown Action';
+    switch (key) {
+        case 'r': action = 'Regenerate Artwork'; break;
+        case 'e': action = 'Export as PNG'; break;
+        case 'g': action = 'Open Gallery'; break;
+        case 'f': action = 'Toggle Fullscreen'; break;
+        case ' ': action = 'Toggle Animation'; break;
+        case 'ctrl+z': action = 'Undo'; break;
+        case 'ctrl+y': case 'ctrl+shift+z': action = 'Redo'; break;
+        case 'c': action = 'Toggle Composition Guides'; break;
+        case 'p': action = 'Show Presets'; break;
+        case 'h': action = 'Toggle Help'; break;
+        case 'esc': action = 'Close Modal'; break;
+        default:
+            if (key >= '1' && key <= '9') {
+                action = `Select Style ${key}`;
+            }
+    }
+    
+    // Update content and show
+    feedback.innerHTML = `
+        <div class="key">${displayKey}</div>
+        <div class="action">${action}</div>
+    `;
+    feedback.classList.add('visible');
+    
+    // Hide after delay
+    setTimeout(() => {
+        feedback.classList.remove('visible');
+    }, 1500);
+}
+
+/**
+ * Observe element changes to update UI
+ * @param {string} elementId - ID of the element to observe
+ * @param {Function} callback - Callback function when element changes
+ * @returns {Function} Function to stop observing
+ */
+function observeElementChanges(elementId, callback) {
+    const element = document.getElementById(elementId);
+    if (!element) return () => {};
+    
+    // Create mutation observer
+    const observer = new MutationObserver((mutations) => {
+        callback(element, mutations);
+    });
+    
+    // Start observing
+    observer.observe(element, { 
+        attributes: true, 
+        childList: true,
+        subtree: true,
+        characterData: true
+    });
+    
+    // Store observer for cleanup
+    _observedElements.set(elementId, observer);
+    
+    // Return function to stop observing
+    return () => {
+        observer.disconnect();
+        _observedElements.delete(elementId);
+    };
 }
 
 /**
@@ -176,10 +268,17 @@ function setupFullscreenChangeListeners(callback) {
  * Clean up all event listeners
  */
 function cleanupEventListeners() {
+    // Remove all registered event listeners
     _eventListeners.forEach(({ element, type, handler }) => {
         element.removeEventListener(type, handler);
     });
     _eventListeners.length = 0;
+    
+    // Disconnect all mutation observers
+    _observedElements.forEach((observer) => {
+        observer.disconnect();
+    });
+    _observedElements.clear();
 }
 
 // Public API
@@ -189,5 +288,6 @@ export {
     setupKeyboardShortcuts,
     setupWindowResize,
     setupFullscreenChangeListeners,
+    observeElementChanges,
     cleanupEventListeners
 };

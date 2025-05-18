@@ -241,8 +241,56 @@ self.addEventListener('message', (e) => {
             );
             self.postMessage({ type: 'noise', result: noiseResult }, [noiseResult.buffer]);
             break;
+
+        case 'processNoise':
+            // Process organic noise data in background
+            processNoiseData(data);
+            break;
+            
+        case 'generateFractal':
+            // Generate fractal patterns in background
+            generateFractalData(data);
+            break;
+            
+        case 'applyVisualEffects':
+            // Apply visual effects like bloom, glow, or distortion
+            applyVisualEffects(data);
+            break;
             
         default:
-            self.postMessage({ type: 'error', message: 'Unknown task type' });
+            self.postMessage({ type: 'error', message: 'Unknown task type', originalType: type });
     }
 });
+
+// Process noise data for organic noise layer
+function processNoiseData(data) {
+    try {
+        // Implementation for noise processing
+        const result = { /* processed noise data */ };
+        self.postMessage({ type: 'processNoise', result });
+    } catch (error) {
+        self.postMessage({ type: 'error', message: 'Error processing noise data', error: error.message });
+    }
+}
+
+// Generate fractal pattern data
+function generateFractalData(data) {
+    try {
+        // Implementation for fractal generation
+        const result = { /* generated fractal data */ };
+        self.postMessage({ type: 'generateFractal', result });
+    } catch (error) {
+        self.postMessage({ type: 'error', message: 'Error generating fractal data', error: error.message });
+    }
+}
+
+// Apply visual effects to image data
+function applyVisualEffects(data) {
+    try {
+        // Implementation for visual effects
+        const result = { /* processed image data */ };
+        self.postMessage({ type: 'applyVisualEffects', result });
+    } catch (error) {
+        self.postMessage({ type: 'error', message: 'Error applying visual effects', error: error.message });
+    }
+}

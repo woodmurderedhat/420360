@@ -196,7 +196,14 @@ function setupSeedControls(drawArtworkFn) {
             if (state.seed) {
                 seedInput.value = state.seed;
                 if (currentSeedDisplay) {
-                    currentSeedDisplay.textContent = state.seed;
+                    // Check if currentSeedDisplay is a div with a span or just a span
+                    if (currentSeedDisplay.tagName === 'SPAN') {
+                        currentSeedDisplay.textContent = state.seed;
+                    } else if (currentSeedDisplay.querySelector('span')) {
+                        currentSeedDisplay.querySelector('span').textContent = state.seed;
+                    } else {
+                        currentSeedDisplay.textContent = state.seed;
+                    }
                 }
             }
 
@@ -207,7 +214,14 @@ function setupSeedControls(drawArtworkFn) {
 
                 // Update seed display
                 if (currentSeedDisplay) {
-                    currentSeedDisplay.textContent = seed;
+                    // Check if currentSeedDisplay is a div with a span or just a span
+                    if (currentSeedDisplay.tagName === 'SPAN') {
+                        currentSeedDisplay.textContent = seed;
+                    } else if (currentSeedDisplay.querySelector('span')) {
+                        currentSeedDisplay.querySelector('span').textContent = seed;
+                    } else {
+                        currentSeedDisplay.textContent = seed;
+                    }
                 }
 
                 // Set seed and redraw
@@ -224,7 +238,14 @@ function setupSeedControls(drawArtworkFn) {
 
                 // Update seed display
                 if (currentSeedDisplay) {
-                    currentSeedDisplay.textContent = randomSeed;
+                    // Check if currentSeedDisplay is a div with a span or just a span
+                    if (currentSeedDisplay.tagName === 'SPAN') {
+                        currentSeedDisplay.textContent = randomSeed;
+                    } else if (currentSeedDisplay.querySelector('span')) {
+                        currentSeedDisplay.querySelector('span').textContent = randomSeed;
+                    } else {
+                        currentSeedDisplay.textContent = randomSeed;
+                    }
                 }
 
                 // Update state
@@ -361,7 +382,14 @@ function resetCanvasControls() {
             seedInput.value = randomSeed;
 
             if (currentSeedDisplay) {
-                currentSeedDisplay.textContent = randomSeed;
+                // Check if currentSeedDisplay is a div with a span or just a span
+                if (currentSeedDisplay.tagName === 'SPAN') {
+                    currentSeedDisplay.textContent = randomSeed;
+                } else if (currentSeedDisplay.querySelector('span')) {
+                    currentSeedDisplay.querySelector('span').textContent = randomSeed;
+                } else {
+                    currentSeedDisplay.textContent = randomSeed;
+                }
             }
 
             stateUpdate.seed = randomSeed;

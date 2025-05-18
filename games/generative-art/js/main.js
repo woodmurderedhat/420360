@@ -17,6 +17,7 @@ import {
     loadStateFromStorage,
     applyStateFromUrlParams
 } from './state.js';
+import { setSeed } from './utils.js';
 
 // Import the new UI module
 import * as UI from './ui/index.js';
@@ -319,6 +320,12 @@ window.addEventListener('load', () => {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.size > 0) {
             applyStateFromUrlParams(urlParams);
+        }
+
+        // Initialize seed with current state
+        const state = getState();
+        if (state.seed) {
+            setSeed(state.seed.toString());
         }
 
         // Initialize canvas

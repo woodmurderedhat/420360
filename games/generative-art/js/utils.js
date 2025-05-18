@@ -49,9 +49,18 @@ function setSeed(seed) {
         seedValue = hashString(seed);
         seedNumber = seedValue;
         Math.random = rnd;
+
+        // Add seedrandom method to Math object for compatibility with existing code
+        Math.seedrandom = function(seedStr) {
+            setSeed(seedStr);
+            return Math.random;
+        };
     } else {
         seedValue = null;
         Math.random = originalRandom;
+
+        // Remove seedrandom method
+        Math.seedrandom = undefined;
     }
 }
 

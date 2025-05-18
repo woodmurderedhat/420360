@@ -48,20 +48,20 @@ function setupCanvasControls(drawArtworkFn, initCanvasFn) {
     try {
         // Set up basic canvas controls
         setupBasicCanvasControls(drawArtworkFn);
-        
+
         // Set up canvas size controls
         setupCanvasSizeControls(initCanvasFn);
-        
+
         // Set up seed controls
         setupSeedControls(drawArtworkFn);
-        
+
         // Set up advanced controls
         setupAdvancedControls(drawArtworkFn);
-        
+
         // Register reset event handler
         registerHandler('resetCanvasControls', () => {
             resetCanvasControls();
-            
+
             // Reinitialize canvas
             if (initCanvasFn) {
                 initCanvasFn();
@@ -85,7 +85,7 @@ function setupBasicCanvasControls(drawArtworkFn) {
         canvasControls.forEach(control => {
             const input = getElement(control.id);
             const display = getElement(`${control.id}Value`);
-            
+
             if (input) {
                 // Set initial value from state
                 const state = getState();
@@ -95,24 +95,24 @@ function setupBasicCanvasControls(drawArtworkFn) {
                         display.textContent = state[control.stateKey];
                     }
                 }
-                
+
                 // Add input event listener
                 addListener(control.id, 'input', () => {
                     const value = parseFloat(input.value);
-                    
+
                     // Update display
                     if (display) {
                         display.textContent = value;
                     }
-                    
+
                     // Update state
                     const stateUpdate = {};
                     stateUpdate[control.stateKey] = value;
                     updateState(stateUpdate);
-                    
+
                     // Clear palette cache
                     clearPaletteCache();
-                    
+
                     // Redraw artwork if not animating
                     if (!getState().animationEnabled && drawArtworkFn) {
                         drawArtworkFn(getState().currentArtStyle, false);
@@ -136,7 +136,7 @@ function setupCanvasSizeControls(initCanvasFn) {
     try {
         const canvasWidthInput = getElement('canvasWidth');
         const canvasHeightInput = getElement('canvasHeight');
-        
+
         if (canvasWidthInput && canvasHeightInput) {
             // Set initial values from state
             const state = getState();
@@ -146,25 +146,25 @@ function setupCanvasSizeControls(initCanvasFn) {
             if (state.canvasHeight) {
                 canvasHeightInput.value = state.canvasHeight;
             }
-            
+
             // Add change event listeners
             addListener('canvasWidth', 'change', () => {
                 const width = parseInt(canvasWidthInput.value, 10);
                 if (width > 0) {
                     updateState({ canvasWidth: width });
-                    
+
                     // Reinitialize canvas
                     if (initCanvasFn) {
                         initCanvasFn();
                     }
                 }
             });
-            
+
             addListener('canvasHeight', 'change', () => {
                 const height = parseInt(canvasHeightInput.value, 10);
                 if (height > 0) {
                     updateState({ canvasHeight: height });
-                    
+
                     // Reinitialize canvas
                     if (initCanvasFn) {
                         initCanvasFn();
@@ -189,47 +189,47 @@ function setupSeedControls(drawArtworkFn) {
         const seedInput = getElement('seedInput');
         const randomSeedButton = getElement('randomSeedButton');
         const currentSeedDisplay = getElement('currentSeedDisplay');
-        
+
         if (seedInput && randomSeedButton) {
             // Set initial value from state
             const state = getState();
             if (state.seed) {
                 seedInput.value = state.seed;
                 if (currentSeedDisplay) {
-                    currentSeedDisplay.querySelector('span').textContent = state.seed;
+                    currentSeedDisplay.textContent = state.seed;
                 }
             }
-            
+
             // Add change event listener
             addListener('seedInput', 'change', () => {
                 const seed = seedInput.value;
                 updateState({ seed });
-                
+
                 // Update seed display
                 if (currentSeedDisplay) {
-                    currentSeedDisplay.querySelector('span').textContent = seed;
+                    currentSeedDisplay.textContent = seed;
                 }
-                
+
                 // Set seed and redraw
                 setSeed(seed);
                 if (drawArtworkFn) {
                     drawArtworkFn(getState().currentArtStyle);
                 }
             });
-            
+
             // Random seed button
             addListener('randomSeedButton', 'click', () => {
                 const randomSeed = Math.floor(Math.random() * 1000000);
                 seedInput.value = randomSeed;
-                
+
                 // Update seed display
                 if (currentSeedDisplay) {
-                    currentSeedDisplay.querySelector('span').textContent = randomSeed;
+                    currentSeedDisplay.textContent = randomSeed;
                 }
-                
+
                 // Update state
                 updateState({ seed: randomSeed });
-                
+
                 // Set seed and redraw
                 setSeed(randomSeed);
                 if (drawArtworkFn) {
@@ -259,24 +259,24 @@ function setupAdvancedControls(drawArtworkFn) {
             if (state.blendMode) {
                 blendModeSelector.value = state.blendMode;
             }
-            
+
             // Add change event listener
             addListener('blendModeSelector', 'change', () => {
                 const blendMode = getValue('blendModeSelector');
                 updateState({ blendMode });
-                
+
                 // Redraw artwork if not animating
                 if (!getState().animationEnabled && drawArtworkFn) {
                     drawArtworkFn(getState().currentArtStyle, false);
                 }
             });
         }
-        
+
         // Set up advanced sliders
         advancedControls.forEach(control => {
             const input = getElement(control.id);
             const display = getElement(`${control.id}Value`);
-            
+
             if (input) {
                 // Set initial value from state
                 const state = getState();
@@ -286,21 +286,21 @@ function setupAdvancedControls(drawArtworkFn) {
                         display.textContent = state[control.stateKey];
                     }
                 }
-                
+
                 // Add input event listener
                 addListener(control.id, 'input', () => {
                     const value = parseFloat(input.value);
-                    
+
                     // Update display
                     if (display) {
                         display.textContent = value;
                     }
-                    
+
                     // Update state
                     const stateUpdate = {};
                     stateUpdate[control.stateKey] = value;
                     updateState(stateUpdate);
-                    
+
                     // Redraw artwork if not animating
                     if (!getState().animationEnabled && drawArtworkFn) {
                         drawArtworkFn(getState().currentArtStyle, false);
@@ -322,77 +322,77 @@ function setupAdvancedControls(drawArtworkFn) {
 function resetCanvasControls() {
     try {
         const stateUpdate = {};
-        
+
         // Reset basic canvas controls
         canvasControls.forEach(control => {
             const input = getElement(control.id);
             const display = getElement(`${control.id}Value`);
-            
+
             if (input) {
                 input.value = control.defaultValue;
                 if (display) {
                     display.textContent = control.defaultValue;
                 }
-                
+
                 stateUpdate[control.stateKey] = control.defaultValue;
             }
         });
-        
+
         // Reset canvas size controls
         const canvasWidthInput = getElement('canvasWidth');
         const canvasHeightInput = getElement('canvasHeight');
-        
+
         if (canvasWidthInput) {
             canvasWidthInput.value = '';
             stateUpdate.canvasWidth = window.innerWidth;
         }
-        
+
         if (canvasHeightInput) {
             canvasHeightInput.value = '';
             stateUpdate.canvasHeight = window.innerHeight;
         }
-        
+
         // Reset seed control
         const seedInput = getElement('seedInput');
         const currentSeedDisplay = getElement('currentSeedDisplay');
-        
+
         if (seedInput) {
             const randomSeed = Math.floor(Math.random() * 1000000);
             seedInput.value = randomSeed;
-            
+
             if (currentSeedDisplay) {
-                currentSeedDisplay.querySelector('span').textContent = randomSeed;
+                currentSeedDisplay.textContent = randomSeed;
             }
-            
+
             stateUpdate.seed = randomSeed;
             setSeed(randomSeed);
         }
-        
+
         // Reset blend mode
         const blendModeSelector = getElement('blendModeSelector');
         if (blendModeSelector) {
             blendModeSelector.value = 'source-over';
             stateUpdate.blendMode = 'source-over';
         }
-        
+
         // Reset advanced controls
         advancedControls.forEach(control => {
             const input = getElement(control.id);
             const display = getElement(`${control.id}Value`);
-            
+
             if (input) {
                 input.value = control.defaultValue;
                 if (display) {
                     display.textContent = control.defaultValue;
                 }
-                
+
                 stateUpdate[control.stateKey] = control.defaultValue;
             }
         });
-        
+
         // Update state
         updateState(stateUpdate);
-        
+
         // Clear palette cache
         clearPaletteCache();
     } catch (error) {

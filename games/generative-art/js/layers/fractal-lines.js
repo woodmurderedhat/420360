@@ -32,27 +32,35 @@ function drawFractalLineRecursive(ctx, x1, y1, x2, y2, depth, color, palette) {
  * Draw a reduced Fractal Lines layer
  * @param {CanvasRenderingContext2D} ctx - The canvas context
  * @param {Array<string>} palette - The color palette
- * @param {boolean} isAnimationFrame - Whether this is an animation frame
- * @param {Object} params - Additional parameters (canvas dimensions, etc.)
+ * @param {boolean} isAnimationFrame - Whether this is an animation frame (used for animated effects)
+ * @param {Object} params - Parameters including canvasWidth, canvasHeight, fractalLinesDensity, lineWidth.
  * @param {number} opacity - Opacity of the layer
  */
 export function drawFractalLinesLayer(ctx, palette, isAnimationFrame, params, opacity = 1.0) {
     if (opacity === 0) return;
 
-    const { canvasWidth, canvasHeight, fractalLinesDensity } = params;
-    const numLines = Math.floor(fractalLinesDensity / 100 * 5) + 1; // Example density mapping
+    // Add some animation effects if this is an animation frame
+    const animationOffset = isAnimationFrame ? Math.sin(Date.now() * 0.001) * 10 : 0;
+
+    const { canvasWidth, canvasHeight, fractalLinesDensity, lineWidth } = params;
+    // Ensure fractalLinesDensity is a number, default if not provided
+    const density = typeof fractalLinesDensity === 'number' ? fractalLinesDensity : 50;
+    const numLines = Math.floor(density / 100 * 5) + 1; // Example density mapping
     const maxDepth = 3;
 
     ctx.globalAlpha = opacity;
-    ctx.lineWidth = params.lineWidth || 1;
+    ctx.lineWidth = lineWidth || 1; // Use provided lineWidth or default to 1
 
     for (let i = 0; i < numLines; i++) {
-        const startX = Math.random() * canvasWidth;
-        const startY = Math.random() * canvasHeight;
-        const endX = Math.random() * canvasWidth;
-        const endY = Math.random() * canvasHeight;
+        // Apply animation offset to starting and ending points if animating
+        const startX = Math.random() * canvasWidth + (isAnimationFrame ? animationOffset : 0);
+        const startY = Math.random() * canvasHeight + (isAnimationFrame ? animationOffset * 0.5 : 0);
+        const endX = Math.random() * canvasWidth - (isAnimationFrame ? animationOffset : 0);
+        const endY = Math.random() * canvasHeight - (isAnimationFrame ? animationOffset * 0.5 : 0);
+
+        // Initial call to the recursive function
         const initialColor = palette[Math.floor(Math.random() * palette.length)];
         drawFractalLineRecursive(ctx, startX, startY, endX, endY, maxDepth, initialColor, palette);
     }
-    ctx.globalAlpha = 1.0; // Reset global alpha
+    ctx.globalAlpha = 1.0;
 }

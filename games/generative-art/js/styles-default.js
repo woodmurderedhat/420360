@@ -11,10 +11,10 @@ import { drawFractalLinesLayer } from './layers/fractal-lines.js';
 import { drawGeometricGridLayer } from './layers/geometric-grid.js';
 import { drawParticleSwarmLayer } from './layers/particle-swarm.js';
 import { drawOrganicNoiseLayer } from './layers/organic-noise.js';
+import { drawGlitchMosaicLayer } from './layers/glitch-mosaic.js';
 
 // TODO: The following layers are defined in state.js but not yet implemented
 // These will be implemented in future updates:
-// - glitch-mosaic.js: Digital glitch effects and mosaic patterns
 // - pixel-sort.js: Pixel sorting algorithms for interesting visual effects
 // - gradient-overlay.js: Gradient overlay effects
 // - dot-matrix.js: Dot matrix patterns reminiscent of old printers
@@ -40,8 +40,8 @@ function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params =
         geometricGridOpacity = 0,
         particleSwarmOpacity = 0,
         organicNoiseOpacity = 0,
+        glitchMosaicOpacity = 0,
         // The following are not yet implemented but defined in state.js
-        // glitchMosaicOpacity = 0,
         // pixelSortOpacity = 0,
         // gradientOverlayOpacity = 0,
         // dotMatrixOpacity = 0,
@@ -98,7 +98,12 @@ function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params =
         drawOrganicNoiseLayer(ctx, palette, isAnimationFrame, createLayerParams('organicNoiseDensity'), organicNoiseOpacity);
     }
 
-    // TODO: Add calls for other layers (Glitch Mosaic, Pixel Sort, etc.)
+    // Draw Glitch Mosaic Layer
+    if (glitchMosaicOpacity > 0 && typeof drawGlitchMosaicLayer === 'function') {
+        drawGlitchMosaicLayer(ctx, palette, isAnimationFrame, createLayerParams('glitchMosaicDensity'), glitchMosaicOpacity);
+    }
+
+    // TODO: Add calls for other layers (Pixel Sort, Gradient Overlay, etc.)
     // following the same pattern once their modules and drawing functions are available and imported.
 
     // ... (calls for other layers like Dot Matrix, Flowing Lines, Symmetrical Patterns)

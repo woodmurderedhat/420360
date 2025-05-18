@@ -12,9 +12,9 @@ import { drawFractalLinesLayer } from './layers/fractal-lines.js';
 import { drawGeometricGridLayer } from './layers/geometric-grid.js';
 import { drawParticleSwarmLayer } from './layers/particle-swarm.js';
 import { drawOrganicNoiseLayer } from './layers/organic-noise.js';
+import { drawGlitchMosaicLayer } from './layers/glitch-mosaic.js';
 
 // TODO: The following styles are defined in artStyles but not yet implemented as separate modules:
-// - glitch-mosaic.js: Digital glitch effects and mosaic patterns
 // - pixel-sort.js: Pixel sorting algorithms for interesting visual effects
 // - dot-matrix.js: Dot matrix patterns reminiscent of old printers
 // - flowing-lines.js: Flowing, organic line patterns
@@ -108,8 +108,13 @@ export function drawArtwork(ctx, style, palette, isAnimationFrame = false, param
                 drawOrganicNoiseLayer(ctx, palette, isAnimationFrame, createLayerParams('organicNoiseDensity', params.organicNoiseDensity || 50), 1.0);
             }
             break;
+        case artStyles.GLITCH_MOSAIC:
+            if (typeof drawGlitchMosaicLayer === 'function') {
+                drawGlitchMosaicLayer(ctx, palette, isAnimationFrame, createLayerParams('glitchMosaicDensity', params.glitchMosaicDensity || 50), 1.0);
+            }
+            break;
         // TODO: Add cases for other individual art styles
-        // These might call their own dedicated drawing functions (e.g., drawGlitchMosaicStyle)
+        // These might call their own dedicated drawing functions (e.g., drawPixelSortStyle)
         // or reuse layer functions if the style is simple enough.
         default:
             console.warn(`Art style "${style}" not yet implemented. Drawing default.`);

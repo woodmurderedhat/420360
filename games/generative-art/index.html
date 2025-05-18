@@ -78,98 +78,124 @@
 
         <!-- Layer Controls -->
         <div class="control-section">
-            <h3>Layer Controls</h3>
+            <h3>Default Masterpiece Layers</h3>
+            <p class="section-description">Adjust the opacity of each layer in the default masterpiece style.</p>
             <div class="layer-controls">
-                <label for="voronoiOpacity">Voronoi Cells:</label>
-                <input type="range" id="voronoiOpacity" min="0" max="1" step="0.05" value="0.4">
-                <span id="voronoiOpacityValue" class="slider-value">0.4</span>
+                <!-- Geometric Elements -->
+                <div class="layer-group">
+                    <h4>Geometric Elements</h4>
+                    <label for="voronoiOpacity">Voronoi Cells:</label>
+                    <input type="range" id="voronoiOpacity" min="0" max="1" step="0.05" value="0.4">
+                    <span id="voronoiOpacityValue" class="slider-value">0.4</span>
 
-                <label for="organicSplattersOpacity">Organic Splatters:</label>
-                <input type="range" id="organicSplattersOpacity" min="0" max="1" step="0.05" value="0.3">
-                <span id="organicSplattersOpacityValue" class="slider-value">0.3</span>
+                    <label for="geometricGridOpacity">Geometric Grid:</label>
+                    <input type="range" id="geometricGridOpacity" min="0" max="1" step="0.05" value="0.6">
+                    <span id="geometricGridOpacityValue" class="slider-value">0.6</span>
 
-                <label for="neonWavesOpacity">Neon Waves:</label>
-                <input type="range" id="neonWavesOpacity" min="0" max="1" step="0.05" value="0.6">
-                <span id="neonWavesOpacityValue" class="slider-value">0.6</span>
+                    <label for="dotMatrixOpacity">Dot Matrix:</label>
+                    <input type="range" id="dotMatrixOpacity" min="0" max="1" step="0.05" value="0.4">
+                    <span id="dotMatrixOpacityValue" class="slider-value">0.4</span>
 
-                <label for="fractalLinesOpacity">Fractal Lines:</label>
-                <input type="range" id="fractalLinesOpacity" min="0" max="1" step="0.05" value="0.7">
-                <span id="fractalLinesOpacityValue" class="slider-value">0.7</span>
+                    <label for="symmetricalPatternsOpacity">Symmetrical Patterns:</label>
+                    <input type="range" id="symmetricalPatternsOpacity" min="0" max="1" step="0.05" value="0.5">
+                    <span id="symmetricalPatternsOpacityValue" class="slider-value">0.5</span>
+                </div>
 
-                <label for="geometricGridOpacity">Geometric Grid:</label>
-                <input type="range" id="geometricGridOpacity" min="0" max="1" step="0.05" value="0.6">
-                <span id="geometricGridOpacityValue" class="slider-value">0.6</span>
+                <!-- Organic Elements -->
+                <div class="layer-group">
+                    <h4>Organic Elements</h4>
+                    <label for="organicSplattersOpacity">Organic Splatters:</label>
+                    <input type="range" id="organicSplattersOpacity" min="0" max="1" step="0.05" value="0.3">
+                    <span id="organicSplattersOpacityValue" class="slider-value">0.3</span>
 
-                <label for="particleSwarmOpacity">Particle Swarm:</label>
-                <input type="range" id="particleSwarmOpacity" min="0" max="1" step="0.05" value="0.5">
-                <span id="particleSwarmOpacityValue" class="slider-value">0.5</span>
+                    <label for="organicNoiseOpacity">Organic Noise:</label>
+                    <input type="range" id="organicNoiseOpacity" min="0" max="1" step="0.05" value="0.3">
+                    <span id="organicNoiseOpacityValue" class="slider-value">0.3</span>
 
-                <label for="organicNoiseOpacity">Organic Noise:</label>
-                <input type="range" id="organicNoiseOpacity" min="0" max="1" step="0.05" value="0.3">
-                <span id="organicNoiseOpacityValue" class="slider-value">0.3</span>
+                    <label for="flowingLinesOpacity">Flowing Lines:</label>
+                    <input type="range" id="flowingLinesOpacity" min="0" max="1" step="0.05" value="0.4">
+                    <span id="flowingLinesOpacityValue" class="slider-value">0.4</span>
+                </div>
 
-                <label for="glitchMosaicOpacity">Glitch Mosaic:</label>
-                <input type="range" id="glitchMosaicOpacity" min="0" max="1" step="0.05" value="0.15">
-                <span id="glitchMosaicOpacityValue" class="slider-value">0.15</span>
+                <!-- Dynamic Elements -->
+                <div class="layer-group">
+                    <h4>Dynamic Elements</h4>
+                    <label for="neonWavesOpacity">Neon Waves:</label>
+                    <input type="range" id="neonWavesOpacity" min="0" max="1" step="0.05" value="0.6">
+                    <span id="neonWavesOpacityValue" class="slider-value">0.6</span>
 
-                <label for="pixelSortOpacity">Pixel Sort:</label>
-                <input type="range" id="pixelSortOpacity" min="0" max="1" step="0.05" value="0.2">
-                <span id="pixelSortOpacityValue" class="slider-value">0.2</span>
+                    <label for="fractalLinesOpacity">Fractal Lines:</label>
+                    <input type="range" id="fractalLinesOpacity" min="0" max="1" step="0.05" value="0.7">
+                    <span id="fractalLinesOpacityValue" class="slider-value">0.7</span>
 
-                <!-- New layer opacity controls -->
-                <label for="gradientOverlayOpacity">Gradient Overlay:</label>
-                <input type="range" id="gradientOverlayOpacity" min="0" max="1" step="0.05" value="0.3">
-                <span id="gradientOverlayOpacityValue" class="slider-value">0.3</span>
+                    <label for="particleSwarmOpacity">Particle Swarm:</label>
+                    <input type="range" id="particleSwarmOpacity" min="0" max="1" step="0.05" value="0.5">
+                    <span id="particleSwarmOpacityValue" class="slider-value">0.5</span>
+                </div>
 
-                <label for="dotMatrixOpacity">Dot Matrix:</label>
-                <input type="range" id="dotMatrixOpacity" min="0" max="1" step="0.05" value="0.4">
-                <span id="dotMatrixOpacityValue" class="slider-value">0.4</span>
+                <!-- Effect Elements -->
+                <div class="layer-group">
+                    <h4>Effect Elements</h4>
+                    <label for="glitchMosaicOpacity">Glitch Mosaic:</label>
+                    <input type="range" id="glitchMosaicOpacity" min="0" max="1" step="0.05" value="0.15">
+                    <span id="glitchMosaicOpacityValue" class="slider-value">0.15</span>
 
-                <label for="textureOverlayOpacity">Texture Overlay:</label>
-                <input type="range" id="textureOverlayOpacity" min="0" max="1" step="0.05" value="0.2">
-                <span id="textureOverlayOpacityValue" class="slider-value">0.2</span>
+                    <label for="pixelSortOpacity">Pixel Sort:</label>
+                    <input type="range" id="pixelSortOpacity" min="0" max="1" step="0.05" value="0.2">
+                    <span id="pixelSortOpacityValue" class="slider-value">0.2</span>
 
-                <label for="symmetricalPatternsOpacity">Symmetrical Patterns:</label>
-                <input type="range" id="symmetricalPatternsOpacity" min="0" max="1" step="0.05" value="0.5">
-                <span id="symmetricalPatternsOpacityValue" class="slider-value">0.5</span>
+                    <label for="gradientOverlayOpacity">Gradient Overlay:</label>
+                    <input type="range" id="gradientOverlayOpacity" min="0" max="1" step="0.05" value="0.3">
+                    <span id="gradientOverlayOpacityValue" class="slider-value">0.3</span>
 
-                <label for="flowingLinesOpacity">Flowing Lines:</label>
-                <input type="range" id="flowingLinesOpacity" min="0" max="1" step="0.05" value="0.4">
-                <span id="flowingLinesOpacityValue" class="slider-value">0.4</span>
+                    <label for="textureOverlayOpacity">Texture Overlay:</label>
+                    <input type="range" id="textureOverlayOpacity" min="0" max="1" step="0.05" value="0.2">
+                    <span id="textureOverlayOpacityValue" class="slider-value">0.2</span>
+                </div>
             </div>
         </div>
 
         <!-- Layer Density Controls -->
         <div class="control-section">
             <h3>Layer Density</h3>
-            <label for="voronoiDensity">Voronoi Cells Density:</label>
-            <input type="range" id="voronoiDensity" min="5" max="50" step="1" value="15">
-            <span id="voronoiDensityValue" class="slider-value">15</span>
+            <p class="section-description">Adjust the density of elements in each layer.</p>
+            <div class="layer-density-controls">
+                <!-- Geometric Elements -->
+                <div class="density-group">
+                    <h4>Geometric Elements</h4>
+                    <label for="voronoiDensity">Voronoi Cells Density:</label>
+                    <input type="range" id="voronoiDensity" min="5" max="50" step="1" value="15">
+                    <span id="voronoiDensityValue" class="slider-value">15</span>
 
-            <label for="organicSplattersDensity">Organic Splatters Density:</label>
-            <input type="range" id="organicSplattersDensity" min="3" max="30" step="1" value="10">
-            <span id="organicSplattersDensityValue" class="slider-value">10</span>
+                    <label for="dotMatrixDensity">Dot Matrix Density:</label>
+                    <input type="range" id="dotMatrixDensity" min="5" max="50" step="1" value="20">
+                    <span id="dotMatrixDensityValue" class="slider-value">20</span>
 
-            <label for="neonWavesDensity">Neon Waves Count:</label>
-            <input type="range" id="neonWavesDensity" min="1" max="15" step="1" value="5">
-            <span id="neonWavesDensityValue" class="slider-value">5</span>
+                    <label for="symmetricalPatternsDensity">Symmetrical Patterns Count:</label>
+                    <input type="range" id="symmetricalPatternsDensity" min="3" max="12" step="1" value="6">
+                    <span id="symmetricalPatternsDensityValue" class="slider-value">6</span>
+                </div>
 
-            <label for="fractalLinesDensity">Fractal Lines Count:</label>
-            <input type="range" id="fractalLinesDensity" min="1" max="10" step="1" value="2">
-            <span id="fractalLinesDensityValue" class="slider-value">2</span>
+                <!-- Organic & Dynamic Elements -->
+                <div class="density-group">
+                    <h4>Organic & Dynamic Elements</h4>
+                    <label for="organicSplattersDensity">Organic Splatters Density:</label>
+                    <input type="range" id="organicSplattersDensity" min="3" max="30" step="1" value="10">
+                    <span id="organicSplattersDensityValue" class="slider-value">10</span>
 
-            <!-- New layer density controls -->
-            <label for="dotMatrixDensity">Dot Matrix Density:</label>
-            <input type="range" id="dotMatrixDensity" min="5" max="50" step="1" value="20">
-            <span id="dotMatrixDensityValue" class="slider-value">20</span>
+                    <label for="neonWavesDensity">Neon Waves Count:</label>
+                    <input type="range" id="neonWavesDensity" min="1" max="15" step="1" value="5">
+                    <span id="neonWavesDensityValue" class="slider-value">5</span>
 
-            <label for="flowingLinesDensity">Flowing Lines Count:</label>
-            <input type="range" id="flowingLinesDensity" min="1" max="20" step="1" value="8">
-            <span id="flowingLinesDensityValue" class="slider-value">8</span>
+                    <label for="fractalLinesDensity">Fractal Lines Count:</label>
+                    <input type="range" id="fractalLinesDensity" min="1" max="10" step="1" value="2">
+                    <span id="fractalLinesDensityValue" class="slider-value">2</span>
 
-            <label for="symmetricalPatternsDensity">Symmetrical Patterns Count:</label>
-            <input type="range" id="symmetricalPatternsDensity" min="3" max="12" step="1" value="6">
-            <span id="symmetricalPatternsDensityValue" class="slider-value">6</span>
+                    <label for="flowingLinesDensity">Flowing Lines Count:</label>
+                    <input type="range" id="flowingLinesDensity" min="1" max="20" step="1" value="8">
+                    <span id="flowingLinesDensityValue" class="slider-value">8</span>
+                </div>
+            </div>
         </div>
 
         <!-- Advanced Controls -->

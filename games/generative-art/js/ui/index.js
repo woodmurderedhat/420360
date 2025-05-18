@@ -3,11 +3,14 @@
  * Coordinates UI components and provides a unified interface
  */
 
-import { getElement, getElements, hasRequiredElements, addListener, setValue, getValue, getValues, getLayerOpacityValues, getLayerDensityValues } from './components.js';
+import { getElement, getElements, hasRequiredElements, addListener, setValue, getValue, getValues } from './components.js';
 import { registerHandler, triggerEvent, setupKeyboardShortcuts, setupWindowResize, setupFullscreenChangeListeners, cleanupEventListeners } from './events.js';
-import { SETTINGS_KEY, setupColorThemeControls, setupAnimationControls, setupSliderDisplays } from './controls.js';
 import { setupGalleryModalControls, openGallery } from './gallery-ui.js';
 import { initResponsiveUI, toggleControlPanel, cleanupResponsiveUI } from './responsive.js';
+import { setupColorThemeControls } from './color-controls.js';
+import { setupAnimationControls } from './animation-controls.js';
+import { setupCanvasControls } from './canvas-controls.js';
+import { setupLayerOpacityControls, setupLayerDensityControls } from './layer-controls.js';
 import { getState, updateState } from '../state.js';
 import { handleError, ErrorType, ErrorSeverity } from '../error-service.js';
 import { setSeed } from '../utils.js';
@@ -16,6 +19,9 @@ import { saveToHistory, undo, redo, updateHistoryButtons } from '../history.js';
 import { cleanupAnimationResources, stopAnimation } from '../animation.js';
 import { clearPaletteCache } from '../palette.js';
 import { artStyles } from '../styles.js';
+
+// Local storage key for settings
+const SETTINGS_KEY = 'generativeArtSettings';
 
 // Private module state
 let _initialized = false;
@@ -316,10 +322,12 @@ function setupEventHandlers() {
  * Set up UI components
  */
 function setupUIComponents() {
-    // Set up UI components
-    setupColorThemeControls();
+    // Set up UI components by category
+    setupColorThemeControls(_drawArtworkFn);
     setupAnimationControls(_drawArtworkFn);
-    setupSliderDisplays();
+    setupCanvasControls(_drawArtworkFn, _initCanvasFn);
+    setupLayerOpacityControls(_drawArtworkFn);
+    setupLayerDensityControls(_drawArtworkFn);
     setupGalleryModalControls();
 
     // Set up window resize handling

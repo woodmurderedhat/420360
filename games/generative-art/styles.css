@@ -5,10 +5,16 @@
     --button-focus-border: #777;
     --panel-bg: rgba(240, 240, 240, 0.9);
     --panel-text: #333;
+    --panel-heading: #222;
+    --panel-subheading: #444;
+    --panel-description: #666;
     --input-bg: #fff;
     --input-border: #ccc;
     --input-focus-border: #777;
     --section-border: #ddd;
+    --group-bg: rgba(255, 255, 255, 0.5);
+    --group-border: #ccc;
+    --slider-value: #555;
     --modal-bg: rgba(0, 0, 0, 0.7);
     --modal-content-bg: #fff;
     --gallery-item-bg: #f5f5f5;
@@ -178,37 +184,71 @@ body {
 /* Control sections */
 .control-section {
     border-top: 1px solid var(--section-border);
-    padding: 10px 0;
+    padding: 15px 0;
     margin-top: 5px;
 }
 
 .control-section h3 {
-    font-size: 14px;
-    margin: 0 0 8px 0;
-    color: var(--panel-text);
+    font-size: 16px;
+    margin: 0 0 10px 0;
+    color: var(--panel-heading);
+    font-weight: bold;
+}
+
+.section-description {
+    font-size: 13px;
+    color: var(--panel-description);
+    margin-bottom: 15px;
+    font-style: italic;
 }
 
 /* Layer Controls */
 .layer-controls {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 15px;
 }
 
-.layer-controls label {
+.layer-group, .density-group {
+    background-color: var(--group-bg);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.layer-group h4, .density-group h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--panel-subheading);
+    border-bottom: 1px dashed var(--group-border);
+    padding-bottom: 5px;
+}
+
+.layer-controls label, .layer-density-controls label {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0;
+    font-size: 13px;
 }
 
-.layer-controls input[type="range"] {
+.layer-controls input[type="range"], .layer-density-controls input[type="range"] {
     width: 70%;
 }
 
-.layer-controls .slider-value {
+.layer-controls .slider-value, .layer-density-controls .slider-value {
     width: 30px;
     text-align: right;
+    font-family: monospace;
+    color: var(--slider-value);
+}
+
+/* Layer Density Controls */
+.layer-density-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .toggle-control {
@@ -454,10 +494,16 @@ body {
         --button-focus-border: #999;
         --panel-bg: rgba(40, 40, 40, 0.9);
         --panel-text: #eee;
+        --panel-heading: #fff;
+        --panel-subheading: #ccc;
+        --panel-description: #aaa;
         --input-bg: #333;
         --input-border: #555;
         --input-focus-border: #777;
         --section-border: #444;
+        --group-bg: rgba(60, 60, 60, 0.5);
+        --group-border: #555;
+        --slider-value: #bbb;
         --gallery-item-bg: #333;
         --gallery-item-hover: #444;
     }

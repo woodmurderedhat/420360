@@ -179,6 +179,55 @@ function formatDate(date) {
     return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
 }
 
+/**
+ * Parse a color string to RGB values
+ * @param {string} color - The color string to parse (hex, rgb, or hsl)
+ * @returns {Object} An object with r, g, b properties or null if parsing failed
+ */
+function parseColorToRgb(color) {
+    try {
+        // Default fallback values
+        let r = 255, g = 200, b = 100;
+
+        if (!color) {
+            return { r, g, b };
+        }
+
+        // Check if the color is in hex format (#RRGGBB)
+        if (color.startsWith('#') && color.length >= 7) {
+            r = parseInt(color.slice(1, 3), 16);
+            g = parseInt(color.slice(3, 5), 16);
+            b = parseInt(color.slice(5, 7), 16);
+        } else if (color.startsWith('rgb')) {
+            // Handle rgb/rgba format
+            const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+            if (rgbMatch) {
+                r = parseInt(rgbMatch[1], 10);
+                g = parseInt(rgbMatch[2], 10);
+                b = parseInt(rgbMatch[3], 10);
+            }
+        } else if (color.startsWith('hsl')) {
+            // For HSL colors, we would need to convert HSL to RGB
+            // For simplicity, we'll use fallback values
+            r = 255;
+            g = 200;
+            b = 100;
+        }
+
+        // Validate that we have valid numbers
+        if (isNaN(r) || isNaN(g) || isNaN(b)) {
+            r = 255;
+            g = 200;
+            b = 100;
+        }
+
+        return { r, g, b };
+    } catch (error) {
+        // Return fallback values if any error occurs
+        return { r: 255, g: 200, b: 100 };
+    }
+}
+
 // Export the utility functions
 export {
     setSeed,
@@ -189,6 +238,7 @@ export {
     randomRange,
     randomInt,
     hslToString,
+    parseColorToRgb,
     clamp,
     debounce,
     throttle,

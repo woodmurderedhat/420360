@@ -2,7 +2,7 @@
  * js/layers/particle-swarm.js - Particle Swarm layer for the Generative Art Studio
  */
 
-import { randomRange, randomInt } from '../utils.js';
+import { randomRange, randomInt, parseColorToRgb } from '../utils.js';
 import { initWebGL, isWebGLAvailable, renderParticles } from '../webgl-renderer.js';
 
 /**
@@ -60,11 +60,12 @@ function generateParticles(numParticles, width, height, palette) {
     const particles = [];
 
     for (let i = 0; i < numParticles; i++) {
-        // Convert color from hex to RGB
+        // Convert color from hex to RGB using our utility function
         const color = palette[Math.floor(Math.random() * palette.length)];
-        const r = parseInt(color.slice(1, 3), 16) / 255;
-        const g = parseInt(color.slice(3, 5), 16) / 255;
-        const b = parseInt(color.slice(5, 7), 16) / 255;
+        const { r: rValue, g: gValue, b: bValue } = parseColorToRgb(color);
+        const r = rValue / 255;
+        const g = gValue / 255;
+        const b = bValue / 255;
 
         particles.push({
             x: Math.random() * width,

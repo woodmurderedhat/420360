@@ -3,6 +3,8 @@
  * Implements advanced branching, color transitions, and glow effects
  */
 
+import { parseColorToRgb } from '../utils.js';
+
 /**
  * Helper function to interpolate between two colors
  * @param {string} color1 - First color in hex format
@@ -11,14 +13,9 @@
  * @returns {string} - Interpolated color in rgba format
  */
 function interpolateColors(color1, color2, factor) {
-    // Parse hex colors to RGB
-    const r1 = parseInt(color1.slice(1, 3), 16);
-    const g1 = parseInt(color1.slice(3, 5), 16);
-    const b1 = parseInt(color1.slice(5, 7), 16);
-
-    const r2 = parseInt(color2.slice(1, 3), 16);
-    const g2 = parseInt(color2.slice(3, 5), 16);
-    const b2 = parseInt(color2.slice(5, 7), 16);
+    // Parse colors to RGB using our utility function
+    const { r: r1, g: g1, b: b1 } = parseColorToRgb(color1);
+    const { r: r2, g: g2, b: b2 } = parseColorToRgb(color2);
 
     // Interpolate
     const r = Math.round(r1 + factor * (r2 - r1));
@@ -50,10 +47,8 @@ function drawFractalLineRecursive(ctx, x1, y1, x2, y2, depth, startColor, endCol
         const lineLength = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
         const normalizedLength = Math.min(1, lineLength / 200); // Normalize length for glow intensity
 
-        // Parse colors for glow
-        const r = parseInt(startColor.slice(1, 3), 16);
-        const g = parseInt(startColor.slice(3, 5), 16);
-        const b = parseInt(startColor.slice(5, 7), 16);
+        // Parse colors for glow using our utility function
+        const { r, g, b } = parseColorToRgb(startColor);
 
         // Draw glow (multiple passes with decreasing opacity)
         const glowPasses = isMainBranch ? 3 : 2;

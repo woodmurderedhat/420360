@@ -3,6 +3,8 @@
  * Implements natural noise patterns and textures using Perlin/Simplex noise
  */
 
+import { parseColorToRgb } from '../utils.js';
+
 /**
  * Draw an Organic Noise layer
  * @param {CanvasRenderingContext2D} ctx - The canvas context
@@ -15,23 +17,23 @@ export function drawOrganicNoiseLayer(ctx, palette, isAnimationFrame, params, op
     if (opacity === 0) return;
 
     const { canvasWidth, canvasHeight, seed, organicNoiseDensity = 50 } = params;
-    
+
     // Set global alpha for the layer
     ctx.globalAlpha = opacity;
-    
+
     // Create noise with varying density
     const density = organicNoiseDensity / 100; // Convert 0-100 scale to 0-1
     const scale = 0.003 + (density * 0.01); // Scale factor for noise (smaller = more zoomed out)
     const detail = Math.floor(density * 5) + 2; // Level of detail/octaves
-    
+
     // Create ImageData for pixel manipulation
     const imageData = ctx.createImageData(canvasWidth, canvasHeight);
     const data = imageData.data;
-    
+
     // Use the seed to create deterministic noise
     const seedValue = seed || Math.floor(Math.random() * 1000000);
     const randomFn = createRandomFunction(seedValue);
-    
+
     // Generate noise values
     for (let y = 0; y < canvasHeight; y++) {
         for (let x = 0; x < canvasWidth; x++) {
@@ -40,41 +42,41 @@ export function drawOrganicNoiseLayer(ctx, palette, isAnimationFrame, params, op
             let amplitude = 1;
             let frequency = 1;
             let maxValue = 0;
-            
+
             // Add multiple layers of noise with different frequencies
             for (let i = 0; i < detail; i++) {
                 // Get noise value at this position and frequency
                 const nx = x * scale * frequency;
                 const ny = y * scale * frequency;
-                
+
                 // Use improved noise function
                 const value = improvedNoise(nx, ny, seedValue * 0.1 * frequency);
-                
+
                 // Add to total noise value
                 noiseValue += value * amplitude;
-                
+
                 // Keep track of max possible value for normalization
                 maxValue += amplitude;
-                
+
                 // Increase frequency and decrease amplitude for next octave
                 amplitude *= 0.5;
                 frequency *= 2;
             }
-            
+
             // Normalize noise value to 0-1 range
             noiseValue = (noiseValue / maxValue) * 0.5 + 0.5;
-            
+
             // Apply animation if needed
             if (isAnimationFrame) {
                 // Shift noise pattern slightly over time
                 const time = Date.now() * 0.0005;
                 noiseValue = (noiseValue + Math.sin(time + x * 0.01 + y * 0.01) * 0.1) % 1.0;
             }
-            
+
             // Map noise value to color from palette
             const colorIndex = Math.floor(noiseValue * palette.length);
             const color = hexToRgb(palette[colorIndex % palette.length]);
-            
+
             // Set pixel color
             const pixelIndex = (y * canvasWidth + x) * 4;
             data[pixelIndex] = color.r;
@@ -83,10 +85,10 @@ export function drawOrganicNoiseLayer(ctx, palette, isAnimationFrame, params, op
             data[pixelIndex + 3] = 255 * (0.3 + noiseValue * 0.7); // Vary alpha for more organic feel
         }
     }
-    
+
     // Put the image data back to the canvas
     ctx.putImageData(imageData, 0, 0);
-    
+
     // Reset global alpha
     ctx.globalAlpha = 1.0;
 }
@@ -104,21 +106,13 @@ function createRandomFunction(seed) {
 }
 
 /**
- * Convert a hex color string to RGB object
- * @param {string} hex - The hex color string
+ * Convert a color string to RGB object
+ * @param {string} color - The color string
  * @returns {Object} RGB color object
  */
-function hexToRgb(hex) {
-    // Remove # if present
-    hex = hex.replace(/^#/, '');
-    
-    // Parse hex values
-    const bigint = parseInt(hex, 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    
-    return { r, g, b };
+function hexToRgb(color) {
+    // Use our utility function for robust color parsing
+    return parseColorToRgb(color);
 }
 
 /**
@@ -130,37 +124,37 @@ function improvedNoise(x, y, z) {
     const X = Math.floor(x) & 255;
     const Y = Math.floor(y) & 255;
     const Z = Math.floor(z) & 255;
-    
+
     // Find relative x, y, z of point in cube
     x -= Math.floor(x);
     y -= Math.floor(y);
     z -= Math.floor(z);
-    
+
     // Compute fade curves for each of x, y, z
     const u = fade(x);
     const v = fade(y);
     const w = fade(z);
-    
+
     // Hash coordinates of the 8 cube corners
     const p = new Array(512);
     for (let i = 0; i < 256; i++) {
         p[i] = p[i + 256] = permutation[i];
     }
-    
+
     const A = p[X] + Y;
     const AA = p[A] + Z;
     const AB = p[A + 1] + Z;
     const B = p[X + 1] + Y;
     const BA = p[B] + Z;
     const BB = p[B + 1] + Z;
-    
+
     // Add blended results from 8 corners of cube
-    return lerp(w, 
-        lerp(v, 
+    return lerp(w,
+        lerp(v,
             lerp(u, grad(p[AA], x, y, z), grad(p[BA], x-1, y, z)),
             lerp(u, grad(p[AB], x, y-1, z), grad(p[BB], x-1, y-1, z))
         ),
-        lerp(v, 
+        lerp(v,
             lerp(u, grad(p[AA+1], x, y, z-1), grad(p[BA+1], x-1, y, z-1)),
             lerp(u, grad(p[AB+1], x, y-1, z-1), grad(p[BB+1], x-1, y-1, z-1))
         )

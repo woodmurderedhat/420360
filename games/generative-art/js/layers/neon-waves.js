@@ -3,6 +3,8 @@
  * Implements advanced glow effects, variable thickness, and improved animation
  */
 
+import { parseColorToRgb } from '../utils.js';
+
 /**
  * Draw an enhanced Neon Waves layer with glow effects and depth
  * @param {CanvasRenderingContext2D} ctx - The canvas context
@@ -37,10 +39,8 @@ export function drawNeonWavesLayer(ctx, palette, isAnimationFrame, params, opaci
             // Get a color from the palette
             const baseColor = palette[Math.floor(Math.random() * palette.length)];
 
-            // Parse the color to create glow effects
-            const r = parseInt(baseColor.slice(1, 3), 16);
-            const g = parseInt(baseColor.slice(3, 5), 16);
-            const b = parseInt(baseColor.slice(5, 7), 16);
+            // Parse the color to create glow effects using our utility function
+            const { r, g, b } = parseColorToRgb(baseColor);
 
             // Calculate wave parameters
             const waveAmplitude = (30 + Math.random() * 40) * depthScale;

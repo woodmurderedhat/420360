@@ -133,10 +133,13 @@ export function drawLightRaysLayer(ctx, palette, isAnimationFrame, params, opaci
         originX, originY, glowRadius
     );
 
-    // No need for additional validation here as parseColorToRgb already handles it
+    // Validate RGB values before using them
+    const validR = isNaN(r) ? 255 : r;
+    const validG = isNaN(g) ? 255 : g;
+    const validB = isNaN(b) ? 255 : b;
 
     glowGradient.addColorStop(0, `rgba(255, 255, 255, ${lightRaysIntensity})`);
-    glowGradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${lightRaysIntensity * 0.5})`);
+    glowGradient.addColorStop(0.5, `rgba(${validR}, ${validG}, ${validB}, ${lightRaysIntensity * 0.5})`);
     glowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
     ctx.beginPath();

@@ -182,7 +182,7 @@ function formatDate(date) {
 /**
  * Parse a color string to RGB values
  * @param {string} color - The color string to parse (hex, rgb, or hsl)
- * @returns {Object} An object with r, g, b properties or null if parsing failed
+ * @returns {Object} An object with r, g, b properties
  */
 function parseColorToRgb(color) {
     try {
@@ -194,10 +194,17 @@ function parseColorToRgb(color) {
         }
 
         // Check if the color is in hex format (#RRGGBB)
-        if (color.startsWith('#') && color.length >= 7) {
-            r = parseInt(color.slice(1, 3), 16);
-            g = parseInt(color.slice(3, 5), 16);
-            b = parseInt(color.slice(5, 7), 16);
+        if (color.startsWith('#')) {
+            if (color.length >= 7) {
+                r = parseInt(color.slice(1, 3), 16);
+                g = parseInt(color.slice(3, 5), 16);
+                b = parseInt(color.slice(5, 7), 16);
+            } else if (color.length >= 4) {
+                // Handle shorthand hex (#RGB)
+                r = parseInt(color.slice(1, 2) + color.slice(1, 2), 16);
+                g = parseInt(color.slice(2, 3) + color.slice(2, 3), 16);
+                b = parseInt(color.slice(3, 4) + color.slice(3, 4), 16);
+            }
         } else if (color.startsWith('rgb')) {
             // Handle rgb/rgba format
             const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
@@ -207,11 +214,26 @@ function parseColorToRgb(color) {
                 b = parseInt(rgbMatch[3], 10);
             }
         } else if (color.startsWith('hsl')) {
-            // For HSL colors, we would need to convert HSL to RGB
-            // For simplicity, we'll use fallback values
-            r = 255;
-            g = 200;
-            b = 100;
+            // Handle hsl/hsla format by converting to RGB
+            const hslMatch = color.match(/hsla?\((\d+),\s*(\d+)%,\s*(\d+)%/i);
+            if (hslMatch) {
+                const h = parseInt(hslMatch[1], 10) / 360;
+                const s = parseInt(hslMatch[2], 10) / 100;
+                const l = parseInt(hslMatch[3], 10) / 100;
+
+                // Convert HSL to RGB using the algorithm
+                if (s === 0) {
+                    // Achromatic (gray)
+                    r = g = b = Math.round(l * 255);
+                } else {
+                    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                    const p = 2 * l - q;
+
+                    r = Math.round(hueToRgb(p, q, h + 1/3) * 255);
+                    g = Math.round(hueToRgb(p, q, h) * 255);
+                    b = Math.round(hueToRgb(p, q, h - 1/3) * 255);
+                }
+            }
         }
 
         // Validate that we have valid numbers
@@ -228,6 +250,22 @@ function parseColorToRgb(color) {
     }
 }
 
+/**
+ * Helper function for HSL to RGB conversion
+ * @param {number} p - First parameter for conversion
+ * @param {number} q - Second parameter for conversion
+ * @param {number} t - Third parameter for conversion
+ * @returns {number} RGB component value (0-1)
+ */
+function hueToRgb(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+}
+
 // Export the utility functions
 export {
     setSeed,
@@ -239,6 +277,7 @@ export {
     randomInt,
     hslToString,
     parseColorToRgb,
+    hueToRgb,
     clamp,
     debounce,
     throttle,

@@ -160,8 +160,16 @@ function addColorStops(gradient, palette, randomFn, isAnimationFrame) {
 
         try {
             // Validate color by parsing it first
-            parseColorToRgb(color);
-            gradient.addColorStop(safePosition, color);
+            const { r, g, b } = parseColorToRgb(color);
+
+            // If we got valid RGB values, use the original color
+            // Otherwise, create a new color string from the parsed RGB values
+            if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+                gradient.addColorStop(safePosition, color);
+            } else {
+                // Use fallback RGB values
+                gradient.addColorStop(safePosition, `rgb(255, 165, 0)`);
+            }
         } catch (error) {
             // If color parsing fails, use a fallback color
             console.warn(`Invalid color in gradient: ${color}. Using fallback.`);

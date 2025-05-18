@@ -39,9 +39,6 @@ index.html
 │   ├── js/layers/symmetrical-patterns.js
 │   ├── js/layers/texture-overlay.js
 │   └── js/layers/voronoi.js
-├── test-console.js (Basic tests)
-├── test-functionality.js (Comprehensive tests)
-└── test-todo-items.js (Todo item tests)
 ```
 
 ## Data Flow

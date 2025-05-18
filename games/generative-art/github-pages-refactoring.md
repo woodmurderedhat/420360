@@ -12,32 +12,22 @@ Changed absolute paths to relative paths:
 <!-- Before -->
 <link rel="stylesheet" href="/styles.css">
 <script type="module" src="/js/main.js"></script>
-<script src="/test-console.js"></script>
-<script src="/test-functionality.js"></script>
-<script src="/test-todo-items.js"></script>
 
 <!-- After -->
 <link rel="stylesheet" href="./styles.css">
 <script type="module" src="./js/main.js"></script>
-<script src="./test-console.js"></script>
-<script src="./test-functionality.js"></script>
-<script src="./test-todo-items.js"></script>
 ```
 
 ### 2. Fixed Path References in JavaScript Files
 
-Updated the path reference in test-todo-items.js:
+Updated path references in JavaScript files to use relative paths:
 
 ```javascript
 // Before
-if (script.src && script.src.includes('/layers/')) {
-    return true;
-}
+const worker = new Worker('/js/worker.js');
 
 // After
-if (script.src && script.src.includes('layers/')) {
-    return true;
-}
+const worker = new Worker('js/worker.js');
 ```
 
 ### 3. Created Documentation

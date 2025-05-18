@@ -51,7 +51,7 @@ const errorListeners = [];
 export function handleError(error, type = ErrorType.UNKNOWN, severity = ErrorSeverity.ERROR, details = {}) {
     // Generate a unique error ID
     const errorId = generateErrorId();
-    
+
     // Create standardized error object
     const errorObject = {
         id: errorId,
@@ -62,18 +62,18 @@ export function handleError(error, type = ErrorType.UNKNOWN, severity = ErrorSev
         stack: error instanceof Error ? error.stack : null,
         details
     };
-    
+
     // Log the error
     logError(errorObject);
-    
+
     // Show user feedback if needed
     if (severity === ErrorSeverity.ERROR || severity === ErrorSeverity.CRITICAL) {
         showUserFeedback(errorObject);
     }
-    
+
     // Notify error listeners
     notifyErrorListeners(errorObject);
-    
+
     return errorId;
 }
 
@@ -83,10 +83,10 @@ export function handleError(error, type = ErrorType.UNKNOWN, severity = ErrorSev
  */
 function logError(errorObject) {
     const { id, timestamp, type, severity, message, stack, details } = errorObject;
-    
+
     // Format the console output
     const logPrefix = `[${severity.toUpperCase()}][${type}][${id}]`;
-    
+
     // Use appropriate console method based on severity
     switch (severity) {
         case ErrorSeverity.INFO:
@@ -110,10 +110,10 @@ function logError(errorObject) {
  */
 function showUserFeedback(errorObject) {
     const { type, severity, message } = errorObject;
-    
+
     // Get a user-friendly message
     const userMessage = getUserFriendlyMessage(type, message);
-    
+
     // Create or update error notification element
     const notificationContainer = document.getElementById('errorNotifications') || createNotificationContainer();
     const notification = document.createElement('div');
@@ -126,21 +126,21 @@ function showUserFeedback(errorObject) {
         </div>
         <button class="error-close">&times;</button>
     `;
-    
+
     // Add close button functionality
     const closeButton = notification.querySelector('.error-close');
     closeButton.addEventListener('click', () => {
         notification.classList.add('closing');
         setTimeout(() => {
             notification.remove();
-            
+
             // Remove container if empty
             if (notificationContainer.children.length === 0) {
                 notificationContainer.remove();
             }
         }, 300);
     });
-    
+
     // Auto-dismiss non-critical errors after a delay
     if (severity !== ErrorSeverity.CRITICAL) {
         setTimeout(() => {
@@ -150,10 +150,10 @@ function showUserFeedback(errorObject) {
             }
         }, 5000);
     }
-    
+
     // Add to the DOM
     notificationContainer.appendChild(notification);
-    
+
     // Animate in
     setTimeout(() => {
         notification.classList.add('visible');
@@ -183,7 +183,7 @@ function getUserFriendlyMessage(type, message) {
     if (message && message.length < 100 && !message.includes('Error:')) {
         return message;
     }
-    
+
     // Otherwise use a default message based on the error type
     return defaultErrorMessages[type] || defaultErrorMessages[ErrorType.UNKNOWN];
 }
@@ -232,7 +232,7 @@ function getErrorTitle(severity) {
  * @returns {string} A unique error ID
  */
 function generateErrorId() {
-    return 'err_' + Math.random().toString(36).substr(2, 9);
+    return 'err_' + Math.random().toString(36).substring(2, 11);
 }
 
 /**
@@ -242,7 +242,7 @@ function generateErrorId() {
  */
 export function addErrorListener(listener) {
     errorListeners.push(listener);
-    
+
     // Return a function to remove this listener
     return () => {
         const index = errorListeners.indexOf(listener);
@@ -274,7 +274,7 @@ function createErrorStyles() {
     if (document.getElementById('error-service-styles')) {
         return;
     }
-    
+
     const style = document.createElement('style');
     style.id = 'error-service-styles';
     style.textContent = `
@@ -288,7 +288,7 @@ function createErrorStyles() {
             gap: 10px;
             max-width: 350px;
         }
-        
+
         .error-notification {
             background-color: white;
             border-radius: 4px;
@@ -299,52 +299,52 @@ function createErrorStyles() {
             transition: transform 0.3s ease;
             opacity: 0.95;
         }
-        
+
         .error-notification.visible {
             transform: translateX(0);
         }
-        
+
         .error-notification.closing {
             transform: translateX(120%);
         }
-        
+
         .error-notification.info {
             border-left: 4px solid #2196F3;
         }
-        
+
         .error-notification.warning {
             border-left: 4px solid #FF9800;
         }
-        
+
         .error-notification.error {
             border-left: 4px solid #F44336;
         }
-        
+
         .error-notification.critical {
             border-left: 4px solid #9C27B0;
         }
-        
+
         .error-icon {
             margin-right: 12px;
             font-size: 24px;
             display: flex;
             align-items: center;
         }
-        
+
         .error-content {
             flex: 1;
         }
-        
+
         .error-title {
             font-weight: bold;
             margin-bottom: 4px;
         }
-        
+
         .error-message {
             font-size: 14px;
             color: #555;
         }
-        
+
         .error-close {
             background: none;
             border: none;
@@ -355,12 +355,12 @@ function createErrorStyles() {
             margin-left: 8px;
             align-self: flex-start;
         }
-        
+
         .error-close:hover {
             color: #555;
         }
     `;
-    
+
     document.head.appendChild(style);
 }
 

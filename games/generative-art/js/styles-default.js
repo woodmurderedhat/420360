@@ -1,6 +1,7 @@
 /**
- * styles-default.js - Default masterpiece art style for the Generative Art Studio
+ * styles-default.js - Enhanced Default masterpiece art style for the Generative Art Studio
  * Combines elements from all other art styles into one harmonious masterpiece
+ * with improved visual effects and composition
  */
 
 // Import implemented layer rendering functions
@@ -18,11 +19,12 @@ import { drawDotMatrixLayer } from './layers/dot-matrix.js';
 import { drawTextureOverlayLayer } from './layers/texture-overlay.js';
 import { drawSymmetricalPatternsLayer } from './layers/symmetrical-patterns.js';
 import { drawFlowingLinesLayer } from './layers/flowing-lines.js';
+import { drawLightRaysLayer } from './layers/light-rays.js';
 
-// All layers have now been implemented
+// All layers have now been implemented with enhanced visual effects
 
 /**
- * Draw the Default Masterpiece style - combines all other art styles
+ * Draw the Enhanced Default Masterpiece style - combines all other art styles with improved visuals
  * @param {CanvasRenderingContext2D} ctx - The canvas context
  * @param {Array<string>} palette - The color palette
  * @param {boolean} isAnimationFrame - Whether this is an animation frame
@@ -45,7 +47,8 @@ function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params =
         dotMatrixOpacity = 0,
         textureOverlayOpacity = 0,
         symmetricalPatternsOpacity = 0,
-        flowingLinesOpacity = 0
+        flowingLinesOpacity = 0,
+        lightRaysOpacity = 0
     } = params;
 
     // Helper to create layer-specific params
@@ -54,7 +57,12 @@ function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params =
         canvasHeight,
         seed, // Pass global seed, layers can use it if needed
         lineWidth: params.lineWidth || 1, // Pass global lineWidth with default
-        [densityProperty]: params[densityProperty] || 50 // Default density to 50 if not provided
+        [densityProperty]: params[densityProperty] || 50, // Default density to 50 if not provided
+        // Pass additional global parameters that might be needed by layers
+        blendMode: params.blendMode || 'source-over',
+        colorShiftAmount: params.colorShiftAmount || 0,
+        scaleAmount: params.scaleAmount || 1.0,
+        rotationAmount: params.rotationAmount || 0
     });
 
     // Draw Voronoi Cells Layer
@@ -145,7 +153,19 @@ function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params =
         drawFlowingLinesLayer(ctx, palette, isAnimationFrame, flowingParams, flowingLinesOpacity);
     }
 
-    // All layers have now been implemented and integrated into the default masterpiece style
+    // Draw Light Rays Layer (new dramatic lighting effect)
+    if (lightRaysOpacity > 0 && typeof drawLightRaysLayer === 'function') {
+        const lightRaysParams = {
+            ...createLayerParams('lightRaysDensity'),
+            lightRaysIntensity: params.lightRaysIntensity || 0.7,
+            lightRaysDirection: params.lightRaysDirection || 0,
+            lightRaysSpread: params.lightRaysSpread || 60,
+            lightRaysColor: params.lightRaysColor || null
+        };
+        drawLightRaysLayer(ctx, palette, isAnimationFrame, lightRaysParams, lightRaysOpacity);
+    }
+
+    // All layers have now been implemented and integrated into the enhanced default masterpiece style
 }
 
 // Export the default masterpiece drawing function

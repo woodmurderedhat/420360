@@ -11,6 +11,7 @@ import { setupColorThemeControls } from './color-controls.js';
 import { setupAnimationControls } from './animation-controls.js';
 import { setupCanvasControls } from './canvas-controls.js';
 import { setupLayerOpacityControls, setupLayerDensityControls } from './layer-controls.js';
+import { initLightRaysControls } from './light-rays-controls.js';
 import { getState, updateState } from '../state.js';
 import { handleError, ErrorType, ErrorSeverity } from '../error-service.js';
 import { setSeed } from '../utils.js';
@@ -222,7 +223,8 @@ function setupEventHandlers() {
 
         // Update advanced settings
         const advancedInputs = [
-            'colorShiftAmount', 'scaleAmount', 'rotationAmount'
+            'colorShiftAmount', 'scaleAmount', 'rotationAmount',
+            'lightRaysIntensity', 'lightRaysDirection', 'lightRaysSpread'
         ];
 
         advancedInputs.forEach(inputId => {
@@ -329,6 +331,11 @@ function setupUIComponents() {
     setupLayerOpacityControls(_drawArtworkFn);
     setupLayerDensityControls(_drawArtworkFn);
     setupGalleryModalControls();
+
+    // Initialize Light Rays controls
+    initLightRaysControls({
+        drawArtwork: _drawArtworkFn
+    });
 
     // Set up window resize handling
     setupWindowResize(_initCanvasFn);

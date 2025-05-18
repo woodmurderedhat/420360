@@ -58,6 +58,7 @@ const _elements = {
     textureOverlayOpacityInput: document.getElementById('textureOverlayOpacity'),
     symmetricalPatternsOpacityInput: document.getElementById('symmetricalPatternsOpacity'),
     flowingLinesOpacityInput: document.getElementById('flowingLinesOpacity'),
+    lightRaysOpacityInput: document.getElementById('lightRaysOpacity'),
 
     // Layer density controls
     voronoiDensityInput: document.getElementById('voronoiDensity'),
@@ -69,12 +70,19 @@ const _elements = {
     dotMatrixDensityInput: document.getElementById('dotMatrixDensity'),
     flowingLinesDensityInput: document.getElementById('flowingLinesDensity'),
     symmetricalPatternsDensityInput: document.getElementById('symmetricalPatternsDensity'),
+    lightRaysDensityInput: document.getElementById('lightRaysDensity'),
 
     // Advanced controls
     blendModeSelector: document.getElementById('blendModeSelector'),
     colorShiftAmountInput: document.getElementById('colorShiftAmount'),
     scaleAmountInput: document.getElementById('scaleAmount'),
     rotationAmountInput: document.getElementById('rotationAmount'),
+
+    // Light Rays advanced controls
+    lightRaysIntensityInput: document.getElementById('lightRaysIntensity'),
+    lightRaysDirectionInput: document.getElementById('lightRaysDirection'),
+    lightRaysSpreadInput: document.getElementById('lightRaysSpread'),
+    lightDirectionPreview: document.getElementById('lightDirectionPreview'),
 
     // Display elements
     numShapesDisplay: document.getElementById('numShapesValue'),
@@ -204,7 +212,7 @@ function getLayerOpacityValues() {
         'fractalLinesOpacity', 'geometricGridOpacity', 'particleSwarmOpacity',
         'organicNoiseOpacity', 'glitchMosaicOpacity', 'pixelSortOpacity',
         'gradientOverlayOpacity', 'dotMatrixOpacity', 'textureOverlayOpacity',
-        'symmetricalPatternsOpacity', 'flowingLinesOpacity'
+        'symmetricalPatternsOpacity', 'flowingLinesOpacity', 'lightRaysOpacity'
     ];
 
     return getValues(opacityKeys);
@@ -218,10 +226,21 @@ function getLayerDensityValues() {
     const densityKeys = [
         'voronoiDensity', 'organicSplattersDensity', 'neonWavesDensity',
         'fractalLinesDensity', 'dotMatrixDensity', 'flowingLinesDensity',
-        'symmetricalPatternsDensity'
+        'symmetricalPatternsDensity', 'lightRaysDensity'
     ];
 
     return getValues(densityKeys);
+}
+
+/**
+ * Update slider value display
+ * @param {HTMLElement} slider - The slider element
+ * @param {HTMLElement} valueDisplay - The value display element
+ */
+function updateSliderValue(slider, valueDisplay) {
+    if (slider && valueDisplay) {
+        valueDisplay.textContent = slider.value;
+    }
 }
 
 // Public API
@@ -234,5 +253,6 @@ export {
     getValue,
     getValues,
     getLayerOpacityValues,
-    getLayerDensityValues
+    getLayerDensityValues,
+    updateSliderValue
 };

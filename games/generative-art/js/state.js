@@ -18,17 +18,17 @@ const defaultState = {
     saturation: 70,
     lightness: 50,
     seed: Math.floor(Math.random() * 1000000),
-    
+
     // Canvas dimensions
     canvasWidth: window.innerWidth,
     canvasHeight: window.innerHeight,
-    
+
     // Animation settings
     animationEnabled: false,
     animationSpeed: 50,
     interactiveMode: false,
     adaptiveQuality: true,
-    
+
     // Layer opacity settings
     voronoiOpacity: 0.7,
     organicSplattersOpacity: 0.6,
@@ -44,7 +44,8 @@ const defaultState = {
     textureOverlayOpacity: 0.4,
     symmetricalPatternsOpacity: 0.7,
     flowingLinesOpacity: 0.6,
-    
+    lightRaysOpacity: 0.4,
+
     // Layer density settings
     voronoiDensity: 50,
     organicSplattersDensity: 50,
@@ -53,12 +54,18 @@ const defaultState = {
     dotMatrixDensity: 50,
     flowingLinesDensity: 50,
     symmetricalPatternsDensity: 50,
-    
+    lightRaysDensity: 50,
+
     // Advanced settings
     blendMode: 'normal',
     colorShiftAmount: 0,
     scaleAmount: 1,
-    rotationAmount: 0
+    rotationAmount: 0,
+
+    // Light Rays settings
+    lightRaysIntensity: 0.7,
+    lightRaysDirection: 45,
+    lightRaysSpread: 60
 };
 
 // Current application state
@@ -86,17 +93,17 @@ function updateState(newState, recordHistory = true, notifyListeners = true) {
     // Create a new state object by merging the current state with the new state
     const previousState = { ...appState };
     appState = { ...appState, ...newState };
-    
+
     // Record in history if requested
     if (recordHistory) {
         saveToHistory(getState());
     }
-    
+
     // Notify listeners if requested
     if (notifyListeners) {
         notifyStateChangeListeners(previousState, appState);
     }
-    
+
     return appState;
 }
 
@@ -107,11 +114,11 @@ function updateState(newState, recordHistory = true, notifyListeners = true) {
  */
 function resetState(recordHistory = true) {
     // Generate a new random seed
-    const newDefaultState = { 
+    const newDefaultState = {
         ...defaultState,
         seed: Math.floor(Math.random() * 1000000)
     };
-    
+
     return updateState(newDefaultState, recordHistory);
 }
 
@@ -122,7 +129,7 @@ function resetState(recordHistory = true) {
  */
 function addStateChangeListener(listener) {
     stateChangeListeners.push(listener);
-    
+
     // Return a function to remove this listener
     return () => {
         const index = stateChangeListeners.indexOf(listener);
@@ -185,7 +192,7 @@ function loadStateFromStorage(recordHistory = false) {
  */
 function applyStateFromUrlParams(params, recordHistory = true) {
     const newState = {};
-    
+
     // Process URL parameters and update state
     for (const [key, value] of params.entries()) {
         // Only update if the key exists in our state
@@ -200,7 +207,7 @@ function applyStateFromUrlParams(params, recordHistory = true) {
             }
         }
     }
-    
+
     return updateState(newState, recordHistory);
 }
 
@@ -211,12 +218,12 @@ function applyStateFromUrlParams(params, recordHistory = true) {
 function generateStateUrl() {
     const url = new URL(window.location.href);
     url.search = ''; // Clear existing parameters
-    
+
     // Add each state property as a URL parameter
     Object.entries(appState).forEach(([key, value]) => {
         url.searchParams.append(key, value);
     });
-    
+
     return url.toString();
 }
 

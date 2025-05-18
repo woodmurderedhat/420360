@@ -24,7 +24,8 @@ const layerOpacityControls = [
     { id: 'dotMatrixOpacity', stateKey: 'dotMatrixOpacity', defaultValue: 0.6 },
     { id: 'textureOverlayOpacity', stateKey: 'textureOverlayOpacity', defaultValue: 0.4 },
     { id: 'symmetricalPatternsOpacity', stateKey: 'symmetricalPatternsOpacity', defaultValue: 0.7 },
-    { id: 'flowingLinesOpacity', stateKey: 'flowingLinesOpacity', defaultValue: 0.6 }
+    { id: 'flowingLinesOpacity', stateKey: 'flowingLinesOpacity', defaultValue: 0.6 },
+    { id: 'lightRaysOpacity', stateKey: 'lightRaysOpacity', defaultValue: 0.4 }
 ];
 
 // Layer density controls configuration
@@ -36,7 +37,8 @@ const layerDensityControls = [
     { id: 'dotMatrixDensity', stateKey: 'dotMatrixDensity', defaultValue: 50 },
     { id: 'flowingLinesDensity', stateKey: 'flowingLinesDensity', defaultValue: 50 },
     { id: 'symmetricalPatternsDensity', stateKey: 'symmetricalPatternsDensity', defaultValue: 50 },
-    { id: 'organicNoiseDensity', stateKey: 'organicNoiseDensity', defaultValue: 50 }
+    { id: 'organicNoiseDensity', stateKey: 'organicNoiseDensity', defaultValue: 50 },
+    { id: 'lightRaysDensity', stateKey: 'lightRaysDensity', defaultValue: 50 }
 ];
 
 /**
@@ -49,7 +51,7 @@ function setupLayerOpacityControls(drawArtworkFn) {
         layerOpacityControls.forEach(control => {
             const input = getElement(control.id);
             const display = getElement(`${control.id}Value`);
-            
+
             if (input) {
                 // Set initial value from state
                 const state = getState();
@@ -59,24 +61,24 @@ function setupLayerOpacityControls(drawArtworkFn) {
                         display.textContent = state[control.stateKey];
                     }
                 }
-                
+
                 // Add input event listener
                 addListener(control.id, 'input', () => {
                     const value = parseFloat(input.value);
-                    
+
                     // Update display
                     if (display) {
                         display.textContent = value;
                     }
-                    
+
                     // Update state
                     const stateUpdate = {};
                     stateUpdate[control.stateKey] = value;
                     updateState(stateUpdate);
-                    
+
                     // Clear palette cache
                     clearPaletteCache();
-                    
+
                     // Redraw artwork if not animating
                     if (!getState().animationEnabled && drawArtworkFn) {
                         drawArtworkFn(getState().currentArtStyle, false);
@@ -84,11 +86,11 @@ function setupLayerOpacityControls(drawArtworkFn) {
                 });
             }
         });
-        
+
         // Register reset event handler
         registerHandler('resetLayerOpacities', () => {
             resetLayerOpacities();
-            
+
             // Redraw artwork if not animating
             if (!getState().animationEnabled && drawArtworkFn) {
                 drawArtworkFn(getState().currentArtStyle, false);
@@ -112,7 +114,7 @@ function setupLayerDensityControls(drawArtworkFn) {
         layerDensityControls.forEach(control => {
             const input = getElement(control.id);
             const display = getElement(`${control.id}Value`);
-            
+
             if (input) {
                 // Set initial value from state
                 const state = getState();
@@ -122,24 +124,24 @@ function setupLayerDensityControls(drawArtworkFn) {
                         display.textContent = state[control.stateKey];
                     }
                 }
-                
+
                 // Add input event listener
                 addListener(control.id, 'input', () => {
                     const value = parseInt(input.value, 10);
-                    
+
                     // Update display
                     if (display) {
                         display.textContent = value;
                     }
-                    
+
                     // Update state
                     const stateUpdate = {};
                     stateUpdate[control.stateKey] = value;
                     updateState(stateUpdate);
-                    
+
                     // Clear palette cache
                     clearPaletteCache();
-                    
+
                     // Redraw artwork if not animating
                     if (!getState().animationEnabled && drawArtworkFn) {
                         drawArtworkFn(getState().currentArtStyle, false);
@@ -147,11 +149,11 @@ function setupLayerDensityControls(drawArtworkFn) {
                 });
             }
         });
-        
+
         // Register reset event handler
         registerHandler('resetLayerDensities', () => {
             resetLayerDensities();
-            
+
             // Redraw artwork if not animating
             if (!getState().animationEnabled && drawArtworkFn) {
                 drawArtworkFn(getState().currentArtStyle, false);
@@ -171,21 +173,21 @@ function setupLayerDensityControls(drawArtworkFn) {
 function resetLayerOpacities() {
     try {
         const stateUpdate = {};
-        
+
         layerOpacityControls.forEach(control => {
             const input = getElement(control.id);
             const display = getElement(`${control.id}Value`);
-            
+
             if (input) {
                 input.value = control.defaultValue;
                 if (display) {
                     display.textContent = control.defaultValue;
                 }
-                
+
                 stateUpdate[control.stateKey] = control.defaultValue;
             }
         });
-        
+
         updateState(stateUpdate);
         clearPaletteCache();
     } catch (error) {
@@ -202,21 +204,21 @@ function resetLayerOpacities() {
 function resetLayerDensities() {
     try {
         const stateUpdate = {};
-        
+
         layerDensityControls.forEach(control => {
             const input = getElement(control.id);
             const display = getElement(`${control.id}Value`);
-            
+
             if (input) {
                 input.value = control.defaultValue;
                 if (display) {
                     display.textContent = control.defaultValue;
                 }
-                
+
                 stateUpdate[control.stateKey] = control.defaultValue;
             }
         });
-        
+
         updateState(stateUpdate);
         clearPaletteCache();
     } catch (error) {

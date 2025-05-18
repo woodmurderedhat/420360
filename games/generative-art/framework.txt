@@ -23,7 +23,8 @@ index.html
 │       ├── js/ui/color-controls.js (Color controls)
 │       ├── js/ui/animation-controls.js (Animation controls)
 │       ├── js/ui/canvas-controls.js (Canvas controls)
-│       └── js/ui/layer-controls.js (Layer controls)
+│       ├── js/ui/layer-controls.js (Layer controls)
+│       └── js/ui/light-rays-controls.js (Light Rays controls)
 ├── js/layers/ (Layer modules)
 │   ├── js/layers/dot-matrix.js
 │   ├── js/layers/flowing-lines.js
@@ -38,7 +39,8 @@ index.html
 │   ├── js/layers/pixel-sort.js
 │   ├── js/layers/symmetrical-patterns.js
 │   ├── js/layers/texture-overlay.js
-│   └── js/layers/voronoi.js
+│   ├── js/layers/voronoi.js
+│   └── js/layers/light-rays.js (New dramatic lighting effect)
 ```
 
 ## Data Flow
@@ -74,6 +76,28 @@ index.html
    - State changes are recorded in `history.js`
    - Undo/redo functionality allows navigating through state history
    - History is maintained for the current session only
+
+## Enhanced Visual Effects
+
+The application includes several advanced visual effects to create more impressive artwork:
+
+1. **Neon Waves Layer**:
+   - Implements advanced glow effects with multiple passes
+   - Variable wave thickness and depth perception
+   - Complex wave patterns with multiple sine wave combinations
+   - Smooth animation with realistic light behavior
+
+2. **Fractal Lines Layer**:
+   - Enhanced recursive branching with variable complexity
+   - Color transitions along fractal paths
+   - Glow effects with variable intensity
+   - Improved composition with intentional starting points
+
+3. **Light Rays Layer**:
+   - Dramatic crepuscular/god rays effect
+   - Customizable direction, spread, and intensity
+   - Interactive preview for direction control
+   - Realistic light source glow
 
 ## GitHub Pages Compatibility
 

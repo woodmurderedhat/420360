@@ -4,7 +4,6 @@
  */
 
 import { artStyles } from './styles.js';
-import { saveToHistory } from './history.js';
 
 // Default state values
 const defaultState = {
@@ -22,12 +21,6 @@ const defaultState = {
     // Canvas dimensions
     canvasWidth: window.innerWidth,
     canvasHeight: window.innerHeight,
-
-    // Animation settings
-    animationEnabled: false,
-    animationSpeed: 50,
-    interactiveMode: false,
-    adaptiveQuality: true,
 
     // Layer opacity settings
     voronoiOpacity: 0.7,
@@ -85,19 +78,13 @@ function getState() {
 /**
  * Update the application state
  * @param {Object} newState - Partial state to update
- * @param {boolean} recordHistory - Whether to record this state change in history
  * @param {boolean} notifyListeners - Whether to notify state change listeners
  * @returns {Object} The updated state
  */
-function updateState(newState, recordHistory = true, notifyListeners = true) {
+function updateState(newState, notifyListeners = true) {
     // Create a new state object by merging the current state with the new state
     const previousState = { ...appState };
     appState = { ...appState, ...newState };
-
-    // Record in history if requested
-    if (recordHistory) {
-        saveToHistory(getState());
-    }
 
     // Notify listeners if requested
     if (notifyListeners) {
@@ -109,17 +96,17 @@ function updateState(newState, recordHistory = true, notifyListeners = true) {
 
 /**
  * Reset the application state to default values
- * @param {boolean} recordHistory - Whether to record this state change in history
+ * @param {boolean} notifyListeners - Whether to notify state change listeners
  * @returns {Object} The reset state
  */
-function resetState(recordHistory = true) {
+function resetState(notifyListeners = true) {
     // Generate a new random seed
     const newDefaultState = {
         ...defaultState,
         seed: Math.floor(Math.random() * 1000000)
     };
 
-    return updateState(newDefaultState, recordHistory);
+    return updateState(newDefaultState, notifyListeners);
 }
 
 /**
@@ -167,15 +154,14 @@ function saveStateToStorage() {
 
 /**
  * Load state from localStorage
- * @param {boolean} recordHistory - Whether to record this state change in history
  * @returns {Object} The loaded state or null if no saved state exists
  */
-function loadStateFromStorage(recordHistory = false) {
+function loadStateFromStorage() {
     try {
         const savedState = localStorage.getItem('generativeArtState');
         if (savedState) {
             const parsedState = JSON.parse(savedState);
-            updateState(parsedState, recordHistory);
+            updateState(parsedState);
             return appState;
         }
     } catch (error) {
@@ -187,10 +173,9 @@ function loadStateFromStorage(recordHistory = false) {
 /**
  * Apply state from URL parameters
  * @param {URLSearchParams} params - URL search parameters
- * @param {boolean} recordHistory - Whether to record this state change in history
  * @returns {Object} The updated state
  */
-function applyStateFromUrlParams(params, recordHistory = true) {
+function applyStateFromUrlParams(params) {
     const newState = {};
 
     // Process URL parameters and update state
@@ -208,7 +193,7 @@ function applyStateFromUrlParams(params, recordHistory = true) {
         }
     }
 
-    return updateState(newState, recordHistory);
+    return updateState(newState);
 }
 
 /**

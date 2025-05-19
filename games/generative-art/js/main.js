@@ -3,26 +3,14 @@
  * Handles initialization and core functionality
  */
 
-import { generatePalette, clearPaletteCache, getPaletteCacheStats } from './palette.js';
-import { artStyles } from './styles.js';
+import { generatePalette, clearPaletteCache } from './palette.js';
 import { drawDefaultMasterpiece } from './styles-default.js';
-import { initAnimation } from './animation.js';
-import { initWorkers } from './worker-manager.js';
-import { saveToHistory, updateHistoryButtons } from './history.js';
+import { getState, updateState, loadStateFromStorage, applyStateFromUrlParams } from './state.js';
 import { handleError, ErrorType, ErrorSeverity } from './error-service.js';
-import {
-    getState,
-    updateState,
-    resetState,
-    loadStateFromStorage,
-    applyStateFromUrlParams
-} from './state.js';
 import { setSeed } from './utils.js';
 
-// Import the new UI module
+// Import the UI module
 import * as UI from './ui/index.js';
-
-// Use centralized state management instead of local appState object
 
 /**
  * Initialize the canvas dimensions and sets up event listeners.
@@ -51,11 +39,8 @@ function initCanvas() {
         const state = getState();
 
         // Use custom dimensions if provided, otherwise fill viewport
-        const canvasWidthInput = UI.getElement('canvasWidthInput');
-        const canvasHeightInput = UI.getElement('canvasHeightInput');
-
-        const w = (canvasWidthInput && +canvasWidthInput.value) || window.innerWidth;
-        const h = (canvasHeightInput && +canvasHeightInput.value) || window.innerHeight;
+        const w = window.innerWidth; // Simplified to always use window inner dimensions
+        const h = window.innerHeight;
 
         canvas.width = w * dpr;
         canvas.height = h * dpr;
@@ -68,7 +53,7 @@ function initCanvas() {
         ctx.fillStyle = state.backgroundColor;
         ctx.fillRect(0, 0, w, h);
 
-        drawArtwork(state.currentArtStyle);
+        drawArtwork(); // Simplified, style is implicit (default)
     } catch (error) {
         handleError(error, ErrorType.RENDERING, ErrorSeverity.ERROR, {
             component: 'initCanvas',
@@ -79,18 +64,14 @@ function initCanvas() {
 
 /**
  * Draw artwork based on the selected style
- * @param {string} style - The art style to draw
  * @param {boolean} showLoading - Whether to show loading indicator
  */
-function drawArtwork(style, showLoading = true) {
+function drawArtwork(showLoading = true) { // Removed style parameter
     try {
-        // Clear palette cache when style changes from the current one
-        const currentState = getState();
-        if (currentState.currentArtStyle !== style) {
-            clearPaletteCache();
-        }
+        // Clear palette cache (always, as style is now fixed or implicit)
+        clearPaletteCache();
 
-        // Show loading indicator for complex styles
+        // Show loading indicator
         const loadingIndicator = document.getElementById('loadingIndicator');
         if (showLoading && loadingIndicator) {
             loadingIndicator.style.display = 'flex';
@@ -124,7 +105,7 @@ function drawArtwork(style, showLoading = true) {
 
                 // Generate palette
                 const palette = generatePalette(
-                    style,
+                    state.currentArtStyle, // Assuming currentArtStyle is managed in state for default
                     state.colorTheme,
                     state.baseHue,
                     state.saturation,
@@ -132,26 +113,19 @@ function drawArtwork(style, showLoading = true) {
                 );
 
                 // Common parameters for all styles - pass the entire state as params
-                // This simplifies the code and ensures all parameters are available
                 const params = {
                     ...state,
                     width,
                     height,
-                    isAnimationFrame: false
+                    isAnimationFrame: false // Animation removed
                 };
 
                 // Always draw the Default Masterpiece style
-                // Pass all parameters to ensure all UI settings affect the style
                 drawDefaultMasterpiece(ctx, palette, false, params);
 
-                // Update state with the current art style
-                if (currentState.currentArtStyle !== style) {
-                    updateState({ currentArtStyle: style });
-                }
             } catch (error) {
                 handleError(error, ErrorType.RENDERING, ErrorSeverity.ERROR, {
                     component: 'drawArtwork',
-                    style,
                     message: 'Error drawing artwork'
                 });
             } finally {
@@ -164,127 +138,10 @@ function drawArtwork(style, showLoading = true) {
     } catch (error) {
         handleError(error, ErrorType.RENDERING, ErrorSeverity.ERROR, {
             component: 'drawArtwork',
-            style,
             message: 'Error preparing to draw artwork'
         });
     }
 }
-
-/**
- * Get the current application state
- * @returns {Object} The current state
- */
-function getCurrentAppState() {
-    try {
-        // Get the base state from our state management
-        const state = getState();
-
-        // Override with any current UI values that might not be in state yet
-        return {
-            ...state,
-            style: state.currentArtStyle,
-            numShapes: UI.getValue('numShapesInput') ?? state.numShapes,
-            lineWidth: UI.getValue('lineWidthInput') ?? state.lineWidth,
-            canvasWidth: UI.getValue('canvasWidthInput') ?? state.canvasWidth,
-            canvasHeight: UI.getValue('canvasHeightInput') ?? state.canvasHeight,
-            seed: UI.getValue('seedInput') ?? state.seed,
-            colorTheme: UI.getValue('colorThemeSelector') ?? state.colorTheme,
-            baseHue: UI.getValue('baseHueInput') ?? state.baseHue,
-            saturation: UI.getValue('saturationInput') ?? state.saturation,
-            lightness: UI.getValue('lightnessInput') ?? state.lightness,
-            backgroundColor: UI.getValue('backgroundColorPicker') ?? state.backgroundColor,
-            isAnimating: UI.getValue('animationToggle') ?? state.animationEnabled,
-            animationSpeed: UI.getValue('animationSpeedInput') ?? state.animationSpeed,
-            isInteractive: UI.getValue('interactiveToggle') ?? state.interactiveMode
-        };
-    } catch (error) {
-        handleError(error, ErrorType.STATE, ErrorSeverity.WARNING, {
-            component: 'getCurrentAppState',
-            message: 'Error getting current application state'
-        });
-
-        // Return the base state if there's an error
-        return getState();
-    }
-}
-
-/**
- * Apply a state to the application
- * @param {Object} state - The state to apply
- */
-function applyAppState(state) {
-    if (!state) return;
-
-    // Create a new state object with properly typed values
-    const newState = {};
-
-    // Map style to currentArtStyle if needed
-    if (state.style && Object.values(artStyles).includes(state.style)) {
-        newState.currentArtStyle = state.style;
-    }
-
-    // Process numeric values
-    const numericProps = [
-        'numShapes', 'lineWidth', 'baseHue', 'saturation', 'lightness',
-        'voronoiOpacity', 'organicSplattersOpacity', 'neonWavesOpacity',
-        'fractalLinesOpacity', 'geometricGridOpacity', 'particleSwarmOpacity',
-        'organicNoiseOpacity', 'glitchMosaicOpacity', 'pixelSortOpacity',
-        'gradientOverlayOpacity', 'dotMatrixOpacity', 'textureOverlayOpacity',
-        'symmetricalPatternsOpacity', 'flowingLinesOpacity',
-        'voronoiDensity', 'organicSplattersDensity', 'neonWavesDensity',
-        'fractalLinesDensity', 'dotMatrixDensity', 'flowingLinesDensity',
-        'symmetricalPatternsDensity', 'colorShiftAmount', 'scaleAmount',
-        'rotationAmount', 'animationSpeed'
-    ];
-
-    numericProps.forEach(prop => {
-        if (state[prop] !== undefined) {
-            newState[prop] = +state[prop];
-        }
-    });
-
-    // Process string values
-    const stringProps = [
-        'colorTheme', 'backgroundColor', 'blendMode'
-    ];
-
-    stringProps.forEach(prop => {
-        if (state[prop] !== undefined) {
-            newState[prop] = state[prop];
-        }
-    });
-
-    // Process boolean values
-    if (state.isAnimating !== undefined) {
-        newState.animationEnabled = state.isAnimating === true || state.isAnimating === 'true';
-    }
-
-    if (state.isInteractive !== undefined) {
-        newState.interactiveMode = state.isInteractive === true || state.isInteractive === 'true';
-    }
-
-    if (state.adaptiveQuality !== undefined) {
-        newState.adaptiveQuality = state.adaptiveQuality === true || state.adaptiveQuality === 'true';
-    }
-
-    // Update the state
-    updateState(newState);
-}
-
-/**
- * Log palette cache statistics to the console
- * Useful for debugging and performance monitoring
- */
-function logPaletteCacheStats() {
-    const stats = getPaletteCacheStats();
-    console.log('Palette Cache Statistics:', stats);
-    console.log(`Cache Hit Rate: ${(stats.hitRate * 100).toFixed(2)}%`);
-    console.log(`Cache Size: ${stats.size}/${stats.maxSize}`);
-    console.log(`Hits: ${stats.hits}, Misses: ${stats.misses}`);
-}
-
-// Add palette cache stats to window for debugging
-window.logPaletteCacheStats = logPaletteCacheStats;
 
 // Initialize the application
 window.addEventListener('load', () => {
@@ -292,9 +149,7 @@ window.addEventListener('load', () => {
         // Initialize UI module
         const uiInitialized = UI.initialize({
             drawArtwork,
-            initCanvas,
-            getCurrentAppState,
-            applyAppState
+            initCanvas
         });
 
         if (!uiInitialized) {
@@ -307,16 +162,10 @@ window.addEventListener('load', () => {
             throw new Error('Canvas element not found');
         }
 
-        // Initialize animation
-        initAnimation(canvas);
-
-        // Initialize web workers for background processing
-        initWorkers();
-
-        // Load settings from storage
+        // Load settings from storage (might only be seed now)
         loadStateFromStorage();
 
-        // Apply URL parameters
+        // Apply URL parameters (might only be seed now)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.size > 0) {
             applyStateFromUrlParams(urlParams);
@@ -326,22 +175,16 @@ window.addEventListener('load', () => {
         const state = getState();
         if (state.seed) {
             setSeed(state.seed.toString());
+        } else {
+            // If no seed in state (e.g. first load), generate a random one
+            const randomSeed = Date.now().toString();
+            setSeed(randomSeed);
+            updateState({ seed: randomSeed });
+            UI.setValue('seedInput', randomSeed); // Update UI if seedInput exists
         }
 
         // Initialize canvas
         initCanvas();
-
-        // Save initial state to history
-        saveToHistory(getCurrentAppState());
-        updateHistoryButtons();
-
-        // Register event handlers for UI events
-        UI.triggerEvent('registerHandlers', {
-            drawArtwork,
-            initCanvas,
-            getCurrentAppState,
-            applyAppState
-        });
 
         console.log('Application initialized successfully');
     } catch (error) {

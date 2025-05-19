@@ -3,24 +3,12 @@
  * Handles UI control setup and interactions
  */
 
-import { getElement, getElements, addListener, setValue, getValue } from './components.js';
-import { registerHandler, triggerEvent } from './events.js';
-import { getState, updateState } from '../state.js';
-import { handleError, ErrorType, ErrorSeverity } from '../error-service.js';
+import { getElement, addListener, getValue } from './components.js'; // Removed getElements, setValue
+import { updateState } from '../state.js'; // Removed getState
 import { clearPaletteCache } from '../palette.js';
-import { setSeed } from '../utils.js';
-import { artStyles } from '../styles.js';
-import {
-    startAnimation,
-    stopAnimation,
-    setAnimationSpeed,
-    setInteractiveMode,
-    setAdaptiveQuality,
-    cleanupAnimationResources
-} from '../animation.js';
 
 // Local storage key for settings
-const SETTINGS_KEY = 'generativeArtSettings';
+// const SETTINGS_KEY = 'generativeArtSettings'; // Removed
 
 /**
  * Set up color theme controls
@@ -59,176 +47,6 @@ function setupColorThemeControls() {
 }
 
 /**
- * Set up animation controls
- * @param {Function} drawArtwork - Function to draw artwork
- */
-function setupAnimationControls(drawArtwork) {
-    const animationToggle = getElement('animationToggle');
-    const animationSpeedInput = getElement('animationSpeedInput');
-    const interactiveToggle = getElement('interactiveToggle');
-    const adaptiveQualityToggle = getElement('adaptiveQualityToggle');
-    const fpsDisplay = getElement('fpsDisplay');
-    const canvas = getElement('canvas');
-    const ctx = getElement('ctx');
-
-    if (!animationToggle || !canvas || !ctx) return;
-
-    // Animation toggle
-    addListener('animationToggle', 'change', () => {
-        const isAnimating = getValue('animationToggle');
-
-        if (isAnimating) {
-            // Enable animation speed slider
-            if (animationSpeedInput) {
-                animationSpeedInput.disabled = false;
-            }
-
-            // Get current state
-            const state = getState();
-
-            // Start animation with all state parameters
-            startAnimation(canvas, ctx, state.currentArtStyle, {
-                // Basic settings
-                animationSpeed: getValue('animationSpeedInput') || 50,
-                isInteractive: getValue('interactiveToggle') || false,
-                backgroundColor: state.backgroundColor,
-                colorTheme: state.colorTheme,
-                baseHue: state.baseHue,
-                saturation: state.saturation,
-                lightness: state.lightness,
-                lineWidth: state.lineWidth,
-                numShapes: state.numShapes,
-
-                // Layer opacity settings
-                voronoiOpacity: state.voronoiOpacity,
-                organicSplattersOpacity: state.organicSplattersOpacity,
-                neonWavesOpacity: state.neonWavesOpacity,
-                fractalLinesOpacity: state.fractalLinesOpacity,
-                geometricGridOpacity: state.geometricGridOpacity,
-                particleSwarmOpacity: state.particleSwarmOpacity,
-                organicNoiseOpacity: state.organicNoiseOpacity,
-                glitchMosaicOpacity: state.glitchMosaicOpacity,
-                pixelSortOpacity: state.pixelSortOpacity,
-                gradientOverlayOpacity: state.gradientOverlayOpacity,
-                dotMatrixOpacity: state.dotMatrixOpacity,
-                textureOverlayOpacity: state.textureOverlayOpacity,
-                symmetricalPatternsOpacity: state.symmetricalPatternsOpacity,
-                flowingLinesOpacity: state.flowingLinesOpacity,
-
-                // Layer density settings
-                voronoiDensity: state.voronoiDensity,
-                organicSplattersDensity: state.organicSplattersDensity,
-                neonWavesDensity: state.neonWavesDensity,
-                fractalLinesDensity: state.fractalLinesDensity,
-                dotMatrixDensity: state.dotMatrixDensity,
-                flowingLinesDensity: state.flowingLinesDensity,
-                symmetricalPatternsDensity: state.symmetricalPatternsDensity,
-
-                // Advanced settings
-                blendMode: state.blendMode,
-                colorShiftAmount: state.colorShiftAmount,
-                scaleAmount: state.scaleAmount,
-                rotationAmount: state.rotationAmount
-            });
-
-            // Start FPS display update
-            if (fpsDisplay) {
-                startFpsMonitoring();
-            }
-        } else {
-            // Disable animation speed slider
-            if (animationSpeedInput) {
-                animationSpeedInput.disabled = true;
-            }
-
-            // Stop animation with full cleanup
-            stopAnimation(true);
-
-            // Ensure all resources are properly cleaned up
-            cleanupAnimationResources();
-
-            // Redraw static artwork
-            if (drawArtwork) {
-                drawArtwork(getState().currentArtStyle);
-            }
-
-            // Stop FPS display update
-            if (fpsDisplay) {
-                stopFpsMonitoring();
-                fpsDisplay.textContent = '-';
-            }
-        }
-    });
-
-    // Animation speed slider
-    if (animationSpeedInput) {
-        addListener('animationSpeedInput', 'input', () => {
-            const animationSpeed = getValue('animationSpeedInput');
-            const animationSpeedDisplay = getElement('animationSpeedDisplay');
-
-            if (animationSpeedDisplay) {
-                animationSpeedDisplay.textContent = animationSpeed;
-            }
-
-            setAnimationSpeed(animationSpeed);
-        });
-    }
-
-    // Interactive mode toggle
-    if (interactiveToggle) {
-        addListener('interactiveToggle', 'change', () => {
-            setInteractiveMode(getValue('interactiveToggle'));
-        });
-    }
-
-    // Adaptive quality toggle
-    if (adaptiveQualityToggle) {
-        addListener('adaptiveQualityToggle', 'change', () => {
-            setAdaptiveQuality(getValue('adaptiveQualityToggle'));
-        });
-    }
-
-    // FPS monitoring
-    let fpsMonitoringInterval = null;
-
-    function startFpsMonitoring() {
-        if (fpsMonitoringInterval) {
-            clearInterval(fpsMonitoringInterval);
-        }
-
-        fpsMonitoringInterval = setInterval(() => {
-            if (fpsDisplay) {
-                // Import these dynamically to avoid circular dependencies
-                const { currentFps, qualityLevel } = require('../animation.js');
-
-                fpsDisplay.textContent = currentFps;
-
-                // Update quality level display if it exists
-                const qualityDisplay = document.getElementById('qualityLevelDisplay');
-                if (qualityDisplay) {
-                    qualityDisplay.textContent = Math.round(qualityLevel * 100) + '%';
-                }
-            }
-        }, 500);
-    }
-
-    function stopFpsMonitoring() {
-        if (fpsMonitoringInterval) {
-            clearInterval(fpsMonitoringInterval);
-            fpsMonitoringInterval = null;
-        }
-    }
-
-    // Register animation event handlers
-    registerHandler('toggleAnimation', () => {
-        if (animationToggle) {
-            animationToggle.checked = !animationToggle.checked;
-            animationToggle.dispatchEvent(new Event('change'));
-        }
-    });
-}
-
-/**
  * Set up slider display updates
  */
 function setupSliderDisplays() {
@@ -240,9 +58,8 @@ function setupSliderDisplays() {
         'baseHue': getElement('baseHueDisplay'),
         'saturation': getElement('saturationDisplay'),
         'lightness': getElement('lightnessDisplay'),
-        'animationSpeed': getElement('animationSpeedDisplay'),
 
-        // Layer opacity controls
+        // Layer opacity controls (keeping these as they are related to art generation)
         'voronoiOpacity': getElement('voronoiOpacityDisplay'),
         'organicSplattersOpacity': getElement('organicSplattersOpacityDisplay'),
         'neonWavesOpacity': getElement('neonWavesOpacityDisplay'),
@@ -258,7 +75,7 @@ function setupSliderDisplays() {
         'symmetricalPatternsOpacity': getElement('symmetricalPatternsOpacityDisplay'),
         'flowingLinesOpacity': getElement('flowingLinesOpacityDisplay'),
 
-        // Layer density controls
+        // Layer density controls (keeping these)
         'voronoiDensity': getElement('voronoiDensityDisplay'),
         'organicSplattersDensity': getElement('organicSplattersDensityDisplay'),
         'neonWavesDensity': getElement('neonWavesDensityDisplay'),
@@ -267,7 +84,7 @@ function setupSliderDisplays() {
         'flowingLinesDensity': getElement('flowingLinesDensityDisplay'),
         'symmetricalPatternsDensity': getElement('symmetricalPatternsDensityDisplay'),
 
-        // Advanced controls
+        // Advanced controls (keeping these)
         'colorShiftAmount': getElement('colorShiftAmountDisplay'),
         'scaleAmount': getElement('scaleAmountDisplay'),
         'rotationAmount': getElement('rotationAmountDisplay')
@@ -286,8 +103,6 @@ function setupSliderDisplays() {
 
 // Public API
 export {
-    SETTINGS_KEY,
     setupColorThemeControls,
-    setupAnimationControls,
     setupSliderDisplays
 };

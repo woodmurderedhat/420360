@@ -1,0 +1,76 @@
+# Generative Art Simplification Todo List
+
+## Goal
+Remove animation, gallery, and history features to focus only on art generation with:
+- Seed control
+- Randomize button
+- Save artwork button
+
+## HTML Changes
+- [x] Remove animation controls section
+- [x] Remove gallery modal
+- [x] Remove history controls section
+- [x] Remove mobile gallery button
+- [x] Simplify controls panel to only include essential elements
+- [x] Keep only seed input, randomize button, and save artwork button
+- [x] Update shortcuts section
+
+## JavaScript Changes
+
+### main.js
+- [x] Remove imports for animation.js, gallery.js, and history.js
+- [x] Remove initAnimation() call
+- [x] Remove saveToHistory() calls
+- [x] Remove updateHistoryButtons() calls
+- [x] Simplify initialization process
+- [x] Keep only core art generation functionality
+
+### state.js
+- [x] Remove state properties related to animation
+- [x] Remove references to history
+- [x] Simplify state management
+
+### ui/index.js
+- [x] Remove event handlers for animation, gallery, and history
+- [x] Remove UI components for animation, gallery, and history
+- [x] Keep only essential UI components for seed, randomize, and save artwork
+- [x] Update registerHandlers function
+
+### ui/components.js
+- [x] Remove references to UI elements that will be removed
+- [x] Keep only essential UI components
+
+### ui/controls.js
+- [x] Remove animation controls setup
+- [x] Remove gallery controls setup
+- [x] Remove history controls setup
+
+### utils.js
+- [x] Keep seed functionality intact
+
+### styles-default.js
+- [x] No changes needed - keep the art generation logic
+
+## CSS Changes
+- [x] Remove CSS related to animation
+- [x] Remove CSS related to gallery
+- [x] Remove CSS related to history
+- [x] Simplify UI styling
+- [x] Remove empty CSS rules
+
+## Files to Remove (Optional)
+- [x] js/animation.js
+- [x] js/gallery.js
+- [x] js/history.js
+- [x] js/ui/gallery-ui.js
+- [x] js/ui/animation-controls.js
+
+## Framework Update
+- [x] Update framework.txt to reflect the simplified structure
+
+## Testing
+- [x] Test seed input functionality
+- [x] Test randomize button
+- [x] Test save artwork button
+- [x] Verify that all layer styles still work correctly
+- [x] Ensure the application loads and runs without errors

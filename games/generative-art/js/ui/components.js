@@ -11,8 +11,6 @@ const _elements = {
     // Control buttons
     regenerateButton: document.getElementById('regenerateButton'),
     exportButton: document.getElementById('exportButton'),
-    galleryButton: document.getElementById('galleryButton'),
-    saveToGalleryButton: document.getElementById('saveToGalleryButton'),
 
     // Control panel elements
     numShapesInput: document.getElementById('numShapes'),
@@ -33,13 +31,6 @@ const _elements = {
     lightnessInput: document.getElementById('lightness'),
     backgroundColorPicker: document.getElementById('backgroundColor'),
     customColorControls: document.getElementById('customColorControls'),
-
-    // Animation controls
-    animationToggle: document.getElementById('animationToggle'),
-    animationSpeedInput: document.getElementById('animationSpeed'),
-    interactiveToggle: document.getElementById('interactiveToggle'),
-    adaptiveQualityToggle: document.getElementById('adaptiveQualityToggle'),
-    fpsDisplay: document.getElementById('fpsDisplay'),
 
     // Layer opacity controls
     voronoiOpacityInput: document.getElementById('voronoiOpacity'),
@@ -90,16 +81,6 @@ const _elements = {
     baseHueDisplay: document.getElementById('baseHueValue'),
     saturationDisplay: document.getElementById('saturationValue'),
     lightnessDisplay: document.getElementById('lightnessValue'),
-    animationSpeedDisplay: document.getElementById('animationSpeedValue'),
-
-    // Gallery modal elements
-    galleryModal: document.getElementById('galleryModal'),
-    galleryContainer: document.getElementById('galleryContainer'),
-    closeButton: document.querySelector('.close-button'),
-
-    // History controls
-    undoButton: document.getElementById('undoButton'),
-    redoButton: document.getElementById('redoButton'),
 };
 
 // Initialize canvas context if canvas exists

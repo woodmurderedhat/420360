@@ -5,20 +5,14 @@
 
 import { getElement, getElements, hasRequiredElements, addListener, setValue, getValue, getValues } from './components.js';
 import { registerHandler, triggerEvent, setupKeyboardShortcuts, setupWindowResize, setupFullscreenChangeListeners, cleanupEventListeners } from './events.js';
-import { setupGalleryModalControls, openGallery } from './gallery-ui.js';
 import { initResponsiveUI, toggleControlPanel, cleanupResponsiveUI } from './responsive.js';
 import { setupColorThemeControls } from './color-controls.js';
-import { setupAnimationControls } from './animation-controls.js';
 import { setupCanvasControls } from './canvas-controls.js';
 import { setupLayerOpacityControls, setupLayerDensityControls } from './layer-controls.js';
 import { initLightRaysControls } from './light-rays-controls.js';
 import { getState, updateState } from '../state.js';
 import { handleError, ErrorType, ErrorSeverity } from '../error-service.js';
 import { setSeed } from '../utils.js';
-import { saveToGallery } from '../gallery.js';
-import { saveToHistory, undo, redo, updateHistoryButtons } from '../history.js';
-import { cleanupAnimationResources, stopAnimation } from '../animation.js';
-import { clearPaletteCache } from '../palette.js';
 import { artStyles } from '../styles.js';
 
 // Local storage key for settings
@@ -28,8 +22,6 @@ const SETTINGS_KEY = 'generativeArtSettings';
 let _initialized = false;
 let _drawArtworkFn = null;
 let _initCanvasFn = null;
-let _getCurrentAppStateFn = null;
-let _applyAppStateFn = null;
 
 /**
  * Initialize the UI module
@@ -43,8 +35,6 @@ function initialize(options = {}) {
         // Store callback functions
         _drawArtworkFn = options.drawArtwork;
         _initCanvasFn = options.initCanvas;
-        _getCurrentAppStateFn = options.getCurrentAppState;
-        _applyAppStateFn = options.applyAppState;
 
         // Check for required elements
         const requiredElements = ['canvas', 'regenerateButton', 'exportButton'];
@@ -81,16 +71,6 @@ function initialize(options = {}) {
 function setupEventHandlers() {
     // Regenerate button
     addListener('regenerateButton', 'click', () => {
-        // Stop animation if running with full cleanup
-        const animationToggle = getElement('animationToggle');
-        if (animationToggle && animationToggle.checked) {
-            stopAnimation(true); // Full cleanup
-            animationToggle.checked = false;
-        }
-
-        // Ensure resources are cleaned up before regenerating
-        cleanupAnimationResources();
-
         if (_drawArtworkFn) {
             _drawArtworkFn(getState().currentArtStyle);
         }
@@ -99,33 +79,6 @@ function setupEventHandlers() {
     // Export button
     addListener('exportButton', 'click', () => {
         triggerEvent('export');
-    });
-
-    // Gallery button
-    addListener('galleryButton', 'click', () => {
-        openGallery();
-    });
-
-    // Save to gallery button
-    addListener('saveToGalleryButton', 'click', () => {
-        const canvas = getElement('canvas');
-        if (!canvas) return;
-
-        const state = getState();
-        const settings = {
-            style: state.currentArtStyle,
-            numShapes: state.numShapes,
-            lineWidth: state.lineWidth,
-            seed: getValue('seedInput'),
-            colorTheme: state.colorTheme,
-            baseHue: state.baseHue,
-            saturation: state.saturation,
-            lightness: state.lightness,
-            backgroundColor: state.backgroundColor
-        };
-
-        saveToGallery(canvas, settings);
-        alert('Artwork saved to gallery!');
     });
 
     // Random seed generation
@@ -173,7 +126,7 @@ function setupEventHandlers() {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         // Get current state
-        const state = getState();
+        getState(); // Just to ensure state is up to date
 
         // Update basic settings
         const newState = {
@@ -246,12 +199,6 @@ function setupEventHandlers() {
             currentSeedDisplay.textContent = seedValue || 'random';
         }
 
-        // Save state to history
-        if (_getCurrentAppStateFn) {
-            saveToHistory(_getCurrentAppStateFn());
-            updateHistoryButtons();
-        }
-
         // Redraw artwork
         if (_drawArtworkFn) {
             _drawArtworkFn('Default');
@@ -269,17 +216,7 @@ function setupEventHandlers() {
         if (exportButton) exportButton.click();
     });
 
-    registerHandler('undo', () => {
-        undo();
-        if (_applyAppStateFn) _applyAppStateFn(getState());
-    });
-
-    registerHandler('redo', () => {
-        redo();
-        if (_applyAppStateFn) _applyAppStateFn(getState());
-    });
-
-    registerHandler('quickGenerate', ({ preset }) => {
+    registerHandler('quickGenerate', () => {
         // Always use Default art style
         updateState({ currentArtStyle: artStyles.DEFAULT });
 
@@ -326,11 +263,9 @@ function setupEventHandlers() {
 function setupUIComponents() {
     // Set up UI components by category
     setupColorThemeControls(_drawArtworkFn);
-    setupAnimationControls(_drawArtworkFn);
     setupCanvasControls(_drawArtworkFn, _initCanvasFn);
     setupLayerOpacityControls(_drawArtworkFn);
     setupLayerDensityControls(_drawArtworkFn);
-    setupGalleryModalControls();
 
     // Initialize Light Rays controls
     initLightRaysControls({
@@ -358,7 +293,6 @@ function setupUIComponents() {
  */
 function cleanup() {
     cleanupEventListeners();
-    cleanupAnimationResources();
     cleanupResponsiveUI();
     _initialized = false;
 }
@@ -372,6 +306,5 @@ export {
     setValue,
     getValue,
     triggerEvent,
-    openGallery,
     SETTINGS_KEY
 };

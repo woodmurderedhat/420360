@@ -58,7 +58,13 @@ const defaultState = {
     // Light Rays settings
     lightRaysIntensity: 0.7,
     lightRaysDirection: 45,
-    lightRaysSpread: 60
+    lightRaysSpread: 60,
+
+    // Landscape settings
+    landscapeType: 'mountain', // mountain, desert, ocean, forest
+    timeOfDay: 'day', // day, sunset, night, dawn
+    landscapeComplexity: 70, // 0-100
+    weatherCondition: 'clear' // clear, cloudy, foggy, stormy
 };
 
 // Current application state
@@ -135,7 +141,13 @@ function resetState(notifyListeners = true) {
         textureOverlayDensity: 20 + Math.random() * 80,
         symmetricalPatternsDensity: 20 + Math.random() * 80,
         flowingLinesDensity: 20 + Math.random() * 80,
-        lightRaysDensity: 20 + Math.random() * 80
+        lightRaysDensity: 20 + Math.random() * 80,
+
+        // Randomize landscape settings
+        landscapeType: ['mountain', 'desert', 'ocean', 'forest'][Math.floor(Math.random() * 4)],
+        timeOfDay: ['dawn', 'day', 'sunset', 'night'][Math.floor(Math.random() * 4)],
+        landscapeComplexity: 40 + Math.random() * 60,
+        weatherCondition: ['clear', 'cloudy', 'foggy', 'stormy'][Math.floor(Math.random() * 4)]
     };
 
     return updateState(newDefaultState, notifyListeners);

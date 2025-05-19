@@ -6,7 +6,8 @@ index.html
 ├── art-rando.txt (Randomization documentation)
 ├── js/main.js (Entry point)
 │   ├── js/styles.js (Art style definitions)
-│   │   └── js/styles-default.js (Enhanced randomized masterpiece style)
+│   │   ├── js/styles-default.js (Enhanced randomized masterpiece style)
+│   │   └── js/styles-landscape.js (Random landscape style)
 │   ├── js/palette.js (Advanced color palette generation)
 │   ├── js/state.js (State management with randomization)
 │   ├── js/error-service.js (Error handling)
@@ -28,6 +29,7 @@ index.html
 │   ├── js/layers/geometric-grid.js
 │   ├── js/layers/glitch-mosaic.js
 │   ├── js/layers/gradient-overlay.js
+│   ├── js/layers/landscape.js (Random landscape generation)
 │   ├── js/layers/neon-waves.js
 │   ├── js/layers/organic-noise.js
 │   ├── js/layers/organic-splatters.js
@@ -86,33 +88,41 @@ The application includes several advanced visual effects with enhanced randomiza
    - Multiple rendering styles per layer
    - Comprehensive randomization documentation in art-rando.txt
 
-2. **Voronoi Cells Layer** (Fully Randomized Implementation):
+2. **Landscape Generation**:
+   - Procedurally generated landscapes with natural elements
+   - Multiple landscape types (mountain, forest, ocean, desert)
+   - Time of day variations (dawn, day, sunset, night)
+   - Weather condition effects (clear, cloudy, foggy, stormy)
+   - Layered composition with horizon, sky, and terrain elements
+   - Specialized color palettes for different landscape scenarios
+
+3. **Voronoi Cells Layer** (Fully Randomized Implementation):
    - Multiple rendering styles (circles, rectangles, polygons, blobs)
    - Randomized shape parameters with distortion
    - Probability-based stroke and fill combinations
    - Varied transparency and blend modes
    - Density variation based on randomized parameters
 
-3. **Color Palette Generation**:
+4. **Color Palette Generation**:
    - Multiple palette generation strategies (monochromatic, complementary, triadic, etc.)
    - Randomized color relationships and harmonies
    - Varied saturation and lightness profiles
    - Style-specific color schemes
    - Dynamic color count based on randomization
 
-4. **Neon Waves Layer**:
+5. **Neon Waves Layer**:
    - Implements advanced glow effects with multiple passes
    - Variable wave thickness and depth perception
    - Complex wave patterns with multiple sine wave combinations
    - Randomized wave parameters and compositions
 
-5. **Fractal Lines Layer**:
+6. **Fractal Lines Layer**:
    - Enhanced recursive branching with variable complexity
    - Color transitions along fractal paths
    - Glow effects with variable intensity
    - Randomized starting points and branching patterns
 
-6. **Light Rays Layer**:
+7. **Light Rays Layer**:
    - Dramatic crepuscular/god rays effect
    - Randomized direction, spread, and intensity
    - Varied light source positions

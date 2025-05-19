@@ -5,6 +5,7 @@
 
 // Import style implementations
 import { drawDefaultMasterpiece } from './styles-default.js';
+import { drawLandscapeMasterpiece } from './styles-landscape.js';
 import { drawVoronoiCellsLayer } from './layers/voronoi.js';
 import { drawOrganicSplattersLayer } from './layers/organic-splatters.js';
 import { drawNeonWavesLayer } from './layers/neon-waves.js';
@@ -25,6 +26,7 @@ import { drawFlowingLinesLayer } from './layers/flowing-lines.js';
 // Art style constants
 export const artStyles = {
     DEFAULT: 'default',
+    LANDSCAPE: 'landscape',
     VORONOI_CELLS: 'voronoi-cells',
     ORGANIC_SPLATTERS: 'organic-splatters',
     NEON_WAVES: 'neon-waves',
@@ -76,6 +78,9 @@ export function drawArtwork(ctx, style, palette, isAnimationFrame = false, param
     switch (style) {
         case artStyles.DEFAULT:
             drawDefaultMasterpiece(ctx, palette, isAnimationFrame, params); // Pass all params
+            break;
+        case artStyles.LANDSCAPE:
+            drawLandscapeMasterpiece(ctx, palette, isAnimationFrame, params); // Pass all params
             break;
         case artStyles.VORONOI_CELLS:
             if (typeof drawVoronoiCellsLayer === 'function') {
@@ -180,6 +185,7 @@ export function drawArtwork(ctx, style, palette, isAnimationFrame = false, param
 export function getStyleDisplayName(style) {
     switch (style) {
         case artStyles.DEFAULT: return 'Masterpiece';
+        case artStyles.LANDSCAPE: return 'Random Landscape';
         case artStyles.VORONOI_CELLS: return 'Voronoi Cells';
         case artStyles.ORGANIC_SPLATTERS: return 'Organic Splatters';
         case artStyles.NEON_WAVES: return 'Neon Waves';

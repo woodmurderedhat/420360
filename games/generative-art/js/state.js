@@ -103,7 +103,39 @@ function resetState(notifyListeners = true) {
     // Generate a new random seed
     const newDefaultState = {
         ...defaultState,
-        seed: Math.floor(Math.random() * 1000000)
+        seed: Math.floor(Math.random() * 1000000),
+        // Randomize layer opacities for more varied art styles
+        voronoiOpacity: Math.random() * 0.9,
+        organicSplattersOpacity: Math.random() * 0.9,
+        neonWavesOpacity: Math.random() * 0.9,
+        fractalLinesOpacity: Math.random() * 0.9,
+        geometricGridOpacity: Math.random() * 0.9,
+        particleSwarmOpacity: Math.random() * 0.9,
+        organicNoiseOpacity: Math.random() * 0.9,
+        glitchMosaicOpacity: Math.random() * 0.9,
+        pixelSortOpacity: Math.random() * 0.9,
+        gradientOverlayOpacity: Math.random() * 0.5, // Lower max for overlay effects
+        dotMatrixOpacity: Math.random() * 0.9,
+        textureOverlayOpacity: Math.random() * 0.6, // Lower max for overlay effects
+        symmetricalPatternsOpacity: Math.random() * 0.9,
+        flowingLinesOpacity: Math.random() * 0.9,
+        lightRaysOpacity: Math.random() * 0.7, // Lower max for light effects
+
+        // Randomize layer densities for more varied art styles
+        voronoiDensity: 20 + Math.random() * 80,
+        organicSplattersDensity: 20 + Math.random() * 80,
+        neonWavesDensity: 20 + Math.random() * 80,
+        fractalLinesDensity: 20 + Math.random() * 80,
+        geometricGridDensity: 20 + Math.random() * 80,
+        particleSwarmDensity: 20 + Math.random() * 80,
+        organicNoiseDensity: 20 + Math.random() * 80,
+        glitchMosaicDensity: 20 + Math.random() * 80,
+        pixelSortDensity: 20 + Math.random() * 80,
+        dotMatrixDensity: 20 + Math.random() * 80,
+        textureOverlayDensity: 20 + Math.random() * 80,
+        symmetricalPatternsDensity: 20 + Math.random() * 80,
+        flowingLinesDensity: 20 + Math.random() * 80,
+        lightRaysDensity: 20 + Math.random() * 80
     };
 
     return updateState(newDefaultState, notifyListeners);

@@ -63,7 +63,7 @@ function initCanvas() {
 }
 
 /**
- * Draw artwork based on the selected style
+ * Draw artwork based on the selected style with enhanced randomization
  * @param {boolean} showLoading - Whether to show loading indicator
  */
 function drawArtwork(showLoading = true) { // Removed style parameter
@@ -88,7 +88,54 @@ function drawArtwork(showLoading = true) { // Removed style parameter
                     throw new Error('Canvas or context not found');
                 }
 
-                // Get current state
+                // Randomize layer opacities and densities for more varied results
+                // Only do this if we're not using a specific seed for reproducibility
+                const randomizedState = {
+                    // Randomize layer opacities
+                    voronoiOpacity: Math.random() * 0.9,
+                    organicSplattersOpacity: Math.random() * 0.9,
+                    neonWavesOpacity: Math.random() * 0.9,
+                    fractalLinesOpacity: Math.random() * 0.9,
+                    geometricGridOpacity: Math.random() * 0.9,
+                    particleSwarmOpacity: Math.random() * 0.9,
+                    organicNoiseOpacity: Math.random() * 0.9,
+                    glitchMosaicOpacity: Math.random() * 0.9,
+                    pixelSortOpacity: Math.random() * 0.9,
+                    gradientOverlayOpacity: Math.random() * 0.5,
+                    dotMatrixOpacity: Math.random() * 0.9,
+                    textureOverlayOpacity: Math.random() * 0.6,
+                    symmetricalPatternsOpacity: Math.random() * 0.9,
+                    flowingLinesOpacity: Math.random() * 0.9,
+                    lightRaysOpacity: Math.random() * 0.7,
+
+                    // Randomize layer densities
+                    voronoiDensity: 20 + Math.random() * 80,
+                    organicSplattersDensity: 20 + Math.random() * 80,
+                    neonWavesDensity: 20 + Math.random() * 80,
+                    fractalLinesDensity: 20 + Math.random() * 80,
+                    geometricGridDensity: 20 + Math.random() * 80,
+                    particleSwarmDensity: 20 + Math.random() * 80,
+                    organicNoiseDensity: 20 + Math.random() * 80,
+                    glitchMosaicDensity: 20 + Math.random() * 80,
+                    pixelSortDensity: 20 + Math.random() * 80,
+                    dotMatrixDensity: 20 + Math.random() * 80,
+                    textureOverlayDensity: 20 + Math.random() * 80,
+                    symmetricalPatternsDensity: 20 + Math.random() * 80,
+                    flowingLinesDensity: 20 + Math.random() * 80,
+                    lightRaysDensity: 20 + Math.random() * 80,
+
+                    // Randomize other parameters
+                    lineWidth: 0.5 + Math.random() * 2.5, // 0.5 to 3.0
+                    blendMode: ['source-over', 'multiply', 'screen', 'overlay', 'darken', 'lighten'][Math.floor(Math.random() * 6)],
+                    colorShiftAmount: Math.random() * 60 - 30, // -30 to +30
+                    scaleAmount: 0.8 + Math.random() * 0.4, // 0.8 to 1.2
+                    rotationAmount: Math.random() * 360 // 0 to 360
+                };
+
+                // Update state with randomized values
+                updateState(randomizedState, false); // Don't notify listeners to avoid UI updates
+
+                // Get current state after updates
                 const state = getState();
 
                 // Get canvas dimensions
@@ -103,9 +150,9 @@ function drawArtwork(showLoading = true) { // Removed style parameter
                 // Apply global line width
                 ctx.lineWidth = state.lineWidth;
 
-                // Generate palette
+                // Generate palette with more randomness
                 const palette = generatePalette(
-                    state.currentArtStyle, // Assuming currentArtStyle is managed in state for default
+                    state.currentArtStyle,
                     state.colorTheme,
                     state.baseHue,
                     state.saturation,
@@ -117,7 +164,9 @@ function drawArtwork(showLoading = true) { // Removed style parameter
                     ...state,
                     width,
                     height,
-                    isAnimationFrame: false // Animation removed
+                    isAnimationFrame: false, // Animation removed
+                    randomSeed: Math.random() * 1000000, // Additional random seed for more variation
+                    randomFactor: Math.random() // Generic random factor for layers to use
                 };
 
                 // Always draw the Default Masterpiece style

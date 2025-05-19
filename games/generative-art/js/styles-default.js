@@ -51,121 +51,208 @@ function drawDefaultMasterpiece(ctx, palette, isAnimationFrame = false, params =
         lightRaysOpacity = 0
     } = params;
 
-    // Helper to create layer-specific params
-    const createLayerParams = (densityProperty) => ({
-        canvasWidth,
-        canvasHeight,
-        seed, // Pass global seed, layers can use it if needed
-        lineWidth: params.lineWidth || 1, // Pass global lineWidth with default
-        [densityProperty]: params[densityProperty] || 50, // Default density to 50 if not provided
-        // Pass additional global parameters that might be needed by layers
-        blendMode: params.blendMode || 'source-over',
-        colorShiftAmount: params.colorShiftAmount || 0,
-        scaleAmount: params.scaleAmount || 1.0,
-        rotationAmount: params.rotationAmount || 0
-    });
+    // Helper to create layer-specific params with randomized variations
+    const createLayerParams = (densityProperty) => {
+        // Add random variations to parameters for more diverse results
+        const randomVariation = Math.random() * 0.4 + 0.8; // 0.8 to 1.2 multiplier
+        const randomRotation = Math.random() * 360; // Random rotation angle
+        const randomScale = Math.random() * 0.5 + 0.75; // 0.75 to 1.25 scale factor
+        const randomColorShift = Math.random() * 60 - 30; // -30 to +30 color shift
 
-    // Draw Voronoi Cells Layer
+        return {
+            canvasWidth,
+            canvasHeight,
+            seed, // Pass global seed, layers can use it if needed
+            lineWidth: (params.lineWidth || 1) * randomVariation, // Randomize line width
+            [densityProperty]: (params[densityProperty] || 50) * randomVariation, // Randomize density
+            // Pass additional global parameters with random variations
+            blendMode: params.blendMode || 'source-over',
+            colorShiftAmount: (params.colorShiftAmount || 0) + randomColorShift,
+            scaleAmount: (params.scaleAmount || 1.0) * randomScale,
+            rotationAmount: (params.rotationAmount || 0) + randomRotation,
+            // Add more random parameters for layers to use
+            randomFactor: Math.random(), // Generic random factor layers can use
+            noiseScale: Math.random() * 0.1 + 0.01, // Random noise scale
+            distortionAmount: Math.random() * 0.2 // Random distortion amount
+        };
+    };
+
+    // Create an array of layer drawing functions with their parameters
+    const layers = [];
+
+    // Add each layer to the array if its opacity is > 0
     if (voronoiOpacity > 0 && typeof drawVoronoiCellsLayer === 'function') {
-        drawVoronoiCellsLayer(ctx, palette, isAnimationFrame, createLayerParams('voronoiDensity'), voronoiOpacity);
+        layers.push({
+            draw: drawVoronoiCellsLayer,
+            params: createLayerParams('voronoiDensity'),
+            opacity: voronoiOpacity,
+            zIndex: Math.random() // Random z-index for layer ordering
+        });
     }
 
-    // Draw Organic Splatters Layer
     if (organicSplattersOpacity > 0 && typeof drawOrganicSplattersLayer === 'function') {
-        drawOrganicSplattersLayer(ctx, palette, isAnimationFrame, createLayerParams('organicSplattersDensity'), organicSplattersOpacity);
+        layers.push({
+            draw: drawOrganicSplattersLayer,
+            params: createLayerParams('organicSplattersDensity'),
+            opacity: organicSplattersOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Neon Waves Layer
     if (neonWavesOpacity > 0 && typeof drawNeonWavesLayer === 'function') {
-        drawNeonWavesLayer(ctx, palette, isAnimationFrame, createLayerParams('neonWavesDensity'), neonWavesOpacity);
+        layers.push({
+            draw: drawNeonWavesLayer,
+            params: createLayerParams('neonWavesDensity'),
+            opacity: neonWavesOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Fractal Lines Layer
     if (fractalLinesOpacity > 0 && typeof drawFractalLinesLayer === 'function') {
         const fractalParams = {
             ...createLayerParams('fractalLinesDensity'),
-            lineWidth: params.lineWidth // Ensure fractal lines also get lineWidth if it's separate or uses global
+            lineWidth: params.lineWidth * (Math.random() * 0.5 + 0.75) // Randomize line width
         };
-        drawFractalLinesLayer(ctx, palette, isAnimationFrame, fractalParams, fractalLinesOpacity);
+        layers.push({
+            draw: drawFractalLinesLayer,
+            params: fractalParams,
+            opacity: fractalLinesOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Geometric Grid Layer
     if (geometricGridOpacity > 0 && typeof drawGeometricGridLayer === 'function') {
-        drawGeometricGridLayer(ctx, palette, isAnimationFrame, createLayerParams('geometricGridDensity'), geometricGridOpacity);
+        layers.push({
+            draw: drawGeometricGridLayer,
+            params: createLayerParams('geometricGridDensity'),
+            opacity: geometricGridOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Particle Swarm Layer
     if (particleSwarmOpacity > 0 && typeof drawParticleSwarmLayer === 'function') {
-        drawParticleSwarmLayer(ctx, palette, isAnimationFrame, createLayerParams('particleSwarmDensity'), particleSwarmOpacity);
+        layers.push({
+            draw: drawParticleSwarmLayer,
+            params: createLayerParams('particleSwarmDensity'),
+            opacity: particleSwarmOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Organic Noise Layer
     if (organicNoiseOpacity > 0 && typeof drawOrganicNoiseLayer === 'function') {
-        drawOrganicNoiseLayer(ctx, palette, isAnimationFrame, createLayerParams('organicNoiseDensity'), organicNoiseOpacity);
+        layers.push({
+            draw: drawOrganicNoiseLayer,
+            params: createLayerParams('organicNoiseDensity'),
+            opacity: organicNoiseOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Glitch Mosaic Layer
     if (glitchMosaicOpacity > 0 && typeof drawGlitchMosaicLayer === 'function') {
-        drawGlitchMosaicLayer(ctx, palette, isAnimationFrame, createLayerParams('glitchMosaicDensity'), glitchMosaicOpacity);
+        layers.push({
+            draw: drawGlitchMosaicLayer,
+            params: createLayerParams('glitchMosaicDensity'),
+            opacity: glitchMosaicOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Pixel Sort Layer
     if (pixelSortOpacity > 0 && typeof drawPixelSortLayer === 'function') {
-        drawPixelSortLayer(ctx, palette, isAnimationFrame, createLayerParams('pixelSortDensity'), pixelSortOpacity);
+        layers.push({
+            draw: drawPixelSortLayer,
+            params: createLayerParams('pixelSortDensity'),
+            opacity: pixelSortOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Gradient Overlay Layer
     if (gradientOverlayOpacity > 0 && typeof drawGradientOverlayLayer === 'function') {
         const gradientParams = {
             canvasWidth,
             canvasHeight,
             seed,
-            blendMode: params.blendMode || 'overlay'
+            blendMode: params.blendMode || 'overlay',
+            gradientType: Math.random() < 0.5 ? 'radial' : 'linear', // Randomize gradient type
+            gradientAngle: Math.random() * 360 // Random angle for linear gradients
         };
-        drawGradientOverlayLayer(ctx, palette, isAnimationFrame, gradientParams, gradientOverlayOpacity);
+        layers.push({
+            draw: drawGradientOverlayLayer,
+            params: gradientParams,
+            opacity: gradientOverlayOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Dot Matrix Layer
     if (dotMatrixOpacity > 0 && typeof drawDotMatrixLayer === 'function') {
-        drawDotMatrixLayer(ctx, palette, isAnimationFrame, createLayerParams('dotMatrixDensity'), dotMatrixOpacity);
+        layers.push({
+            draw: drawDotMatrixLayer,
+            params: createLayerParams('dotMatrixDensity'),
+            opacity: dotMatrixOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Texture Overlay Layer
     if (textureOverlayOpacity > 0 && typeof drawTextureOverlayLayer === 'function') {
         const textureParams = {
             ...createLayerParams('textureOverlayDensity'),
-            blendMode: params.blendMode || 'overlay'
+            blendMode: params.blendMode || 'overlay',
+            textureType: Math.floor(Math.random() * 5) // Random texture type
         };
-        drawTextureOverlayLayer(ctx, palette, isAnimationFrame, textureParams, textureOverlayOpacity);
+        layers.push({
+            draw: drawTextureOverlayLayer,
+            params: textureParams,
+            opacity: textureOverlayOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Symmetrical Patterns Layer
     if (symmetricalPatternsOpacity > 0 && typeof drawSymmetricalPatternsLayer === 'function') {
-        drawSymmetricalPatternsLayer(ctx, palette, isAnimationFrame, createLayerParams('symmetricalPatternsDensity'), symmetricalPatternsOpacity);
+        layers.push({
+            draw: drawSymmetricalPatternsLayer,
+            params: createLayerParams('symmetricalPatternsDensity'),
+            opacity: symmetricalPatternsOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Flowing Lines Layer
     if (flowingLinesOpacity > 0 && typeof drawFlowingLinesLayer === 'function') {
         const flowingParams = {
             ...createLayerParams('flowingLinesDensity'),
-            lineWidth: params.lineWidth || 2
+            lineWidth: params.lineWidth * (Math.random() * 0.5 + 0.75) // Randomize line width
         };
-        drawFlowingLinesLayer(ctx, palette, isAnimationFrame, flowingParams, flowingLinesOpacity);
+        layers.push({
+            draw: drawFlowingLinesLayer,
+            params: flowingParams,
+            opacity: flowingLinesOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // Draw Light Rays Layer (new dramatic lighting effect)
     if (lightRaysOpacity > 0 && typeof drawLightRaysLayer === 'function') {
         const lightRaysParams = {
             ...createLayerParams('lightRaysDensity'),
-            lightRaysIntensity: params.lightRaysIntensity || 0.7,
-            lightRaysDirection: params.lightRaysDirection || 0,
-            lightRaysSpread: params.lightRaysSpread || 60,
-            lightRaysColor: params.lightRaysColor || null
+            lightRaysIntensity: Math.random() * 0.5 + 0.5, // Random intensity between 0.5 and 1.0
+            lightRaysDirection: Math.random() * 360, // Random direction
+            lightRaysSpread: Math.random() * 90 + 30, // Random spread between 30 and 120
+            lightRaysColor: Math.random() < 0.7 ? null : palette[Math.floor(Math.random() * palette.length)] // Sometimes use a specific color
         };
-        drawLightRaysLayer(ctx, palette, isAnimationFrame, lightRaysParams, lightRaysOpacity);
+        layers.push({
+            draw: drawLightRaysLayer,
+            params: lightRaysParams,
+            opacity: lightRaysOpacity,
+            zIndex: Math.random()
+        });
     }
 
-    // All layers have now been implemented and integrated into the enhanced default masterpiece style
+    // Sort layers by z-index to randomize drawing order
+    layers.sort((a, b) => a.zIndex - b.zIndex);
+
+    // Draw layers in the randomized order
+    layers.forEach(layer => {
+        layer.draw(ctx, palette, isAnimationFrame, layer.params, layer.opacity);
+    });
+
+    // All layers have now been implemented and integrated into the enhanced default masterpiece style with randomized order
 }
 
 // Export the default masterpiece drawing function

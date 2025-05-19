@@ -1,0 +1,262 @@
+# Art Style Randomization Guide
+
+This document explains the randomization techniques implemented in the Generative Art Studio to help developers add similar randomization to other layers.
+
+## Core Randomization Principles
+
+1. **Layer Parameter Randomization**: Vary parameters like density, opacity, and size
+2. **Rendering Style Randomization**: Implement multiple rendering styles for each layer
+3. **Color Randomization**: Use varied color selection strategies
+4. **Composition Randomization**: Randomize the order of layer rendering
+5. **Shape Variation**: Add distortion and variation to shapes
+6. **Seeded Randomness**: Use seeded random functions for reproducibility
+
+## Implementation Levels
+
+### Level 1: Basic Parameter Randomization
+- Randomize opacity values (0-1.0)
+- Randomize density values (20-100)
+- Randomize size multipliers (0.5-2.0)
+
+### Level 2: Visual Style Randomization
+- Implement multiple rendering styles (3-4 per layer)
+- Randomize blend modes
+- Randomize stroke/fill combinations
+
+### Level 3: Advanced Composition
+- Randomize layer ordering
+- Implement parameter relationships
+- Add distortion and noise
+
+## Example Implementation (Voronoi Layer)
+
+The Voronoi layer demonstrates all three levels of randomization:
+
+```javascript
+export function drawVoronoiCellsLayer(ctx, palette, isAnimationFrame, params, opacity = 1.0) {
+    // Extract parameters with defaults and add randomization
+    const { 
+        canvasWidth, 
+        canvasHeight, 
+        seed, 
+        voronoiDensity = 50,
+        randomFactor = Math.random(), // Use randomFactor if provided
+        distortionAmount = Math.random() * 0.2,
+        scaleAmount = 1.0
+    } = params;
+
+    // Create a seeded random function
+    const seedRandom = seed ? 
+        (() => {
+            let seedValue = parseInt(seed, 10) || Date.now();
+            return () => {
+                seedValue = (seedValue * 9301 + 49297) % 233280;
+                return seedValue / 233280;
+            };
+        })() : 
+        Math.random;
+
+    // Add density variation (Level 1)
+    const densityVariation = 0.5 + seedRandom() * 1.5; // 0.5 to 2.0 multiplier
+    const numPoints = Math.floor((voronoiDensity / 100 * 200 * densityVariation) + 10);
+
+    // Choose a random rendering style (Level 2)
+    const renderStyle = Math.floor(seedRandom() * 4); // 0-3 different styles
+
+    // Generate points
+    const points = [];
+    for (let i = 0; i < numPoints; i++) {
+        points.push({
+            x: seedRandom() * canvasWidth,
+            y: seedRandom() * canvasHeight,
+            color: palette[Math.floor(seedRandom() * palette.length)]
+        });
+    }
+
+    // Draw based on the selected style
+    switch (renderStyle) {
+        case 0: // Circular cells
+            // Implementation...
+            break;
+        case 1: // Rectangular cells
+            // Implementation...
+            break;
+        case 2: // Polygon cells
+            // Implementation with distortion (Level 3)
+            // Implementation...
+            break;
+        case 3: // Overlapping transparent cells
+            // Implementation with advanced effects
+            // Implementation...
+            break;
+    }
+}
+```
+
+## Randomization in State Management
+
+The state.js file randomizes layer parameters on reset:
+
+```javascript
+function resetState(notifyListeners = true) {
+    const newDefaultState = {
+        ...defaultState,
+        seed: Math.floor(Math.random() * 1000000),
+        // Randomize layer opacities
+        voronoiOpacity: Math.random() * 0.9,
+        organicSplattersOpacity: Math.random() * 0.9,
+        // More opacity randomizations...
+        
+        // Randomize layer densities
+        voronoiDensity: 20 + Math.random() * 80,
+        organicSplattersDensity: 20 + Math.random() * 80,
+        // More density randomizations...
+    };
+
+    return updateState(newDefaultState, notifyListeners);
+}
+```
+
+## Randomization in Main Drawing Function
+
+The main.js file randomizes parameters on each regeneration:
+
+```javascript
+function drawArtwork(showLoading = true) {
+    // Randomize state parameters
+    const randomizedState = {
+        // Randomize layer opacities
+        voronoiOpacity: Math.random() * 0.9,
+        // More opacity randomizations...
+        
+        // Randomize layer densities
+        voronoiDensity: 20 + Math.random() * 80,
+        // More density randomizations...
+        
+        // Randomize other parameters
+        lineWidth: 0.5 + Math.random() * 2.5,
+        blendMode: ['source-over', 'multiply', 'screen', 'overlay', 'darken', 'lighten'][Math.floor(Math.random() * 6)],
+        colorShiftAmount: Math.random() * 60 - 30,
+        scaleAmount: 0.8 + Math.random() * 0.4,
+        rotationAmount: Math.random() * 360
+    };
+    
+    updateState(randomizedState, false);
+}
+```
+
+## Randomization in Layer Composition
+
+The styles-default.js file randomizes the order of layer rendering:
+
+```javascript
+function drawDefaultMasterpiece(ctx, palette, isAnimationFrame, params) {
+    // Create an array of layer drawing functions with their parameters
+    const layers = [];
+
+    // Add each layer to the array if its opacity is > 0
+    if (voronoiOpacity > 0) {
+        layers.push({
+            draw: drawVoronoiCellsLayer,
+            params: createLayerParams('voronoiDensity'),
+            opacity: voronoiOpacity,
+            zIndex: Math.random() // Random z-index for layer ordering
+        });
+    }
+    // Add more layers...
+
+    // Sort layers by z-index to randomize drawing order
+    layers.sort((a, b) => a.zIndex - b.zIndex);
+
+    // Draw layers in the randomized order
+    layers.forEach(layer => {
+        layer.draw(ctx, palette, isAnimationFrame, layer.params, layer.opacity);
+    });
+}
+```
+
+## Randomization in Color Palettes
+
+The palette.js file implements multiple color generation strategies:
+
+```javascript
+// Randomly choose a palette generation strategy
+const paletteStrategy = Math.random();
+
+if (paletteStrategy < 0.2) {
+    // Monochromatic with accents
+    // Implementation...
+} else if (paletteStrategy < 0.4) {
+    // Complementary with variations
+    // Implementation...
+} else if (paletteStrategy < 0.6) {
+    // Triadic harmony
+    // Implementation...
+} else if (paletteStrategy < 0.8) {
+    // Analogous with wide range
+    // Implementation...
+} else {
+    // Random color explosion with some harmony
+    // Implementation...
+}
+```
+
+## How to Add Randomization to a New Layer
+
+1. **Extract and randomize parameters**:
+   ```javascript
+   const {
+       canvasWidth, canvasHeight, seed,
+       layerDensity = 50,
+       randomFactor = Math.random(),
+       distortionAmount = Math.random() * 0.2
+   } = params;
+   ```
+
+2. **Create a seeded random function**:
+   ```javascript
+   const seedRandom = seed ? 
+       (() => {
+           let seedValue = parseInt(seed, 10) || Date.now();
+           return () => {
+               seedValue = (seedValue * 9301 + 49297) % 233280;
+               return seedValue / 233280;
+           };
+       })() : 
+       Math.random;
+   ```
+
+3. **Implement multiple rendering styles**:
+   ```javascript
+   const renderStyle = Math.floor(seedRandom() * 4);
+   switch (renderStyle) {
+       case 0: // Style 1
+           // Implementation...
+           break;
+       case 1: // Style 2
+           // Implementation...
+           break;
+       // More styles...
+   }
+   ```
+
+4. **Add shape variation and distortion**:
+   ```javascript
+   const distortion = 1 + (seedRandom() * 2 - 1) * distortionAmount;
+   const x = Math.cos(angle) * size * distortion;
+   const y = Math.sin(angle) * size * distortion;
+   ```
+
+5. **Randomize colors from palette**:
+   ```javascript
+   const color = palette[Math.floor(seedRandom() * palette.length)];
+   ```
+
+6. **Add probability-based effects**:
+   ```javascript
+   if (seedRandom() < 0.3) {
+       // Add special effect with 30% probability
+   }
+   ```
+
+By following these guidelines, you can add rich randomization to any layer in the Generative Art Studio.

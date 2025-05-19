@@ -3,13 +3,14 @@
 ```
 index.html
 ├── styles.css (Main stylesheet)
+├── art-rando.txt (Randomization documentation)
 ├── js/main.js (Entry point)
 │   ├── js/styles.js (Art style definitions)
-│   │   └── js/styles-default.js (Default masterpiece style)
-│   ├── js/palette.js (Color palette generation)
-│   ├── js/state.js (State management)
+│   │   └── js/styles-default.js (Enhanced randomized masterpiece style)
+│   ├── js/palette.js (Advanced color palette generation)
+│   ├── js/state.js (State management with randomization)
 │   ├── js/error-service.js (Error handling)
-│   ├── js/utils.js (Utility functions)
+│   ├── js/utils.js (Utility functions and seeded randomization)
 │   ├── js/worker-manager.js (Web worker management)
 │   ├── js/webgl-renderer.js (WebGL rendering)
 │   └── js/ui/index.js (UI module entry point)
@@ -20,7 +21,7 @@ index.html
 │       ├── js/ui/canvas-controls.js (Canvas controls)
 │       ├── js/ui/layer-controls.js (Layer controls)
 │       └── js/ui/light-rays-controls.js (Light Rays controls)
-├── js/layers/ (Layer modules)
+├── js/layers/ (Layer modules with enhanced randomization)
 │   ├── js/layers/dot-matrix.js
 │   ├── js/layers/flowing-lines.js
 │   ├── js/layers/fractal-lines.js
@@ -34,7 +35,7 @@ index.html
 │   ├── js/layers/pixel-sort.js
 │   ├── js/layers/symmetrical-patterns.js
 │   ├── js/layers/texture-overlay.js
-│   ├── js/layers/voronoi.js
+│   ├── js/layers/voronoi.js (Fully randomized implementation)
 │   └── js/layers/light-rays.js (Dramatic lighting effect)
 ```
 
@@ -45,42 +46,77 @@ index.html
    - `main.js` imports modules and initializes the application
    - UI components are initialized through `js/ui/index.js`
    - Event listeners are set up for user interactions
-   - Initial artwork is generated
+   - Random seed is generated and applied
+   - Initial artwork is generated with randomized parameters
 
-2. **Rendering Flow**:
+2. **Rendering Flow with Enhanced Randomization**:
    - User adjusts parameters or randomizes seed
-   - State is updated in `state.js`
+   - State is updated in `state.js` with randomized values
    - `drawArtwork()` function in `main.js` is called
+   - Layer parameters are randomized (opacities, densities, etc.)
+   - Color palette is generated with randomized strategies
    - Default masterpiece style rendering function is called
-   - Layers are rendered in sequence from `js/layers/`
+   - Layers are sorted randomly by z-index
+   - Each layer applies its own internal randomization
+   - Layers are rendered in randomized order
    - Canvas is updated with the new artwork
 
-3. **Save Artwork Flow**:
+3. **Randomization Levels**:
+   - **State-level randomization**: Layer opacities, densities, and global parameters
+   - **Composition randomization**: Layer ordering and z-index sorting
+   - **Style randomization**: Multiple rendering styles per layer
+   - **Parameter randomization**: Random variations in size, position, and appearance
+   - **Color randomization**: Multiple palette generation strategies
+   - **Effect randomization**: Probability-based special effects
+
+4. **Save Artwork Flow**:
    - User clicks "Save Artwork" button
    - Canvas content is converted to a data URL
    - Browser downloads the image as a PNG file
 
-## Enhanced Visual Effects
+## Enhanced Visual Effects and Randomization
 
-The application includes several advanced visual effects to create more impressive artwork:
+The application includes several advanced visual effects with enhanced randomization to create more impressive and varied artwork:
 
-1. **Neon Waves Layer**:
+1. **Enhanced Randomization System**:
+   - Multi-level randomization architecture (state, composition, style, parameter)
+   - Seeded random functions for reproducibility with the same seed
+   - Probability-based effects and style variations
+   - Dynamic layer ordering with z-index sorting
+   - Multiple rendering styles per layer
+   - Comprehensive randomization documentation in art-rando.txt
+
+2. **Voronoi Cells Layer** (Fully Randomized Implementation):
+   - Multiple rendering styles (circles, rectangles, polygons, blobs)
+   - Randomized shape parameters with distortion
+   - Probability-based stroke and fill combinations
+   - Varied transparency and blend modes
+   - Density variation based on randomized parameters
+
+3. **Color Palette Generation**:
+   - Multiple palette generation strategies (monochromatic, complementary, triadic, etc.)
+   - Randomized color relationships and harmonies
+   - Varied saturation and lightness profiles
+   - Style-specific color schemes
+   - Dynamic color count based on randomization
+
+4. **Neon Waves Layer**:
    - Implements advanced glow effects with multiple passes
    - Variable wave thickness and depth perception
    - Complex wave patterns with multiple sine wave combinations
-   - Smooth animation with realistic light behavior
+   - Randomized wave parameters and compositions
 
-2. **Fractal Lines Layer**:
+5. **Fractal Lines Layer**:
    - Enhanced recursive branching with variable complexity
    - Color transitions along fractal paths
    - Glow effects with variable intensity
-   - Improved composition with intentional starting points
+   - Randomized starting points and branching patterns
 
-3. **Light Rays Layer**:
+6. **Light Rays Layer**:
    - Dramatic crepuscular/god rays effect
-   - Customizable direction, spread, and intensity
-   - Interactive preview for direction control
-   - Realistic light source glow
+   - Randomized direction, spread, and intensity
+   - Varied light source positions
+   - Realistic light source glow with random color variations
 
 ## GitHub Pages Compatibility
 

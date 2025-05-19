@@ -86,10 +86,37 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
 
         // Cache miss, generate a new palette
         cacheMisses++;
-    // Use custom color settings if selected
+    // Use custom color settings if selected, otherwise use more varied random values
     let paletteBaseHue = colorTheme === 'custom' ? baseHue : Math.random() * 360;
-    let paletteSaturation = colorTheme === 'custom' ? saturation : 70 + Math.random() * 30;
-    let paletteLightness = colorTheme === 'custom' ? lightness : 50 + Math.random() * 20;
+
+    // More varied saturation and lightness for more diverse palettes
+    let paletteSaturation, paletteLightness;
+
+    if (colorTheme === 'custom') {
+        paletteSaturation = saturation;
+        paletteLightness = lightness;
+    } else {
+        // Randomly choose between different saturation/lightness profiles
+        const colorProfile = Math.random();
+
+        if (colorProfile < 0.25) {
+            // Vibrant colors
+            paletteSaturation = 80 + Math.random() * 20;
+            paletteLightness = 45 + Math.random() * 25;
+        } else if (colorProfile < 0.5) {
+            // Pastel colors
+            paletteSaturation = 40 + Math.random() * 30;
+            paletteLightness = 70 + Math.random() * 20;
+        } else if (colorProfile < 0.75) {
+            // Muted colors
+            paletteSaturation = 20 + Math.random() * 40;
+            paletteLightness = 40 + Math.random() * 30;
+        } else {
+            // High contrast
+            paletteSaturation = 60 + Math.random() * 40;
+            paletteLightness = 30 + Math.random() * 60;
+        }
+    }
 
     const palette = [];
     let numColors = 5;
@@ -227,26 +254,100 @@ function generatePalette(style, colorTheme = 'random', baseHue = 180, saturation
                     break;
 
                 case artStyles.DEFAULT:
-                    // Rich, diverse palette for the default masterpiece style
-                    // Include a wide range of colors that work well together
-                    numColors = 8 + Math.floor(Math.random() * 4);
+                    // Enhanced random palette generation for the default masterpiece style
 
-                    // Add some vibrant colors
-                    for (let i = 0; i < numColors / 2; i++) {
-                        const hue = (paletteBaseHue + i * (360 / (numColors / 2))) % 360;
-                        palette.push(hslToString(hue, 85 + Math.random() * 15, 55 + Math.random() * 15));
+                    // Randomly choose a palette generation strategy for more variety
+                    const paletteStrategy = Math.random();
+
+                    if (paletteStrategy < 0.2) {
+                        // Monochromatic with accents
+                        numColors = 6 + Math.floor(Math.random() * 4);
+                        const monoHue = Math.random() * 360;
+                        const accentHue = (monoHue + 180 + (Math.random() * 60 - 30)) % 360;
+
+                        // Main monochromatic colors
+                        for (let i = 0; i < numColors - 2; i++) {
+                            const l = 30 + (i * 50 / (numColors - 2));
+                            const s = 60 + Math.random() * 40;
+                            palette.push(hslToString(monoHue, s, l));
+                        }
+
+                        // Add accent colors
+                        palette.push(hslToString(accentHue, 90 + Math.random() * 10, 50 + Math.random() * 20));
+                        palette.push(hslToString(accentHue, 70 + Math.random() * 20, 70 + Math.random() * 20));
+
+                    } else if (paletteStrategy < 0.4) {
+                        // Complementary with variations
+                        numColors = 8 + Math.floor(Math.random() * 4);
+                        const hue1 = Math.random() * 360;
+                        const hue2 = (hue1 + 180) % 360;
+
+                        for (let i = 0; i < numColors / 2; i++) {
+                            // First complementary color with variations
+                            const h1 = (hue1 + (Math.random() * 30 - 15)) % 360;
+                            const s1 = 70 + Math.random() * 30;
+                            const l1 = 40 + Math.random() * 40;
+                            palette.push(hslToString(h1, s1, l1));
+
+                            // Second complementary color with variations
+                            const h2 = (hue2 + (Math.random() * 30 - 15)) % 360;
+                            const s2 = 70 + Math.random() * 30;
+                            const l2 = 40 + Math.random() * 40;
+                            palette.push(hslToString(h2, s2, l2));
+                        }
+
+                    } else if (paletteStrategy < 0.6) {
+                        // Triadic harmony
+                        numColors = 9 + Math.floor(Math.random() * 3);
+                        const baseHue = Math.random() * 360;
+
+                        for (let i = 0; i < 3; i++) {
+                            const hue = (baseHue + i * 120) % 360;
+
+                            // Three variations of each hue
+                            palette.push(hslToString(hue, 90 + Math.random() * 10, 50 + Math.random() * 15)); // Vibrant
+                            palette.push(hslToString(hue, 60 + Math.random() * 20, 70 + Math.random() * 20)); // Pastel
+                            palette.push(hslToString(hue, 40 + Math.random() * 20, 30 + Math.random() * 20)); // Muted
+                        }
+
+                    } else if (paletteStrategy < 0.8) {
+                        // Analogous with wide range
+                        numColors = 7 + Math.floor(Math.random() * 5);
+                        const baseHue = Math.random() * 360;
+                        const range = 30 + Math.random() * 60; // Between 30-90 degrees
+
+                        for (let i = 0; i < numColors; i++) {
+                            const hue = (baseHue + (i - numColors/2) * range / numColors + 360) % 360;
+                            const sat = 60 + Math.random() * 40;
+                            const light = 40 + Math.random() * 40;
+                            palette.push(hslToString(hue, sat, light));
+                        }
+
+                    } else {
+                        // Random color explosion with some harmony
+                        numColors = 10 + Math.floor(Math.random() * 6);
+
+                        // Generate completely random colors but with some relationship
+                        for (let i = 0; i < numColors; i++) {
+                            // Every third color is related to the previous one
+                            const hue = (i % 3 === 0) ?
+                                Math.random() * 360 :
+                                (palette.length > 0 ?
+                                    (parseInt(palette[palette.length-1].match(/hsl\((\d+)/)[1]) +
+                                    (Math.random() < 0.5 ? 30 : 330) + Math.random() * 30) % 360 :
+                                    Math.random() * 360);
+
+                            const sat = 20 + Math.random() * 80;
+                            const light = 20 + Math.random() * 70;
+                            palette.push(hslToString(hue, sat, light));
+                        }
                     }
 
-                    // Add some softer, more pastel colors
-                    for (let i = 0; i < numColors / 2; i++) {
-                        const hue = (paletteBaseHue + 30 + i * (360 / (numColors / 2))) % 360;
-                        palette.push(hslToString(hue, 60 + Math.random() * 20, 75 + Math.random() * 15));
-                    }
+                    // Add neutral colors for all strategies
+                    if (Math.random() < 0.7) palette.push(hslToString(0, 0, 95)); // Near white
+                    if (Math.random() < 0.7) palette.push(hslToString(0, 0, 20)); // Near black
+                    if (Math.random() < 0.5) palette.push(hslToString(paletteBaseHue, 15, 50)); // Muted base hue
 
-                    // Add a few neutral colors
-                    palette.push(hslToString(0, 0, 95)); // Near white
-                    palette.push(hslToString(0, 0, 20)); // Near black
-                    palette.push(hslToString(paletteBaseHue, 15, 50)); // Muted base hue
                     break;
 
                 default:

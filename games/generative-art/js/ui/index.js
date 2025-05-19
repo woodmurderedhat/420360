@@ -98,22 +98,10 @@ function setupEventHandlers() {
         }
     });
 
-    // Toggle panel visibility
+    // Toggle panel visibility is now handled in responsive.js
+    // This listener is kept for backward compatibility
     addListener('togglePanelButton', 'click', () => {
-        const controlsPanel = getElement('controlsPanel');
-        const togglePanelButton = getElement('togglePanelButton');
-
-        if (!controlsPanel || !togglePanelButton) return;
-
-        if (controlsPanel.style.display === 'none') {
-            controlsPanel.style.display = 'flex';
-            togglePanelButton.textContent = 'Hide Settings';
-            togglePanelButton.title = 'Toggle settings panel';
-        } else {
-            controlsPanel.style.display = 'none';
-            togglePanelButton.textContent = 'Show Settings';
-            togglePanelButton.title = 'Toggle settings panel';
-        }
+        triggerEvent('togglePanel');
     });
 
     // Apply settings and re-render
@@ -203,6 +191,29 @@ function setupEventHandlers() {
         if (_drawArtworkFn) {
             _drawArtworkFn('Default');
         }
+    });
+
+    // Mobile action buttons
+    addListener('mobileRandomizeButton', 'click', () => {
+        if (_drawArtworkFn) {
+            // Generate a new random seed
+            const randomSeed = Date.now().toString();
+            setValue('seedInput', randomSeed);
+            setSeed(randomSeed);
+
+            // Update seed display if it exists
+            const currentSeedDisplay = getElement('currentSeedDisplay');
+            if (currentSeedDisplay) {
+                currentSeedDisplay.textContent = randomSeed;
+            }
+
+            // Redraw artwork
+            _drawArtworkFn(getState().currentArtStyle);
+        }
+    });
+
+    addListener('mobileExportButton', 'click', () => {
+        triggerEvent('export');
     });
 
     // Register event handlers

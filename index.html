@@ -3,38 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <title>420360</title>
+<!-- Pixel font from Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   html, body {
     margin: 0; padding: 0;
-    background: #000080;
+    background: #181825;
     color: #fff;
-    font-family: "Chicago", "Courier New", monospace;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
     height: 100%;
     overflow: hidden;
     display: flex; align-items: center; justify-content: center;
     flex-direction: column;
+    min-height: 100vh;
+    image-rendering: pixelated;
   }
   .blurb {
-    font-size: 24px;
-    max-width: 80%;
+    font-size: 18px;
+    max-width: 90%;
     text-align: center;
-    line-height: 1.4;
+    line-height: 1.7;
+    letter-spacing: 1.5px;
+    position: relative;
+    background: #181825;
+    border: 4px solid #00fff7;
+    box-shadow: 0 0 0 4px #ff00ea, 8px 8px 0 0 #fff700, 0 0 0 8px #000;
+    border-radius: 0;
+    padding: 24px 16px 16px 16px;
+    z-index: 1;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    /* text-shadow removed */
+  }
+  .blurb span {
+    display: inline-block;
+    color: #fff700;
+    font-weight: bold;
+    margin-bottom: 2px;
+    /* text-shadow removed */
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    transition: color 0.2s, background 0.2s;
+  }
+  .blurb .glitch {
+    color: #ff00ea;
+    background: #fff700;
+    text-shadow: 2px 2px 0 #00fff7, 0 0 1px #000;
+    animation: glitchy 0.12s steps(2) infinite alternate;
+  }
+  @keyframes glitchy {
+    0% { transform: translate(0,0); }
+    20% { transform: translate(-2px,1px); }
+    40% { transform: translate(2px,-1px); }
+    60% { transform: translate(-1px,2px); }
+    80% { transform: translate(1px,-2px); }
+    100% { transform: translate(0,0); }
+  }
+  .blurb .cursor {
+    display: inline-block;
+    width: 1ch;
+    color: #00fff7;
+    background: #000;
+    font-weight: bold;
+    animation: blink 0.8s steps(1) infinite;
+    text-shadow: 2px 2px 0 #ff00ea;
+    vertical-align: baseline;
+  }
+  @keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
   }
   .popup {
-    position: absolute;
+    position: fixed;
     width: 250px;
-    background: #c0c0c0;
-    border: 2px solid #000;
-    font-family: "Chicago", "Courier New", monospace;
-    box-shadow: 4px 4px 0px #000;
+    background: #181825;
+    border: 4px solid #ff00ea;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    box-shadow: 0 0 0 4px #00fff7, 8px 8px 0 0 #fff700, 0 0 0 8px #000;
+    border-radius: 0;
+    color: #fff700;
+    text-shadow: 2px 2px 0 #00fff7, 0 0 1px #ff00ea;
+    z-index: 1000;
+    overflow: hidden;
   }
   .titlebar {
-    background: linear-gradient(to right, #000080, #1084d0);
-    color: white;
+    background: #ff00ea;
+    color: #181825;
     font-weight: bold;
     display: flex; justify-content: space-between; align-items: center;
     padding: 2px 4px;
-    font-size: 14px;
+    font-size: 10px;
+    text-shadow: 2px 2px 0 #fff700, 0 0 1px #00fff7;
+    border-bottom: 4px solid #00fff7;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
   }
   .titlebar .left {
     display: flex; align-items: center;
@@ -42,19 +101,32 @@
   }
   .titlebar img {
     width: 16px; height: 16px;
+    image-rendering: pixelated;
   }
   .close {
     cursor: pointer;
+    color: #fff700;
+    text-shadow: 2px 2px 0 #00fff7;
+    transition: color 0.2s;
+    font-size: 16px;
+  }
+  .close:hover {
+    color: #ff00ea;
   }
   .content {
-    padding: 6px;
-    background: #fff;
-    color: #000;
-    font-size: 12px;
+    padding: 10px 8px 8px 8px;
+    background: #181825;
+    color: #fff700;
+    font-size: 10px;
     text-align: center;
+    text-shadow: 2px 2px 0 #00fff7, 0 0 1px #ff00ea;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
   }
   .content img {
     max-width: 100%;
+    border: 4px solid #00fff7;
+    box-shadow: 0 0 0 4px #ff00ea, 4px 4px 0 0 #fff700;
+    image-rendering: pixelated;
   }
 </style>
 </head>
@@ -87,7 +159,7 @@ const ADS = [
 ];
 
 const POPUP_INTERVAL_MS = 5000;  // auto popup every 5s
-const POPUP_LIFETIME_MS = 5000;  // popup disappears after 4s
+const POPUP_LIFETIME_MS = 5000;  // popup disappears after 5s
 
 const SENTENCES = [
   "Welcome to the future of the internet ",
@@ -103,8 +175,82 @@ const SENTENCES = [
   "Now with 256 colors ",
   "remember that summer ",
   "it's 4:20 ",
+  "Pixels were our stars in the night sky ",
+  "Every click a gamble with fate ",
+  "Lost in a sea of blinking cursors ",
+  "Memory leaks from forgotten dreams ",
+  "The browser crashed but we kept refreshing ",
+  "Neon lights blinking on the edge of reason ",
+  "Our souls cached in temporary files ",
+  "The modem’s hum was a lullaby for the lost ",
+  "Virtual ghosts in the machine whisper secrets ",
+  "Where do lost packets go to die? ",
+  "Every hyperlink was a new beginning ",
+  "Error 404: meaning not found ",
+  "The echo of a forgotten chatroom lingers ",
+  "Ctrl+Alt+Del your existential dread ",
+  "Life was just a loading bar stuck at 99% ",
+  "Reality pixelated in low-res confusion ",
+  "Upload your dreams, download your fears ",
+  "Static noise filled the void between thoughts ",
+  "In cyberspace, we were gods and ghosts ",
+  "The scroll bar of time moves too fast ",
+  "Syntax errors in the script of life ",
+  "A pixelated heart beats behind the glass ",
+  "The cursor blinks, waiting for meaning ",
+  "Paused between frames of consciousness ",
+  "A vintage screensaver of endless questions ",
+  "Flip the disk, reboot the soul ",
+  "Lost signals in an analog dream ",
+  "The neon grid pulses with silent truths ",
+  "Binary code hides our fragile hopes ",
+  "Ghosts of chatrooms past haunt the void ",
+  "The page won't load but neither will we ",
+  "Syntax forgotten like old passwords ",
+  "Infinite scroll of fleeting existence ",
+  "Pixels bleed into analog memories ",
+  "Waiting for the next ping in the void ",
+  "Reboot your heart, clear your cache ",
+  "Dial-up dreams in a fiber optic world ",
+  "Disconnected but still searching for connection ",
+  "The fade-in fade-out of digital ghosts ",
+  "An icon blinking on the desktop of life ",
+  "Fragmented identity in a pop-up world ",
+  "Surfing the edge of a pixelated abyss ",
+  "Waiting for cookies that never expire ",
+  "Lost in the metadata of my own mind ",
+  "Crashing waves of static and signal ",
+  "The blue screen of existential dread ",
+  "Files corrupted by time and memory ",
+  "Loading life in 8-bit resolution ",
+  "When the modem sings, the soul listens ",
+  "404 not found: purpose missing ",
+  "Memory fragments scattered like pixels ",
+  "The echo chamber of digital solitude ",
+  "Our existence compressed in tiny bytes ",
+  "Hovering over links to unknown futures ",
+  "Fragments of a pixelated dreamscape ",
+  "The hum of the server is our heartbeat ",
+  "Code compiled from lost moments ",
+  "A desktop littered with forgotten hopes ",
+  "Waiting for the system to respond ",
+  "The cursor blinks, and so do we ",
+  "Outdated software, outdated soul ",
+  "Waiting for life to finally download ",
+  "The pixel dust of forgotten icons ",
+  "Click, drag, drop — repeat forever ",
+  "A folder full of unanswered questions ",
+  "Lost in the cache of yesterday ",
+  "The recycle bin holds our mistakes ",
+  "Digital footprints fade with every refresh ",
+  "The CPU of the mind overheats with doubt ",
+  "Static screensavers hide restless minds ",
+  "Connection lost, searching for meaning ",
+  "Fragmented thoughts in a fragmented world ",
+  "Life stuck in a perpetual loading state ",
+  "Glitches reveal the cracks beneath ",
+  "Uninstall your fears, install your dreams ",
   "2 x 365 "
-  
 ];
 
 /* ---------------------
@@ -142,13 +288,13 @@ function makePopup(ad) {
 
   const content = document.createElement('div');
   content.className = 'content';
-  content.innerHTML = `<p><a href="${ad.href}" target="_blank">${ad.label}</a></p><img src="${ad.gif}" alt="gif">`;
+  content.innerHTML = `<p><a href="${ad.href}" target="_blank" rel="noopener noreferrer">${ad.label}</a></p><img src="${ad.gif}" alt="gif">`;
 
   p.appendChild(tb);
   p.appendChild(content);
 
-  p.style.left = Math.random() * 70 + '%';
-  p.style.top = Math.random() * 70 + '%';
+  p.style.left = (Math.random() * 70) + '%';
+  p.style.top = (Math.random() * 70) + '%';
 
   document.body.appendChild(p);
 
@@ -170,57 +316,87 @@ let currentSentence = SENTENCES[0];
 setBlurbText(currentSentence);
 
 function setBlurbText(sentence) {
-  const words = sentence.split(" ");
+  const words = sentence.trim().split(" ");
   blurbEl.textContent = "";
-  words.forEach(word => {
+  words.forEach((word, i) => {
     const span = document.createElement('span');
     span.textContent = word;
     span.style.marginRight = "6px";
     blurbEl.appendChild(span);
   });
+  // Add blinking cursor
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  cursor.textContent = '_';
+  blurbEl.appendChild(cursor);
 }
 
 function glitchRandomWord() {
-  const spans = blurbEl.querySelectorAll('span');
+  const spans = blurbEl.querySelectorAll('span:not(.cursor)');
   if (!spans.length) return;
-  const i = Math.floor(Math.random() * spans.length);
-  const original = currentSentence.split(" ")[i];
+
+  const currentWords = currentSentence.trim().split(" ");
+  let activeGlitches = 0;
+  spans.forEach((span, idx) => {
+    if (span.classList.contains('glitch')) activeGlitches++;
+  });
+  if (activeGlitches >= 2) return;
+
+  let i = Math.floor(Math.random() * spans.length);
+  if (!spans[i].textContent.trim() || spans[i].classList.contains('glitch')) return;
+
+  const original = currentWords[i];
+  if (!original) return;
+
   const glitch = randomGlitchString(original.length);
+  spans[i].dataset.original = original;
   spans[i].textContent = glitch;
-  setTimeout(() => spans[i].textContent = original, 200 + Math.random()*400);
+  spans[i].classList.add('glitch');
+
+  setTimeout(() => {
+    spans[i].textContent = original;
+    spans[i].classList.remove('glitch');
+  }, 120 + Math.random() * 350);
 }
 
 function randomGlitchString(len) {
   const chars = "!@#$%^&*()_+=-[]{};:<>,.?/|~420360247STEPHANUS";
   let s = "";
-  for (let i=0; i<len; i++) {
+  for (let i = 0; i < len; i++) {
     s += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return s;
 }
 
 function morphToRandomSentence() {
-  let nextSentence;
-  do {
-    nextSentence = SENTENCES[Math.floor(Math.random() * SENTENCES.length)];
-  } while (nextSentence === currentSentence);
+  const currentTrimmed = currentSentence.trim();
+  const uniqueSentences = SENTENCES.filter(s => s.trim() !== currentTrimmed);
+  if (uniqueSentences.length === 0) return;
 
-  const currentWords = currentSentence.split(" ");
-  const targetWords = nextSentence.split(" ");
+  let nextSentence = uniqueSentences[Math.floor(Math.random() * uniqueSentences.length)];
+
+  const currentWords = currentSentence.trim().split(" ");
+  const targetWords = nextSentence.trim().split(" ");
   const maxLength = Math.max(currentWords.length, targetWords.length);
 
-  const spans = blurbEl.querySelectorAll('span');
-
-  // Pad with blanks if needed
+  let spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  // Add spans if needed
   while (spans.length < maxLength) {
     const span = document.createElement('span');
-    span.textContent = "";
     span.style.marginRight = "6px";
-    blurbEl.appendChild(span);
+    blurbEl.insertBefore(span, blurbEl.querySelector('.cursor'));
+    spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  }
+  // Remove extra spans if target sentence shorter
+  if (spans.length > maxLength) {
+    for (let i = spans.length - 1; i >= maxLength; i--) {
+      spans[i].remove();
+    }
+    spans = blurbEl.querySelectorAll('span:not(.cursor)');
   }
 
   let changeOrder = Array.from({length: maxLength}, (_, i) => i);
-  changeOrder = changeOrder.sort(() => Math.random() - 0.5);
+  changeOrder.sort(() => Math.random() - 0.5);
 
   let step = 0;
   function changeNextWord() {
@@ -234,12 +410,20 @@ function morphToRandomSentence() {
     step++;
     setTimeout(changeNextWord, 150);
   }
-
   changeNextWord();
 }
 
-setInterval(morphToRandomSentence, 12000);
-setInterval(glitchRandomWord, 300);
+/* ---------------------
+   INTERVALS
+--------------------- */
+setInterval(() => {
+  glitchRandomWord();
+}, 200);
+
+setInterval(() => {
+  morphToRandomSentence();
+}, 2500);
+
 </script>
 
 </body>

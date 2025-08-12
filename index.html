@@ -165,8 +165,8 @@ const ADS = [
 
 const POPUP_INTERVAL_MS = 5000;    // auto spawn interval
 const POPUP_LIFETIME_MS = 120000;  // how long each popup lives (ms)
-const MAX_POPUPS = 60;             // hard cap to avoid memory bloat
-const NON_OVERLAP_ATTEMPTS = 5;   // tries to find non-overlapping placement
+const MAX_POPUPS = 30;             // hard cap to avoid memory bloat
+const NON_OVERLAP_ATTEMPTS = 30;   // tries to find non-overlapping placement
 
 const SENTENCES = [
   "Welcome to the future of the internet ",
@@ -233,15 +233,49 @@ function fullGlitch(){
   setTimeout(()=> blurbEl.classList.remove('glitch-effect'), 300);
 }
 
-function morphToRandomSentence(){
-  let next = SENTENCES[Math.floor(Math.random()*SENTENCES.length)];
-  // ensure it's different
-  if (next === currentSentence){
-    const alt = SENTENCES.filter(s => s !== currentSentence);
-    if (alt.length) next = alt[Math.floor(Math.random()*alt.length)];
+function morphToRandomSentence() {
+  const currentTrimmed = currentSentence.trim();
+  const uniqueSentences = SENTENCES.filter(s => s.trim() !== currentTrimmed);
+  if (uniqueSentences.length === 0) return;
+
+  let nextSentence = uniqueSentences[Math.floor(Math.random() * uniqueSentences.length)];
+
+  const currentWords = currentSentence.trim().split(" ");
+  const targetWords = nextSentence.trim().split(" ");
+  const maxLength = Math.max(currentWords.length, targetWords.length);
+
+  let spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  // Add spans if needed
+  while (spans.length < maxLength) {
+    const span = document.createElement('span');
+    span.style.marginRight = "6px";
+    blurbEl.insertBefore(span, blurbEl.querySelector('.cursor'));
+    spans = blurbEl.querySelectorAll('span:not(.cursor)');
   }
-  currentSentence = next;
-  setBlurbText(next);
+  // Remove extra spans if target sentence shorter
+  if (spans.length > maxLength) {
+    for (let i = spans.length - 1; i >= maxLength; i--) {
+      spans[i].remove();
+    }
+    spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  }
+
+  let changeOrder = Array.from({length: maxLength}, (_, i) => i);
+  changeOrder.sort(() => Math.random() - 0.5);
+
+  let step = 0;
+  function changeNextWord() {
+    if (step >= changeOrder.length) {
+      currentSentence = nextSentence;
+      return;
+    }
+    const idx = changeOrder[step];
+    const newWord = targetWords[idx] || "";
+    spans[idx].textContent = newWord;
+    step++;
+    setTimeout(changeNextWord, 150);
+  }
+  changeNextWord();
 }
 
 /* ========== POPUP MANAGEMENT ========== */

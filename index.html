@@ -1,430 +1,401 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>420360</title>
-<!-- Pixel font from Google Fonts -->
+
+<!-- Pixel font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <style>
-  html, body {
-    margin: 0; padding: 0;
-    background: #181825;
-    color: #fff;
-    font-family: 'Press Start 2P', 'Courier New', monospace;
-    height: 100%;
-    overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column;
-    min-height: 100vh;
-    image-rendering: pixelated;
-  }
-  .blurb {
-    font-size: 18px;
-    max-width: 90%;
-    text-align: center;
-    line-height: 1.7;
-    letter-spacing: 1.5px;
-    position: relative;
-    background: #181825;
-    border: 4px solid #00fff7;
-    box-shadow: 0 0 0 4px #ff00ea, 8px 8px 0 0 #fff700, 0 0 0 8px #000;
-    border-radius: 0;
-    padding: 24px 16px 16px 16px;
-    z-index: 1;
-    font-family: 'Press Start 2P', 'Courier New', monospace;
-    /* text-shadow removed */
-  }
-  .blurb span {
-    display: inline-block;
-    color: #fff700;
-    font-weight: bold;
-    margin-bottom: 2px;
-    /* text-shadow removed */
-    font-family: 'Press Start 2P', 'Courier New', monospace;
-    transition: color 0.2s, background 0.2s;
-  }
-  .blurb .glitch {
-    color: #ff00ea;
-    background: #fff700;
-    text-shadow: 2px 2px 0 #00fff7, 0 0 1px #000;
-    animation: glitchy 0.12s steps(2) infinite alternate;
-  }
-  @keyframes glitchy {
-    0% { transform: translate(0,0); }
-    20% { transform: translate(-2px,1px); }
-    40% { transform: translate(2px,-1px); }
-    60% { transform: translate(-1px,2px); }
-    80% { transform: translate(1px,-2px); }
-    100% { transform: translate(0,0); }
-  }
-  .blurb .cursor {
-    display: inline-block;
-    width: 1ch;
-    color: #00fff7;
-    background: #000;
-    font-weight: bold;
-    animation: blink 0.8s steps(1) infinite;
-    text-shadow: 2px 2px 0 #ff00ea;
-    vertical-align: baseline;
-  }
-  @keyframes blink {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
-  }
-  .popup {
-    position: fixed;
-    width: 250px;
-    background: #181825;
-    border: 4px solid #ff00ea;
-    font-family: 'Press Start 2P', 'Courier New', monospace;
-    box-shadow: 0 0 0 4px #00fff7, 8px 8px 0 0 #fff700, 0 0 0 8px #000;
-    border-radius: 0;
-    color: #fff700;
-    text-shadow: 2px 2px 0 #00fff7, 0 0 1px #ff00ea;
-    z-index: 1000;
-    overflow: hidden;
-  }
-  .titlebar {
-    background: #ff00ea;
-    color: #181825;
-    font-weight: bold;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 2px 4px;
-    font-size: 10px;
-    text-shadow: 2px 2px 0 #fff700, 0 0 1px #00fff7;
-    border-bottom: 4px solid #00fff7;
-    font-family: 'Press Start 2P', 'Courier New', monospace;
-  }
-  .titlebar .left {
-    display: flex; align-items: center;
-    gap: 4px;
-  }
-  .titlebar img {
-    width: 16px; height: 16px;
-    image-rendering: pixelated;
-  }
-  .close {
-    cursor: pointer;
-    color: #fff700;
-    text-shadow: 2px 2px 0 #00fff7;
-    transition: color 0.2s;
-    font-size: 16px;
-  }
-  .close:hover {
-    color: #ff00ea;
-  }
-  .content {
-    padding: 10px 8px 8px 8px;
-    background: #181825;
-    color: #fff700;
-    font-size: 10px;
-    text-align: center;
-    text-shadow: 2px 2px 0 #00fff7, 0 0 1px #ff00ea;
-    font-family: 'Press Start 2P', 'Courier New', monospace;
-  }
-  .content img {
-    max-width: 100%;
-    border: 4px solid #00fff7;
-    box-shadow: 0 0 0 4px #ff00ea, 4px 4px 0 0 #fff700;
-    image-rendering: pixelated;
-  }
+:root{
+  --bg: #181825;
+  --primary: #00fff7;
+  --secondary: #ff00ea;
+  --highlight: #fff700;
+  --text: #ffffff;
+  --popup-w: 250px;
+  --popup-h: 150px;
+}
+
+* { box-sizing: border-box; }
+
+html,body{
+  height:100%;
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  image-rendering: pixelated;
+  overflow: hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+
+/* Blurb / headline */
+.blurb{
+  font-size:18px;
+  max-width:90%;
+  text-align:center;
+  line-height:1.7;
+  letter-spacing:1.5px;
+  background:var(--bg);
+  border:4px solid var(--primary);
+  box-shadow:
+    0 0 0 4px var(--secondary),
+    8px 8px 0 0 var(--highlight),
+    0 0 0 8px #000;
+  padding:24px 16px 16px 16px;
+  z-index:2;
+  user-select:none;
+}
+.blurb span{ display:inline-block; margin-right:6px; transition: color .2s, background .2s; }
+.blurb .glitch{
+  color:var(--secondary);
+  background:var(--highlight);
+  text-shadow:2px 2px 0 var(--primary), 0 0 1px #000;
+  animation: glitchy .12s steps(2) infinite alternate;
+}
+
+/* small CRT screen glitch of the whole blurb */
+.blurb.glitch-effect{ animation: screen-glitch .15s steps(2) 3; }
+
+@keyframes glitchy{
+  0%{ transform: translate(0,0); }
+  20%{ transform: translate(-2px,1px); }
+  40%{ transform: translate(2px,-1px); }
+  60%{ transform: translate(-1px,2px); }
+  80%{ transform: translate(1px,-2px); }
+  100%{ transform: translate(0,0); }
+}
+@keyframes screen-glitch{
+  0%,100%{ transform: translate(0,0); }
+  25%{ transform: translate(-2px,1px); }
+  50%{ transform: translate(2px,-1px); }
+  75%{ transform: translate(-1px,2px); }
+}
+
+/* blinking cursor */
+.cursor{
+  display:inline-block;
+  width:1ch;
+  color:var(--primary);
+  background:#000;
+  font-weight:bold;
+  animation: blink .8s steps(1) infinite;
+  text-shadow:2px 2px 0 var(--secondary);
+  vertical-align:baseline;
+}
+@keyframes blink{ 0%,49%{ opacity:1 } 50%,100%{ opacity:0 } }
+
+/* Pause state (applies when page is hidden) */
+.paused .blurb,
+.paused .blurb .glitch,
+.paused .cursor,
+.paused .popup { animation-play-state: paused !important; }
+
+/* Popup styling */
+.popup{
+  position:fixed;
+  width:var(--popup-w);
+  min-height:var(--popup-h);
+  background:var(--bg);
+  border:4px solid var(--secondary);
+  box-shadow:
+    0 0 0 4px var(--primary),
+    8px 8px 0 0 var(--highlight),
+    0 0 0 8px #000;
+  color:var(--highlight);
+  z-index:1000;
+  overflow:hidden;
+  opacity:0;
+  transform: scale(.85) rotate(0deg);
+  animation: popup-in .25s ease forwards;
+  user-select:none;
+}
+@keyframes popup-in{
+  to{ opacity:1; transform: scale(1) rotate(var(--rotation)); }
+}
+
+.titlebar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:2px 6px;
+  font-size:10px;
+  background:var(--secondary);
+  color:var(--bg);
+  border-bottom:4px solid var(--primary);
+}
+.titlebar .left{ display:flex; gap:6px; align-items:center; }
+.titlebar img{ width:16px; height:16px; image-rendering: pixelated; }
+.close{ cursor:pointer; font-size:16px; color:var(--highlight); transition: color .15s; }
+.close:hover{ color:var(--secondary); }
+
+.content{ padding:10px 8px 12px 8px; color:var(--highlight); font-size:10px; text-align:center; }
+.content img{
+  max-width:100%;
+  border:4px solid var(--primary);
+  box-shadow: 0 0 0 4px var(--secondary), 4px 4px 0 0 var(--highlight);
+  image-rendering: pixelated;
+}
+
+/* accessible focus styles for links */
+.content a{ color:inherit; text-decoration:underline; }
+.content a:focus{ outline:2px dashed var(--primary); outline-offset:3px; }
 </style>
 </head>
 <body>
 
-<div class="blurb" id="blurb"></div>
+<div class="blurb" id="blurb" aria-live="polite"></div>
 
 <script>
-/* ---------------------
-   CONFIG
---------------------- */
+/* ========== CONFIG ========== */
 const ICON_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAALklEQVQoka3OMQ0AAAzDsPnfpM1Yip5JRGCBqgMFBQUFBQUFBQUFBQUFBSUlG8mG6tD3oxAAAAAElFTkSuQmCC";
 
 const ADS = [
-  {
-    label: "ZEF VIBES",
-    href: "https://discord.gg/zef",
-    gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXFrbmg4Mjh3b25vbGt4NmRkeXY4b3IzaDd0Z3pnbXp0ZW1kY3c5ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eYDnuFt0MckAb3xdSH/giphy.gif"
-  },
-  {
-    label: "TETROMINO",
-    href: "https://420360.xyz/games/tarot-tetromino/index.html",
-    gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGdrdGJiOXUxN25tczJyNWpudmZqYjgyOGVodDFleGk0Y3F0bHhxNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qoiWHxmgeltKhBjmgv/giphy.gif"
-  },
-  {
-    label: "247420",
-    href: "https://discord.gg/an-entrypoint-367741339393327104",
-    gif: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzAzdTZjbWQ3NmZ6bWt1em1idW1vNzhjY3J2dXR3MnM3b2ZkN2ZtbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BjSvGRkurICB0n17fb/giphy.gif"
-  }
+  { label: "ZEF VIBES", href: "https://discord.gg/zef", gif: "https://media0.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif" },
+  { label: "TETROMINO", href: "https://420360.xyz/games/tarot-tetromino/index.html", gif: "https://media4.giphy.com/media/qoiWHxmgeltKhBjmgv/giphy.gif" },
+  { label: "247420", href: "https://discord.gg/an-entrypoint-367741339393327104", gif: "https://media1.giphy.com/media/BjSvGRkurICB0n17fb/giphy.gif" }
 ];
 
-const POPUP_INTERVAL_MS = 5000;  // auto popup every 5s
-const POPUP_LIFETIME_MS = 5000;  // popup disappears after 5s
+const POPUP_INTERVAL_MS = 5000;    // auto spawn interval
+const POPUP_LIFETIME_MS = 120000;  // how long each popup lives (ms)
+const MAX_POPUPS = 60;             // hard cap to avoid memory bloat
+const NON_OVERLAP_ATTEMPTS = 5;   // tries to find non-overlapping placement
 
 const SENTENCES = [
   "Welcome to the future of the internet ",
-  "Welcome to the future of the world ",
-  "Fuck the literal bullshit in this universe ",
-  "Why did the chicken cross the road ",
-  "To get to the other side ",
-  "It's a chameleon ",
-  "What's it called again ",
-  "That movie was so forgettable ",
   "Surf the web like it’s 1996 ",
-  "Click here for 500 free internets ",
-  "Now with 256 colors ",
-  "remember that summer ",
-  "it's 4:20 ",
   "Pixels were our stars in the night sky ",
-  "Every click a gamble with fate ",
-  "Lost in a sea of blinking cursors ",
-  "Memory leaks from forgotten dreams ",
-  "The browser crashed but we kept refreshing ",
-  "Neon lights blinking on the edge of reason ",
-  "Our souls cached in temporary files ",
-  "The modem’s hum was a lullaby for the lost ",
-  "Virtual ghosts in the machine whisper secrets ",
-  "Where do lost packets go to die? ",
-  "Every hyperlink was a new beginning ",
   "Error 404: meaning not found ",
-  "The echo of a forgotten chatroom lingers ",
-  "Ctrl+Alt+Del your existential dread ",
-  "Life was just a loading bar stuck at 99% ",
+  "The modem’s hum was a lullaby for the lost ",
   "Reality pixelated in low-res confusion ",
-  "Upload your dreams, download your fears ",
-  "Static noise filled the void between thoughts ",
-  "In cyberspace, we were gods and ghosts ",
-  "The scroll bar of time moves too fast ",
-  "Syntax errors in the script of life ",
-  "A pixelated heart beats behind the glass ",
   "The cursor blinks, waiting for meaning ",
-  "Paused between frames of consciousness ",
-  "A vintage screensaver of endless questions ",
-  "Flip the disk, reboot the soul ",
-  "Lost signals in an analog dream ",
-  "The neon grid pulses with silent truths ",
-  "Binary code hides our fragile hopes ",
-  "Ghosts of chatrooms past haunt the void ",
-  "The page won't load but neither will we ",
-  "Syntax forgotten like old passwords ",
-  "Infinite scroll of fleeting existence ",
-  "Pixels bleed into analog memories ",
-  "Waiting for the next ping in the void ",
-  "Reboot your heart, clear your cache ",
-  "Dial-up dreams in a fiber optic world ",
-  "Disconnected but still searching for connection ",
-  "The fade-in fade-out of digital ghosts ",
-  "An icon blinking on the desktop of life ",
-  "Fragmented identity in a pop-up world ",
-  "Surfing the edge of a pixelated abyss ",
-  "Waiting for cookies that never expire ",
   "Lost in the metadata of my own mind ",
-  "Crashing waves of static and signal ",
   "The blue screen of existential dread ",
-  "Files corrupted by time and memory ",
-  "Loading life in 8-bit resolution ",
-  "When the modem sings, the soul listens ",
-  "404 not found: purpose missing ",
-  "Memory fragments scattered like pixels ",
-  "The echo chamber of digital solitude ",
-  "Our existence compressed in tiny bytes ",
-  "Hovering over links to unknown futures ",
-  "Fragments of a pixelated dreamscape ",
-  "The hum of the server is our heartbeat ",
-  "Code compiled from lost moments ",
-  "A desktop littered with forgotten hopes ",
-  "Waiting for the system to respond ",
-  "The cursor blinks, and so do we ",
-  "Outdated software, outdated soul ",
-  "Waiting for life to finally download ",
-  "The pixel dust of forgotten icons ",
-  "Click, drag, drop — repeat forever ",
-  "A folder full of unanswered questions ",
-  "Lost in the cache of yesterday ",
-  "The recycle bin holds our mistakes ",
-  "Digital footprints fade with every refresh ",
-  "The CPU of the mind overheats with doubt ",
-  "Static screensavers hide restless minds ",
-  "Connection lost, searching for meaning ",
-  "Fragmented thoughts in a fragmented world ",
-  "Life stuck in a perpetual loading state ",
-  "Glitches reveal the cracks beneath ",
-  "Uninstall your fears, install your dreams ",
-  "2 x 365 "
+  "Loading life in 8-bit resolution "
 ];
 
-/* ---------------------
-   POPUP CREATION
---------------------- */
-function randomAd() {
-  return ADS[Math.floor(Math.random() * ADS.length)];
-}
+/* ========== PRELOAD GIFS ========== */
+ADS.forEach(a => { const i = new Image(); i.src = a.gif; });
 
-function makePopup(ad) {
-  const p = document.createElement('div');
-  p.className = 'popup';
-
-  const tb = document.createElement('div');
-  tb.className = 'titlebar';
-  const left = document.createElement('div');
-  left.className = 'left';
-
-  const icon = document.createElement('img');
-  icon.src = ICON_DATA;
-
-  const txt = document.createElement('span');
-  txt.textContent = ad.label;
-
-  left.appendChild(icon);
-  left.appendChild(txt);
-
-  const close = document.createElement('div');
-  close.className = 'close';
-  close.textContent = '×';
-  close.onclick = () => p.remove();
-
-  tb.appendChild(left);
-  tb.appendChild(close);
-
-  const content = document.createElement('div');
-  content.className = 'content';
-  content.innerHTML = `<p><a href="${ad.href}" target="_blank" rel="noopener noreferrer">${ad.label}</a></p><img src="${ad.gif}" alt="gif">`;
-
-  p.appendChild(tb);
-  p.appendChild(content);
-
-  p.style.left = (Math.random() * 70) + '%';
-  p.style.top = (Math.random() * 70) + '%';
-
-  document.body.appendChild(p);
-
-  setTimeout(() => p.remove(), POPUP_LIFETIME_MS);
-}
-
-function spawnPopup() {
-  makePopup(randomAd());
-}
-
-document.addEventListener('click', spawnPopup);
-setInterval(spawnPopup, POPUP_INTERVAL_MS);
-
-/* ---------------------
-   BLURB MORPHING + GLITCH
---------------------- */
+/* ========== DOM REFS ========== */
 const blurbEl = document.getElementById('blurb');
 let currentSentence = SENTENCES[0];
-setBlurbText(currentSentence);
 
-function setBlurbText(sentence) {
-  const words = sentence.trim().split(" ");
-  blurbEl.textContent = "";
-  words.forEach((word, i) => {
-    const span = document.createElement('span');
-    span.textContent = word;
-    span.style.marginRight = "6px";
-    blurbEl.appendChild(span);
+/* ========== BLURB TEXT + GLITCH ========= */
+function setBlurbText(sentence){
+  blurbEl.innerHTML = "";
+  const words = sentence.trim().split(" ").filter(Boolean);
+  words.forEach(w => {
+    const s = document.createElement('span');
+    s.textContent = w;
+    blurbEl.appendChild(s);
   });
-  // Add blinking cursor
   const cursor = document.createElement('span');
   cursor.className = 'cursor';
   cursor.textContent = '_';
   blurbEl.appendChild(cursor);
 }
+setBlurbText(currentSentence);
 
-function glitchRandomWord() {
+function randomGlitchString(len){
+  const chars = "!@#$%^&*()_+=-[]{};:<>,.?/|~420360";
+  return Array.from({length:len}, ()=>chars.charAt(Math.floor(Math.random()*chars.length))).join('');
+}
+
+function glitchRandomWord(){
   const spans = blurbEl.querySelectorAll('span:not(.cursor)');
   if (!spans.length) return;
+  // rare chance for whole-blurb glitch
+  if (Math.random() < 0.02) fullGlitch();
 
-  const currentWords = currentSentence.trim().split(" ");
-  let activeGlitches = 0;
-  spans.forEach((span, idx) => {
-    if (span.classList.contains('glitch')) activeGlitches++;
-  });
-  if (activeGlitches >= 2) return;
-
-  let i = Math.floor(Math.random() * spans.length);
-  if (!spans[i].textContent.trim() || spans[i].classList.contains('glitch')) return;
-
-  const original = currentWords[i];
-  if (!original) return;
-
-  const glitch = randomGlitchString(original.length);
-  spans[i].dataset.original = original;
-  spans[i].textContent = glitch;
-  spans[i].classList.add('glitch');
-
-  setTimeout(() => {
-    spans[i].textContent = original;
-    spans[i].classList.remove('glitch');
-  }, 120 + Math.random() * 350);
+  // pick a word and briefly replace it with gibberish
+  const idx = Math.floor(Math.random()*spans.length);
+  const span = spans[idx];
+  if (!span || span.classList.contains('glitch')) return;
+  const original = span.textContent;
+  span.textContent = randomGlitchString(Math.max(1, original.length));
+  span.classList.add('glitch');
+  setTimeout(()=> {
+    span.textContent = original;
+    span.classList.remove('glitch');
+  }, 120 + Math.random()*300);
 }
 
-function randomGlitchString(len) {
-  const chars = "!@#$%^&*()_+=-[]{};:<>,.?/|~420360247STEPHANUS";
-  let s = "";
-  for (let i = 0; i < len; i++) {
-    s += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return s;
+function fullGlitch(){
+  blurbEl.classList.add('glitch-effect');
+  setTimeout(()=> blurbEl.classList.remove('glitch-effect'), 300);
 }
 
-function morphToRandomSentence() {
-  const currentTrimmed = currentSentence.trim();
-  const uniqueSentences = SENTENCES.filter(s => s.trim() !== currentTrimmed);
-  if (uniqueSentences.length === 0) return;
-
-  let nextSentence = uniqueSentences[Math.floor(Math.random() * uniqueSentences.length)];
-
-  const currentWords = currentSentence.trim().split(" ");
-  const targetWords = nextSentence.trim().split(" ");
-  const maxLength = Math.max(currentWords.length, targetWords.length);
-
-  let spans = blurbEl.querySelectorAll('span:not(.cursor)');
-  // Add spans if needed
-  while (spans.length < maxLength) {
-    const span = document.createElement('span');
-    span.style.marginRight = "6px";
-    blurbEl.insertBefore(span, blurbEl.querySelector('.cursor'));
-    spans = blurbEl.querySelectorAll('span:not(.cursor)');
+function morphToRandomSentence(){
+  let next = SENTENCES[Math.floor(Math.random()*SENTENCES.length)];
+  // ensure it's different
+  if (next === currentSentence){
+    const alt = SENTENCES.filter(s => s !== currentSentence);
+    if (alt.length) next = alt[Math.floor(Math.random()*alt.length)];
   }
-  // Remove extra spans if target sentence shorter
-  if (spans.length > maxLength) {
-    for (let i = spans.length - 1; i >= maxLength; i--) {
-      spans[i].remove();
+  currentSentence = next;
+  setBlurbText(next);
+}
+
+/* ========== POPUP MANAGEMENT ========== */
+const activePopups = []; // FIFO list of DOM elements currently on-screen (or recently added)
+
+/* helper: does a candidate rect overlap an existing popup element? */
+function rectsOverlap(x, y, w, h, el){
+  const r = el.getBoundingClientRect();
+  return !(x + w < r.left || x > r.right || y + h < r.top || y > r.bottom);
+}
+
+/* try to find a non-overlapping x,y; returns px,py in px */
+function findNonOverlappingPosition(attempts = NON_OVERLAP_ATTEMPTS){
+  const w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-w')) || 250;
+  const h = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-h')) || 150;
+  const maxX = Math.max(0, window.innerWidth - w);
+  const maxY = Math.max(0, window.innerHeight - h);
+
+  for (let i=0;i<attempts;i++){
+    const x = Math.floor(Math.random() * (maxX+1));
+    const y = Math.floor(Math.random() * (maxY+1));
+    let collides = false;
+    for (const existing of activePopups){
+      // some existing popups may have been removed; skip those
+      if (!existing || !existing.getBoundingClientRect) continue;
+      if (rectsOverlap(x, y, w, h, existing)) { collides = true; break; }
     }
-    spans = blurbEl.querySelectorAll('span:not(.cursor)');
+    if (!collides) return {x,y};
   }
-
-  let changeOrder = Array.from({length: maxLength}, (_, i) => i);
-  changeOrder.sort(() => Math.random() - 0.5);
-
-  let step = 0;
-  function changeNextWord() {
-    if (step >= changeOrder.length) {
-      currentSentence = nextSentence;
-      return;
-    }
-    const idx = changeOrder[step];
-    const newWord = targetWords[idx] || "";
-    spans[idx].textContent = newWord;
-    step++;
-    setTimeout(changeNextWord, 150);
-  }
-  changeNextWord();
+  // give up, return a random position
+  return { x: Math.floor(Math.random() * (maxX+1)), y: Math.floor(Math.random() * (maxY+1)) };
 }
 
-/* ---------------------
-   INTERVALS
---------------------- */
-setInterval(() => {
-  glitchRandomWord();
-}, 200);
+/* remove element safely and update activePopups list */
+function removePopupElement(el){
+  if (!el) return;
+  const idx = activePopups.indexOf(el);
+  if (idx !== -1) activePopups.splice(idx,1);
+  if (el.parentNode) el.parentNode.removeChild(el);
+}
 
-setInterval(() => {
-  morphToRandomSentence();
-}, 2500);
+/* create and append a popup element, returns element */
+function makePopup(ad){
+  const p = document.createElement('div');
+  p.className = 'popup';
+  // rotation + tiny scale randomization for chaotic aesthetic
+  const rotation = (Math.random()*12 - 6).toFixed(2) + 'deg';
+  const scale = (1 + (Math.random()*0.08 - 0.04)).toFixed(3);
+  p.style.setProperty('--rotation', rotation);
+  p.style.transform = `scale(${scale}) rotate(${rotation})`;
+
+  // position (attempt to avoid overlap)
+  const pos = findNonOverlappingPosition();
+  p.style.left = pos.x + 'px';
+  p.style.top = pos.y + 'px';
+
+  // content
+  p.innerHTML = `
+    <div class="titlebar" role="presentation">
+      <div class="left">
+        <img src="${ICON_DATA}" alt="" aria-hidden="true">
+        <span>${escapeHtml(ad.label)}</span>
+      </div>
+      <div class="close" role="button" aria-label="Close popup" tabindex="0">×</div>
+    </div>
+    <div class="content">
+      <p><a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(ad.label)}</a></p>
+      <img src="${escapeHtml(ad.gif)}" alt="${escapeHtml(ad.label)} animation">
+    </div>
+  `;
+
+  // close handlers
+  const closeBtn = p.querySelector('.close');
+  closeBtn.addEventListener('click', ()=> removePopupElement(p));
+  closeBtn.addEventListener('keydown', (ev)=> { if(ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); removePopupElement(p); } });
+
+  document.body.appendChild(p);
+  activePopups.push(p);
+
+  // schedule lifetime removal
+  const lifetimeTimer = setTimeout(()=>{
+    // if still present, remove it
+    removePopupElement(p);
+    clearTimeout(lifetimeTimer);
+  }, POPUP_LIFETIME_MS);
+
+  // enforce MAX_POPUPS
+  if (activePopups.length > MAX_POPUPS){
+    // remove oldest until length <= MAX_POPUPS
+    while (activePopups.length > MAX_POPUPS){
+      const old = activePopups.shift();
+      if (old && old.parentNode) old.parentNode.removeChild(old);
+    }
+  }
+
+  return p;
+}
+
+/* utility to escape user-supplied strings in markup to avoid injection */
+function escapeHtml(s){
+  if (typeof s !== 'string') return '';
+  return s.replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]); });
+}
+
+/* ========== SPAWN CONTROL ========== */
+function randomAd(){ return ADS[Math.floor(Math.random()*ADS.length)]; }
+function spawnPopup(){ makePopup(randomAd()); }
+
+/* ========== INTERVALS & PAUSE/RESUME ========== */
+let popupIntervalId = null;
+let glitchIntervalId = null;
+let morphIntervalId = null;
+
+// start repeated tasks if not already running
+function startIntervals(){
+  if (!popupIntervalId) popupIntervalId = setInterval(spawnPopup, POPUP_INTERVAL_MS);
+  if (!glitchIntervalId) glitchIntervalId = setInterval(glitchRandomWord, 200);
+  if (!morphIntervalId) morphIntervalId = setInterval(morphToRandomSentence, 2500);
+  document.documentElement.classList.remove('paused');
+}
+
+// stop repeated tasks
+function stopIntervals(){
+  if (popupIntervalId){ clearInterval(popupIntervalId); popupIntervalId = null; }
+  if (glitchIntervalId){ clearInterval(glitchIntervalId); glitchIntervalId = null; }
+  if (morphIntervalId){ clearInterval(morphIntervalId); morphIntervalId = null; }
+  // pause CSS animations
+  document.documentElement.classList.add('paused');
+}
+
+/* handle visibility change to pause heavy activity when page not visible */
+document.addEventListener('visibilitychange', ()=> {
+  if (document.hidden) stopIntervals();
+  else startIntervals();
+});
+
+// also pause when page is being unloaded / pagehide (mobile)
+window.addEventListener('pagehide', ()=> stopIntervals());
+window.addEventListener('pageshow', ()=> { if (!document.hidden) startIntervals(); });
+
+/* ========== INITIAL BOOT ========== */
+// initial intervals start only when page visible
+if (!document.hidden) startIntervals();
+
+// immediate spawn on first load for effect
+spawnPopup();
+
+/* also allow click to spawn (debounced slightly to avoid accidental drag-spam) */
+let lastClick = 0;
+document.addEventListener('click', (ev)=>{
+  const now = Date.now();
+  if (now - lastClick > 120) { spawnPopup(); lastClick = now; }
+});
 
 </script>
-
 </body>
 </html>

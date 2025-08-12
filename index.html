@@ -1,9 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>420360</title>
+
+<!-- Social/SEO Metadata -->
+<meta name="description" content="420360: 90s retro web popups, glitch art, and digital nostalgia." />
+<meta property="og:title" content="420360" />
+<meta property="og:description" content="90s retro web popups, glitch art, and digital nostalgia." />
+<meta property="og:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://420360.xyz/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="420360" />
+<meta name="twitter:description" content="90s retro web popups, glitch art, and digital nostalgia." />
+<meta name="twitter:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+<!-- Social links for search engines -->
+<link rel="me" href="https://hey.xyz/u/wooden" />
+<link rel="me" href="https://www.youtube.com/@woodenhat" />
+<link rel="me" href="https://woodmurderedhat.com/social" />
+
+<!-- Favicon: Retro smiley emoji as data URL -->
+<link rel="icon" type="image/svg+xml" href="https://420360.xyz/assets/images//favicon.ico">
 
 <!-- Pixel font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -148,8 +168,58 @@ html,body{
 .content a{ color:inherit; text-decoration:underline; }
 .content a:focus{ outline:2px dashed var(--primary); outline-offset:3px; }
 </style>
+<!-- Glitch-out disappearance animation for popups -->
+<style>
+@keyframes popup-glitch-out {
+  0% { opacity: 1; filter: none; transform: translate(0,0) scale(1) rotate(var(--rotation)); }
+  20% { opacity: 1; filter: hue-rotate(45deg) contrast(2); transform: translate(-2px, 1px) scale(1.05) rotate(var(--rotation)); }
+  40% { opacity: .8; filter: hue-rotate(-45deg) contrast(3); transform: translate(2px, -1px) scale(0.95) rotate(var(--rotation)); }
+  60% { opacity: .6; filter: hue-rotate(90deg) contrast(4); transform: translate(-1px, 2px) scale(1.08) rotate(var(--rotation)); }
+  80% { opacity: .3; filter: hue-rotate(-90deg) contrast(0.5); transform: translate(1px, -2px) scale(0.9) rotate(var(--rotation)); }
+  100% { opacity: 0; filter: none; transform: translate(0,0) scale(0.8) rotate(var(--rotation)); }
+}
+@keyframes popup-glitch-fade {
+  0% { opacity: 1; filter: none; }
+  30% { opacity: 0.7; filter: blur(1.5px) brightness(1.5); }
+  60% { opacity: 0.4; filter: blur(3px) brightness(2); }
+  100% { opacity: 0; filter: blur(6px) brightness(2.5); }
+}
+@keyframes popup-glitch-slide {
+  0% { opacity: 1; transform: translate(0,0) scale(1) rotate(var(--rotation)); }
+  40% { opacity: 0.7; transform: translate(-40px, 10px) scale(1.1) rotate(calc(var(--rotation) + 8deg)); }
+  80% { opacity: 0.3; transform: translate(60px, -20px) scale(0.9) rotate(calc(var(--rotation) - 12deg)); }
+  100% { opacity: 0; transform: translate(0,80px) scale(0.7) rotate(var(--rotation)); }
+}
+@keyframes popup-glitch-scale {
+  0% { opacity: 1; transform: scale(1) rotate(var(--rotation)); filter: none; }
+  30% { opacity: 0.8; transform: scale(1.2) rotate(calc(var(--rotation) + 10deg)); filter: contrast(2); }
+  60% { opacity: 0.5; transform: scale(0.7) rotate(calc(var(--rotation) - 10deg)); filter: contrast(0.5); }
+  100% { opacity: 0; transform: scale(0.3) rotate(var(--rotation)); filter: none; }
+}
+.popup.glitch-out {
+  animation: popup-glitch-out 0.35s steps(2, jump-none) forwards;
+}
+.popup.glitch-fade {
+  animation: popup-glitch-fade 0.45s linear forwards;
+}
+.popup.glitch-slide {
+  animation: popup-glitch-slide 0.38s cubic-bezier(.7,-0.2,.6,1.5) forwards;
+}
+.popup.glitch-scale {
+  animation: popup-glitch-scale 0.32s cubic-bezier(.5,1.5,.7,1) forwards;
+}
+</style>
 </head>
 <body>
+
+<!-- Emoticon & Socials Section -->
+<div id="socials-emoticons" style="margin: 18px 0 10px 0; text-align: center; z-index: 10;">
+  <div style="font-size: 13px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <a href="https://hey.xyz/u/wooden" target="_blank" rel="noopener noreferrer" title="😎" style="color:var(--secondary);text-decoration:none;">👁️</a>
+    <a href="https://www.youtube.com/@woodenhat" target="_blank" rel="noopener noreferrer" title="🕹️" style="color:var(--highlight);text-decoration:none;">▶️</a>
+    <a href="https://woodmurderedhat.com/social" target="_blank" rel="noopener noreferrer" title="🌐" style="color:var(--text);text-decoration:none;">🌲</a>
+  </div>
+</div>
 
 <div class="blurb" id="blurb" aria-live="polite"></div>
 
@@ -162,14 +232,22 @@ const ADS = [
   { label: "TETROMINO", href: "https://420360.xyz/games/tarot-tetromino/index.html", gif: "https://media4.giphy.com/media/qoiWHxmgeltKhBjmgv/giphy.gif" },
   { label: "247420", href: "https://discord.gg/an-entrypoint-367741339393327104", gif: "https://media1.giphy.com/media/BjSvGRkurICB0n17fb/giphy.gif" },
   { label: "GIPHY", href: "https://giphy.com/woodmurderedhat", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYW5iM2lsNjR1NGt4NjI0aHk4cWZrcWFicWNpeHQxZmRzMGNrNTNiYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7AA8vvC4ZPOsmOphuc/giphy.gif" },
-  { label: "WOODMURDEREDHAT", href: "hhttps://woodmurderedhat.com/social", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDU5M3d3a3RkdTNoa3cwcGVjZTBncWFkeGQwcnE5dnpoa3BqZjZpYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/H197ec6QieWHNx8t2w/giphy.gif" },
+  { label: "WOODMURDEREDHAT", href: "https://woodmurderedhat.com/social", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDU5M3d3a3RkdTNoa3cwcGVjZTBncWFkeGQwcnE5dnpoa3BqZjZpYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/H197ec6QieWHNx8t2w/giphy.gif" },
   { label: "YOUTUBE", href: "https://www.youtube.com/@woodenhat", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExemplazEweG82cDRucXhodThlZTBxY2NhcmFoNWRqaHVvbmdncWMzdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/JeEjGpM2TVZGaM5BuE/giphy.gif" },
+  { label: "FRIDAY", href: "#", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExemxoajc2MWN5Z3ZkbDB1YTB3YjRwNDF0NW40dTh6OGhoZGFkYzhoZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ccZaTF9RyZXc6Cs06S/giphy.gif" },
+  { label: "SATURDAY", href: "#", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGlkbDVxMTllazBncnFnZ3IyaGNtcDdvOHpsMGhkM2pqbnQ0YjR4byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/DfqSbJVYLHmO8QFn1R/giphy.gif" },
+  { label: "PEARL WHAT?", href: "#", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWtqNmUwZ3ZpOWlrNzdiMzdtZHIwd2U0MXc3M2FmMncwNnE0dmZhdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/nIE5kDeythSFImKueF/giphy.gif" },
+  { label: "ZEF SHELLED#", href: "#", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzlxcmw3aTJid3g5ZG5yMWR0MTR3ZmR6ZGl5M3pjeDNkeXQ4dDFidyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IZwprtK0UY3FXNGTDD/giphy.gif" },
+  { label: "MOAN-AH", href: "#", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYjNvYzdtbzI1MncycDg0aTlwaWx4bnh1Ym5ucTJua3Fic2p0ZHl3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qxJ9pAQCBIJLxfelCv/giphy.gif" },
+  { label: "WEDNESDAY", href: "#", gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTF5dmR1eXRlNTIwNXlnYTNheGhtYW9zZ3Q0MjBqZHE5MGh5NGVlMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4sEUNeVe2y3mIMkuur/giphy.gif" },
+  { label: "WAR ART", href: "#", gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGtqeXlneGRncndxb3JwMmN2MzY2Mzh5dmppZ2QzOWFiZ3lwZzQyaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Obp3D49Jjrp3cSNPqc/giphy.gif" },
+  { label: "ZEF DEMONS", href: "#", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDIxd21ocDNrcGhrYnh5MnFpaGE5YWtyYm1tcGozOG9oZnZvOGZtMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ccPxUOXjNMfnRe7qPP/giphy.gif" },
   { label: "HEY ON LENS", href: "https://hey.xyz/u/wooden", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNG44Ync4cTQyZWY2emV6d3Z1NGJqNGF5ZnZwN2YxcG50dGhyb3BlaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/0zAV0pUI1CjTCgr8FB/giphy.gif" }
 ];
 
-const POPUP_INTERVAL_MS = 5000;    // auto spawn interval
-const POPUP_LIFETIME_MS = 120000;  // how long each popup lives (ms)
-const MAX_POPUPS = 30;             // hard cap to avoid memory bloat
+const POPUP_INTERVAL_MS = 1000;    // auto spawn interval
+const POPUP_LIFETIME_MS = 9500;  // how long each popup lives (ms)
+const MAX_POPUPS = 200;             // hard cap to avoid memory bloat
 const NON_OVERLAP_ATTEMPTS = 30;   // tries to find non-overlapping placement
 
 const SENTENCES = [
@@ -366,7 +444,6 @@ function makePopup(ad){
       <div class="close" role="button" aria-label="Close popup" tabindex="0">×</div>
     </div>
     <div class="content">
-      <p><a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(ad.label)}</a></p>
       <a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer">
         <img src="${escapeHtml(ad.gif)}" alt="${escapeHtml(ad.label)} animation">
       </a>
@@ -447,7 +524,7 @@ window.addEventListener('pageshow', ()=> { if (!document.hidden) startIntervals(
 if (!document.hidden) startIntervals();
 
 // immediate spawn on first load for effect
-spawnPopup();
+// spawnPopup();
 
 /* also allow click to spawn (debounced slightly to avoid accidental drag-spam) */
 let lastClick = 0;
@@ -456,6 +533,31 @@ document.addEventListener('click', (ev)=>{
   if (now - lastClick > 120) { spawnPopup(); lastClick = now; }
 });
 
+</script>
+<script>
+// Glitch-out disappearance for random popups with multiple effects
+function randomPopupGlitchOut(){
+  if (!activePopups.length) return;
+  const popup = activePopups[Math.floor(Math.random()*activePopups.length)];
+  if (!popup) return;
+  // Pick a random effect
+  const effects = [
+    { cls: 'glitch-out', dur: 400 },
+    { cls: 'glitch-fade', dur: 500 },
+    { cls: 'glitch-slide', dur: 420 },
+    { cls: 'glitch-scale', dur: 350 }
+  ];
+  // Don't apply if already glitching out
+  if (effects.some(e => popup.classList.contains(e.cls))) return;
+  const effect = effects[Math.floor(Math.random()*effects.length)];
+  popup.classList.add(effect.cls);
+  setTimeout(() => removePopupElement(popup), effect.dur);
+}
+
+// Run every ~12–120 seconds for randomness
+setInterval(() => {
+  if (Math.random() < 0.5) randomPopupGlitchOut();
+}, 4500 + Math.random()*6000);
 </script>
 </body>
 </html>

@@ -178,7 +178,27 @@ const SENTENCES = [
   "The cursor blinks, waiting for meaning ",
   "Lost in the metadata of my own mind ",
   "The blue screen of existential dread ",
-  "Loading life in 8-bit resolution "
+  "Loading life in 8-bit resolution ",
+  "Dial-up dreams in a broadband world ",
+  "My heart beats in ASCII code ",
+  "Pop-ups were portals to the unknown ",
+  "Neon hyperlinks light the way home ",
+  "Buffering thoughts in a digital haze ",
+  "Chatrooms echo with forgotten voices ",
+  "The web was wild, untamed, infinite ",
+  "Caffeine and code at 3AM ",
+  "My soul uploads at 56k speeds ",
+  "Lost packets, lost memories ",
+  "The homepage is where the heart is ",
+  "Right-click to save nostalgia ",
+  "Pop culture in pop-up windows ",
+  "The night glows with CRT static ",
+  "We surfed the chaos, byte by byte ",
+  "404: Sleep not found ",
+  "My dreams are animated GIFs ",
+  "The internet never forgets a meme ",
+  "Reality checks in Comic Sans ",
+  "I left my heart in a guestbook "
 ];
 
 /* ========== PRELOAD GIFS ========== */
@@ -343,7 +363,9 @@ function makePopup(ad){
     </div>
     <div class="content">
       <p><a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(ad.label)}</a></p>
-      <img src="${escapeHtml(ad.gif)}" alt="${escapeHtml(ad.label)} animation">
+      <a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer">
+        <img src="${escapeHtml(ad.gif)}" alt="${escapeHtml(ad.label)} animation">
+      </a>
     </div>
   `;
 

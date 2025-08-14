@@ -1,191 +1,563 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>420360.xyz - Arcade Gaming Site</title>
-    <meta name="description" content="420360.xyz offers free, modern arcade games playable instantly in your browser. Enjoy unique titles like Tarot Tetromino—no downloads needed.">
-    <meta name="keywords" content="arcade games, browser games, free games, tetris, tarot, retro games, online games, 420360, 420360.xyz, Tarot Tetromino">
-    <meta name="author" content="420360.xyz">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#222233">
-    
-    <!-- Social Media & SEO Meta Tags -->
-    <meta property="og:title" content="420360.xyz - Arcade Gaming Site">
-    <meta property="og:description" content="A collection of unique arcade-style games with modern twists. Play free browser games like Tarot Tetromino on any device.">
-    <meta property="og:image" content="https://420360.xyz/assets/images/420360arcadebanner.png">
-    <meta property="og:url" content="https://420360.xyz/">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="420360.xyz">
-    <meta property="og:locale" content="en_US">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="420360.xyz - Arcade Gaming Site">
-    <meta name="twitter:description" content="A collection of unique arcade-style games with modern twists. Play free browser games like Tarot Tetromino on any device.">
-    <meta name="twitter:image" content="https://420360.xyz/assets/images/420360arcadebanner.png">
-    <meta name="twitter:site" content="@420360xyz">
-    <meta name="twitter:creator" content="@420360xyz">
-    <!-- Pinterest -->
-    <meta name="pinterest-rich-pin" content="true">
-    <!-- Facebook Messenger -->
-    <meta property="al:android:url" content="https://420360.xyz/">
-    <meta property="al:ios:url" content="https://420360.xyz/">
-    <!-- WhatsApp -->
-    
-    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
-    <link rel="stylesheet" href="css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>420360</title>
+
+<!-- Social/SEO Metadata -->
+<meta name="description" content="420360: 90s retro web popups, glitch art, and digital nostalgia." />
+<meta property="og:title" content="420360" />
+<meta property="og:description" content="90s retro web popups, glitch art, and digital nostalgia." />
+<meta property="og:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://420360.xyz/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="420360" />
+<meta name="twitter:description" content="90s retro web popups, glitch art, and digital nostalgia." />
+<meta name="twitter:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+<!-- Social links for search engines -->
+<link rel="me" href="https://hey.xyz/u/wooden" />
+<link rel="me" href="https://www.youtube.com/@woodenhat" />
+<link rel="me" href="https://woodmurderedhat.com/social" />
+
+<!-- Favicon: Retro smiley emoji as data URL -->
+<link rel="icon" type="image/svg+xml" href="https://420360.xyz/assets/images//favicon.ico">
+
+<!-- Pixel font -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg: #181825;
+  --primary: #00fff7;
+  --secondary: #ff00ea;
+  --highlight: #fff700;
+  --text: #ffffff;
+  --popup-w: 250px;
+  --popup-h: 150px;
+}
+
+* { box-sizing: border-box; }
+
+html,body{
+  height:100%;
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  image-rendering: pixelated;
+  overflow: hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+
+/* Blurb / headline */
+.blurb{
+  font-size:18px;
+  max-width:90%;
+  text-align:center;
+  line-height:1.7;
+  letter-spacing:1.5px;
+  background:var(--bg);
+  border:4px solid var(--primary);
+  box-shadow:
+    0 0 0 4px var(--secondary),
+    8px 8px 0 0 var(--highlight),
+    0 0 0 8px #000;
+  padding:24px 16px 16px 16px;
+  z-index:2;
+  user-select:none;
+}
+.blurb span{ display:inline-block; margin-right:6px; transition: color .2s, background .2s; }
+.blurb .glitch{
+  color:var(--secondary);
+  background:var(--highlight);
+  text-shadow:2px 2px 0 var(--primary), 0 0 1px #000;
+  animation: glitchy .12s steps(2) infinite alternate;
+}
+
+/* small CRT screen glitch of the whole blurb */
+.blurb.glitch-effect{ animation: screen-glitch .15s steps(2) 3; }
+
+@keyframes glitchy{
+  0%{ transform: translate(0,0); }
+  20%{ transform: translate(-2px,1px); }
+  40%{ transform: translate(2px,-1px); }
+  60%{ transform: translate(-1px,2px); }
+  80%{ transform: translate(1px,-2px); }
+  100%{ transform: translate(0,0); }
+}
+@keyframes screen-glitch{
+  0%,100%{ transform: translate(0,0); }
+  25%{ transform: translate(-2px,1px); }
+  50%{ transform: translate(2px,-1px); }
+  75%{ transform: translate(-1px,2px); }
+}
+
+/* blinking cursor */
+.cursor{
+  display:inline-block;
+  width:1ch;
+  color:var(--primary);
+  background:#000;
+  font-weight:bold;
+  animation: blink .8s steps(1) infinite;
+  text-shadow:2px 2px 0 var(--secondary);
+  vertical-align:baseline;
+}
+@keyframes blink{ 0%,49%{ opacity:1 } 50%,100%{ opacity:0 } }
+
+/* Pause state (applies when page is hidden) */
+.paused .blurb,
+.paused .blurb .glitch,
+.paused .cursor,
+.paused .popup { animation-play-state: paused !important; }
+
+/* Popup styling */
+.popup{
+  position:fixed;
+  width:var(--popup-w);
+  min-height:var(--popup-h);
+  background:var(--bg);
+  border:4px solid var(--secondary);
+  box-shadow:
+    0 0 0 4px var(--primary),
+    8px 8px 0 0 var(--highlight),
+    0 0 0 8px #000;
+  color:var(--highlight);
+  z-index:1000;
+  overflow:hidden;
+  opacity:0;
+  transform: scale(.85) rotate(0deg);
+  animation: popup-in .25s ease forwards;
+  user-select:none;
+}
+@keyframes popup-in{
+  to{ opacity:1; transform: scale(1) rotate(var(--rotation)); }
+}
+
+.titlebar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:2px 6px;
+  font-size:10px;
+  background:var(--secondary);
+  color:var(--bg);
+  border-bottom:4px solid var(--primary);
+}
+.titlebar .left{ display:flex; gap:6px; align-items:center; }
+.titlebar img{ width:16px; height:16px; image-rendering: pixelated; }
+.close{ cursor:pointer; font-size:16px; color:var(--highlight); transition: color .15s; }
+.close:hover{ color:var(--secondary); }
+
+.content{ padding:10px 8px 12px 8px; color:var(--highlight); font-size:10px; text-align:center; }
+.content img{
+  max-width:100%;
+  border:4px solid var(--primary);
+  box-shadow: 0 0 0 4px var(--secondary), 4px 4px 0 0 var(--highlight);
+  image-rendering: pixelated;
+}
+
+/* accessible focus styles for links */
+.content a{ color:inherit; text-decoration:underline; }
+.content a:focus{ outline:2px dashed var(--primary); outline-offset:3px; }
+</style>
+<!-- Glitch-out disappearance animation for popups -->
+<style>
+@keyframes popup-glitch-out {
+  0% { opacity: 1; filter: none; transform: translate(0,0) scale(1) rotate(var(--rotation)); }
+  20% { opacity: 1; filter: hue-rotate(45deg) contrast(2); transform: translate(-2px, 1px) scale(1.05) rotate(var(--rotation)); }
+  40% { opacity: .8; filter: hue-rotate(-45deg) contrast(3); transform: translate(2px, -1px) scale(0.95) rotate(var(--rotation)); }
+  60% { opacity: .6; filter: hue-rotate(90deg) contrast(4); transform: translate(-1px, 2px) scale(1.08) rotate(var(--rotation)); }
+  80% { opacity: .3; filter: hue-rotate(-90deg) contrast(0.5); transform: translate(1px, -2px) scale(0.9) rotate(var(--rotation)); }
+  100% { opacity: 0; filter: none; transform: translate(0,0) scale(0.8) rotate(var(--rotation)); }
+}
+@keyframes popup-glitch-fade {
+  0% { opacity: 1; filter: none; }
+  30% { opacity: 0.7; filter: blur(1.5px) brightness(1.5); }
+  60% { opacity: 0.4; filter: blur(3px) brightness(2); }
+  100% { opacity: 0; filter: blur(6px) brightness(2.5); }
+}
+@keyframes popup-glitch-slide {
+  0% { opacity: 1; transform: translate(0,0) scale(1) rotate(var(--rotation)); }
+  40% { opacity: 0.7; transform: translate(-40px, 10px) scale(1.1) rotate(calc(var(--rotation) + 8deg)); }
+  80% { opacity: 0.3; transform: translate(60px, -20px) scale(0.9) rotate(calc(var(--rotation) - 12deg)); }
+  100% { opacity: 0; transform: translate(0,80px) scale(0.7) rotate(var(--rotation)); }
+}
+@keyframes popup-glitch-scale {
+  0% { opacity: 1; transform: scale(1) rotate(var(--rotation)); filter: none; }
+  30% { opacity: 0.8; transform: scale(1.2) rotate(calc(var(--rotation) + 10deg)); filter: contrast(2); }
+  60% { opacity: 0.5; transform: scale(0.7) rotate(calc(var(--rotation) - 10deg)); filter: contrast(0.5); }
+  100% { opacity: 0; transform: scale(0.3) rotate(var(--rotation)); filter: none; }
+}
+.popup.glitch-out {
+  animation: popup-glitch-out 0.35s steps(2, jump-none) forwards;
+}
+.popup.glitch-fade {
+  animation: popup-glitch-fade 0.45s linear forwards;
+}
+.popup.glitch-slide {
+  animation: popup-glitch-slide 0.38s cubic-bezier(.7,-0.2,.6,1.5) forwards;
+}
+.popup.glitch-scale {
+  animation: popup-glitch-scale 0.32s cubic-bezier(.5,1.5,.7,1) forwards;
+}
+</style>
 </head>
 <body>
-    <!-- Pixel Art Animated Background -->
-    <div class="pixel-bg" aria-hidden="true">
-        <div class="pixel-particles"></div>
-        <canvas id="starfield"></canvas>
-        <img src="assets/images/420360arcadebanner.png" alt="420360 Arcade Banner" class="hero-banner">
-    </div>
-    <!-- Site Header -->
-    <header class="site-header metal-effect" role="banner">
-        <div class="container">
-            <h1 class="site-title interactive-title" tabindex="0">420360.xyz</h1>
-            <p class="site-tagline">Modern Arcade Gaming</p>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main-content" role="main">
-        <section class="hero hero-animated animated-section" aria-label="Welcome to the Arcade">
-            <div class="container">
-                <h2 class="glow">Welcome to the Arcade</h2>
-                <p>Discover unique gaming experiences with modern twists on classic arcade games.</p>
-                <div class="arcade-coins" aria-hidden="true">
-                    <div class="coin"></div>
-                    <div class="coin"></div>
-                    <div class="coin"></div>
-                </div>
-            </div>
-        </section>
+<!-- Emoticon & Socials Section -->
+<div id="socials-emoticons" style="margin: 18px 0 10px 0; text-align: center; z-index: 10;">
+  <div style="font-size: 13px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <a href="https://hey.xyz/u/wooden" target="_blank" rel="noopener noreferrer" title="😎" style="color:var(--secondary);text-decoration:none;">👁️</a>
+    <a href="https://www.youtube.com/@woodenhat" target="_blank" rel="noopener noreferrer" title="🕹️" style="color:var(--highlight);text-decoration:none;">▶️</a>
+    <a href="https://woodmurderedhat.com/social" target="_blank" rel="noopener noreferrer" title="🌐" style="color:var(--text);text-decoration:none;">🌲</a>
+  </div>
+</div>
 
-        <section class="games-showcase animated-section" aria-label="Our Games">
-            <div class="container">
-                <h2 class="glow">Our Games</h2>
-                <div class="games-grid animated-grid">
-                    <!-- Tarot Tetromino Game Card -->
-                    <article class="game-card pixel-card animated-card" tabindex="0" aria-label="Tarot Tetromino">
-                        <div class="game-image">
-                            <img src="assets/images/320x320.png" alt="Tarot Tetromino">
-                        </div>
-                        <div class="game-info">
-                            <h3>Tarot Tetromino</h3>
-                            <p>A mystical twist on the classic Tetris game with tarot card influences.</p>
-                            <a href="games/tarot-tetromino/index.html" class="play-button animated-btn" aria-label="Play Tarot Tetromino">Play Now</a>
-                        </div>
-                    </article>
+<div class="blurb" id="blurb" aria-live="polite"></div>
 
-                    <!-- Generative Art Game Card -->
-                    <article class="game-card pixel-card animated-card" tabindex="0" aria-label="Generative Art">
-                        <div class="game-image">
-                            <img src="assets/images/320x320.png" alt="Generative Art">
-                        </div>
-                        <div class="game-info">
-                            <h3>Generative Art</h3>
-                            <p>Experience unique, randomized digital artworks rendered in real-time.</p>
-                            <a href="games/generative-art/index.html" class="play-button animated-btn" aria-label="Open Generative Art">Explore Now</a>
-                        </div>
-                    </article>
+<script>
+/* ========== CONFIG ========== */
+const ICON_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAALklEQVQoka3OMQ0AAAzDsPnfpM1Yip5JRGCBqgMFBQUFBQUFBQUFBQUFBSUlG8mG6tD3oxAAAAAElFTkSuQmCC";
 
-                    <!-- Noctis Reverie Game Card -->
-                    <article class="game-card pixel-card animated-card" tabindex="0" aria-label="Noctis Reverie">
-                        <div class="game-image">
-                            <img src="games/noctis-reverie/assets/vectors/star.svg" alt="Noctis Reverie">
-                        </div>
-                        <div class="game-info">
-                            <h3>Noctis Reverie</h3>
-                            <p>A generative art experience that runs in your browser.</p>
-                            <a href="games/noctis-reverie/index.html" class="play-button animated-btn" aria-label="Open Noctis Reverie">Explore Now</a>
-                        </div>
-                    </article>
+const ADS = [
+  { label: "ZEF VIBES", href: "https://discord.gg/zef", gif: "https://media0.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif" },
+  { label: "TETROMINO", href: "https://420360.xyz/games/tarot-tetromino/index.html", gif: "https://media4.giphy.com/media/qoiWHxmgeltKhBjmgv/giphy.gif" },
+  { label: "247420", href: "https://discord.gg/an-entrypoint-367741339393327104", gif: "https://media1.giphy.com/media/BjSvGRkurICB0n17fb/giphy.gif" },
+  { label: "GIPHY", href: "https://giphy.com/woodmurderedhat", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYW5iM2lsNjR1NGt4NjI0aHk4cWZrcWFicWNpeHQxZmRzMGNrNTNiYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7AA8vvC4ZPOsmOphuc/giphy.gif" },
+  { label: "WOODMURDEREDHAT", href: "https://woodmurderedhat.com/social", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDU5M3d3a3RkdTNoa3cwcGVjZTBncWFkeGQwcnE5dnpoa3BqZjZpYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/H197ec6QieWHNx8t2w/giphy.gif" },
+  { label: "YOUTUBE", href: "https://www.youtube.com/@woodenhat", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExemplazEweG82cDRucXhodThlZTBxY2NhcmFoNWRqaHVvbmdncWMzdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/JeEjGpM2TVZGaM5BuE/giphy.gif" },
+  { label: "FRIDAY", href: "#", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExemxoajc2MWN5Z3ZkbDB1YTB3YjRwNDF0NW40dTh6OGhoZGFkYzhoZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ccZaTF9RyZXc6Cs06S/giphy.gif" },
+  { label: "SATURDAY", href: "#", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGlkbDVxMTllazBncnFnZ3IyaGNtcDdvOHpsMGhkM2pqbnQ0YjR4byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/DfqSbJVYLHmO8QFn1R/giphy.gif" },
+  { label: "PEARL WHAT?", href: "#", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWtqNmUwZ3ZpOWlrNzdiMzdtZHIwd2U0MXc3M2FmMncwNnE0dmZhdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/nIE5kDeythSFImKueF/giphy.gif" },
+  { label: "ZEF SHELLED#", href: "#", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzlxcmw3aTJid3g5ZG5yMWR0MTR3ZmR6ZGl5M3pjeDNkeXQ4dDFidyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IZwprtK0UY3FXNGTDD/giphy.gif" },
+  { label: "MOAN-AH", href: "#", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYjNvYzdtbzI1MncycDg0aTlwaWx4bnh1Ym5ucTJua3Fic2p0ZHl3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qxJ9pAQCBIJLxfelCv/giphy.gif" },
+  { label: "WEDNESDAY", href: "#", gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTF5dmR1eXRlNTIwNXlnYTNheGhtYW9zZ3Q0MjBqZHE5MGh5NGVlMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4sEUNeVe2y3mIMkuur/giphy.gif" },
+  { label: "WAR ART", href: "#", gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGtqeXlneGRncndxb3JwMmN2MzY2Mzh5dmppZ2QzOWFiZ3lwZzQyaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Obp3D49Jjrp3cSNPqc/giphy.gif" },
+  { label: "ZEF DEMONS", href: "#", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDIxd21ocDNrcGhrYnh5MnFpaGE5YWtyYm1tcGozOG9oZnZvOGZtMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ccPxUOXjNMfnRe7qPP/giphy.gif" },
+  { label: "HEY ON LENS", href: "https://hey.xyz/u/wooden", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNG44Ync4cTQyZWY2emV6d3Z1NGJqNGF5ZnZwN2YxcG50dGhyb3BlaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/0zAV0pUI1CjTCgr8FB/giphy.gif" }
+];
 
-                    <!-- Coming Soon Game Card -->
-                    <article class="game-card coming-soon pixel-card animated-card" tabindex="0" aria-label="Coming Soon">
-                        <div class="game-image">
-                            <img src="assets/images/32x32.png" alt="Coming Soon">
-                        </div>
-                        <div class="game-info">
-                            <h3>Coming Soon</h3>
-                            <p>More exciting games are on the way! Check back soon for updates.</p>
-                            <span class="coming-soon-label">Coming Soon</span>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
+const POPUP_INTERVAL_MS = 1000;    // auto spawn interval
+const POPUP_LIFETIME_MS = 9500;  // how long each popup lives (ms)
+const MAX_POPUPS = 200;             // hard cap to avoid memory bloat
+const NON_OVERLAP_ATTEMPTS = 30;   // tries to find non-overlapping placement
 
-        <section class="about-section animated-section" aria-label="About 420360.xyz">
-            <div class="container">
-                <h2 class="glow">About 420360.xyz</h2>
-                <p>420360.xyz is a collection of unique arcade-style games with modern twists. Our games combine classic gameplay mechanics with innovative features to create fresh gaming experiences.</p>
-                <p>All games are free to play and optimized for both desktop and mobile devices.</p>
-                <!-- Expanded SEO content -->
-                <p>At 420360.xyz, we are passionate about bringing the excitement of classic arcade games to the modern web. Our platform features browser-based games that are easy to access and play instantly—no downloads or installations required. Whether you enjoy puzzle games, idle games, or action-packed challenges, our growing library has something for everyone.</p>
-                <p>Our flagship titles, such as <strong>Tarot Tetromino</strong>, blend retro aesthetics with new mechanics, offering a nostalgic yet fresh experience. We focus on accessibility, ensuring our games run smoothly on all devices, including smartphones, tablets, and PCs. New games and updates are added regularly, so be sure to check back often for the latest releases.</p>
-                <p>Join our community of arcade enthusiasts and rediscover the joy of high-score chasing, strategic gameplay, and creative game design. 420360.xyz is your destination for innovative browser arcade games, free entertainment, and a touch of retro fun—anytime, anywhere.</p>
-            </div>
-        </section>
-    </main>
+const SENTENCES = [
+  "Welcome to the future of the internet ",
+  "Surf the web like it’s 1996 ",
+  "Pixels were our stars in the night sky ",
+  "Error 404: meaning not found ",
+  "The modem’s hum was a lullaby for the lost ",
+  "Reality pixelated in low-res confusion ",
+  "The cursor blinks, waiting for meaning ",
+  "Lost in the metadata of my own mind ",
+  "The blue screen of existential dread ",
+  "Loading life in 8-bit resolution ",
+  "Dial-up dreams in a broadband world ",
+  "My heart beats in ASCII code ",
+  "Pop-ups were portals to the unknown ",
+  "Neon hyperlinks light the way home ",
+  "Buffering thoughts in a digital haze ",
+  "Chatrooms echo with forgotten voices ",
+  "The web was wild, untamed, infinite ",
+  "Caffeine and code at 3AM ",
+  "My soul uploads at 56k speeds ",
+  "Lost packets, lost memories ",
+  "The homepage is where the heart is ",
+  "Right-click to save nostalgia ",
+  "Pop culture in pop-up windows ",
+  "The night glows with CRT static ",
+  "We surfed the chaos, byte by byte ",
+  "404: Sleep not found ",
+  "My dreams are animated GIFs ",
+  "The internet never forgets a meme ",
+  "Reality checks in Comic Sans ",
+  "I left my heart in a guestbook "
+];
 
-    <!-- Site Footer -->
-    <footer class="site-footer" role="contentinfo">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-credit">
-                    <p>&copy; 2025 420360.xyz. All rights reserved.</p>
-                    <a href="https://woodmurderedhat.com" class="footer-link" target="_blank" rel="noopener">woodmurderedhat.com</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+/* ========== PRELOAD GIFS ========== */
+ADS.forEach(a => { const i = new Image(); i.src = a.gif; });
 
-    <!-- Scripts -->
-    <script src="js/main.js"></script>
-    <script>
-    // Starfield animation for pixel-bg
-    const canvas = document.getElementById('starfield');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        // Make squares instead of stars, and make them bigger
-        let squares = Array.from({length: 60}, () => ({
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            s: Math.random() * 32 + 32, // size 10-22px
-            d: Math.random() * 0.5 + 0.2
-        }));
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight * 0.5;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let sq of squares) {
-                ctx.fillStyle = 'rgba(0,200,255,0.18)';
-                ctx.fillRect(sq.x, sq.y, sq.s, sq.s);
-                ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-                ctx.strokeRect(sq.x, sq.y, sq.s, sq.s);
-                sq.y += sq.d;
-                if (sq.y > canvas.height) {
-                    sq.x = Math.random() * canvas.width;
-                    sq.y = 0;
-                }
-            }
-            requestAnimationFrame(draw);
-        }
-        draw();
+/* ========== DOM REFS ========== */
+const blurbEl = document.getElementById('blurb');
+let currentSentence = SENTENCES[0];
+
+/* ========== BLURB TEXT + GLITCH ========= */
+function setBlurbText(sentence){
+  blurbEl.innerHTML = "";
+  const words = sentence.trim().split(" ").filter(Boolean);
+  words.forEach(w => {
+    const s = document.createElement('span');
+    s.textContent = w;
+    blurbEl.appendChild(s);
+  });
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  cursor.textContent = '_';
+  blurbEl.appendChild(cursor);
+}
+setBlurbText(currentSentence);
+
+function randomGlitchString(len){
+  const chars = "!@#$%^&*()_+=-[]{};:<>,.?/|~420360";
+  return Array.from({length:len}, ()=>chars.charAt(Math.floor(Math.random()*chars.length))).join('');
+}
+
+function glitchRandomWord(){
+  const spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  if (!spans.length) return;
+  // rare chance for whole-blurb glitch
+  if (Math.random() < 0.02) fullGlitch();
+
+  // pick a word and briefly replace it with gibberish
+  const idx = Math.floor(Math.random()*spans.length);
+  const span = spans[idx];
+  if (!span || span.classList.contains('glitch')) return;
+  const original = span.textContent;
+  span.textContent = randomGlitchString(Math.max(1, original.length));
+  span.classList.add('glitch');
+  setTimeout(()=> {
+    span.textContent = original;
+    span.classList.remove('glitch');
+  }, 120 + Math.random()*300);
+}
+
+function fullGlitch(){
+  blurbEl.classList.add('glitch-effect');
+  setTimeout(()=> blurbEl.classList.remove('glitch-effect'), 300);
+}
+
+function morphToRandomSentence() {
+  const currentTrimmed = currentSentence.trim();
+  const uniqueSentences = SENTENCES.filter(s => s.trim() !== currentTrimmed);
+  if (uniqueSentences.length === 0) return;
+
+  let nextSentence = uniqueSentences[Math.floor(Math.random() * uniqueSentences.length)];
+
+  const currentWords = currentSentence.trim().split(" ");
+  const targetWords = nextSentence.trim().split(" ");
+  const maxLength = Math.max(currentWords.length, targetWords.length);
+
+  let spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  // Add spans if needed
+  while (spans.length < maxLength) {
+    const span = document.createElement('span');
+    span.style.marginRight = "6px";
+    blurbEl.insertBefore(span, blurbEl.querySelector('.cursor'));
+    spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  }
+  // Remove extra spans if target sentence shorter
+  if (spans.length > maxLength) {
+    for (let i = spans.length - 1; i >= maxLength; i--) {
+      spans[i].remove();
     }
-    // Interactive title effect
-    document.querySelectorAll('.interactive-title').forEach(title => {
-        title.addEventListener('mouseenter', () => title.classList.add('sparkle'));
-        title.addEventListener('mouseleave', () => title.classList.remove('sparkle'));
-    });
-    </script>
+    spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  }
+
+  let changeOrder = Array.from({length: maxLength}, (_, i) => i);
+  changeOrder.sort(() => Math.random() - 0.5);
+
+  let step = 0;
+  function changeNextWord() {
+    if (step >= changeOrder.length) {
+      currentSentence = nextSentence;
+      return;
+    }
+    const idx = changeOrder[step];
+    const newWord = targetWords[idx] || "";
+    spans[idx].textContent = newWord;
+    step++;
+    setTimeout(changeNextWord, 150);
+  }
+  changeNextWord();
+}
+
+/* ========== POPUP MANAGEMENT ========== */
+const activePopups = []; // FIFO list of DOM elements currently on-screen (or recently added)
+
+/* helper: does a candidate rect overlap an existing popup element? */
+function rectsOverlap(x, y, w, h, el){
+  const r = el.getBoundingClientRect();
+  return !(x + w < r.left || x > r.right || y + h < r.top || y > r.bottom);
+}
+
+/* try to find a non-overlapping x,y; returns px,py in px */
+function findNonOverlappingPosition(attempts = NON_OVERLAP_ATTEMPTS){
+  const w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-w')) || 250;
+  const h = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-h')) || 150;
+  const maxX = Math.max(0, window.innerWidth - w);
+  const maxY = Math.max(0, window.innerHeight - h);
+
+  for (let i=0;i<attempts;i++){
+    const x = Math.floor(Math.random() * (maxX+1));
+    const y = Math.floor(Math.random() * (maxY+1));
+    let collides = false;
+    for (const existing of activePopups){
+      // some existing popups may have been removed; skip those
+      if (!existing || !existing.getBoundingClientRect) continue;
+      if (rectsOverlap(x, y, w, h, existing)) { collides = true; break; }
+    }
+    if (!collides) return {x,y};
+  }
+  // give up, return a random position
+  return { x: Math.floor(Math.random() * (maxX+1)), y: Math.floor(Math.random() * (maxY+1)) };
+}
+
+/* remove element safely and update activePopups list */
+function removePopupElement(el){
+  if (!el) return;
+  const idx = activePopups.indexOf(el);
+  if (idx !== -1) activePopups.splice(idx,1);
+  if (el.parentNode) el.parentNode.removeChild(el);
+}
+
+/* create and append a popup element, returns element */
+function makePopup(ad){
+  const p = document.createElement('div');
+  p.className = 'popup';
+  // rotation + tiny scale randomization for chaotic aesthetic
+  const rotation = (Math.random()*12 - 6).toFixed(2) + 'deg';
+  const scale = (1 + (Math.random()*0.08 - 0.04)).toFixed(3);
+  p.style.setProperty('--rotation', rotation);
+  p.style.transform = `scale(${scale}) rotate(${rotation})`;
+
+  // position (attempt to avoid overlap)
+  const pos = findNonOverlappingPosition();
+  p.style.left = pos.x + 'px';
+  p.style.top = pos.y + 'px';
+
+  // content
+  p.innerHTML = `
+    <div class="titlebar" role="presentation">
+      <div class="left">
+        <img src="${ICON_DATA}" alt="" aria-hidden="true">
+        <span>${escapeHtml(ad.label)}</span>
+      </div>
+      <div class="close" role="button" aria-label="Close popup" tabindex="0">×</div>
+    </div>
+    <div class="content">
+      <a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer">
+        <img src="${escapeHtml(ad.gif)}" alt="${escapeHtml(ad.label)} animation">
+      </a>
+    </div>
+  `;
+
+  // close handlers
+  const closeBtn = p.querySelector('.close');
+  closeBtn.addEventListener('click', ()=> removePopupElement(p));
+  closeBtn.addEventListener('keydown', (ev)=> { if(ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); removePopupElement(p); } });
+
+  document.body.appendChild(p);
+  activePopups.push(p);
+
+  // schedule lifetime removal
+  const lifetimeTimer = setTimeout(()=>{
+    // if still present, remove it
+    removePopupElement(p);
+    clearTimeout(lifetimeTimer);
+  }, POPUP_LIFETIME_MS);
+
+  // enforce MAX_POPUPS
+  if (activePopups.length > MAX_POPUPS){
+    // remove oldest until length <= MAX_POPUPS
+    while (activePopups.length > MAX_POPUPS){
+      const old = activePopups.shift();
+      if (old && old.parentNode) old.parentNode.removeChild(old);
+    }
+  }
+
+  return p;
+}
+
+/* utility to escape user-supplied strings in markup to avoid injection */
+function escapeHtml(s){
+  if (typeof s !== 'string') return '';
+  return s.replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]); });
+}
+
+/* ========== SPAWN CONTROL ========== */
+function randomAd(){ return ADS[Math.floor(Math.random()*ADS.length)]; }
+function spawnPopup(){ makePopup(randomAd()); }
+
+/* ========== INTERVALS & PAUSE/RESUME ========== */
+let popupIntervalId = null;
+let glitchIntervalId = null;
+let morphIntervalId = null;
+
+// start repeated tasks if not already running
+function startIntervals(){
+  if (!popupIntervalId) popupIntervalId = setInterval(spawnPopup, POPUP_INTERVAL_MS);
+  if (!glitchIntervalId) glitchIntervalId = setInterval(glitchRandomWord, 200);
+  if (!morphIntervalId) morphIntervalId = setInterval(morphToRandomSentence, 2500);
+  document.documentElement.classList.remove('paused');
+}
+
+// stop repeated tasks
+function stopIntervals(){
+  if (popupIntervalId){ clearInterval(popupIntervalId); popupIntervalId = null; }
+  if (glitchIntervalId){ clearInterval(glitchIntervalId); glitchIntervalId = null; }
+  if (morphIntervalId){ clearInterval(morphIntervalId); morphIntervalId = null; }
+  // pause CSS animations
+  document.documentElement.classList.add('paused');
+}
+
+/* handle visibility change to pause heavy activity when page not visible */
+document.addEventListener('visibilitychange', ()=> {
+  if (document.hidden) stopIntervals();
+  else startIntervals();
+});
+
+// also pause when page is being unloaded / pagehide (mobile)
+window.addEventListener('pagehide', ()=> stopIntervals());
+window.addEventListener('pageshow', ()=> { if (!document.hidden) startIntervals(); });
+
+/* ========== INITIAL BOOT ========== */
+// initial intervals start only when page visible
+if (!document.hidden) startIntervals();
+
+// immediate spawn on first load for effect
+// spawnPopup();
+
+/* also allow click to spawn (debounced slightly to avoid accidental drag-spam) */
+let lastClick = 0;
+document.addEventListener('click', (ev)=>{
+  const now = Date.now();
+  if (now - lastClick > 120) { spawnPopup(); lastClick = now; }
+});
+
+</script>
+<script>
+// Glitch-out disappearance for random popups with multiple effects
+function randomPopupGlitchOut(){
+  if (!activePopups.length) return;
+  const popup = activePopups[Math.floor(Math.random()*activePopups.length)];
+  if (!popup) return;
+  // Pick a random effect
+  const effects = [
+    { cls: 'glitch-out', dur: 400 },
+    { cls: 'glitch-fade', dur: 500 },
+    { cls: 'glitch-slide', dur: 420 },
+    { cls: 'glitch-scale', dur: 350 }
+  ];
+  // Don't apply if already glitching out
+  if (effects.some(e => popup.classList.contains(e.cls))) return;
+  const effect = effects[Math.floor(Math.random()*effects.length)];
+  popup.classList.add(effect.cls);
+  setTimeout(() => removePopupElement(popup), effect.dur);
+}
+
+// Run every ~12–120 seconds for randomness
+setInterval(() => {
+  if (Math.random() < 0.5) randomPopupGlitchOut();
+}, 4500 + Math.random()*6000);
+</script>
 </body>
 </html>

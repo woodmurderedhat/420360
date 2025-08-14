@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>90s Pop Page</title>
+<style>
+@font-face {
+  font-family: 'PixelFont';
+  src: url(data:font/woff;base64,d09GMgABAAAAAAXkAAsAAAAACpAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAABCAAAAGAAAABgDx6zT1MvMgAAAfoAAABcAAAAbAWwATFjbWFwAAAB7AAAAKQAAACk5nMplmN2dCAAAAJUAAAAXAAAAFwBIAGZmcGdtAAACiAAAAGwAAABsBG0AAmZ2FZAAABhEAAAB+AAAB+Lw4szZnbHlmAAAY5AAAASoAAAEq3YwQF2hlYWQAABjYAAAAMAAAADAPqX5jaGhlYQAAH/gAAAAgAAAAJAfSAXhobXR4AAAgHAAAAGYAAABmEykMcGxvY2EAACFcAAAAOAAAADgCdQR3bWF4cAAAIeQAAAAgAAAAIAEYAF1uYW1lAAAh9AAAAbQAAAG0w3npoHBvc3QAACNoAAAAKAAAACgR/vm9Y3ByZXAAACNsAAAAWgAAAFoI9bnwAAEAAAABAACaD2UAAAAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA) format('woff');
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:#0b0f1a;overflow:hidden;font-family: 'PixelFont', monospace;}
+.wrap{height:100vh;display:grid;place-items:center;position:relative;color:#f8f6ff}
+
+.bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(255,0,128,0.08), transparent 10%),
+    radial-gradient(ellipse at 80% 80%, rgba(0,255,255,0.04), transparent 10%),
+    linear-gradient(135deg,#0b0f1a 0%, #081029 40%, #0b1026 100%);
+}
+
+.card{
+  position:relative;z-index:4;
+  width:min(920px,92vw);height:min(560px,86vh);
+  border-radius:14px;padding:28px;
+  background: rgba(20,20,40,0.6);
+  border: 2px solid rgba(255,255,255,0.06);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.blurb{max-width:72ch;font-size:20px;line-height:1.35;color:#e8e6ff;text-align:center;}
+.blurb .word{display:inline-block;padding:0 2px}
+.glitch{animation: glitch-flicker .9s steps(2, end) 1;color:#fff6d6;}
+@keyframes glitch-flicker{
+  0%{transform: translateY(0)}20%{transform: translateY(-2px)}40%{transform: translateY(1px)}
+}
+
+/* Win98 popup look */
+.popup{
+  position:absolute;z-index:2000;width:320px;background:#c0c0c0;color:#000;
+  border:2px solid #fff;border-right-color:#404040;border-bottom-color:#404040;
+  box-shadow:4px 4px 0 #000;animation:popup-in .18s ease;
+}
+@keyframes popup-in{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+
+.titlebar{
+  background:linear-gradient(#000080,#000060);
+  color:white;font-size:12px;height:20px;display:flex;align-items:center;
+  padding:0 4px;justify-content:space-between;
+}
+.titlebar img{width:16px;height:16px;margin-right:4px}
+.titlebar .left{display:flex;align-items:center}
+.close{background:#c0c0c0;border:2px solid #fff;border-right-color:#404040;border-bottom-color:#404040;
+  font-weight:bold;width:18px;height:16px;text-align:center;line-height:14px;cursor:pointer;}
+
+.content{background:#fff;padding:8px;font-size:12px;text-align:center}
+.content img{max-width:100%;}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bg"></div>
+  <div class="card">
+    <div class="blurb" id="blurb">
+      remember that summer when the internet felt infinite and every link might be a secret?
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------------------
+  CONFIG
+--------------------- */
+// Base64 16x16 pixel icon
+const ICON_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAnFBMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8xF3VtAAAAJ3RSTlMAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJ3wa9DwAAABiSURBVBjTdY9LDoAgDETDKnXaWq3f/6GfKqu8gZs1l9ihoHR3ag5ePjAQh6QhFQoRq0fHhOykjq0nAJJi3ZBwSPC13IppcpFZ1N5dVd2VUXf3nvrdnVutDYvt/0Zq02n0sUGX3p5sU3iy5EnL0RP1uzV8OBPAAAAAElFTkSuQmCC";
+
+// GIF ads array — add more objects to create new popup types
+const ADS = [
+  {
+    label: "HOT SHAREWARE",
+    href: "https://example.com/shareware",
+    gif: "data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQmZmZo6OjvLy8k5OTgAAAAAAAAAAACH5BAAAAAAALAAAAAAQABAAAAM6CLrc/jDKSau9OOvNu/9gKI5kiWJYaoaGJqroKn8sFADs="
+  },
+  {
+    label: "GIF ARCHIVE",
+    href: "https://example.com/gif",
+    gif: "data:image/gif;base64,R0lGODlhEAAQAMQfAFVVVbOzs2ZmZgAAAJmZmX19fdnZ2X5+fpKSkr6+vq6urq+vr6ioqM/Pz8TExP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAQABAAAAViICSOZGmeaKqubOu+cCzPdF2HgF2aFQAOw=="
+  }
+];
+
+// Timing config
+const POPUP_INTERVAL_MS = 5000;   // auto popup every 5s
+const POPUP_LIFETIME_MS = 4000;   // popup disappears after 4s
+
+/* ---------------------
+  BLURB GLITCH
+--------------------- */
+function buildBlurb(){
+  const blurb = document.getElementById('blurb');
+  const words = blurb.textContent.split(' ');
+  blurb.innerHTML = '';
+  words.forEach((w,i)=>{
+    const span=document.createElement('span');
+    span.className='word';
+    span.textContent=w+(i<words.length-1?' ':'');
+    blurb.appendChild(span);
+  });
+}
+buildBlurb();
+setInterval(()=>{
+  const words=document.querySelectorAll('.word');
+  const w=words[Math.floor(Math.random()*words.length)];
+  w.classList.add('glitch');
+  const orig=w.textContent;
+  w.textContent="@@@ ";
+  setTimeout(()=>{w.textContent=orig;w.classList.remove('glitch');},400);
+},1500);
+
+/* ---------------------
+  POPUP CREATION
+--------------------- */
+function randomAd(){
+  return ADS[Math.floor(Math.random()*ADS.length)];
+}
+
+function makePopup(ad){
+  const p=document.createElement('div');
+  p.className='popup';
+  
+  const tb=document.createElement('div');
+  tb.className='titlebar';
+  const left=document.createElement('div');
+  left.className='left';
+  const icon=document.createElement('img');icon.src=ICON_DATA;
+  const txt=document.createElement('span');txt.textContent=ad.label;
+  left.appendChild(icon);left.appendChild(txt);
+  
+  const close=document.createElement('div');
+  close.className='close';close.textContent='×';
+  close.onclick=()=>p.remove();
+  
+  tb.appendChild(left);tb.appendChild(close);
+  
+  const content=document.createElement('div');
+  content.className='content';
+  content.innerHTML = `<p><a href="${ad.href}" target="_blank">${ad.label}</a></p><img src="${ad.gif}" alt="gif">`;
+  
+  p.appendChild(tb);p.appendChild(content);
+  p.style.left=Math.random()*70+'%';
+  p.style.top=Math.random()*70+'%';
+  document.body.appendChild(p);
+  
+  // auto remove after lifetime
+  setTimeout(()=>{p.remove();}, POPUP_LIFETIME_MS);
+}
+
+/* ---------------------
+  EVENTS & INTERVALS
+--------------------- */
+document.addEventListener('click', ()=>{
+  makePopup(randomAd());
+});
+
+setInterval(()=>{
+  makePopup(randomAd());
+}, POPUP_INTERVAL_MS);
+
+</script>
+</body>
+</html>

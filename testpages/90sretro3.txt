@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>420360</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    background: #000080;
+    color: #fff;
+    font-family: "Chicago", "Courier New", monospace;
+    height: 100%;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+  .blurb {
+    font-size: 24px;
+    max-width: 80%;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .popup {
+    position: absolute;
+    width: 250px;
+    background: #c0c0c0;
+    border: 2px solid #000;
+    font-family: "Chicago", "Courier New", monospace;
+    box-shadow: 4px 4px 0px #000;
+  }
+  .titlebar {
+    background: linear-gradient(to right, #000080, #1084d0);
+    color: white;
+    font-weight: bold;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 2px 4px;
+    font-size: 14px;
+  }
+  .titlebar .left {
+    display: flex; align-items: center;
+    gap: 4px;
+  }
+  .titlebar img {
+    width: 16px; height: 16px;
+  }
+  .close {
+    cursor: pointer;
+  }
+  .content {
+    padding: 6px;
+    background: #fff;
+    color: #000;
+    font-size: 12px;
+    text-align: center;
+  }
+  .content img {
+    max-width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<div class="blurb" id="blurb"></div>
+
+<script>
+/* ---------------------
+   CONFIG
+--------------------- */
+const ICON_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAALklEQVQoka3OMQ0AAAzDsPnfpM1Yip5JRGCBqgMFBQUFBQUFBQUFBQUFBSUlG8mG6tD3oxAAAAAElFTkSuQmCC";
+
+const ADS = [
+  {
+    label: "ZEF VIBES",
+    href: "https://discord.gg/zef",
+    gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXFrbmg4Mjh3b25vbGt4NmRkeXY4b3IzaDd0Z3pnbXp0ZW1kY3c5ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eYDnuFt0MckAb3xdSH/giphy.gif"
+  },
+  {
+    label: "TETROMINO",
+    href: "https://420360.xyz/games/tarot-tetromino/index.html",
+    gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGdrdGJiOXUxN25tczJyNWpudmZqYjgyOGVodDFleGk0Y3F0bHhxNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qoiWHxmgeltKhBjmgv/giphy.gif"
+  },
+  {
+    label: "247420",
+    href: "https://discord.gg/an-entrypoint-367741339393327104",
+    gif: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzAzdTZjbWQ3NmZ6bWt1em1idW1vNzhjY3J2dXR3MnM3b2ZkN2ZtbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BjSvGRkurICB0n17fb/giphy.gif"
+  }
+];
+
+const POPUP_INTERVAL_MS = 5000;  // auto popup every 5s
+const POPUP_LIFETIME_MS = 5000;  // popup disappears after 4s
+
+const SENTENCES = [
+  "Welcome to the future of the internet ",
+  "Welcome to the future of the world ",
+  "Fuck the literal bullshit in this universe ",
+  "Why did the chicken cross the road ",
+  "To get to the other side ",
+  "It's a chameleon ",
+  "What's it called again ",
+  "That movie was so forgettable ",
+  "Surf the web like it’s 1996 ",
+  "Click here for 500 free internets ",
+  "Now with 256 colors ",
+  "remember that summer ",
+  "it's 4:20 ",
+  "2 x 365 "
+  
+];
+
+/* ---------------------
+   POPUP CREATION
+--------------------- */
+function randomAd() {
+  return ADS[Math.floor(Math.random() * ADS.length)];
+}
+
+function makePopup(ad) {
+  const p = document.createElement('div');
+  p.className = 'popup';
+
+  const tb = document.createElement('div');
+  tb.className = 'titlebar';
+  const left = document.createElement('div');
+  left.className = 'left';
+
+  const icon = document.createElement('img');
+  icon.src = ICON_DATA;
+
+  const txt = document.createElement('span');
+  txt.textContent = ad.label;
+
+  left.appendChild(icon);
+  left.appendChild(txt);
+
+  const close = document.createElement('div');
+  close.className = 'close';
+  close.textContent = '×';
+  close.onclick = () => p.remove();
+
+  tb.appendChild(left);
+  tb.appendChild(close);
+
+  const content = document.createElement('div');
+  content.className = 'content';
+  content.innerHTML = `<p><a href="${ad.href}" target="_blank">${ad.label}</a></p><img src="${ad.gif}" alt="gif">`;
+
+  p.appendChild(tb);
+  p.appendChild(content);
+
+  p.style.left = Math.random() * 70 + '%';
+  p.style.top = Math.random() * 70 + '%';
+
+  document.body.appendChild(p);
+
+  setTimeout(() => p.remove(), POPUP_LIFETIME_MS);
+}
+
+function spawnPopup() {
+  makePopup(randomAd());
+}
+
+document.addEventListener('click', spawnPopup);
+setInterval(spawnPopup, POPUP_INTERVAL_MS);
+
+/* ---------------------
+   BLURB MORPHING + GLITCH
+--------------------- */
+const blurbEl = document.getElementById('blurb');
+let currentSentence = SENTENCES[0];
+setBlurbText(currentSentence);
+
+function setBlurbText(sentence) {
+  const words = sentence.split(" ");
+  blurbEl.textContent = "";
+  words.forEach(word => {
+    const span = document.createElement('span');
+    span.textContent = word;
+    span.style.marginRight = "6px";
+    blurbEl.appendChild(span);
+  });
+}
+
+function glitchRandomWord() {
+  const spans = blurbEl.querySelectorAll('span');
+  if (!spans.length) return;
+  const i = Math.floor(Math.random() * spans.length);
+  const original = currentSentence.split(" ")[i];
+  const glitch = randomGlitchString(original.length);
+  spans[i].textContent = glitch;
+  setTimeout(() => spans[i].textContent = original, 200 + Math.random()*400);
+}
+
+function randomGlitchString(len) {
+  const chars = "!@#$%^&*()_+=-[]{};:<>,.?/|~420360247STEPHANUS";
+  let s = "";
+  for (let i=0; i<len; i++) {
+    s += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return s;
+}
+
+function morphToRandomSentence() {
+  let nextSentence;
+  do {
+    nextSentence = SENTENCES[Math.floor(Math.random() * SENTENCES.length)];
+  } while (nextSentence === currentSentence);
+
+  const currentWords = currentSentence.split(" ");
+  const targetWords = nextSentence.split(" ");
+  const maxLength = Math.max(currentWords.length, targetWords.length);
+
+  const spans = blurbEl.querySelectorAll('span');
+
+  // Pad with blanks if needed
+  while (spans.length < maxLength) {
+    const span = document.createElement('span');
+    span.textContent = "";
+    span.style.marginRight = "6px";
+    blurbEl.appendChild(span);
+  }
+
+  let changeOrder = Array.from({length: maxLength}, (_, i) => i);
+  changeOrder = changeOrder.sort(() => Math.random() - 0.5);
+
+  let step = 0;
+  function changeNextWord() {
+    if (step >= changeOrder.length) {
+      currentSentence = nextSentence;
+      return;
+    }
+    const idx = changeOrder[step];
+    const newWord = targetWords[idx] || "";
+    spans[idx].textContent = newWord;
+    step++;
+    setTimeout(changeNextWord, 150);
+  }
+
+  changeNextWord();
+}
+
+setInterval(morphToRandomSentence, 12000);
+setInterval(glitchRandomWord, 300);
+</script>
+
+</body>
+</html>

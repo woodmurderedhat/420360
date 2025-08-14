@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHADOW PROTOCOL: Digital Nightmare</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Experience SHADOW PROTOCOL: Digital Nightmare - An interactive cyberpunk comic where your choices alter the timeline. Navigate through a digital dystopia filled with glitches, corruption, and branching narratives.">
+    <meta name="keywords" content="interactive comic, cyberpunk, digital nightmare, shadow protocol, branching narrative, webcomic, sci-fi">
+    <meta name="author" content="420360 Comics">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:title" content="SHADOW PROTOCOL: Digital Nightmare">
+    <meta property="og:description" content="Experience an interactive cyberpunk comic where your choices alter the timeline. Navigate through a digital dystopia filled with glitches, corruption, and branching narratives.">
+    <meta property="og:image" content="img/portait1.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="SHADOW PROTOCOL: Digital Nightmare - Interactive Cyberpunk Comic">
+    <meta property="og:site_name" content="420360 Comics">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="">
+    <meta name="twitter:title" content="SHADOW PROTOCOL: Digital Nightmare">
+    <meta name="twitter:description" content="Experience an interactive cyberpunk comic where your choices alter the timeline. Navigate through a digital dystopia filled with glitches, corruption, and branching narratives.">
+    <meta name="twitter:image" content="img/portait1.webp">
+    <meta name="twitter:image:alt" content="SHADOW PROTOCOL: Digital Nightmare - Interactive Cyberpunk Comic">
+
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#000000">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="application-name" content="Shadow Protocol">
+
+    <!-- Canonical URL (update with actual domain) -->
+    <link rel="canonical" href="">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="comic-container">
+        <header class="comic-header">
+            <h1 class="comic-title">SHADOW PROTOCOL</h1>
+            <div class="story-indicator">
+                <span id="page-indicator">Page 1</span>
+                <span id="panel-indicator">Panel 1</span>
+            </div>
+        </header>
+
+        <main class="comic-main">
+            <div class="panel-container" id="panel-container">
+                <div class="panel" id="current-panel">
+                    <img id="panel-image" src="" alt="Comic Panel" class="panel-image">
+                    <div class="text-overlay">
+                        <div id="panel-caption" class="caption"></div>
+                        <div id="panel-dialog" class="dialog"></div>
+                        <div id="panel-sfx" class="sfx"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation-controls">
+                <button id="prev-btn" class="nav-btn prev-btn" disabled>
+                    <span class="btn-icon">◀</span>
+                    <span class="btn-text">PREVIOUS</span>
+                    <span class="btn-subtitle">Alter Timeline</span>
+                </button>
+                
+                <div class="progress-indicator">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <div class="branching-indicator" id="branching-indicator">
+                        <span class="branch-icon">⚡</span>
+                        <span class="branch-text">Timeline Corruption Detected</span>
+                    </div>
+                </div>
+
+                <button id="next-btn" class="nav-btn next-btn">
+                    <span class="btn-text">NEXT</span>
+                    <span class="btn-icon">▶</span>
+                    <span class="btn-subtitle">Descend Deeper</span>
+                </button>
+            </div>
+        </main>
+
+        <footer class="comic-footer">
+            <div class="debug-info" id="debug-info">
+                <span id="debug-state"></span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner">
+            <div class="glitch-text">LOADING...</div>
+        </div>
+    </div>
+
+    <!-- Audio elements for sound effects (optional) -->
+    <audio id="glitch-sound" preload="none">
+        <!-- Audio files are optional for this demo -->
+    </audio>
+    <audio id="page-turn-sound" preload="none">
+        <!-- Audio files are optional for this demo -->
+    </audio>
+
+    <script src="comic.js"></script>
+</body>
+</html>

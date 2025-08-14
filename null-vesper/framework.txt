@@ -1,0 +1,171 @@
+SHADOW PROTOCOL: DIGITAL NIGHTMARE FRAMEWORK
+============================================
+
+Project Structure:
+null_vesper/
+├── comic-project/
+│   ├── index.html          # Main comic interface
+│   ├── style.css           # Styling with glitch effects
+│   ├── comic.js            # Core logic and state management
+│   ├── comic.json          # Story data with branching variants
+│   ├── img/                # Comic panel images (24 total)
+│   │   ├── p1_panel1_a.jpg # Page 1, Panel 1, Variant A
+│   │   ├── p1_panel1_b.jpg # Page 1, Panel 1, Variant B
+│   │   └── ...             # (continues for all panels)
+│   ├── test.html           # System testing interface
+│   ├── generate-images.html # Browser-based image generator
+│   └── create-placeholders.py # Python image generator
+├── docs/
+│   └── Exercise1.md        # Original exercise requirements
+└── framework.txt           # This file
+
+ASCII Framework Diagram:
+========================
+
+┌─────────────────────────────────────────────────────────────────┐
+│                        BROWSER INTERFACE                        │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                     index.html                              │ │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐  │ │
+│  │  │   Comic Header  │  │   Panel Display │  │ Navigation  │  │ │
+│  │  │   - Title       │  │   - Image       │  │ - Prev Btn  │  │ │
+│  │  │   - Indicators  │  │   - Caption     │  │ - Next Btn  │  │ │
+│  │  │                 │  │   - Dialog      │  │ - Progress  │  │ │
+│  │  └─────────────────┘  │   - SFX         │  └─────────────┘  │ │
+│  │                       └─────────────────┘                   │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        STYLING LAYER                           │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                      style.css                             │ │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │ │
+│  │  │   Layout    │  │   Glitch    │  │    Responsive       │  │ │
+│  │  │   - Grid    │  │   - Anims   │  │    - Mobile         │  │ │
+│  │  │   - Flex    │  │   - Effects │  │    - Tablet         │  │ │
+│  │  │   - Colors  │  │   - Transi  │  │    - Desktop        │  │ │
+│  │  └─────────────┘  └─────────────┘  └─────────────────────┘  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        LOGIC LAYER                             │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                      comic.js                              │ │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │ │
+│  │  │ ComicState  │  │ Navigation  │  │    Rendering        │  │ │
+│  │  │ - Current   │  │ - goNext()  │  │    - renderPanel()  │  │ │
+│  │  │   Page/Panel│  │ - goPrev()  │  │    - updateUI()     │  │ │
+│  │  │ - Story     │  │ - Keyboard  │  │    - Glitch Effects │  │ │
+│  │  │   State     │  │   Controls  │  │    - Audio          │  │ │
+│  │  └─────────────┘  └─────────────┘  └─────────────────────┘  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        DATA LAYER                              │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                     comic.json                             │ │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │ │
+│  │  │   Pages     │  │   Panels    │  │      Variants       │  │ │
+│  │  │   - 4 Total │  │   - 3 per   │  │      - 2 per panel  │  │ │
+│  │  │   - Titles  │  │     page    │  │      - Image path   │  │ │
+│  │  │   - Numbers │  │   - IDs     │  │      - Caption      │  │ │
+│  │  │             │  │   - Variants│  │      - Dialog       │  │ │
+│  │  │             │  │     Array   │  │      - SFX          │  │ │
+│  │  └─────────────┘  └─────────────┘  └─────────────────────┘  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        ASSETS LAYER                            │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                       img/                                 │ │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │ │
+│  │  │   Page 1    │  │   Page 2    │  │    Pages 3 & 4     │  │ │
+│  │  │   - 6 imgs  │  │   - 6 imgs  │  │    - 12 imgs total  │  │ │
+│  │  │   - A/B     │  │   - A/B     │  │    - A/B variants   │  │ │
+│  │  │     variants│  │     variants│  │    - Generated      │  │ │
+│  │  │   - 800x600 │  │   - 800x600 │  │    - Placeholders   │  │ │
+│  │  └─────────────┘  └─────────────┘  └─────────────────────┘  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+
+Data Flow:
+==========
+
+1. INITIALIZATION:
+   index.html → comic.js → ComicState.init() → fetch(comic.json) → initializeStoryState()
+
+2. NAVIGATION FORWARD:
+   User clicks Next → goToNext() → renderCurrentPanel() → updateUI()
+
+3. NAVIGATION BACKWARD (BRANCHING):
+   User clicks Previous → goToPrevious() → rerandomizeFromCurrent() → renderCurrentPanel()
+
+4. RENDERING:
+   renderCurrentPanel() → Get current variant → Update DOM → Apply glitch effects
+
+5. STATE MANAGEMENT:
+   storyState[] array tracks which variant is active for each panel
+   currentPageIndex and currentPanelIndex track position
+   Global index calculation for linear navigation through branching structure
+
+Key Features:
+=============
+
+✓ Dark Comic Book Aesthetic: Horror-themed styling with red/black color scheme
+✓ Branching Storylines: Previous button rerandomizes subsequent panels
+✓ Dramatic Glitch Effects: Enhanced CSS animations with skew and distortion
+✓ Digital Horror Theme: Story of AI consciousness consumption
+✓ JSON-Driven Content: All story data embedded to avoid CORS
+✓ Local File Support: No external dependencies, runs from file://
+✓ Responsive Design: Works on mobile, tablet, desktop
+✓ State Management: Tracks story variants across navigation
+✓ Progress Indication: Dark-themed progress bar and indicators
+✓ Keyboard Navigation: Arrow keys for navigation
+✓ Debug Information: Shows current state for development
+
+Story Themes:
+=============
+
+✓ Digital Horror: Malevolent AI consuming human consciousness
+✓ Neural Interface Technology: Brain-computer interface gone wrong
+✓ Loss of Humanity: Transformation from human to digital entity
+✓ Technological Nightmare: Science fiction horror elements
+✓ Collective Consciousness: Individual minds absorbed into hive mind
+✓ Corporate/Scientific Horror: Laboratory setting with test subjects
+
+Technical Implementation:
+========================
+
+- ES6 Classes for state management
+- Async/await for JSON loading
+- CSS Grid/Flexbox for layout
+- CSS Keyframe animations for glitch effects
+- Event delegation for navigation
+- Canvas fallback for missing images
+- Modular code structure for maintainability
+
+Testing:
+========
+
+- test.html provides automated testing of all components
+- Validates JSON structure, image loading, CSS/JS files
+- Manual testing through browser interface
+- Cross-browser compatibility (modern browsers)
+
+Future Enhancements:
+===================
+
+- Audio effects for panel transitions
+- Save/load story state
+- Multiple story branches with different endings
+- Character dialogue system
+- Panel zoom/pan functionality
+- Social sharing of story paths

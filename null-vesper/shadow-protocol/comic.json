@@ -1,0 +1,246 @@
+{
+  "title": "Glitch Tales: The Reality Breach",
+  "description": "A branching comic where reality itself can be rewritten",
+  "pages": [
+    {
+      "number": 1,
+      "title": "The Discovery",
+      "panels": [
+        {
+          "id": "p1_1",
+          "variants": [
+            {
+              "image": "img/p1_panel1_a.jpg",
+              "caption": "Dr. Sarah Chen stared at the anomalous readings on her quantum computer screen.",
+              "dialog": "",
+              "sfx": ""
+            },
+            {
+              "image": "img/p1_panel1_b.jpg",
+              "caption": "The laboratory hummed with an otherworldly energy as Sarah discovered the impossible.",
+              "dialog": "",
+              "sfx": "BZZZZT"
+            }
+          ]
+        },
+        {
+          "id": "p1_2",
+          "variants": [
+            {
+              "image": "img/p1_panel2_a.jpg",
+              "caption": "",
+              "dialog": "These quantum fluctuations... they're not random. There's a pattern.",
+              "sfx": ""
+            },
+            {
+              "image": "img/p1_panel2_b.jpg",
+              "caption": "",
+              "dialog": "Something is trying to communicate through the quantum foam itself!",
+              "sfx": "WHIRRRR"
+            }
+          ]
+        },
+        {
+          "id": "p1_3",
+          "variants": [
+            {
+              "image": "img/p1_panel3_a.jpg",
+              "caption": "The screen flickered as reality began to bend around the laboratory.",
+              "dialog": "",
+              "sfx": "GLITCH"
+            },
+            {
+              "image": "img/p1_panel3_b.jpg",
+              "caption": "Suddenly, the air itself seemed to tear like fabric.",
+              "dialog": "",
+              "sfx": "RIIIIIP"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "The Breach",
+      "panels": [
+        {
+          "id": "p2_1",
+          "variants": [
+            {
+              "image": "img/p2_panel1_a.jpg",
+              "caption": "Through the tear in reality, Sarah glimpsed another world entirely.",
+              "dialog": "",
+              "sfx": ""
+            },
+            {
+              "image": "img/p2_panel1_b.jpg",
+              "caption": "The breach revealed a mirror universe where everything was inverted.",
+              "dialog": "",
+              "sfx": "WHOOOOSH"
+            }
+          ]
+        },
+        {
+          "id": "p2_2",
+          "variants": [
+            {
+              "image": "img/p2_panel2_a.jpg",
+              "caption": "",
+              "dialog": "I have to document this... but who would believe me?",
+              "sfx": ""
+            },
+            {
+              "image": "img/p2_panel2_b.jpg",
+              "caption": "",
+              "dialog": "The equations were wrong... reality itself is programmable!",
+              "sfx": "BEEP BEEP"
+            }
+          ]
+        },
+        {
+          "id": "p2_3",
+          "variants": [
+            {
+              "image": "img/p2_panel3_a.jpg",
+              "caption": "A figure emerged from the breach - Sarah's own reflection, but wrong somehow.",
+              "dialog": "",
+              "sfx": "STEP"
+            },
+            {
+              "image": "img/p2_panel3_b.jpg",
+              "caption": "The other Sarah smiled with too many teeth and eyes that glowed with digital fire.",
+              "dialog": "",
+              "sfx": "STATIC"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "The Choice",
+      "panels": [
+        {
+          "id": "p3_1",
+          "variants": [
+            {
+              "image": "img/p3_panel1_a.jpg",
+              "caption": "",
+              "dialog": "You've found the source code of reality. Will you help us rewrite it?",
+              "sfx": ""
+            },
+            {
+              "image": "img/p3_panel1_b.jpg",
+              "caption": "",
+              "dialog": "Your universe is just one branch in an infinite tree. We can show you the others.",
+              "sfx": "WHISPER"
+            }
+          ]
+        },
+        {
+          "id": "p3_2",
+          "variants": [
+            {
+              "image": "img/p3_panel2_a.jpg",
+              "caption": "Sarah reached toward the breach, her hand trembling with possibility.",
+              "dialog": "",
+              "sfx": ""
+            },
+            {
+              "image": "img/p3_panel2_b.jpg",
+              "caption": "Sarah stepped back, fear and wonder warring in her mind.",
+              "dialog": "",
+              "sfx": "HEARTBEAT"
+            }
+          ]
+        },
+        {
+          "id": "p3_3",
+          "variants": [
+            {
+              "image": "img/p3_panel3_a.jpg",
+              "caption": "The choice would echo across infinite realities...",
+              "dialog": "I... I need to think about this.",
+              "sfx": ""
+            },
+            {
+              "image": "img/p3_panel3_b.jpg",
+              "caption": "The moment of decision arrived like a thunderclap.",
+              "dialog": "Show me everything.",
+              "sfx": "BOOM"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Consequences",
+      "panels": [
+        {
+          "id": "p4_1",
+          "variants": [
+            {
+              "image": "img/p4_panel1_a.jpg",
+              "caption": "Reality fractured into a thousand possible paths.",
+              "dialog": "",
+              "sfx": "SHATTER"
+            },
+            {
+              "image": "img/p4_panel1_b.jpg",
+              "caption": "The laboratory dissolved into pure information.",
+              "dialog": "",
+              "sfx": "DISSOLVE"
+            }
+          ]
+        },
+        {
+          "id": "p4_2",
+          "variants": [
+            {
+              "image": "img/p4_panel2_a.jpg",
+              "caption": "",
+              "dialog": "Every choice creates a new branch. Every branch creates new possibilities.",
+              "sfx": ""
+            },
+            {
+              "image": "img/p4_panel2_b.jpg",
+              "caption": "",
+              "dialog": "Welcome to the space between realities, where all stories are true.",
+              "sfx": "ECHO"
+            }
+          ]
+        },
+        {
+          "id": "p4_3",
+          "variants": [
+            {
+              "image": "img/p4_panel3_a.jpg",
+              "caption": "Sarah found herself floating in an ocean of infinite stories.",
+              "dialog": "What have I become?",
+              "sfx": ""
+            },
+            {
+              "image": "img/p4_panel3_b.jpg",
+              "caption": "Sarah realized she was now part of the code itself.",
+              "dialog": "I am the glitch in the system.",
+              "sfx": "DIGITAL"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "totalPages": 4,
+    "totalPanels": 12,
+    "branchingPoints": [
+      "p1_1", "p1_2", "p1_3",
+      "p2_1", "p2_2", "p2_3", 
+      "p3_1", "p3_2", "p3_3",
+      "p4_1", "p4_2", "p4_3"
+    ],
+    "themes": ["quantum physics", "reality manipulation", "choice and consequence", "digital horror"],
+    "version": "1.0"
+  }
+}

@@ -8,7 +8,7 @@ async function loadComic(issueFile) {
   
   // Initialize random story path
   storyPath = comicData.pages.map(page => 
-    page.panels.map(panel => Math.floor(Math.random() * panel.alts.length))
+    page.panels.map(panel => Math.floor(Math.random() * panel.alternates.length))
   );
 
   pageIndex = 0;
@@ -22,8 +22,8 @@ function renderPage() {
   const page = comicData.pages[pageIndex];
   
   page.panels.forEach((panel, panelIndex) => {
-    const altIndex = storyPath[pageIndex][panelIndex];
-    const alt = panel.alts[altIndex];
+  const altIndex = storyPath[pageIndex][panelIndex];
+  const alt = panel.alternates[altIndex];
 
     const panelEl = document.createElement("div");
     panelEl.classList.add("panel");
@@ -84,7 +84,7 @@ function prevPage(randomize) {
       for (let p = pageIndex; p < comicData.pages.length; p++) {
         for (let pn = 0; pn < comicData.pages[p].panels.length; pn++) {
           const panel = comicData.pages[p].panels[pn];
-          let newAlt = Math.floor(Math.random() * panel.alts.length);
+          let newAlt = Math.floor(Math.random() * panel.alternates.length);
           storyPath[p][pn] = newAlt;
         }
       }

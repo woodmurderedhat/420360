@@ -1,0 +1,154 @@
+FRAGMENTS OF SANDRA - INTERACTIVE COMIC FRAMEWORK
+=================================================
+
+PROJECT STRUCTURE:
+------------------
+null-vesper/Sandra/
+├── index.html          (Main HTML structure + SEO metadata)
+├── style.css           (Cyberpunk styling + glitch effects)
+├── comic.js            (Comic engine with embedded data)
+├── img/                (Comic panel images + assets)
+│   ├── favicon.ico     (Site favicon)
+│   ├── banner.png      (Social media banner)
+│   ├── panel1a.webp    (Reality A variants)
+│   ├── panel1b.webp    (Reality B variants)
+│   └── ...             (25+ total images)
+├── docs/               (Documentation)
+│   ├── storyline.md    (Original story outline)
+│   ├── exercise1.md    (Project requirements)
+│   └── imageprompts.md (AI image generation prompts)
+├── create_placeholders.html (Utility for generating test images)
+└── framework.txt       (This file)
+
+SYSTEM ARCHITECTURE:
+===================
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   index.html    │    │    style.css    │    │    comic.js     │
+│                 │    │                 │    │                 │
+│ ┌─────────────┐ │    │ ┌─────────────┐ │    │ ┌─────────────┐ │
+│ │Comic Header │ │    │ │Cyberpunk    │ │    │ │ComicEngine  │ │
+│ │Panel Area   │ │◄───┤ │Theme        │ │◄───┤ │Class        │ │
+│ │Navigation   │ │    │ │Glitch FX    │ │    │ │State Mgmt   │ │
+│ │UI Elements  │ │    │ │Footer Style │ │    │ │Navigation   │ │
+│ │Footer Links │ │    │ │Responsive   │ │    │ │COMIC_DATA   │ │
+│ └─────────────┘ │    │ └─────────────┘ │    │ │(embedded)   │ │
+└─────────────────┘    └─────────────────┘    │ └─────────────┘ │
+         │                       │            └─────────────────┘
+         │                       │                     │
+         └───────────────────────┼─────────────────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────┐
+                    │   img/ folder   │
+                    │                 │
+                    │ ┌─────────────┐ │
+                    │ │Panel Images │ │
+                    │ │23 JPG files │ │
+                    │ │Cyberpunk Art│ │
+                    │ └─────────────┘ │
+                    └─────────────────┘
+
+DATA FLOW:
+==========
+
+1. PAGE LOAD:
+   index.html → comic.js → ComicEngine.init()
+
+2. INITIALIZATION:
+   ComicEngine uses embedded COMIC_DATA → initializeStoryState()
+
+3. PANEL RENDERING:
+   renderCurrentPanel() → COMIC_DATA.panels[panelIndex] → storyState[variantIndex] → DOM update
+
+4. NAVIGATION:
+   User clicks Next/Previous → goToNext()/goToPrevious() → triggerGlitchTransition() → renderCurrentPanel()
+
+5. REALITY SWITCHING LOGIC:
+   goToPrevious() → switchReality() → intense glitch effect → switches between Reality A/B
+   goToNext() → stay in current reality → tame glitch effect → maintains story consistency
+
+KEY FEATURES:
+=============
+
+REALITY SWITCHING SYSTEM:
+- Each panel has A/B variants (Reality A: car accident, Reality B: overdose)
+- Forward navigation (Next) stays in current reality with tame glitch effect
+- Backward navigation (Previous) switches reality with intense glitch effect
+- Maintains story consistency within each reality timeline
+
+GLITCH EFFECTS:
+- CSS animations for panel transitions
+- Intense glitch overlay for reality switching (Previous button)
+- Tame glitch overlay for forward navigation (Next button)
+- Cyberpunk visual aesthetic with different effect intensities
+
+STATE MANAGEMENT:
+- storyState[] array tracks current variant per panel
+- currentReality tracks active reality (A or B)
+- currentPanelIndex tracks position
+- Navigation buttons update based on position
+
+RESPONSIVE DESIGN:
+- Mobile-friendly layout
+- Keyboard navigation (arrow keys)
+- Error handling for missing images
+
+TECHNICAL IMPLEMENTATION:
+========================
+
+COMIC ENGINE CLASS METHODS:
+- init(): Initialize comic system
+- initializeStoryState(): Set consistent reality variants
+- renderCurrentPanel(): Display current panel
+- goToNext()/goToPrevious(): Navigation logic with reality management
+- triggerGlitchTransition(isIntense): Visual effects with intensity control
+- switchReality(): Toggle between Reality A and B
+
+CSS FEATURES:
+- CSS Grid/Flexbox layout
+- Keyframe animations for glitch effects (intense/tame variants)
+- CSS custom properties for theming
+- Media queries for responsiveness
+- Transform animations for reality switching effects
+
+EMBEDDED DATA STRUCTURE:
+- COMIC_DATA.panels[]: Array of panel objects
+- variants[]: A/B reality versions per panel
+- Dialogue, captions, image references
+- Speaker attribution and reality markers
+- No external file dependencies
+
+SEO & SOCIAL FEATURES:
+- Comprehensive Open Graph metadata for Facebook/LinkedIn
+- Twitter Card support with large image preview
+- Favicon integration for browser tabs
+- SEO-optimized description and keywords
+- Social media banner (banner.png) for sharing
+
+USAGE INSTRUCTIONS:
+==================
+
+1. Open index.html in web browser
+2. Use Next/Previous buttons or arrow keys to navigate
+3. Next button: Stay in current reality with tame glitch effect
+4. Previous button: Switch reality with intense glitch effect
+5. Panel 12 is the convergence point (shared ending)
+6. Reality indicator shows current timeline (A/B/Convergence)
+
+CUSTOMIZATION:
+==============
+
+To modify the comic:
+1. Edit COMIC_DATA object in comic.js to change dialogue/story
+2. Replace images in img/ folder
+3. Modify CSS variables in style.css for different themes
+4. Extend ComicEngine class for additional features
+
+BROWSER COMPATIBILITY:
+=====================
+
+- Modern browsers with ES6+ support
+- Local file:// protocol compatible
+- No external dependencies or CORS issues
+- Responsive design for mobile/desktop

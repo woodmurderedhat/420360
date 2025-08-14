@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Placeholder Generator</title>
+</head>
+<body>
+    <h1>Generating Placeholder Images...</h1>
+    <div id="output"></div>
+    
+    <script>
+        function createPlaceholderImage(filename, panelText, realityText, width = 600, height = 400) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            // Dark cyberpunk background with gradient
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, '#0a0a0a');
+            gradient.addColorStop(0.5, '#1a1a1a');
+            gradient.addColorStop(1, '#0a0a0a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Neon border
+            ctx.strokeStyle = realityText.includes('A') ? '#00ffff' : '#ff0080';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(10, 10, width - 20, height - 20);
+            
+            // Inner glow effect
+            ctx.strokeStyle = realityText.includes('A') ? 'rgba(0, 255, 255, 0.3)' : 'rgba(255, 0, 128, 0.3)';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(15, 15, width - 30, height - 30);
+            
+            // Title
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(panelText, width / 2, 60);
+            
+            // Reality indicator
+            ctx.fillStyle = realityText.includes('A') ? '#00ffff' : '#ff0080';
+            ctx.font = 'bold 18px Arial';
+            ctx.fillText(`Reality ${realityText}`, width / 2, 90);
+            
+            // Panel content area
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(50, 120, width - 100, height - 200);
+            
+            // Placeholder text
+            ctx.fillStyle = '#cccccc';
+            ctx.font = '16px Arial';
+            ctx.fillText('COMIC PANEL IMAGE', width / 2, height / 2 - 20);
+            ctx.fillText('Cyberpunk Scene', width / 2, height / 2);
+            ctx.fillText(filename, width / 2, height / 2 + 20);
+            
+            // Glitch effect lines
+            ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 5; i++) {
+                const y = Math.random() * height;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+            
+            return canvas.toDataURL('image/jpeg', 0.8);
+        }
+        
+        function downloadImage(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = dataUrl;
+            link.click();
+        }
+        
+        // Generate all placeholder images
+        const images = [
+            { file: 'panel1a.jpg', text: 'Panel 1A', reality: 'A - Car Accident' },
+            { file: 'panel1b.jpg', text: 'Panel 1B', reality: 'B - Overdose' },
+            { file: 'panel2a.jpg', text: 'Panel 2A', reality: 'A - Morgue' },
+            { file: 'panel2b.jpg', text: 'Panel 2B', reality: 'B - Recovery Unit' },
+            { file: 'panel3a.jpg', text: 'Panel 3A', reality: 'A - Age 13' },
+            { file: 'panel3b.jpg', text: 'Panel 3B', reality: 'B - Age 17' },
+            { file: 'panel4a.jpg', text: 'Panel 4A', reality: 'A - Traffic Safety' },
+            { file: 'panel4b.jpg', text: 'Panel 4B', reality: 'B - Substance Registry' },
+            { file: 'panel5a.jpg', text: 'Panel 5A', reality: 'A - AI Malfunction News' },
+            { file: 'panel5b.jpg', text: 'Panel 5B', reality: 'B - Drug Wave News' },
+            { file: 'panel6a.jpg', text: 'Panel 6A', reality: 'A - Grave 2089-2102' },
+            { file: 'panel6b.jpg', text: 'Panel 6B', reality: 'B - Grave 2085-2102' },
+            { file: 'panel7a.jpg', text: 'Panel 7A', reality: 'A - Memory Corrupted' },
+            { file: 'panel7b.jpg', text: 'Panel 7B', reality: 'B - Memory Edited' },
+            { file: 'panel8a.jpg', text: 'Panel 8A', reality: 'A - Toy Car' },
+            { file: 'panel8b.jpg', text: 'Panel 8B', reality: 'B - Pill Bottle' },
+            { file: 'panel9a.jpg', text: 'Panel 9A', reality: 'A - Saw Him' },
+            { file: 'panel9b.jpg', text: 'Panel 9B', reality: 'B - Felt Him' },
+            { file: 'panel10a.jpg', text: 'Panel 10A', reality: 'A - Crash Holograms' },
+            { file: 'panel10b.jpg', text: 'Panel 10B', reality: 'B - Overdose Holograms' },
+            { file: 'panel11a.jpg', text: 'Panel 11A', reality: 'A - Memory Integrity' },
+            { file: 'panel11b.jpg', text: 'Panel 11B', reality: 'B - Identity Integrity' },
+            { file: 'panel12.jpg', text: 'Panel 12', reality: 'SHARED - Convergence' }
+        ];
+        
+        let output = document.getElementById('output');
+        output.innerHTML = '<p>Click the links below to download placeholder images:</p>';
+        
+        images.forEach(img => {
+            const dataUrl = createPlaceholderImage(img.file, img.text, img.reality);
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = img.file;
+            link.textContent = `Download ${img.file}`;
+            link.style.display = 'block';
+            link.style.margin = '5px 0';
+            output.appendChild(link);
+        });
+        
+        output.innerHTML += '<p><strong>Instructions:</strong> Right-click each link and save the images to the img/ folder.</p>';
+    </script>
+</body>
+</html>

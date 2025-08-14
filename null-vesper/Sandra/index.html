@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fragments of Sandra - Interactive Comic</title>
+    <meta name="description" content="Experience a mind-bending cyberpunk interactive comic where reality glitches between two tragic timelines. Navigate Sandra's fractured memories of loss in a dystopian future where truth itself becomes corrupted.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://420360.xyz/null-vesper/Sandra/">
+    <meta property="og:title" content="Fragments of Sandra - Interactive Comic">
+    <meta property="og:description" content="Experience a mind-bending cyberpunk interactive comic where reality glitches between two tragic timelines. Navigate Sandra's fractured memories of loss in a dystopian future where truth itself becomes corrupted.">
+    <meta property="og:image" content="https://420360.xyz/null-vesper/Sandra/img/banner.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="420360">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://420360.xyz/null-vesper/Sandra/">
+    <meta property="twitter:title" content="Fragments of Sandra - Interactive Comic">
+    <meta property="twitter:description" content="Experience a mind-bending cyberpunk interactive comic where reality glitches between two tragic timelines. Navigate Sandra's fractured memories of loss in a dystopian future where truth itself becomes corrupted.">
+    <meta property="twitter:image" content="https://420360.xyz/null-vesper/Sandra/img/banner.png">
+    <meta property="twitter:creator" content="@woodmurderedhat">
+
+    <!-- Additional Meta Tags -->
+    <meta name="author" content="woodmurderedhat">
+    <meta name="publisher" content="420360">
+    <meta name="keywords" content="interactive comic, cyberpunk, dystopian, reality glitch, Sandra, fragments, webcomic, interactive fiction, sci-fi">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#00ffff">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="comic-container">
+        <header class="comic-header">
+            <h1 class="comic-title">Fragments of Sandra</h1>
+            <p class="comic-subtitle">A Glitching Reality</p>
+        </header>
+        
+        <main class="comic-main">
+            <div class="panel-container" id="panelContainer">
+                <!-- Comic panels will be dynamically loaded here -->
+            </div>
+            
+            <div class="panel-info">
+                <span id="panelCounter">Panel 1 of 12</span>
+                <span id="realityIndicator">Reality: ?</span>
+            </div>
+        </main>
+        
+        <nav class="comic-navigation">
+            <button id="prevBtn" class="nav-btn prev-btn" disabled>
+                <span class="btn-text">Previous</span>
+                <span class="btn-subtext">Glitch Reality</span>
+            </button>
+            
+            <button id="nextBtn" class="nav-btn next-btn">
+                <span class="btn-text">Next</span>
+                <span class="btn-subtext">Continue</span>
+            </button>
+        </nav>
+        
+        <div class="story-state">
+            <p class="state-text">Navigate backward to experience alternate realities</p>
+        </div>
+
+        <footer class="comic-footer">
+            <p class="footer-text">
+                Created by <a href="https://woodmurderedhat.com" target="_blank" rel="noopener noreferrer">woodmurderedhat</a> |
+                Published by <a href="https://420360.xyz" target="_blank" rel="noopener noreferrer">420360</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Glitch overlay for transitions -->
+    <div class="glitch-overlay" id="glitchOverlay"></div>
+    
+    <script src="comic.js"></script>
+</body>
+</html>

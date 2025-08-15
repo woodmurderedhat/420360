@@ -240,8 +240,8 @@ const COMIC_DATA = {
         {
           "reality": "SHARED",
           "image": "img/panel12.webp",
-          "dialogue": "Mom… which one is real?",
-          "speaker": "Child",
+          "dialogue": "Which one is real?",
+          "speaker": "Null Vesper",
           "response": "…I don't remember anymore.",
           "responseBy": "Sandra",
           "caption": "Final ambiguous ending in white void",

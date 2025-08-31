@@ -262,6 +262,7 @@
             <div>Time: <span id="timer">0</span>s</div>
             <div>Level: <span id="level">1</span></div>
             <div>Glitches: <span id="glitchCount">0</span></div>
+            <div>Best Level: <span id="bestLevel">0</span></div>
         </div>
         
         <div class="game-board">
@@ -302,6 +303,7 @@
         const timerElement = document.getElementById('timer');
         const levelElement = document.getElementById('level');
         const glitchCountElement = document.getElementById('glitchCount');
+        const bestLevelElement = document.getElementById('bestLevel');
         const gameOverElement = document.getElementById('gameOver');
         const finalTimeElement = document.getElementById('finalTime');
         const finalGlitchesElement = document.getElementById('finalGlitches');
@@ -318,6 +320,10 @@
         let glitchCount = 0;
         let gameTimer = null;
         let glitchTimer = null;
+
+        // Load best level from localStorage
+        let bestLevel = parseInt(localStorage.getItem('glitchMazeBestLevel') || '0', 10);
+        bestLevelElement.textContent = bestLevel;
 
         // Colors matching the retro theme
         const COLORS = {
@@ -499,6 +505,13 @@
             gameRunning = false;
             clearInterval(gameTimer);
             clearInterval(glitchTimer);
+            
+            // Update best level if current level is higher
+            if (level > bestLevel) {
+                bestLevel = level;
+                localStorage.setItem('glitchMazeBestLevel', bestLevel.toString());
+                bestLevelElement.textContent = bestLevel;
+            }
             
             finalTimeElement.textContent = Math.floor(currentTime);
             finalGlitchesElement.textContent = glitchCount;

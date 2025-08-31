@@ -652,6 +652,42 @@ function makePopup(ad){
   p.style.setProperty('--rotation', rotation);
   p.style.transform = `scale(${scale}) rotate(${rotation})`;
 
+  // Random color scheme selection - red, yellow, green, black
+  const colorSchemes = [
+    { // Red scheme
+      bg: '#2a1a1a',
+      primary: '#cc3333',
+      secondary: '#8b2635',
+      highlight: '#ff6666'
+    },
+    { // Yellow scheme
+      bg: '#2a2a1a',
+      primary: '#cccc33',
+      secondary: '#8b8b35',
+      highlight: '#ffff66'
+    },
+    { // Green scheme
+      bg: '#1a2a1a',
+      primary: '#4a8c3a',
+      secondary: '#7b5e8b',
+      highlight: '#8fbc8f'
+    },
+    { // Black scheme
+      bg: '#1a1a1a',
+      primary: '#666666',
+      secondary: '#444444',
+      highlight: '#cccccc'
+    }
+  ];
+  
+  const selectedScheme = colorSchemes[Math.floor(Math.random() * colorSchemes.length)];
+  
+  // Apply the selected color scheme to this popup
+  p.style.setProperty('--bg', selectedScheme.bg);
+  p.style.setProperty('--primary', selectedScheme.primary);
+  p.style.setProperty('--secondary', selectedScheme.secondary);
+  p.style.setProperty('--highlight', selectedScheme.highlight);
+
   // position (attempt to avoid overlap)
   const pos = findNonOverlappingPosition();
   p.style.left = pos.x + 'px';

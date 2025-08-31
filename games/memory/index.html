@@ -314,6 +314,10 @@
                 <span>TIME</span>
                 <span class="stat-value" id="timer">00:00</span>
             </div>
+            <div class="stat">
+                <span>BEST SCORE</span>
+                <span class="stat-value" id="bestScore">0</span>
+            </div>
         </div>
         
         <div class="controls">
@@ -342,6 +346,7 @@
         <h2 id="messageTitle">CONGRATULATIONS!</h2>
         <p id="messageText">You completed the game!</p>
         <p>Moves: <span id="finalMoves">0</span> | Time: <span id="finalTime">00:00</span></p>
+        <p>Score: <span id="finalScore">0</span></p>
         <button class="btn" onclick="startNewGame()">PLAY AGAIN</button>
     </div>
 
@@ -355,6 +360,10 @@
         let gameTimer = null;
         let gameTime = 0;
         let currentDifficulty = 'medium';
+
+        // Load best score from localStorage
+        let bestScore = parseInt(localStorage.getItem('memoryBestScore') || '0', 10);
+        document.getElementById('bestScore').textContent = bestScore;
 
         // Card symbols for different difficulties
         const SYMBOLS = {
@@ -549,8 +558,23 @@
             const seconds = gameTime % 60;
             const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
+            // Calculate score: higher difficulty + fewer moves + less time = better score
+            const difficultyMultiplier = { easy: 100, medium: 200, hard: 300 }[currentDifficulty];
+            const timeBonus = Math.max(0, 300 - gameTime); // bonus for completing faster
+            const moveBonus = Math.max(0, 50 - moves); // bonus for fewer moves
+            const score = difficultyMultiplier + timeBonus + moveBonus;
+            
+            // Update best score if needed
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('memoryBestScore', bestScore.toString());
+                document.getElementById('bestScore').textContent = bestScore;
+                document.getElementById('messageTitle').textContent = 'NEW BEST SCORE!';
+            }
+            
             document.getElementById('finalMoves').textContent = moves;
             document.getElementById('finalTime').textContent = timeString;
+            document.getElementById('finalScore').textContent = score;
             
             showMessage();
         }

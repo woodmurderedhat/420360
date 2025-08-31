@@ -22,6 +22,7 @@
 	.tagrow{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:auto;}
 	.tag{font-size:7px;padding:2px 4px;background:var(--primary);color:#000;letter-spacing:1px;}
 	.card img.preview{width:100%;height:100px;object-fit:cover;image-rendering:pixelated;border:3px solid var(--primary);box-shadow:0 0 0 3px var(--secondary),4px 4px 0 0 var(--highlight);background:#000;margin:0 0 6px 0;}
+	.score-display{font-size:8px;color:var(--highlight);text-shadow:1px 1px 0 var(--primary);margin:4px 0 2px 0;min-height:12px;}
 	.ascii{font-family:monospace;font-size:8px;line-height:10px;white-space:pre;text-align:center;color:var(--primary);text-shadow:0 0 4px var(--secondary);} 
 	.banner{max-width:260px;margin:0 auto 20px auto;display:block;border:4px solid var(--primary);box-shadow:0 0 0 4px var(--secondary),6px 6px 0 0 var(--highlight),0 0 0 8px #000;}
 	.filters{max-width:1200px;margin:0 auto 18px auto;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
@@ -54,14 +55,14 @@
 // Available IDs reference: 3PLAXg1osLVVttjRTN, WveGOgFwcI6uTn2khE, eYDnuFt0MckAb3xdSH, DfqSbJVYLHmO8QFn1R,
 // 7Ti0iZdo5QCiWJfMvA, qxJ9pAQCBIJLxfelCv, HtCcDJ134eAICJZjLb, JeEjGpM2TVZGaM5BuE
 const GAMES = [
-	{ id:'tarot-tetromino', name:'TAROT TETROMINO', url:'tarot-tetromino/', tags:['puzzle','experimental','retro'], blurb:'Arcana-fused falling blocks.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif' },
-	{ id:'glitch-maze', name:'GLITCH MAZE', url:'glitch-maze/', tags:['puzzle','experimental'], blurb:'Escape distortion.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif' },
-	{ id:'neon-simon', name:'NEON SIMON', url:'neon-simon/', tags:['memory','retro'], blurb:'Sequence recall glow.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif' },
-	{ id:'pixel-rain', name:'PIXEL RAIN', url:'pixel-rain/', tags:['experimental','retro'], blurb:'Falling pixel ambience.', gif:'https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif' },
-	{ id:'pong', name:'PONG CLASSIC', url:'pong/', tags:['arcade','retro'], blurb:'OG duel of reflex.', gif:'https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif' },
-	{ id:'snake', name:'SNAKE', url:'snake/', tags:['arcade','retro'], blurb:'Devour & grow.', gif:'https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif' },
-	{ id:'memory', name:'MEMORY CARDS', url:'memory/', tags:['memory','puzzle'], blurb:'Flip & match pairs.', gif:'https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif' },
-	{ id:'breakout', name:'BREAKOUT', url:'breakout/', tags:['arcade','retro'], blurb:'Brick smashing zen.', gif:'https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif' },
+	{ id:'tarot-tetromino', name:'TAROT TETROMINO', url:'tarot-tetromino/', tags:['puzzle','experimental','retro'], blurb:'Arcana-fused falling blocks.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif', scoreKey:'tetrisLeaderboard', scoreType:'leaderboard' },
+	{ id:'glitch-maze', name:'GLITCH MAZE', url:'glitch-maze/', tags:['puzzle','experimental'], blurb:'Escape distortion.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif', scoreKey:'glitchMazeBestLevel', scoreType:'level' },
+	{ id:'neon-simon', name:'NEON SIMON', url:'neon-simon/', tags:['memory','retro'], blurb:'Sequence recall glow.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif', scoreKey:'neonSimonBest', scoreType:'score' },
+	{ id:'pixel-rain', name:'PIXEL RAIN', url:'pixel-rain/', tags:['experimental','retro'], blurb:'Falling pixel ambience.', gif:'https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif', scoreKey:'pixelRainBest', scoreType:'score' },
+	{ id:'pong', name:'PONG CLASSIC', url:'pong/', tags:['arcade','retro'], blurb:'OG duel of reflex.', gif:'https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif', scoreKey:'pongBestWins', scoreType:'wins' },
+	{ id:'snake', name:'SNAKE', url:'snake/', tags:['arcade','retro'], blurb:'Devour & grow.', gif:'https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif', scoreKey:'snakeHighScore', scoreType:'score' },
+	{ id:'memory', name:'MEMORY CARDS', url:'memory/', tags:['memory','puzzle'], blurb:'Flip & match pairs.', gif:'https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif', scoreKey:'memoryBestScore', scoreType:'score' },
+	{ id:'breakout', name:'BREAKOUT', url:'breakout/', tags:['arcade','retro'], blurb:'Brick smashing zen.', gif:'https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif', scoreKey:'breakoutHighScore', scoreType:'score' },
 	{ id:'generative-art', name:'GENERATIVE ART', url:'generative-art/', tags:['experimental'], blurb:'Procedural visuals.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif' },
 	{ id:'tim-the-dialogue-oracle', name:'TIM • ORACLE', url:'../tim-the-dialogue-oracle/', tags:['experimental'], blurb:'Conversational mystic.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif' },
 	{ id:'noctis-reverie', name:'NOCTIS REVERIE', url:'noctis-reverie/', tags:['experimental'], blurb:'Dreamlike voyage.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif' }
@@ -72,6 +73,43 @@ const emptyMsg = document.getElementById('emptyMsg');
 const searchInput = document.getElementById('gameSearch');
 const filterBtns = Array.from(document.querySelectorAll('.filters button'));
 let activeTag = 'all';
+
+function getGameScore(game) {
+	if (!game.scoreKey) return null;
+	
+	try {
+		const stored = localStorage.getItem(game.scoreKey);
+		if (!stored) return null;
+		
+		switch (game.scoreType) {
+			case 'leaderboard':
+				const scores = JSON.parse(stored);
+				return scores.length > 0 ? scores[0].score : null;
+			case 'score':
+			case 'level':
+			case 'wins':
+				return parseInt(stored) || null;
+			default:
+				return null;
+		}
+	} catch (e) {
+		return null;
+	}
+}
+
+function formatScore(score, type) {
+	if (score === null) return 'No scores yet';
+	
+	switch (type) {
+		case 'level':
+			return `Level ${score}`;
+		case 'wins':
+			return `${score} wins`;
+		case 'score':
+		default:
+			return score.toString();
+	}
+}
 
 function render(){
 	grid.innerHTML='';
@@ -85,7 +123,11 @@ function render(){
 	filtered.forEach(g => {
 		const card = document.createElement('div');
 		card.className='card';
-		card.innerHTML = `<img class='preview' src='${g.gif}' alt='Preview for ${g.name}' loading='lazy'><h2>${g.name}</h2><small>${g.blurb}</small><div class="tagrow">${g.tags.map(t=>`<span class='tag'>${t.toUpperCase()}</span>`).join('')}</div>`;
+		
+		const score = getGameScore(g);
+		const scoreDisplay = g.scoreKey ? `<div class="score-display">Best: ${formatScore(score, g.scoreType)}</div>` : '';
+		
+		card.innerHTML = `<img class='preview' src='${g.gif}' alt='Preview for ${g.name}' loading='lazy'><h2>${g.name}</h2><small>${g.blurb}</small>${scoreDisplay}<div class="tagrow">${g.tags.map(t=>`<span class='tag'>${t.toUpperCase()}</span>`).join('')}</div>`;
 		card.addEventListener('click', ()=>{
 			const targetUrl = 'games/' + g.url + 'index.html';
 			// Prefer postMessage for decoupled communication

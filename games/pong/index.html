@@ -239,6 +239,7 @@
         <div class="score-display">
             <div class="player-score">Player: <span id="playerScore">0</span></div>
             <div class="player-score">CPU: <span id="cpuScore">0</span></div>
+            <div class="player-score">Best: <span id="bestWins">0</span></div>
         </div>
         
         <div class="game-board">
@@ -277,6 +278,7 @@
         const ctx = canvas.getContext('2d');
         const playerScoreElement = document.getElementById('playerScore');
         const cpuScoreElement = document.getElementById('cpuScore');
+        const bestWinsElement = document.getElementById('bestWins');
         const gameMessageElement = document.getElementById('gameMessage');
         const messageTitleElement = document.getElementById('messageTitle');
         const messageTextElement = document.getElementById('messageText');
@@ -291,6 +293,10 @@
         let gameRunning = false;
         let gameLoop = null;
         let playerMoving = null;
+
+        // Load best wins from localStorage
+        let bestWins = parseInt(localStorage.getItem('pongBestWins') || '0', 10);
+        bestWinsElement.textContent = bestWins;
 
         // Game objects
         let player = {
@@ -474,7 +480,16 @@
             if (player.score >= WINNING_SCORE) {
                 gameRunning = false;
                 clearInterval(gameLoop);
-                showWinMessage('YOU WIN!', 'Congratulations!');
+                
+                // Update best wins if player won
+                if (player.score > bestWins) {
+                    bestWins = player.score;
+                    localStorage.setItem('pongBestWins', bestWins.toString());
+                    bestWinsElement.textContent = bestWins;
+                    showWinMessage('NEW BEST SCORE!', 'You set a new record!');
+                } else {
+                    showWinMessage('YOU WIN!', 'Congratulations!');
+                }
             } else if (cpu.score >= WINNING_SCORE) {
                 gameRunning = false;
                 clearInterval(gameLoop);

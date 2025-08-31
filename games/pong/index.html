@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong - 420360</title>
+    
+    <!-- Retro pixel font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #181825;
+            --primary: #00fff7;
+            --secondary: #ff00ea;
+            --highlight: #fff700;
+            --text: #ffffff;
+            --danger: #ff0040;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            image-rendering: pixelated;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .game-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-shadow: 2px 2px 0 var(--secondary);
+        }
+
+        .game-board {
+            border: 4px solid var(--primary);
+            box-shadow: 
+                0 0 0 4px var(--secondary),
+                8px 8px 0 0 var(--highlight),
+                0 0 0 8px #000;
+            background: #000;
+            margin: 0 auto 20px auto;
+            position: relative;
+        }
+
+        .score-display {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--highlight);
+            display: flex;
+            justify-content: space-around;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .player-score {
+            padding: 0 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: var(--bg);
+            border: 3px solid var(--primary);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 12px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 3px 3px 0 var(--secondary);
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            color: var(--bg);
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 var(--secondary);
+        }
+
+        .btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0 0 0 var(--secondary);
+        }
+
+        .instructions {
+            margin-top: 20px;
+            font-size: 10px;
+            line-height: 1.6;
+            max-width: 500px;
+            color: var(--text);
+        }
+
+        .mobile-controls {
+            display: none;
+            justify-content: space-between;
+            margin-top: 20px;
+            max-width: 400px;
+            gap: 20px;
+        }
+
+        .player-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mobile-btn {
+            background: var(--bg);
+            border: 2px solid var(--primary);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mobile-btn:hover {
+            background: var(--primary);
+            color: var(--bg);
+        }
+
+        .game-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg);
+            border: 4px solid var(--primary);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 
+                0 0 0 4px var(--secondary),
+                8px 8px 0 0 var(--highlight);
+            display: none;
+        }
+
+        .game-message h2 {
+            color: var(--primary);
+            font-size: 16px;
+            margin: 0 0 10px 0;
+        }
+
+        .game-message p {
+            font-size: 10px;
+            margin: 10px 0;
+        }
+
+        .win-message {
+            border-color: var(--highlight);
+        }
+
+        .win-message h2 {
+            color: var(--highlight);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: flex;
+            }
+            
+            .instructions {
+                font-size: 8px;
+            }
+            
+            h1 {
+                font-size: 18px;
+            }
+
+            .score-display {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>PONG</h1>
+        
+        <div class="score-display">
+            <div class="player-score">Player: <span id="playerScore">0</span></div>
+            <div class="player-score">CPU: <span id="cpuScore">0</span></div>
+        </div>
+        
+        <div class="game-board">
+            <canvas id="gameCanvas" width="600" height="400"></canvas>
+            <div id="gameMessage" class="game-message">
+                <h2 id="messageTitle">GET READY</h2>
+                <p id="messageText">Press SPACE to start</p>
+                <button class="btn" onclick="startGame()">START</button>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" class="btn" onclick="startGame()">START GAME</button>
+            <button class="btn" onclick="pauseGame()">PAUSE</button>
+        </div>
+        
+        <div class="mobile-controls">
+            <div class="player-controls">
+                <span style="font-size: 10px; color: var(--secondary);">PLAYER</span>
+                <button class="mobile-btn" onmousedown="startPlayerMove('up')" onmouseup="stopPlayerMove()" ontouchstart="startPlayerMove('up')" ontouchend="stopPlayerMove()">↑</button>
+                <button class="mobile-btn" onmousedown="startPlayerMove('down')" onmouseup="stopPlayerMove()" ontouchstart="startPlayerMove('down')" ontouchend="stopPlayerMove()">↓</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            Player: Use W/S keys or arrow keys to move your paddle.<br>
+            CPU: Computer controls the right paddle.<br>
+            First to 5 points wins!<br>
+            Press SPACE to serve the ball.
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const playerScoreElement = document.getElementById('playerScore');
+        const cpuScoreElement = document.getElementById('cpuScore');
+        const gameMessageElement = document.getElementById('gameMessage');
+        const messageTitleElement = document.getElementById('messageTitle');
+        const messageTextElement = document.getElementById('messageText');
+
+        const CANVAS_WIDTH = 600;
+        const CANVAS_HEIGHT = 400;
+        const PADDLE_WIDTH = 20;
+        const PADDLE_HEIGHT = 80;
+        const BALL_SIZE = 20;
+        const WINNING_SCORE = 5;
+
+        let gameRunning = false;
+        let gameLoop = null;
+        let playerMoving = null;
+
+        // Game objects
+        let player = {
+            x: 20,
+            y: CANVAS_HEIGHT / 2 - PADDLE_HEIGHT / 2,
+            width: PADDLE_WIDTH,
+            height: PADDLE_HEIGHT,
+            speed: 5,
+            score: 0
+        };
+
+        let cpu = {
+            x: CANVAS_WIDTH - 40,
+            y: CANVAS_HEIGHT / 2 - PADDLE_HEIGHT / 2,
+            width: PADDLE_WIDTH,
+            height: PADDLE_HEIGHT,
+            speed: 4,
+            score: 0
+        };
+
+        let ball = {
+            x: CANVAS_WIDTH / 2,
+            y: CANVAS_HEIGHT / 2,
+            width: BALL_SIZE,
+            height: BALL_SIZE,
+            speedX: 5,
+            speedY: 3,
+            serving: true
+        };
+
+        // Colors matching the retro theme
+        const COLORS = {
+            paddle: '#00fff7',
+            ball: '#fff700',
+            background: '#000000',
+            centerLine: '#ff00ea'
+        };
+
+        function startGame() {
+            gameRunning = true;
+            gameMessageElement.style.display = 'none';
+            ball.serving = false;
+            
+            if (gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(update, 1000 / 60); // 60 FPS
+            
+            document.getElementById('startBtn').textContent = 'RESTART';
+        }
+
+        function pauseGame() {
+            if (gameRunning) {
+                gameRunning = false;
+                clearInterval(gameLoop);
+                showMessage('PAUSED', 'Press START to continue');
+            }
+        }
+
+        function resetGame() {
+            player.score = 0;
+            cpu.score = 0;
+            updateScore();
+            resetBall();
+            showMessage('GET READY', 'Press SPACE to start');
+        }
+
+        function resetBall() {
+            ball.x = CANVAS_WIDTH / 2;
+            ball.y = CANVAS_HEIGHT / 2;
+            ball.speedX = (Math.random() > 0.5 ? 1 : -1) * 5;
+            ball.speedY = (Math.random() - 0.5) * 6;
+            ball.serving = true;
+        }
+
+        function update() {
+            if (!gameRunning) return;
+
+            // Move player paddle
+            if (playerMoving === 'up' && player.y > 0) {
+                player.y -= player.speed;
+            } else if (playerMoving === 'down' && player.y < CANVAS_HEIGHT - player.height) {
+                player.y += player.speed;
+            }
+
+            // Move CPU paddle (AI)
+            if (!ball.serving) {
+                const ballCenterY = ball.y + ball.height / 2;
+                const cpuCenterY = cpu.y + cpu.height / 2;
+                
+                if (ballCenterY < cpuCenterY - 10) {
+                    cpu.y -= cpu.speed;
+                } else if (ballCenterY > cpuCenterY + 10) {
+                    cpu.y += cpu.speed;
+                }
+                
+                // Keep CPU paddle in bounds
+                cpu.y = Math.max(0, Math.min(cpu.y, CANVAS_HEIGHT - cpu.height));
+            }
+
+            // Move ball
+            if (!ball.serving) {
+                ball.x += ball.speedX;
+                ball.y += ball.speedY;
+
+                // Ball collision with top/bottom walls
+                if (ball.y <= 0 || ball.y >= CANVAS_HEIGHT - ball.height) {
+                    ball.speedY = -ball.speedY;
+                }
+
+                // Ball collision with player paddle
+                if (ball.x <= player.x + player.width &&
+                    ball.y + ball.height >= player.y &&
+                    ball.y <= player.y + player.height &&
+                    ball.speedX < 0) {
+                    
+                    ball.speedX = -ball.speedX;
+                    // Add some angle based on where ball hits paddle
+                    const hitPoint = (ball.y + ball.height / 2 - player.y - player.height / 2) / (player.height / 2);
+                    ball.speedY = hitPoint * 5;
+                }
+
+                // Ball collision with CPU paddle
+                if (ball.x + ball.width >= cpu.x &&
+                    ball.y + ball.height >= cpu.y &&
+                    ball.y <= cpu.y + cpu.height &&
+                    ball.speedX > 0) {
+                    
+                    ball.speedX = -ball.speedX;
+                    // Add some angle based on where ball hits paddle
+                    const hitPoint = (ball.y + ball.height / 2 - cpu.y - cpu.height / 2) / (cpu.height / 2);
+                    ball.speedY = hitPoint * 5;
+                }
+
+                // Ball goes off screen (scoring)
+                if (ball.x < 0) {
+                    cpu.score++;
+                    updateScore();
+                    checkWin();
+                    resetBall();
+                } else if (ball.x > CANVAS_WIDTH) {
+                    player.score++;
+                    updateScore();
+                    checkWin();
+                    resetBall();
+                }
+            }
+
+            draw();
+        }
+
+        function draw() {
+            // Clear canvas
+            ctx.fillStyle = COLORS.background;
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+            // Draw center line
+            ctx.setLineDash([10, 10]);
+            ctx.strokeStyle = COLORS.centerLine;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(CANVAS_WIDTH / 2, 0);
+            ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw paddles
+            ctx.fillStyle = COLORS.paddle;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillRect(cpu.x, cpu.y, cpu.width, cpu.height);
+
+            // Draw ball
+            ctx.fillStyle = COLORS.ball;
+            ctx.fillRect(ball.x, ball.y, ball.width, ball.height);
+        }
+
+        function updateScore() {
+            playerScoreElement.textContent = player.score;
+            cpuScoreElement.textContent = cpu.score;
+        }
+
+        function checkWin() {
+            if (player.score >= WINNING_SCORE) {
+                gameRunning = false;
+                clearInterval(gameLoop);
+                showWinMessage('YOU WIN!', 'Congratulations!');
+            } else if (cpu.score >= WINNING_SCORE) {
+                gameRunning = false;
+                clearInterval(gameLoop);
+                showWinMessage('CPU WINS!', 'Better luck next time!');
+            }
+        }
+
+        function showMessage(title, text) {
+            messageTitleElement.textContent = title;
+            messageTextElement.textContent = text;
+            gameMessageElement.className = 'game-message';
+            gameMessageElement.style.display = 'block';
+        }
+
+        function showWinMessage(title, text) {
+            messageTitleElement.textContent = title;
+            messageTextElement.textContent = text;
+            gameMessageElement.className = 'game-message win-message';
+            gameMessageElement.style.display = 'block';
+        }
+
+        function startPlayerMove(direction) {
+            playerMoving = direction;
+        }
+
+        function stopPlayerMove() {
+            playerMoving = null;
+        }
+
+        // Keyboard controls
+        let keys = {};
+
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            
+            switch (e.key) {
+                case ' ':
+                    e.preventDefault();
+                    if (ball.serving && gameRunning) {
+                        ball.serving = false;
+                    } else if (!gameRunning) {
+                        startGame();
+                    }
+                    break;
+                case 'r':
+                case 'R':
+                    e.preventDefault();
+                    resetGame();
+                    break;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        // Continuous movement for smooth paddle control
+        function handleMovement() {
+            if (keys['w'] || keys['W'] || keys['ArrowUp']) {
+                if (player.y > 0) player.y -= player.speed;
+            }
+            if (keys['s'] || keys['S'] || keys['ArrowDown']) {
+                if (player.y < CANVAS_HEIGHT - player.height) player.y += player.speed;
+            }
+        }
+
+        setInterval(handleMovement, 1000 / 60);
+
+        // Initial setup
+        updateScore();
+        draw();
+        showMessage('GET READY', 'Press SPACE to start');
+    </script>
+</body>
+</html>

@@ -115,4 +115,41 @@ main {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
+
+  .back-link {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+/* Header styles */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 15px 0;
+  background: var(--bg-color);
+  border-bottom: 3px solid var(--accent-color);
+  z-index: 10;
+}
+
+.back-link {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  display: inline-block;
+  padding: 8px 15px;
+  border: 2px solid var(--accent-color);
+  background: var(--bg-color);
+  box-shadow: 2px 2px 0 var(--secondary-color);
+}
+
+.back-link:hover {
+  background: var(--accent-color);
+  color: var(--bg-color);
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--secondary-color);
 }

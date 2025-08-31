@@ -168,6 +168,9 @@
         </div>
     </div>
 
+    <!-- Game Sound Utility -->
+    <script src="../../assets/js/game-sounds.js"></script>
+
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -209,6 +212,9 @@
         };
 
         function startGame() {
+            // Initialize audio on user interaction
+            GameSounds.enableAudio();
+            
             // Reset game state
             bird.x = 80;
             bird.y = 300;
@@ -224,6 +230,9 @@
             gameLoop = setInterval(update, 1000/60); // 60 FPS
             
             document.getElementById('startBtn').textContent = 'RESTART';
+            
+            // Play game start sound
+            GameSounds.sounds.GAME_START();
         }
 
         function pauseGame() {
@@ -239,6 +248,9 @@
         function jump() {
             if (!gameRunning) return;
             bird.velocity = bird.jumpPower;
+            
+            // Play jump sound
+            GameSounds.sounds.JUMP();
         }
 
         function update() {
@@ -270,6 +282,9 @@
                     pipe.passed = true;
                     score++;
                     updateScore();
+                    
+                    // Play score sound
+                    GameSounds.sounds.SCORE_POINT();
                 }
                 
                 // Remove off-screen pipes
@@ -339,6 +354,12 @@
                 highScore = score;
                 localStorage.setItem('flappyBirdHighScore', highScore);
                 highScoreElement.textContent = highScore;
+                
+                // Play level up sound for new high score
+                GameSounds.sounds.LEVEL_UP();
+            } else {
+                // Play game over sound
+                GameSounds.sounds.GAME_OVER();
             }
             
             gameOverElement.style.display = 'block';

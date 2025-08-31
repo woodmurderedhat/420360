@@ -153,6 +153,20 @@ function throttle(func, limit) {
 }
 
 /**
+ * Create a seeded random function that generates consistent pseudo-random numbers
+ * @param {number} seed - The seed value for random generation
+ * @returns {Function} A function that returns pseudo-random numbers between 0 and 1
+ */
+function createRandomFunction(seed) {
+    let currentSeed = seed;
+    return function() {
+        // Simple seeded random function using Linear Congruential Generator
+        currentSeed = (currentSeed * 9301 + 49297) % 233280;
+        return currentSeed / 233280;
+    };
+}
+
+/**
  * Generate a unique ID
  * @returns {string} A unique ID
  */
@@ -281,6 +295,7 @@ export {
     clamp,
     debounce,
     throttle,
+    createRandomFunction,
     generateUniqueId,
     isValidNumber,
     formatDate

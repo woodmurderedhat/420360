@@ -1,14 +1,14 @@
 /* Tim the Dialogue Oracle - Pixel / Neon Hybrid Styles */
 :root {
-  --bg: #181825;
-  --panel-bg: #23272b;
-  --panel-bg-alt: #2e3238;
-  --stroke: #ff00ea;
-  --stroke2: #00fff7;
-  --accent: #fff700;
-  --text: #f0f0f0;
-  --danger: #ff2e2e;
-  --focus: #6e44ff;
+  --bg: #1f2937;
+  --panel-bg: #374151;
+  --panel-bg-alt: #4b5563;
+  --stroke: #f59e0b;
+  --stroke2: #3b82f6;
+  --accent: #eab308;
+  --text: #f3f4f6;
+  --danger: #ef4444;
+  --focus: #8b5cf6;
   --radius: 8px;
   --font: 'Press Start 2P', monospace;
   --glow: 0 0 0 4px var(--stroke2), 0 0 8px var(--stroke), 4px 4px 0 0 var(--accent), 0 0 0 8px #000;

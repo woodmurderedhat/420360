@@ -1,25 +1,25 @@
 :root {
-    --metal-dark: #23272b;
-    --metal-mid: #3a3f44;
-    --metal-light: #bfc7ce;
-    --metal-blue: #4f6d7a;
-    --metal-shadow: #11151a;
-    --neon-yellow: #ffdd57;
-    --neon-pink: #ff2e9a;
-    --neon-cyan: #00fff7;
-    --neon-blue: #6e44ff;
-    --neon-green: #39ff14;
+    --metal-dark: #3d2d2d;
+    --metal-mid: #5a4a3a;
+    --metal-light: #d4c5a0;
+    --metal-blue: #8b6f47;
+    --metal-shadow: #2a1f1f;
+    --neon-yellow: #daa520;
+    --neon-pink: #cd853f;
+    --neon-cyan: #d2691e;
+    --neon-blue: #8b4513;
+    --neon-green: #9acd32;
     --neon-gold: #ffd700;
-    --arcade-bg: linear-gradient(135deg, #23272b 0%, #1a1a1a 100%);
-    --arcade-gradient: linear-gradient(120deg, #ffaa00, #6e44ff, #00fff7, #ff2e9a, #ffaa00);
-    --arcade-shadow: 0 0 2rem #6e44ff88, 0 0 1rem #ffdd57;
-    --arcade-metal: repeating-linear-gradient(135deg, #bfc7ce 0 2px, #23272b 2px 8px);
+    --arcade-bg: linear-gradient(135deg, #3d2d2d 0%, #2a1f1f 100%);
+    --arcade-gradient: linear-gradient(120deg, #daa520, #8b4513, #d2691e, #cd853f, #daa520);
+    --arcade-shadow: 0 0 2rem #8b451388, 0 0 1rem #daa520;
+    --arcade-metal: repeating-linear-gradient(135deg, #d4c5a0 0 2px, #3d2d2d 2px 8px);
     --arcade-text: 'Cinzel Decorative', 'Cinzel', serif;
     --arcade-font: 'Cinzel', serif;
     --arcade-radius: 1.2rem;
     --arcade-border: 3px solid var(--neon-yellow);
-    --arcade-panel-bg: linear-gradient(135deg, #23272b 60%, #3a3f44 100%);
-    --arcade-panel-glow: 0 0 1.2rem #00fff788, 0 0 1.2rem #ff2e9a44;
+    --arcade-panel-bg: linear-gradient(135deg, #3d2d2d 60%, #5a4a3a 100%);
+    --arcade-panel-glow: 0 0 1.2rem #d2691e88, 0 0 1.2rem #cd853f44;
 }
 
 body {

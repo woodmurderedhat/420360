@@ -30,11 +30,11 @@
 
 <style>
 :root{
-  --bg: #181825;
-  --primary: #00fff7;
-  --secondary: #ff00ea;
-  --highlight: #fff700;
-  --text: #ffffff;
+  --bg: #1a1f1a;
+  --primary: #4a8c3a;
+  --secondary: #7b5e8b;
+  --highlight: #8fbc8f;
+  --text: #e8f5e8;
   --popup-w: 250px;
   --popup-h: 150px;
 }
@@ -992,6 +992,24 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.body.addEventListener('click', (e)=>{
     // no-op; ensures delegation binding present
   });
+  
+  // Add subtle randomization to weed colors
+  const weedColorVariants = [
+    { primary: '#4a8c3a', secondary: '#7b5e8b', highlight: '#8fbc8f' }, // default
+    { primary: '#3e7b2e', secondary: '#6b4d7b', highlight: '#7daf7d' }, // darker green
+    { primary: '#569946', secondary: '#8b6b9b', highlight: '#9bcf9b' }, // lighter green
+    { primary: '#2d5a2d', secondary: '#5e3a6e', highlight: '#6d8e6d' }, // forest
+    { primary: '#4d7a3d', secondary: '#7a5a8a', highlight: '#8aaa8a' }  // earthy
+  ];
+  
+  // Randomly select colors with 30% chance on page load
+  if (Math.random() < 0.3) {
+    const variant = weedColorVariants[Math.floor(Math.random() * weedColorVariants.length)];
+    const root = document.documentElement;
+    root.style.setProperty('--primary', variant.primary);
+    root.style.setProperty('--secondary', variant.secondary);
+    root.style.setProperty('--highlight', variant.highlight);
+  }
 });
 </script>
 </body>

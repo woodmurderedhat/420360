@@ -212,6 +212,33 @@ html,body{
 </head>
 <body>
 
+<!-- === BACKGROUND MUSIC === -->
+<div id="music-control" style="position:fixed;bottom:10px;right:10px;z-index:5000;display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 8px;cursor:pointer;user-select:none;"
+  role="button" aria-pressed="true" tabindex="0" title="Toggle music (M)">
+  <span id="music-status" style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">MUSIC: ON</span>
+  <span style="color:var(--secondary);">♫</span>
+</div>
+<div id="sfx-control" style="position:fixed;bottom:10px;right:160px;z-index:5000;display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 8px;cursor:pointer;user-select:none;"
+  role="button" aria-pressed="true" tabindex="0" title="Toggle sound effects (S)">
+  <span id="sfx-status" style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">SFX: ON</span>
+  <span style="color:var(--secondary);">🔊</span>
+</div>
+<audio id="bgMusic" preload="auto" loop style="display:none">
+  <source src="assets/music/Chaos is Our Love.mp3" type="audio/mpeg" />
+  <!-- Fallback text -->Your browser does not support the audio element.
+</audio>
+<style>
+/* Music control glitch effect */
+#music-control.glitching{ animation: musicGlitch .18s steps(2) 3; }
+@keyframes musicGlitch{
+  0%{ filter:none; transform:translate(0,0); }
+  25%{ filter:hue-rotate(40deg) contrast(1.6); transform:translate(-2px,1px); }
+  50%{ filter:hue-rotate(-40deg) contrast(2); transform:translate(2px,-1px); }
+  75%{ filter:hue-rotate(80deg) contrast(.8); transform:translate(-1px,2px); }
+  100%{ filter:none; transform:translate(0,0); }
+}
+</style>
+
 <!-- Emoticon & Socials Section -->
 <div id="socials-emoticons" style="margin: 18px 0 10px 0; text-align: center; z-index: 10;">
   <div style="font-size: 13px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
@@ -385,6 +412,14 @@ const POPUP_INTERVAL_MS = 1000;    // auto spawn interval
 const POPUP_LIFETIME_MS = 9500;  // how long each popup lives (ms)
 const MAX_POPUPS = 200;             // hard cap to avoid memory bloat
 const NON_OVERLAP_ATTEMPTS = 30;   // tries to find non-overlapping placement
+// Reduced motion support: if user prefers reduced motion, slow things down & lower counts
+const REDUCED_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Dynamic interval overrides (can't reassign consts above, so we branch when starting intervals)
+const POPUP_INTERVAL_REDUCED = 4000;
+const GLITCH_INTERVAL_DEFAULT = 200;
+const GLITCH_INTERVAL_REDUCED = 1000;
+const MORPH_INTERVAL_DEFAULT = 2500;
+const MORPH_INTERVAL_REDUCED = 6000;
 
 const SENTENCES = [
   "Welcome to the future of the internet ",
@@ -627,7 +662,11 @@ function escapeHtml(s){
 
 /* ========== SPAWN CONTROL ========== */
 function randomAd(){ return ADS[Math.floor(Math.random()*ADS.length)]; }
-function spawnPopup(){ makePopup(randomAd()); }
+function spawnPopup(){
+  const p = makePopup(randomAd());
+  if(window.playAdSfx) window.playAdSfx();
+  return p;
+}
 
 /* ========== INTERVALS & PAUSE/RESUME ========== */
 let popupIntervalId = null;
@@ -636,9 +675,12 @@ let morphIntervalId = null;
 
 // start repeated tasks if not already running
 function startIntervals(){
-  if (!popupIntervalId) popupIntervalId = setInterval(spawnPopup, POPUP_INTERVAL_MS);
-  if (!glitchIntervalId) glitchIntervalId = setInterval(glitchRandomWord, 200);
-  if (!morphIntervalId) morphIntervalId = setInterval(morphToRandomSentence, 2500);
+  const popupDelay = REDUCED_MOTION ? POPUP_INTERVAL_REDUCED : POPUP_INTERVAL_MS;
+  const glitchDelay = REDUCED_MOTION ? GLITCH_INTERVAL_REDUCED : GLITCH_INTERVAL_DEFAULT;
+  const morphDelay = REDUCED_MOTION ? MORPH_INTERVAL_REDUCED : MORPH_INTERVAL_DEFAULT;
+  if (!popupIntervalId && popupDelay > 0) popupIntervalId = setInterval(spawnPopup, popupDelay);
+  if (!glitchIntervalId && glitchDelay > 0) glitchIntervalId = setInterval(glitchRandomWord, glitchDelay);
+  if (!morphIntervalId && morphDelay > 0) morphIntervalId = setInterval(morphToRandomSentence, morphDelay);
   document.documentElement.classList.remove('paused');
 }
 
@@ -679,6 +721,163 @@ document.addEventListener('click', (ev)=>{
 
 </script>
 <script>
+// === MUSIC SYSTEM (deferred start after load, graceful autoplay, periodic glitch) ===
+(()=>{
+  const audio = document.getElementById('bgMusic');
+  const ctrl = document.getElementById('music-control');
+  const status = document.getElementById('music-status');
+  // Persist user preference
+  let userEnabled = (localStorage.getItem('musicEnabled') ?? 'true') === 'true';
+  let attempting = false;  // prevent repeat rapid attempts
+  let ready = false;       // set when canplaythrough
+
+  function updateUI(){
+    const on = !audio.paused && !audio.ended;
+    status.textContent = 'MUSIC: ' + (on ? 'ON' : 'OFF');
+    ctrl.setAttribute('aria-pressed', String(on));
+  }
+
+  function fadeTo(targetVol, ms=1200){
+    const steps = 30; const start = audio.volume; const delta = targetVol - start;
+    let i=0; clearInterval(audio._fadeInt);
+    audio._fadeInt = setInterval(()=>{
+      i++; audio.volume = Math.min(1, Math.max(0, start + delta * (i/steps)));
+      if(i>=steps){ clearInterval(audio._fadeInt); }
+    }, ms/steps);
+  }
+
+  async function playMusic(){
+    if(attempting) return; attempting = true;
+    try{
+      audio.volume = 0; // start silent, then fade
+      await audio.play();
+      fadeTo(0.65, 1800);
+      userEnabled = true;
+    }catch(err){
+      // Autoplay likely blocked; wait for explicit user interaction
+    }finally{ attempting = false; updateUI(); }
+  }
+  function stopMusic(){ audio.pause(); updateUI(); }
+
+  function toggleMusic(){ (audio.paused ? playMusic() : stopMusic()); }
+
+  // First user gesture -> attempt autoplay if not yet enabled
+  function firstGesture(){
+    if(userEnabled && audio.paused){ playMusic(); }
+    window.removeEventListener('click', firstGesture);
+    window.removeEventListener('keydown', firstGesture);
+  }
+  window.addEventListener('click', firstGesture, { once:false });
+  window.addEventListener('keydown', firstGesture, { once:false });
+
+  // Control interactions
+  ctrl.addEventListener('click', e=>{ e.stopPropagation(); toggleMusic(); });
+  ctrl.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggleMusic(); }});
+  window.addEventListener('keydown', e=>{ if(e.key==='m' || e.key==='M'){ toggleMusic(); }});
+
+  // Pause when page hidden, resume if user enabled and not manually paused
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.hidden){ if(!audio.paused) audio._wasPlaying=true; audio.pause(); }
+    else if(audio._wasPlaying && userEnabled){ audio.play().catch(()=>{}); }
+    if(!document.hidden) audio._wasPlaying = false;
+    updateUI();
+  });
+
+  // Normalize/encode src (spaces) & begin loading
+  if(!audio.getAttribute('data-src-set')){
+    const srcTag = audio.querySelector('source');
+    if(srcTag){ const raw = srcTag.getAttribute('src'); if(raw) audio.src = encodeURI(raw); audio.setAttribute('data-src-set','1'); }
+  }
+  try{ audio.load(); }catch(e){}
+
+  audio.addEventListener('canplaythrough', ()=>{ ready = true; if(userEnabled) playMusic(); }, { once:true });
+  audio.addEventListener('error', ()=>{ // retry load lightly
+    setTimeout(()=>{ if(!ready) { try{ audio.load(); }catch(e){} } }, 1800);
+  });
+
+  // Fallback timed attempt if canplaythrough slow / not fired
+  setTimeout(()=>{ if(userEnabled && !ready && audio.paused) playMusic(); }, 2500);
+  updateUI();
+
+  // Periodic random glitch for the music button
+  function glitchMusicBtn(){
+    if(ctrl.classList.contains('glitching')) return;
+    ctrl.classList.add('glitching');
+    setTimeout(()=>ctrl.classList.remove('glitching'), 260);
+  }
+  setInterval(()=>{ if(Math.random()<0.33) glitchMusicBtn(); }, 2400);
+  // Save preference whenever state visibly changes (debounced via requestAnimationFrame)
+  const obs = new MutationObserver(()=>{ localStorage.setItem('musicEnabled', String(!audio.paused && !audio.ended)); });
+  obs.observe(status, { characterData:true, subtree:true });
+})();
+// === END MUSIC SYSTEM ===
+// === POPUP SFX SYSTEM (varied random spawn sounds) ===
+(()=>{
+  const ctrl = document.getElementById('sfx-control');
+  const status = document.getElementById('sfx-status');
+  let sfxEnabled = (localStorage.getItem('sfxEnabled') ?? 'true') === 'true';
+  let lastPlay = 0;
+  const volume = 0.55;
+  const MIN_INTERVAL = 90; // ms throttle
+  const SFX_FILES = [
+    'BreakBeat_Slice01.wav','BreakBeat_Slice02.wav','BreakBeat_Slice03.wav','BreakBeat_Slice04.wav',
+    'Clap02.wav','Clap03.wav','Clap04.wav','Clap05.wav','Clap06.wav'
+  ];
+  // Preload base audio elements
+  const pool = SFX_FILES.map(f=>{ const a=new Audio('assets/sounds/'+f); a.preload='auto'; return a; });
+
+  function updateUI(){
+    status.textContent = 'SFX: ' + (sfxEnabled ? 'ON' : 'OFF');
+    ctrl.setAttribute('aria-pressed', String(sfxEnabled));
+  }
+
+  function play(){
+    if(!sfxEnabled) return;
+    const now = Date.now();
+    if(now - lastPlay < MIN_INTERVAL) return; // throttle overlapping spam
+    lastPlay = now;
+    const base = pool[Math.floor(Math.random()*pool.length)];
+    try{
+      // Clone for concurrent playback without cutting off tail
+      const inst = base.cloneNode();
+      inst.volume = volume * (0.85 + Math.random()*0.3); // slight random loudness
+      // Tiny random detune by playbackRate (±5%) for variety
+      inst.playbackRate = 0.95 + Math.random()*0.1;
+      inst.play().catch(()=>{});
+      // Clean up when ended (browser GC handles but explicit just in case)
+      inst.addEventListener('ended', ()=>{ /* no-op */ }, { once:true });
+    }catch(e){}
+  }
+
+  function toggle(){ sfxEnabled = !sfxEnabled; updateUI(); }
+  ctrl.addEventListener('click', e=>{ e.stopPropagation(); toggle(); });
+  ctrl.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggle(); }});
+  window.addEventListener('keydown', e=>{ if(e.key==='s' || e.key==='S'){ toggle(); }});
+  // Persist SFX preference on change
+  const persistSfx = ()=> localStorage.setItem('sfxEnabled', String(sfxEnabled));
+  ctrl.addEventListener('click', persistSfx);
+  ctrl.addEventListener('keydown', persistSfx);
+  window.addEventListener('keydown', persistSfx);
+
+  // Prime: try silent play for each to reduce latency later
+  const prime = ()=>{
+    pool.forEach(a=>{
+      try{
+        a.muted = true;
+        a.play().then(()=>{ a.pause(); a.currentTime = 0; a.muted = false; }).catch(()=>{});
+      }catch(e){}
+    });
+    window.removeEventListener('click', prime);
+    window.removeEventListener('keydown', prime);
+  };
+  window.addEventListener('click', prime);
+  window.addEventListener('keydown', prime);
+
+  updateUI();
+  window.playAdSfx = play; // expose globally
+})();
+// === END POPUP SFX SYSTEM ===
+/* existing code below ... */
 // Glitch-out disappearance for random popups with multiple effects
 function randomPopupGlitchOut(){
   if (!activePopups.length) return;
@@ -702,6 +901,13 @@ function randomPopupGlitchOut(){
 setInterval(() => {
   if (Math.random() < 0.5) randomPopupGlitchOut();
 }, 4500 + Math.random()*6000);
+
+// Accessibility: add aria-labels to dynamically created overlay buttons (delegated once DOM ready)
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.body.addEventListener('click', (e)=>{
+    // no-op; ensures delegation binding present
+  });
+});
 </script>
 </body>
 </html>

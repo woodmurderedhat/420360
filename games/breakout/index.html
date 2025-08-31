@@ -207,10 +207,46 @@
             .stat-value {
                 font-size: 14px;
             }
+
+            .back-link {
+                font-size: 8px;
+                padding: 6px 12px;
+            }
+        }
+
+        .header {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            background: var(--bg);
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 10px;
+            transition: all 0.2s;
+            display: inline-block;
+            padding: 8px 15px;
+            border: 2px solid var(--primary);
+            background: var(--bg);
+            box-shadow: 2px 2px 0 var(--secondary);
+        }
+
+        .back-link:hover {
+            background: var(--primary);
+            color: var(--bg);
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 var(--secondary);
         }
     </style>
 </head>
 <body>
+    <header class="header">
+        <a href="../../index.html" class="back-link" aria-label="Back to 420360.xyz Home">← Back to 420360.xyz</a>
+    </header>
     <div class="game-container">
         <h1>BREAKOUT</h1>
         

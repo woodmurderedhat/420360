@@ -296,6 +296,16 @@ function createOverlay(id,label,src){
   wrap.querySelector('[data-act="close"]').addEventListener('click', e=>{ e.stopPropagation(); closeOverlay(id); });
   wrap.querySelector('[data-act="external"]').addEventListener('click', e=>{ e.stopPropagation(); const ifr=wrap.querySelector('iframe'); if(ifr) window.open(ifr.src,'_blank','noopener'); });
 }
+// Ensure only one overlay visible at a time (except during close animation of old ones)
+function closeAllOverlays(exceptId){
+  document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>{
+    if(el.id===exceptId) return;
+    // force-hide without animation for instant switch
+    el.classList.add('hidden');
+    el.classList.remove('closing');
+  });
+  resumeBackgroundIfNone();
+}
 // Add fade-out animation style once
 if(!document.getElementById('overlayAnimStyle')){
   const s = document.createElement('style');
@@ -347,7 +357,16 @@ function openContentOverlay(label, url){
   }
   showOverlay(elId);
 }
-function showOverlay(id){ const el=document.getElementById(id); if(el){ el.classList.remove('hidden'); el.focus(); pauseBackground(); }}
+function showOverlay(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  closeAllOverlays(id);
+  el.classList.remove('hidden');
+  // move to end of DOM so stacking order stays intuitive
+  document.body.appendChild(el);
+  el.focus();
+  pauseBackground();
+}
 function closeOverlay(id){
   const el=document.getElementById(id);
   if(!el || el.classList.contains('hidden') || el.classList.contains('closing')) return;
@@ -391,35 +410,54 @@ document.addEventListener('click', (e)=>{
   }
 });
 
+// PostMessage API: allow embedded pages (games index) to request opening a game
+window.addEventListener('message', (event)=>{
+  try{
+    const data = event.data;
+    if(!data || typeof data !== 'object') return;
+    if(data.type === 'open-game' && data.url){
+      const label = (data.label || 'GAME') + ' • 420360';
+      openGameOverlay(label, data.url);
+    }
+    if(data.type === 'close-overlay' && data.id){
+      closeOverlay(data.id);
+    }
+  }catch(err){ /* ignore */ }
+});
+
 const ICON_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAALklEQVQoka3OMQ0AAAzDsPnfpM1Yip5JRGCBqgMFBQUFBQUFBQUFBQUFBSUlG8mG6tD3oxAAAAAElFTkSuQmCC";
 
+// NOTE: All GIFs below must originate from the woodmurderedhat Giphy channel per project policy.
+// Curated list of known woodmurderedhat GIF IDs (can expand as more are uploaded):
+// 3PLAXg1osLVVttjRTN, WveGOgFwcI6uTn2khE, eYDnuFt0MckAb3xdSH, DfqSbJVYLHmO8QFn1R,
+// 7Ti0iZdo5QCiWJfMvA, qxJ9pAQCBIJLxfelCv, HtCcDJ134eAICJZjLb, JeEjGpM2TVZGaM5BuE
 const ADS = [
-  { label: "ZEF VIBES", href: "https://discord.gg/zef", gif: "https://media0.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif" },
-  { label: "TETROMINO", href: "https://420360.xyz/games/tarot-tetromino/index.html", gif: "https://media4.giphy.com/media/qoiWHxmgeltKhBjmgv/giphy.gif" },
-  { label: "GLITCH MAZE", href: "https://420360.xyz/games/glitch-maze/index.html", gif: "https://media3.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif" },
-  { label: "NEON SIMON", href: "https://420360.xyz/games/neon-simon/index.html", gif: "https://media2.giphy.com/media/l378khQxt68syiNJm/giphy.gif" },
-  { label: "PIXEL RAIN", href: "https://420360.xyz/games/pixel-rain/index.html", gif: "https://media1.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif" },
-  { label: "SNAKE GAME", href: "https://420360.xyz/games/snake/index.html", gif: "https://media1.giphy.com/media/l0K4puBUN4w6G4eiQ/giphy.gif" },
-  { label: "PONG CLASSIC", href: "https://420360.xyz/games/pong/index.html", gif: "https://media4.giphy.com/media/xTiN0CNHgoRf1Ha7CM/giphy.gif" },
-  { label: "MEMORY CARDS", href: "https://420360.xyz/games/memory/index.html", gif: "https://media3.giphy.com/media/26BRuo6sLetdllPAQ/giphy.gif" },
-  { label: "BREAKOUT", href: "https://420360.xyz/games/breakout/index.html", gif: "https://media2.giphy.com/media/3o6fJ5LANL0x31R1Ic/giphy.gif" },
-  { label: "GENERATIVE ART", href: "https://420360.xyz/games/generative-art/index.html", gif: "https://media1.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif" },
-  { label: "NOCTIS REVERIE", href: "https://420360.xyz/games/noctis-reverie/index.html", gif: "https://media4.giphy.com/media/l378khQxt68syiNJm/giphy.gif" },
-  { label: "247420", href: "https://discord.gg/an-entrypoint-367741339393327104", gif: "https://media1.giphy.com/media/BjSvGRkurICB0n17fb/giphy.gif" },
-  { label: "GIPHY", href: "https://giphy.com/woodmurderedhat", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYW5iM2lsNjR1NGt4NjI0aHk4cWZrcWFicWNpeHQxZmRzMGNrNTNiYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7AA8vvC4ZPOsmOphuc/giphy.gif" },
-  { label: "WOODMURDEREDHAT", href: "https://woodmurderedhat.com/social", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDU5M3d3a3RkdTNoa3cwcGVjZTBncWFkeGQwcnE5dnpoa3BqZjZpYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/H197ec6QieWHNx8t2w/giphy.gif" },
-  { label: "YOUTUBE", href: "https://www.youtube.com/@woodenhat", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExemplazEweG82cDRucXhodThlZTBxY2NhcmFoNWRqaHVvbmdncWMzdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/JeEjGpM2TVZGaM5BuE/giphy.gif" },
-  { label: "FRIDAY", href: "#", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExemxoajc2MWN5Z3ZkbDB1YTB3YjRwNDF0NW40dTh6OGhoZGFkYzhoZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ccZaTF9RyZXc6Cs06S/giphy.gif" },
-  { label: "SATURDAY", href: "#", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGlkbDVxMTllazBncnFnZ3IyaGNtcDdvOHpsMGhkM2pqbnQ0YjR4byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/DfqSbJVYLHmO8QFn1R/giphy.gif" },
-  { label: "PEARL WHAT?", href: "https://www.youtube.com/watch?v=DXS6NbEAkLM", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWtqNmUwZ3ZpOWlrNzdiMzdtZHIwd2U0MXc3M2FmMncwNnE0dmZhdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/nIE5kDeythSFImKueF/giphy.gif" },
-  { label: "ZEF SHELLED#", href: "#", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzlxcmw3aTJid3g5ZG5yMWR0MTR3ZmR6ZGl5M3pjeDNkeXQ4dDFidyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IZwprtK0UY3FXNGTDD/giphy.gif" },
-  { label: "MOAN-AH", href: "https://www.youtube.com/watch?v=wo5QBEux8nk", gif: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYjNvYzdtbzI1MncycDg0aTlwaWx4bnh1Ym5ucTJua3Fic2p0ZHl3MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qxJ9pAQCBIJLxfelCv/giphy.gif" },
-  { label: "WEDNESDAY", href: "#", gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTF5dmR1eXRlNTIwNXlnYTNheGhtYW9zZ3Q0MjBqZHE5MGh5NGVlMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4sEUNeVe2y3mIMkuur/giphy.gif" },
-  { label: "WAR ART", href: "#", gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGtqeXlneGRncndxb3JwMmN2MzY2Mzh5dmppZ2QzOWFiZ3lwZzQyaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Obp3D49Jjrp3cSNPqc/giphy.gif" },
-  { label: "ZEF DEMONS", href: "#", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDIxd21ocDNrcGhrYnh5MnFpaGE5YWtyYm1tcGozOG9oZnZvOGZtMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ccPxUOXjNMfnRe7qPP/giphy.gif" },
-  { label: "HEY ON LENS", href: "https://hey.xyz/u/wooden", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNG44Ync4cTQyZWY2emV6d3Z1NGJqNGF5ZnZwN2YxcG50dGhyb3BlaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/0zAV0pUI1CjTCgr8FB/giphy.gif" },
-  { label: "SHADOW PROTOCOL", href: "https://420360.xyz/null-vesper/shadow-protocol/", gif: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWd2N2c3eHJlNmIxOGRrdmhrOXdjeng4cHkxYWp3aW5xYzhzN2s1ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3PLAXg1osLVVttjRTN/giphy.gif"},
-  { label: "TIM ORACLE", href: "__INTERNAL_ORACLE__", gif: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYW5iM2lsNjR1NGt4NjI0aHk4cWZrcWFicWNpeHQxZmRzMGNrNTNiYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7AA8vvC4ZPOsmOphuc/giphy.gif" }
+  { label: "ZEF VIBES", href: "https://discord.gg/zef", gif: "https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif" },
+  { label: "TETROMINO", href: "https://420360.xyz/games/tarot-tetromino/index.html", gif: "https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif" },
+  { label: "GLITCH MAZE", href: "https://420360.xyz/games/glitch-maze/index.html", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif" },
+  { label: "NEON SIMON", href: "https://420360.xyz/games/neon-simon/index.html", gif: "https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif" },
+  { label: "PIXEL RAIN", href: "https://420360.xyz/games/pixel-rain/index.html", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" },
+  { label: "SNAKE GAME", href: "https://420360.xyz/games/snake/index.html", gif: "https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif" },
+  { label: "PONG CLASSIC", href: "https://420360.xyz/games/pong/index.html", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" },
+  { label: "MEMORY CARDS", href: "https://420360.xyz/games/memory/index.html", gif: "https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif" },
+  { label: "BREAKOUT", href: "https://420360.xyz/games/breakout/index.html", gif: "https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif" },
+  { label: "GENERATIVE ART", href: "https://420360.xyz/games/generative-art/index.html", gif: "https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif" },
+  { label: "NOCTIS REVERIE", href: "https://420360.xyz/games/noctis-reverie/index.html", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif" },
+  { label: "247420", href: "https://discord.gg/an-entrypoint-367741339393327104", gif: "https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif" },
+  { label: "GIPHY", href: "https://giphy.com/woodmurderedhat", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" },
+  { label: "WOODMURDEREDHAT", href: "https://woodmurderedhat.com/social", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" },
+  { label: "YOUTUBE", href: "https://www.youtube.com/@woodenhat", gif: "https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif" },
+  { label: "FRIDAY", href: "#", gif: "https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif" },
+  { label: "SATURDAY", href: "#", gif: "https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif" },
+  { label: "PEARL WHAT?", href: "https://www.youtube.com/watch?v=DXS6NbEAkLM", gif: "https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif" },
+  { label: "ZEF SHELLED#", href: "#", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif" },
+  { label: "MOAN-AH", href: "https://www.youtube.com/watch?v=wo5QBEux8nk", gif: "https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif" },
+  { label: "WEDNESDAY", href: "#", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" },
+  { label: "WAR ART", href: "#", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" },
+  { label: "ZEF DEMONS", href: "#", gif: "https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif" },
+  { label: "HEY ON LENS", href: "https://hey.xyz/u/wooden", gif: "https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif" },
+  { label: "SHADOW PROTOCOL", href: "https://420360.xyz/null-vesper/shadow-protocol/", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif"},
+  { label: "TIM ORACLE", href: "__INTERNAL_ORACLE__", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" }
 ];
 
 const POPUP_INTERVAL_MS = 1000;    // auto spawn interval

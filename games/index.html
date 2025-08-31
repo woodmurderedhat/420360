@@ -50,18 +50,21 @@
 	<footer>Press G again to close • ESC also works</footer>
 <script>
 // Data for games (manually curated tags & blurbs)
+// NOTE: All GIF previews must come from the woodmurderedhat Giphy channel (curated IDs reused as needed)
+// Available IDs reference: 3PLAXg1osLVVttjRTN, WveGOgFwcI6uTn2khE, eYDnuFt0MckAb3xdSH, DfqSbJVYLHmO8QFn1R,
+// 7Ti0iZdo5QCiWJfMvA, qxJ9pAQCBIJLxfelCv, HtCcDJ134eAICJZjLb, JeEjGpM2TVZGaM5BuE
 const GAMES = [
-	{ id:'tarot-tetromino', name:'TAROT TETROMINO', url:'tarot-tetromino/', tags:['puzzle','experimental','retro'], blurb:'Arcana-fused falling blocks.', gif:'https://media4.giphy.com/media/qoiWHxmgeltKhBjmgv/giphy.gif' },
-	{ id:'glitch-maze', name:'GLITCH MAZE', url:'glitch-maze/', tags:['puzzle','experimental'], blurb:'Escape distortion.', gif:'https://media3.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif' },
-	{ id:'neon-simon', name:'NEON SIMON', url:'neon-simon/', tags:['memory','retro'], blurb:'Sequence recall glow.', gif:'https://media2.giphy.com/media/l378khQxt68syiNJm/giphy.gif' },
-	{ id:'pixel-rain', name:'PIXEL RAIN', url:'pixel-rain/', tags:['experimental','retro'], blurb:'Falling pixel ambience.', gif:'https://media1.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif' },
-	{ id:'pong', name:'PONG CLASSIC', url:'pong/', tags:['arcade','retro'], blurb:'OG duel of reflex.', gif:'https://media4.giphy.com/media/xTiN0CNHgoRf1Ha7CM/giphy.gif' },
-	{ id:'snake', name:'SNAKE', url:'snake/', tags:['arcade','retro'], blurb:'Devour & grow.', gif:'https://media1.giphy.com/media/l0K4puBUN4w6G4eiQ/giphy.gif' },
-	{ id:'memory', name:'MEMORY CARDS', url:'memory/', tags:['memory','puzzle'], blurb:'Flip & match pairs.', gif:'https://media3.giphy.com/media/26BRuo6sLetdllPAQ/giphy.gif' },
-	{ id:'breakout', name:'BREAKOUT', url:'breakout/', tags:['arcade','retro'], blurb:'Brick smashing zen.', gif:'https://media2.giphy.com/media/3o6fJ5LANL0x31R1Ic/giphy.gif' },
-	{ id:'generative-art', name:'GENERATIVE ART', url:'generative-art/', tags:['experimental'], blurb:'Procedural visuals.', gif:'https://media1.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif' },
-	{ id:'tim-the-dialogue-oracle', name:'TIM • ORACLE', url:'../tim-the-dialogue-oracle/', tags:['experimental'], blurb:'Conversational mystic.', gif:'https://media1.giphy.com/media/7AA8vvC4ZPOsmOphuc/giphy.gif' },
-	{ id:'noctis-reverie', name:'NOCTIS REVERIE', url:'noctis-reverie/', tags:['experimental'], blurb:'Dreamlike voyage.', gif:'https://media4.giphy.com/media/l378khQxt68syiNJm/giphy.gif' }
+	{ id:'tarot-tetromino', name:'TAROT TETROMINO', url:'tarot-tetromino/', tags:['puzzle','experimental','retro'], blurb:'Arcana-fused falling blocks.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif' },
+	{ id:'glitch-maze', name:'GLITCH MAZE', url:'glitch-maze/', tags:['puzzle','experimental'], blurb:'Escape distortion.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif' },
+	{ id:'neon-simon', name:'NEON SIMON', url:'neon-simon/', tags:['memory','retro'], blurb:'Sequence recall glow.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif' },
+	{ id:'pixel-rain', name:'PIXEL RAIN', url:'pixel-rain/', tags:['experimental','retro'], blurb:'Falling pixel ambience.', gif:'https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif' },
+	{ id:'pong', name:'PONG CLASSIC', url:'pong/', tags:['arcade','retro'], blurb:'OG duel of reflex.', gif:'https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif' },
+	{ id:'snake', name:'SNAKE', url:'snake/', tags:['arcade','retro'], blurb:'Devour & grow.', gif:'https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif' },
+	{ id:'memory', name:'MEMORY CARDS', url:'memory/', tags:['memory','puzzle'], blurb:'Flip & match pairs.', gif:'https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif' },
+	{ id:'breakout', name:'BREAKOUT', url:'breakout/', tags:['arcade','retro'], blurb:'Brick smashing zen.', gif:'https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif' },
+	{ id:'generative-art', name:'GENERATIVE ART', url:'generative-art/', tags:['experimental'], blurb:'Procedural visuals.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif' },
+	{ id:'tim-the-dialogue-oracle', name:'TIM • ORACLE', url:'../tim-the-dialogue-oracle/', tags:['experimental'], blurb:'Conversational mystic.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif' },
+	{ id:'noctis-reverie', name:'NOCTIS REVERIE', url:'noctis-reverie/', tags:['experimental'], blurb:'Dreamlike voyage.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif' }
 ];
 
 const grid = document.getElementById('gamesGrid');
@@ -83,7 +86,25 @@ function render(){
 		const card = document.createElement('div');
 		card.className='card';
 		card.innerHTML = `<img class='preview' src='${g.gif}' alt='Preview for ${g.name}' loading='lazy'><h2>${g.name}</h2><small>${g.blurb}</small><div class="tagrow">${g.tags.map(t=>`<span class='tag'>${t.toUpperCase()}</span>`).join('')}</div>`;
-		card.addEventListener('click', ()=>{ window.parent && window.parent.openGameOverlay ? window.parent.openGameOverlay(g.name + ' • 420360','games/' + g.url + 'index.html') : window.open(g.url,'_blank'); });
+		card.addEventListener('click', ()=>{
+			const targetUrl = 'games/' + g.url + 'index.html';
+			// Prefer postMessage for decoupled communication
+			try{
+				if(window.parent){
+					window.parent.postMessage({type:'open-game', label:g.name, url:targetUrl}, '*');
+					// Also request parent to close the games index overlay so only game is visible
+					window.parent.postMessage({type:'close-overlay', id:'gamesIndexOverlay'}, '*');
+					return;
+				}
+			}catch(err){ /* ignore and fallback */ }
+			// Fallback direct method if available
+			if(window.parent && window.parent.openGameOverlay){
+				window.parent.openGameOverlay(g.name + ' • 420360', targetUrl);
+				return;
+			}
+			// Last resort open in new tab
+			window.open(g.url,'_blank');
+		});
 		card.addEventListener('keydown', e=>{ if(e.key==='Enter'){ card.click(); }});
 		card.tabIndex=0;
 		grid.appendChild(card);

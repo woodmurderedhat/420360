@@ -272,6 +272,9 @@
         </div>
     </div>
 
+    <!-- Game Sound Utility -->
+    <script src="../../assets/js/game-sounds.js"></script>
+
     <script>
         // Game variables
         const canvas = document.getElementById('gameCanvas');
@@ -336,6 +339,9 @@
         };
 
         function startGame() {
+            // Initialize audio on user interaction
+            GameSounds.enableAudio();
+            
             gameRunning = true;
             gameMessageElement.style.display = 'none';
             ball.serving = false;
@@ -344,6 +350,9 @@
             gameLoop = setInterval(update, 1000 / 60); // 60 FPS
             
             document.getElementById('startBtn').textContent = 'RESTART';
+            
+            // Play game start sound
+            GameSounds.sounds.GAME_START();
         }
 
         function pauseGame() {
@@ -415,6 +424,9 @@
                     // Add some angle based on where ball hits paddle
                     const hitPoint = (ball.y + ball.height / 2 - player.y - player.height / 2) / (player.height / 2);
                     ball.speedY = hitPoint * 5;
+                    
+                    // Play paddle bounce sound
+                    GameSounds.sounds.BOUNCE();
                 }
 
                 // Ball collision with CPU paddle
@@ -427,6 +439,9 @@
                     // Add some angle based on where ball hits paddle
                     const hitPoint = (ball.y + ball.height / 2 - cpu.y - cpu.height / 2) / (cpu.height / 2);
                     ball.speedY = hitPoint * 5;
+                    
+                    // Play paddle bounce sound
+                    GameSounds.sounds.BOUNCE();
                 }
 
                 // Ball goes off screen (scoring)
@@ -435,11 +450,17 @@
                     updateScore();
                     checkWin();
                     resetBall();
+                    
+                    // Play score sound (CPU scored)
+                    GameSounds.sounds.ERROR();
                 } else if (ball.x > CANVAS_WIDTH) {
                     player.score++;
                     updateScore();
                     checkWin();
                     resetBall();
+                    
+                    // Play score sound (Player scored)
+                    GameSounds.sounds.SCORE_POINT();
                 }
             }
 

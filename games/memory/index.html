@@ -350,6 +350,9 @@
         <button class="btn" onclick="startNewGame()">PLAY AGAIN</button>
     </div>
 
+    <!-- Game Sound Utility -->
+    <script src="../../assets/js/game-sounds.js"></script>
+
     <script>
         // Game variables
         let cards = [];
@@ -391,6 +394,9 @@
         }
 
         function startNewGame() {
+            // Initialize audio on user interaction
+            GameSounds.enableAudio();
+            
             // Reset game state
             cards = [];
             flippedCards = [];
@@ -476,6 +482,9 @@
             cardElement.classList.add('flipped');
             flippedCards.push(card);
             
+            // Play card flip sound
+            GameSounds.sounds.MENU_NAVIGATE();
+            
             if (flippedCards.length === 2) {
                 moves++;
                 updateStats();
@@ -501,6 +510,9 @@
                 
                 updateStats();
                 
+                // Play match success sound
+                GameSounds.sounds.SUCCESS();
+                
                 // Check if game is complete
                 if (matchedPairs === DIFFICULTY_CONFIG[currentDifficulty].pairs) {
                     setTimeout(() => {
@@ -513,6 +525,9 @@
                 card2.flipped = false;
                 element1.classList.remove('flipped');
                 element2.classList.remove('flipped');
+                
+                // Play no match sound
+                GameSounds.sounds.ERROR();
             }
             
             flippedCards = [];
@@ -570,6 +585,12 @@
                 localStorage.setItem('memoryBestScore', bestScore.toString());
                 document.getElementById('bestScore').textContent = bestScore;
                 document.getElementById('messageTitle').textContent = 'NEW BEST SCORE!';
+                
+                // Play level up sound for new best score
+                GameSounds.sounds.LEVEL_UP();
+            } else {
+                // Play game completion sound
+                GameSounds.sounds.SUCCESS();
             }
             
             document.getElementById('finalMoves').textContent = moves;

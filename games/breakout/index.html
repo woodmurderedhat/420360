@@ -77,6 +77,9 @@
         </div>
     </div>
 
+<!-- Game Sound Utility -->
+<script src="../../assets/js/game-sounds.js"></script>
+
 <script>
 // Canvas & constants
 const canvas = document.getElementById('gameCanvas');
@@ -163,6 +166,9 @@ function initGame(){
 }
 
 function startGame(){
+    // Initialize audio on user interaction
+    GameSounds.enableAudio();
+    
     if(gameRunning){
         // restart
         resetGame();
@@ -173,6 +179,9 @@ function startGame(){
     if(gameLoop) clearInterval(gameLoop);
     gameLoop = setInterval(gameTick, 1000/60);
     document.getElementById('startBtn').textContent = 'RESTART';
+    
+    // Play game start sound
+    GameSounds.sounds.GAME_START();
 }
 
 function pauseGame(){
@@ -240,6 +249,9 @@ function gameTick(){
             b.speedX = Math.sin(angle) * speed;
             b.speedY = -Math.abs(Math.cos(angle) * speed);
             if(paddle.sticky){ b.launched = false; paddle.sticky = false; }
+            
+            // Play paddle bounce sound
+            GameSounds.sounds.BOUNCE();
         }
 
         // bricks
@@ -254,6 +266,9 @@ function gameTick(){
                 const overlapX = (b.x + b.width/2) - (brick.x + brick.width/2);
                 const overlapY = (b.y + b.height/2) - (brick.y + brick.height/2);
                 if(Math.abs(overlapX) > Math.abs(overlapY)) b.speedX = -b.speedX; else b.speedY = -b.speedY;
+                
+                // Play brick break sound
+                GameSounds.sounds.BREAK();
                 break;
             }
         }
@@ -277,7 +292,10 @@ function gameTick(){
         p.y += p.speed;
         // catch by paddle
         if(p.y + p.size >= paddle.y && p.x >= paddle.x && p.x <= paddle.x + paddle.width){
-            activatePowerup(p.type); powerups.splice(i,1); i--; continue;
+            activatePowerup(p.type); powerups.splice(i,1); i--; 
+            // Play power-up collection sound
+            GameSounds.sounds.POWER_UP();
+            continue;
         }
         // fall out
         if(p.y > CANVAS_HEIGHT) { powerups.splice(i,1); i--; }
@@ -331,9 +349,13 @@ function gameOver(){
         highScore = score; localStorage.setItem('breakoutHighScore', highScore.toString()); updateStats();
         showWinMessage('NEW HIGH SCORE!', `Final Score: ${score}`);
         lastMessageAction = 'restart';
+        // Play level up sound for new high score
+        GameSounds.sounds.LEVEL_UP();
     } else {
         showLoseMessage('GAME OVER', `Final Score: ${score}`);
         lastMessageAction = 'restart';
+        // Play game over sound
+        GameSounds.sounds.GAME_OVER();
     }
 }
 

@@ -1,10 +1,10 @@
 :root {
-    /* Modern color palette */
-    --primary-color: #4361ee;
-    --primary-light: #4895ef;
-    --primary-dark: #3a0ca3;
-    --accent-color: #f72585;
-    --success-color: #4cc9f0;
+    /* Modern color palette - Orange/Red theme */
+    --primary-color: #ff6b35;
+    --primary-light: #ff8c5a;
+    --primary-dark: #d2521c;
+    --accent-color: #ff2e6b;
+    --success-color: #39ff14;
 
     /* UI Elements */
     --button-bg: var(--primary-color);

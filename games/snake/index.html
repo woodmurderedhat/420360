@@ -260,6 +260,9 @@
         </div>
     </div>
 
+    <!-- Game Sound Utility -->
+    <script src="../../assets/js/game-sounds.js"></script>
+
     <script>
         // Game variables
         const canvas = document.getElementById('gameCanvas');
@@ -292,6 +295,9 @@
         };
 
         function startGame() {
+            // Initialize audio on user interaction
+            GameSounds.enableAudio();
+            
             snake = [{ x: 10, y: 10 }];
             direction = { x: 0, y: 0 };
             score = 0;
@@ -305,6 +311,9 @@
             gameLoop = setInterval(update, 150);
             
             document.getElementById('startBtn').textContent = 'RESTART';
+            
+            // Play game start sound
+            GameSounds.sounds.GAME_START();
         }
 
         function pauseGame() {
@@ -345,6 +354,9 @@
                 score += 10;
                 updateScore();
                 generateFood();
+                
+                // Play food collection sound
+                GameSounds.sounds.COLLECT_ITEM();
             } else {
                 snake.pop();
             }
@@ -390,6 +402,9 @@
             }
             
             gameOverElement.style.display = 'block';
+            
+            // Play game over sound
+            GameSounds.sounds.GAME_OVER();
         }
 
         function updateScore() {

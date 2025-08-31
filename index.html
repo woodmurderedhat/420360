@@ -212,14 +212,27 @@ html,body{
 </head>
 <body>
 
-<!-- === BACKGROUND MUSIC === -->
-<div id="music-control" style="position:fixed;bottom:10px;right:10px;z-index:5000;display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 8px;cursor:pointer;user-select:none;"
-  role="button" aria-pressed="true" tabindex="0" title="Toggle music (M)">
+<!-- === HEADER CONTROLS (Top Bar) === -->
+<div id="header-controls" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);display:flex;gap:14px;z-index:6000;flex-wrap:wrap;justify-content:center;">
+  <div id="about-control" class="ctrl-btn" style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 10px;cursor:pointer;user-select:none;" role="button" tabindex="0" title="About (A)" aria-label="About 420360">
+    <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">ABOUT</span>
+    <span style="color:var(--secondary);">ℹ️</span>
+  </div>
+  <div id="games-control" class="ctrl-btn" style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 10px;cursor:pointer;user-select:none;" role="button" tabindex="0" title="Games Index (G)" aria-label="Open games index">
+    <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">GAMES</span>
+    <span style="color:var(--secondary);">🕹️</span>
+  </div>
+</div>
+<!-- Bottom Controls: Issues (left), Music & SFX (right cluster) -->
+<div id="issue-report" style="position:fixed;bottom:10px;left:10px;z-index:5000;display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 10px;cursor:pointer;user-select:none;" role="button" tabindex="0" title="Report an issue on GitHub (I)" aria-label="Report an issue on GitHub">
+  <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">ISSUES</span>
+  <span style="color:var(--secondary);">🐞</span>
+</div>
+<div id="music-control" style="position:fixed;bottom:10px;right:10px;z-index:5000;display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 8px;cursor:pointer;user-select:none;" role="button" aria-pressed="true" tabindex="0" title="Toggle music (M)">
   <span id="music-status" style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">MUSIC: ON</span>
   <span style="color:var(--secondary);">♫</span>
 </div>
-<div id="sfx-control" style="position:fixed;bottom:10px;right:160px;z-index:5000;display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 8px;cursor:pointer;user-select:none;"
-  role="button" aria-pressed="true" tabindex="0" title="Toggle sound effects (S)">
+<div id="sfx-control" style="position:fixed;bottom:10px;right:170px;z-index:5000;display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 8px;cursor:pointer;user-select:none;" role="button" aria-pressed="true" tabindex="0" title="Toggle sound effects (S)">
   <span id="sfx-status" style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">SFX: ON</span>
   <span style="color:var(--secondary);">🔊</span>
 </div>
@@ -245,7 +258,7 @@ html,body{
     <a href="https://hey.xyz/u/wooden" target="_blank" rel="noopener noreferrer" title="😎" style="color:var(--secondary);text-decoration:none;">👁️</a>
     <a href="https://www.youtube.com/@woodenhat" target="_blank" rel="noopener noreferrer" title="🕹️" style="color:var(--highlight);text-decoration:none;">▶️</a>
   <a href="https://woodmurderedhat.com/social" target="_blank" rel="noopener noreferrer" title="🌐" style="color:var(--text);text-decoration:none;">🌲</a>
-  <a href="#" onclick="openAbout();return false;" title="About 420360" style="color:var(--primary);text-decoration:none;">ℹ️</a>
+  
   </div>
 </div>
 
@@ -302,6 +315,7 @@ function makeDraggableOverlay(el){
 
 function openAbout(){ createOverlay('aboutOverlay','ABOUT • 420360','about/index.html'); showOverlay('aboutOverlay'); }
 function openOracle(){ createOverlay('oracleOverlay','TIM • DIALOGUE ORACLE','games/tim-the-dialogue-oracle/index.html'); showOverlay('oracleOverlay'); }
+function openGamesIndex(){ createOverlay('gamesIndexOverlay','GAMES • 420360','games/index.html'); showOverlay('gamesIndexOverlay'); }
 function openGameOverlay(label, url){
   // Normalize internal absolute URLs to relative
   const rel = url.replace(/^https?:\/\/420360\.xyz\//,'');
@@ -347,7 +361,7 @@ function pauseBackground(){ stopIntervals(); }
 function resumeBackgroundIfNone(){ const anyOpen = document.querySelectorAll('.integrated-overlay:not(.hidden)').length>0; if(!anyOpen) startIntervals(); }
 
 // Keyboard shortcut: press A for About, O for Oracle (when not typing inside overlays)
-window.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'|| e.target.tagName==='TEXTAREA') return; if(e.key==='a'||e.key==='A'){ openAbout(); } if(e.key==='o'||e.key==='O'){ openOracle(); } if(e.key==='Escape'){ document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>closeOverlay(el.id)); } });
+window.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'|| e.target.tagName==='TEXTAREA') return; if(e.key==='a'||e.key==='A'){ openAbout(); } if(e.key==='g'||e.key==='G'){ openGamesIndex(); } if(e.key==='o'||e.key==='O'){ openOracle(); } if(e.key==='Escape'){ document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>closeOverlay(el.id)); } });
 
 // Intercept clicks on any popup link to open in overlay (internal or external)
 document.addEventListener('click', (e)=>{
@@ -718,6 +732,32 @@ document.addEventListener('click', (ev)=>{
   if (ev.target.closest('.integrated-overlay')) return;
   if (now - lastClick > 120) { spawnPopup(); lastClick = now; }
 });
+
+// Issue report button behavior
+(()=>{
+  const issueBtn = document.getElementById('issue-report');
+  const issueUrl = 'https://github.com/woodmurderedhat/420360/issues/new/choose';
+  function openIssues(){ window.open(issueUrl,'_blank','noopener'); }
+  issueBtn.addEventListener('click', e=>{ e.stopPropagation(); openIssues(); });
+  issueBtn.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openIssues(); }});
+  // Keyboard shortcut (I)
+  window.addEventListener('keydown', e=>{ if(e.key==='i' || e.key==='I'){ openIssues(); }});
+})();
+// About & Games buttons behavior
+(()=>{
+  const aboutBtn = document.getElementById('about-control');
+  const gamesBtn = document.getElementById('games-control');
+  if(aboutBtn){
+    const act = ()=>{ openAbout(); };
+    aboutBtn.addEventListener('click', e=>{ e.stopPropagation(); act(); });
+    aboutBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); act(); }});
+  }
+  if(gamesBtn){
+    const actG = ()=>{ openGamesIndex(); };
+    gamesBtn.addEventListener('click', e=>{ e.stopPropagation(); actG(); });
+    gamesBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); actG(); }});
+  }
+})();
 
 </script>
 <script>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitch Maze - 420360</title>
+    
+    <!-- Retro pixel font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #181825;
+            --primary: #00fff7;
+            --secondary: #ff00ea;
+            --highlight: #fff700;
+            --text: #ffffff;
+            --danger: #ff0040;
+            --success: #00ff40;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            image-rendering: pixelated;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .game-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-shadow: 2px 2px 0 var(--secondary);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: var(--highlight);
+            max-width: 500px;
+        }
+
+        .game-board {
+            border: 4px solid var(--primary);
+            box-shadow: 
+                0 0 0 4px var(--secondary),
+                8px 8px 0 0 var(--highlight),
+                0 0 0 8px #000;
+            background: #000;
+            margin: 0 auto 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: var(--bg);
+            border: 3px solid var(--primary);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 12px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 3px 3px 0 var(--secondary);
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            color: var(--bg);
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 var(--secondary);
+        }
+
+        .btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0 0 0 var(--secondary);
+        }
+
+        .instructions {
+            margin-top: 20px;
+            font-size: 10px;
+            line-height: 1.6;
+            max-width: 400px;
+            color: var(--text);
+        }
+
+        .mobile-controls {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            max-width: 200px;
+        }
+
+        .mobile-btn {
+            background: var(--bg);
+            border: 2px solid var(--primary);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 16px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mobile-btn:hover {
+            background: var(--primary);
+            color: var(--bg);
+        }
+
+        .mobile-btn:nth-child(2) {
+            grid-column: 2;
+        }
+
+        .mobile-btn:nth-child(3) {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .mobile-btn:nth-child(4) {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .mobile-btn:nth-child(5) {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg);
+            border: 4px solid var(--success);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 
+                0 0 0 4px var(--secondary),
+                8px 8px 0 0 var(--highlight);
+            display: none;
+        }
+
+        .game-over h2 {
+            color: var(--success);
+            font-size: 16px;
+            margin: 0 0 10px 0;
+        }
+
+        .game-over p {
+            font-size: 10px;
+            margin: 10px 0;
+        }
+
+        .header {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            background: var(--bg);
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 10px;
+            transition: all 0.2s;
+            display: inline-block;
+            padding: 8px 15px;
+            border: 2px solid var(--primary);
+            background: var(--bg);
+            box-shadow: 2px 2px 0 var(--secondary);
+        }
+
+        .back-link:hover {
+            background: var(--primary);
+            color: var(--bg);
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 var(--secondary);
+        }
+
+        .glitch-warning {
+            color: var(--danger);
+            font-size: 8px;
+            margin-top: 10px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .glitch-effect {
+            animation: glitch 0.15s steps(2) infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0,0); filter: hue-rotate(0deg); }
+            20% { transform: translate(-2px,1px); filter: hue-rotate(45deg); }
+            40% { transform: translate(2px,-1px); filter: hue-rotate(-45deg); }
+            60% { transform: translate(-1px,2px); filter: hue-rotate(90deg); }
+            80% { transform: translate(1px,-2px); filter: hue-rotate(-90deg); }
+            100% { transform: translate(0,0); filter: hue-rotate(0deg); }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: grid;
+            }
+            
+            .instructions {
+                font-size: 8px;
+            }
+            
+            h1 {
+                font-size: 18px;
+            }
+
+            .back-link {
+                font-size: 8px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="../../index.html" class="back-link" aria-label="Back to 420360.xyz Home">← Back to 420360.xyz</a>
+    </header>
+    <div class="game-container">
+        <h1>GLITCH MAZE</h1>
+        
+        <div class="game-info">
+            <div>Time: <span id="timer">0</span>s</div>
+            <div>Level: <span id="level">1</span></div>
+            <div>Glitches: <span id="glitchCount">0</span></div>
+        </div>
+        
+        <div class="game-board">
+            <canvas id="gameCanvas" width="500" height="500"></canvas>
+            <div id="gameOver" class="game-over">
+                <h2>MAZE COMPLETE!</h2>
+                <p>Time: <span id="finalTime">0</span>s</p>
+                <p>Glitches Survived: <span id="finalGlitches">0</span></p>
+                <button class="btn" onclick="nextLevel()">NEXT LEVEL</button>
+                <button class="btn" onclick="restartGame()">RESTART</button>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" class="btn" onclick="startGame()">START GAME</button>
+            <button class="btn" onclick="pauseGame()">PAUSE</button>
+        </div>
+        
+        <div class="mobile-controls">
+            <button class="mobile-btn" onclick="movePlayer('up')">↑</button>
+            <button class="mobile-btn" onclick="movePlayer('left')">←</button>
+            <button class="mobile-btn" onclick="movePlayer('down')">↓</button>
+            <button class="mobile-btn" onclick="movePlayer('right')">→</button>
+        </div>
+        
+        <div class="instructions">
+            Navigate through the maze to reach the exit.<br>
+            <strong>TWIST:</strong> The maze walls glitch and change randomly!<br>
+            Use arrow keys or WASD to move.<br>
+            <div class="glitch-warning">⚠ REALITY.EXE CORRUPTED ⚠</div>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const timerElement = document.getElementById('timer');
+        const levelElement = document.getElementById('level');
+        const glitchCountElement = document.getElementById('glitchCount');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalTimeElement = document.getElementById('finalTime');
+        const finalGlitchesElement = document.getElementById('finalGlitches');
+
+        const CELL_SIZE = 25;
+        const MAZE_SIZE = 20;
+        let maze = [];
+        let player = { x: 1, y: 1 };
+        let exit = { x: MAZE_SIZE - 2, y: MAZE_SIZE - 2 };
+        let gameRunning = false;
+        let startTime = 0;
+        let currentTime = 0;
+        let level = 1;
+        let glitchCount = 0;
+        let gameTimer = null;
+        let glitchTimer = null;
+
+        // Colors matching the retro theme
+        const COLORS = {
+            wall: '#00fff7',
+            path: '#000000',
+            player: '#fff700',
+            exit: '#00ff40',
+            glitchWall: '#ff00ea',
+            background: '#181825'
+        };
+
+        function generateMaze() {
+            // Initialize maze with walls
+            maze = Array(MAZE_SIZE).fill().map(() => Array(MAZE_SIZE).fill(1));
+            
+            // Create paths using recursive backtracking
+            const stack = [];
+            const start = { x: 1, y: 1 };
+            maze[start.y][start.x] = 0;
+            stack.push(start);
+            
+            while (stack.length > 0) {
+                const current = stack[stack.length - 1];
+                const neighbors = getUnvisitedNeighbors(current);
+                
+                if (neighbors.length > 0) {
+                    const next = neighbors[Math.floor(Math.random() * neighbors.length)];
+                    removeWall(current, next);
+                    maze[next.y][next.x] = 0;
+                    stack.push(next);
+                } else {
+                    stack.pop();
+                }
+            }
+            
+            // Ensure exit is accessible
+            maze[exit.y][exit.x] = 0;
+        }
+
+        function getUnvisitedNeighbors(cell) {
+            const neighbors = [];
+            const directions = [
+                { x: 0, y: -2 }, // up
+                { x: 2, y: 0 },  // right
+                { x: 0, y: 2 },  // down
+                { x: -2, y: 0 }  // left
+            ];
+            
+            directions.forEach(dir => {
+                const newX = cell.x + dir.x;
+                const newY = cell.y + dir.y;
+                
+                if (newX > 0 && newX < MAZE_SIZE - 1 && 
+                    newY > 0 && newY < MAZE_SIZE - 1 && 
+                    maze[newY][newX] === 1) {
+                    neighbors.push({ x: newX, y: newY });
+                }
+            });
+            
+            return neighbors;
+        }
+
+        function removeWall(current, next) {
+            const wallX = current.x + (next.x - current.x) / 2;
+            const wallY = current.y + (next.y - current.y) / 2;
+            maze[wallY][wallX] = 0;
+        }
+
+        function glitchMaze() {
+            if (!gameRunning) return;
+            
+            // Add glitch effect to canvas
+            canvas.classList.add('glitch-effect');
+            setTimeout(() => canvas.classList.remove('glitch-effect'), 200);
+            
+            // Randomly change some walls to paths and paths to walls
+            const glitchIntensity = Math.min(level * 3, 15);
+            
+            for (let i = 0; i < glitchIntensity; i++) {
+                const x = Math.floor(Math.random() * (MAZE_SIZE - 2)) + 1;
+                const y = Math.floor(Math.random() * (MAZE_SIZE - 2)) + 1;
+                
+                // Don't glitch player or exit positions
+                if ((x === player.x && y === player.y) || (x === exit.x && y === exit.y)) {
+                    continue;
+                }
+                
+                // Flip the cell
+                maze[y][x] = maze[y][x] === 0 ? 1 : 0;
+            }
+            
+            glitchCount++;
+            glitchCountElement.textContent = glitchCount;
+            draw();
+        }
+
+        function startGame() {
+            generateMaze();
+            player = { x: 1, y: 1 };
+            exit = { x: MAZE_SIZE - 2, y: MAZE_SIZE - 2 };
+            gameRunning = true;
+            startTime = Date.now();
+            glitchCount = 0;
+            gameOverElement.style.display = 'none';
+            
+            updateDisplay();
+            draw();
+            
+            // Start timers
+            if (gameTimer) clearInterval(gameTimer);
+            if (glitchTimer) clearInterval(glitchTimer);
+            
+            gameTimer = setInterval(updateTimer, 100);
+            glitchTimer = setInterval(glitchMaze, 3000 - (level * 200)); // Glitches get more frequent
+            
+            document.getElementById('startBtn').textContent = 'RESTART';
+        }
+
+        function pauseGame() {
+            if (gameRunning) {
+                gameRunning = false;
+                clearInterval(gameTimer);
+                clearInterval(glitchTimer);
+            } else {
+                gameRunning = true;
+                startTime = Date.now() - currentTime * 1000;
+                gameTimer = setInterval(updateTimer, 100);
+                glitchTimer = setInterval(glitchMaze, 3000 - (level * 200));
+            }
+        }
+
+        function updateTimer() {
+            if (!gameRunning) return;
+            currentTime = (Date.now() - startTime) / 1000;
+            timerElement.textContent = Math.floor(currentTime);
+        }
+
+        function updateDisplay() {
+            levelElement.textContent = level;
+            glitchCountElement.textContent = glitchCount;
+        }
+
+        function movePlayer(direction) {
+            if (!gameRunning) return;
+            
+            let newX = player.x;
+            let newY = player.y;
+            
+            switch (direction) {
+                case 'up':
+                    newY -= 1;
+                    break;
+                case 'down':
+                    newY += 1;
+                    break;
+                case 'left':
+                    newX -= 1;
+                    break;
+                case 'right':
+                    newX += 1;
+                    break;
+            }
+            
+            // Check bounds and walls
+            if (newX >= 0 && newX < MAZE_SIZE && newY >= 0 && newY < MAZE_SIZE && maze[newY][newX] === 0) {
+                player.x = newX;
+                player.y = newY;
+                
+                // Check if reached exit
+                if (player.x === exit.x && player.y === exit.y) {
+                    levelComplete();
+                }
+                
+                draw();
+            }
+        }
+
+        function levelComplete() {
+            gameRunning = false;
+            clearInterval(gameTimer);
+            clearInterval(glitchTimer);
+            
+            finalTimeElement.textContent = Math.floor(currentTime);
+            finalGlitchesElement.textContent = glitchCount;
+            gameOverElement.style.display = 'block';
+        }
+
+        function nextLevel() {
+            level++;
+            startGame();
+        }
+
+        function restartGame() {
+            level = 1;
+            startGame();
+        }
+
+        function draw() {
+            // Clear canvas
+            ctx.fillStyle = COLORS.background;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw maze
+            for (let y = 0; y < MAZE_SIZE; y++) {
+                for (let x = 0; x < MAZE_SIZE; x++) {
+                    if (maze[y][x] === 1) {
+                        ctx.fillStyle = COLORS.wall;
+                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    }
+                }
+            }
+            
+            // Draw exit
+            ctx.fillStyle = COLORS.exit;
+            ctx.fillRect(exit.x * CELL_SIZE + 2, exit.y * CELL_SIZE + 2, CELL_SIZE - 4, CELL_SIZE - 4);
+            
+            // Draw player
+            ctx.fillStyle = COLORS.player;
+            ctx.fillRect(player.x * CELL_SIZE + 4, player.y * CELL_SIZE + 4, CELL_SIZE - 8, CELL_SIZE - 8);
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    movePlayer('up');
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    e.preventDefault();
+                    movePlayer('down');
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    e.preventDefault();
+                    movePlayer('left');
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    e.preventDefault();
+                    movePlayer('right');
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    pauseGame();
+                    break;
+            }
+        });
+
+        // Initialize the game
+        generateMaze();
+        draw();
+    </script>
+</body>
+</html>

@@ -726,8 +726,8 @@ document.addEventListener('click', (ev)=>{
   const audio = document.getElementById('bgMusic');
   const ctrl = document.getElementById('music-control');
   const status = document.getElementById('music-status');
-  // Persist user preference
-  let userEnabled = (localStorage.getItem('musicEnabled') ?? 'true') === 'true';
+  // Start disabled: user must explicitly enable (ignores prior sessions until click)
+  let userEnabled = false;
   let attempting = false;  // prevent repeat rapid attempts
   let ready = false;       // set when canplaythrough
 
@@ -759,7 +759,17 @@ document.addEventListener('click', (ev)=>{
   }
   function stopMusic(){ audio.pause(); updateUI(); }
 
-  function toggleMusic(){ (audio.paused ? playMusic() : stopMusic()); }
+  function toggleMusic(){
+    if(audio.paused){
+      userEnabled = true;
+      playMusic();
+      localStorage.setItem('musicEnabled','true');
+    } else {
+      userEnabled = false;
+      stopMusic();
+      localStorage.setItem('musicEnabled','false');
+    }
+  }
 
   // First user gesture -> attempt autoplay if not yet enabled
   function firstGesture(){
@@ -807,15 +817,15 @@ document.addEventListener('click', (ev)=>{
   }
   setInterval(()=>{ if(Math.random()<0.33) glitchMusicBtn(); }, 2400);
   // Save preference whenever state visibly changes (debounced via requestAnimationFrame)
-  const obs = new MutationObserver(()=>{ localStorage.setItem('musicEnabled', String(!audio.paused && !audio.ended)); });
-  obs.observe(status, { characterData:true, subtree:true });
+  // No mutation observer needed; persistence handled on toggle only.
 })();
 // === END MUSIC SYSTEM ===
 // === POPUP SFX SYSTEM (varied random spawn sounds) ===
 (()=>{
   const ctrl = document.getElementById('sfx-control');
   const status = document.getElementById('sfx-status');
-  let sfxEnabled = (localStorage.getItem('sfxEnabled') ?? 'true') === 'true';
+  // Start disabled: user must explicitly enable SFX each load (do not auto-play)
+  let sfxEnabled = false;
   let lastPlay = 0;
   const volume = 0.55;
   const MIN_INTERVAL = 90; // ms throttle
@@ -849,15 +859,12 @@ document.addEventListener('click', (ev)=>{
     }catch(e){}
   }
 
-  function toggle(){ sfxEnabled = !sfxEnabled; updateUI(); }
+  function toggle(){ sfxEnabled = !sfxEnabled; updateUI(); localStorage.setItem('sfxEnabled', String(sfxEnabled)); }
   ctrl.addEventListener('click', e=>{ e.stopPropagation(); toggle(); });
   ctrl.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggle(); }});
   window.addEventListener('keydown', e=>{ if(e.key==='s' || e.key==='S'){ toggle(); }});
   // Persist SFX preference on change
-  const persistSfx = ()=> localStorage.setItem('sfxEnabled', String(sfxEnabled));
-  ctrl.addEventListener('click', persistSfx);
-  ctrl.addEventListener('keydown', persistSfx);
-  window.addEventListener('keydown', persistSfx);
+  // Persistence integrated into toggle; no extra listeners required.
 
   // Prime: try silent play for each to reduce latency later
   const prime = ()=>{

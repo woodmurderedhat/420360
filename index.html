@@ -330,6 +330,13 @@ document.addEventListener('click', (e)=>{
   if(!href) return;
   // Oracle special
   if(href === '__INTERNAL_ORACLE__'){ e.preventDefault(); openOracle(); return; }
+  // Blocklist: let these open in new tab (X-Frame-Options / CSP issues)
+  const OVERLAY_BLOCKLIST = [/youtube\.com/i, /youtu\.be/i, /discord\.gg/i, /giphy\.com/i];
+  if (OVERLAY_BLOCKLIST.some(r => r.test(href))) {
+    // Ensure it opens in a new tab
+    a.setAttribute('target','_blank');
+    return; // do not preventDefault; allow normal navigation
+  }
   e.preventDefault();
   let label = 'LINK';
   const popup = a.closest('.popup');

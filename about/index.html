@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>About • 420360</title>
+	<link rel="icon" type="image/png" href="../assets/images/favicon.ico" />
+	<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+	<header class="arcade-header">
+		<a class="back-link" href="../index.html">⬅ HOME</a>
+		<h1 class="title pixel-font">ABOUT 420360</h1>
+		<p class="subtitle">Interactive corporate lore archive</p>
+	</header>
+	<main class="app-shell">
+		<section class="oracle-panel metal-frame" aria-live="polite">
+			<div class="npc-wrap">
+				<canvas id="npcCanvas" width="64" height="64" aria-hidden="true"></canvas>
+				<div class="npc-name pixel-font" id="npcName">Archivist</div>
+			</div>
+			<div class="dialogue-box metal-panel" id="dialogueBox">
+				<div id="text" class="dialogue-text" role="text"></div>
+				<ul id="choices" class="choices" aria-label="Responses"></ul>
+			</div>
+			<div class="footer-hint pixel-font" id="hint">Press 1 • 2 • 3 (4) or click. [R] restart current pack.</div>
+		</section>
+		<aside class="side-panel metal-panel">
+			<h2 class="pixel-font small">About Packs</h2>
+			<p class="pixel-font tiny" style="line-height:1.4; opacity:.75;">Explore structured info about the project: mission, tech, ethos, credits & more.</p>
+			<div id="packsList" class="packs"></div>
+			<div class="pack-actions">
+				<button class="neon-btn small" id="randomPackBtn" title="Random pack">Random</button>
+				<button class="neon-btn small" id="restartBtn" title="Restart current pack">Restart</button>
+			</div>
+		</aside>
+	</main>
+	<template id="choiceTemplate"><li><button class="choice-btn pixel-font"></button></li></template>
+	<script src="about-packs.js"></script>
+	<script src="dialogue-engine.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>

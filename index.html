@@ -217,7 +217,8 @@ html,body{
   <div style="font-size: 13px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
     <a href="https://hey.xyz/u/wooden" target="_blank" rel="noopener noreferrer" title="😎" style="color:var(--secondary);text-decoration:none;">👁️</a>
     <a href="https://www.youtube.com/@woodenhat" target="_blank" rel="noopener noreferrer" title="🕹️" style="color:var(--highlight);text-decoration:none;">▶️</a>
-    <a href="https://woodmurderedhat.com/social" target="_blank" rel="noopener noreferrer" title="🌐" style="color:var(--text);text-decoration:none;">🌲</a>
+  <a href="https://woodmurderedhat.com/social" target="_blank" rel="noopener noreferrer" title="🌐" style="color:var(--text);text-decoration:none;">🌲</a>
+  <a href="#" onclick="openAbout();return false;" title="About 420360" style="color:var(--primary);text-decoration:none;">ℹ️</a>
   </div>
 </div>
 
@@ -225,6 +226,123 @@ html,body{
 
 <script>
 /* ========== CONFIG ========== */
+/* ===== Integrated Overlays (About + Oracle) ===== */
+const overlayStyles = document.createElement('style');
+overlayStyles.textContent = `
+  .integrated-overlay{position:fixed;top:5%;left:50%;transform:translateX(-50%);width:82vw;height:82vh;background:var(--bg);border:4px solid var(--secondary);box-shadow:0 0 0 4px var(--primary),8px 8px 0 0 var(--highlight),0 0 0 8px #000;z-index:4000;display:flex;flex-direction:column;}
+  .integrated-overlay.hidden{display:none;}
+  .integrated-overlay header{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;font-size:10px;background:var(--secondary);color:var(--bg);border-bottom:4px solid var(--primary);}
+  .integrated-overlay header span{font-size:11px;letter-spacing:1px;color:var(--highlight);text-shadow:2px 2px 0 var(--primary);}
+  .integrated-overlay header button{font-family:'Press Start 2P', monospace;font-size:10px;cursor:pointer;background:var(--bg);color:var(--highlight);border:2px solid var(--primary);padding:4px 6px;}
+  .integrated-overlay header button:hover{background:var(--primary);color:#000;}
+  .integrated-overlay iframe{flex:1;border:0;background:#000;image-rendering:pixelated;}
+  @media (max-width:900px){ .integrated-overlay{width:96vw;height:86vh;top:6%;} }
+`;
+document.head.appendChild(overlayStyles);
+
+function createOverlay(id,label,src){
+  if(document.getElementById(id)) return;
+  const wrap = document.createElement('div');
+  wrap.id = id; wrap.className = 'integrated-overlay hidden';
+  wrap.innerHTML = `<header><span>${label}</span><div style="display:flex;gap:6px;">
+    <button data-act="external" title="Open in new tab">↗</button>
+    <button data-act="reload" title="Reload">⟳</button>
+    <button data-act="close" title="Close">✕</button>
+  </div></header><iframe src="${src}" loading="lazy" title="${label}"></iframe>`;
+  document.body.appendChild(wrap);
+  makeDraggableOverlay(wrap);
+  // Button handlers with stopPropagation to avoid background clicks
+  wrap.querySelector('[data-act="reload"]').addEventListener('click', e=>{ e.stopPropagation(); reloadFrame(id); });
+  wrap.querySelector('[data-act="close"]').addEventListener('click', e=>{ e.stopPropagation(); closeOverlay(id); });
+  wrap.querySelector('[data-act="external"]').addEventListener('click', e=>{ e.stopPropagation(); const ifr=wrap.querySelector('iframe'); if(ifr) window.open(ifr.src,'_blank','noopener'); });
+}
+// Add fade-out animation style once
+if(!document.getElementById('overlayAnimStyle')){
+  const s = document.createElement('style');
+  s.id='overlayAnimStyle';
+  s.textContent = `.integrated-overlay.closing{ animation: overlayFade .18s ease forwards; }
+  @keyframes overlayFade { to { opacity:0; transform:translateX(-50%) scale(.96); } }`;
+  document.head.appendChild(s);
+}
+
+function makeDraggableOverlay(el){
+  let isDown=false,ox=0,oy=0; const header=el.querySelector('header');
+  header.style.cursor='move';
+  header.addEventListener('mousedown',e=>{isDown=true;ox=e.clientX - el.offsetLeft; oy=e.clientY - el.offsetTop;});
+  window.addEventListener('mouseup',()=>isDown=false);
+  window.addEventListener('mousemove',e=>{ if(!isDown) return; el.style.left=(e.clientX-ox)+'px'; el.style.top=(Math.max(0,e.clientY-oy))+'px'; el.style.transform='translateX(0)'; });
+}
+
+function openAbout(){ createOverlay('aboutOverlay','ABOUT • 420360','about/index.html'); showOverlay('aboutOverlay'); }
+function openOracle(){ createOverlay('oracleOverlay','TIM • DIALOGUE ORACLE','games/tim-the-dialogue-oracle/index.html'); showOverlay('oracleOverlay'); }
+function openGameOverlay(label, url){
+  // Normalize internal absolute URLs to relative
+  const rel = url.replace(/^https?:\/\/420360\.xyz\//,'');
+  // Single reusable game overlay
+  let el = document.getElementById('gameOverlay');
+  if(!el){
+    createOverlay('gameOverlay', label, rel);
+    el = document.getElementById('gameOverlay');
+  } else {
+    // update label and iframe
+    const headerSpan = el.querySelector('header span');
+    if(headerSpan) headerSpan.textContent = label.toUpperCase();
+    const iframe = el.querySelector('iframe');
+    if(iframe) iframe.src = rel;
+  }
+  showOverlay('gameOverlay');
+}
+function openContentOverlay(label, url){
+  const elId = 'contentOverlay';
+  let el = document.getElementById(elId);
+  if(!el){
+    createOverlay(elId, label, url);
+    el = document.getElementById(elId);
+  } else {
+    const headerSpan = el.querySelector('header span');
+    if(headerSpan) headerSpan.textContent = label.toUpperCase();
+    const iframe = el.querySelector('iframe');
+    if(iframe) iframe.src = url;
+  }
+  showOverlay(elId);
+}
+function showOverlay(id){ const el=document.getElementById(id); if(el){ el.classList.remove('hidden'); el.focus(); pauseBackground(); }}
+function closeOverlay(id){
+  const el=document.getElementById(id);
+  if(!el || el.classList.contains('hidden') || el.classList.contains('closing')) return;
+  el.classList.add('closing');
+  // After animation, hide
+  setTimeout(()=>{ el.classList.add('hidden'); el.classList.remove('closing'); resumeBackgroundIfNone(); }, 190);
+}
+function reloadFrame(id){ const el=document.getElementById(id); if(!el) return; const ifr=el.querySelector('iframe'); ifr.src=ifr.src; }
+
+function pauseBackground(){ stopIntervals(); }
+function resumeBackgroundIfNone(){ const anyOpen = document.querySelectorAll('.integrated-overlay:not(.hidden)').length>0; if(!anyOpen) startIntervals(); }
+
+// Keyboard shortcut: press A for About, O for Oracle (when not typing inside overlays)
+window.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'|| e.target.tagName==='TEXTAREA') return; if(e.key==='a'||e.key==='A'){ openAbout(); } if(e.key==='o'||e.key==='O'){ openOracle(); } if(e.key==='Escape'){ document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>closeOverlay(el.id)); } });
+
+// Intercept clicks on any popup link to open in overlay (internal or external)
+document.addEventListener('click', (e)=>{
+  const a = e.target.closest('.popup a');
+  if(!a) return;
+  const href = a.getAttribute('href')||'';
+  if(!href) return;
+  // Oracle special
+  if(href === '__INTERNAL_ORACLE__'){ e.preventDefault(); openOracle(); return; }
+  e.preventDefault();
+  let label = 'LINK';
+  const popup = a.closest('.popup');
+  if(popup){ const span = popup.querySelector('.titlebar span'); if(span) label = span.textContent.trim(); }
+  if(/420360\.xyz\/games\//.test(href) || /^games\//.test(href)){
+    openGameOverlay(label + ' • 420360', href);
+  } else if(/\/games\//.test(href)) {
+    openGameOverlay(label + ' • 420360', href);
+  } else {
+    openContentOverlay(label + ' • EXT', href);
+  }
+});
+
 const ICON_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAALklEQVQoka3OMQ0AAAzDsPnfpM1Yip5JRGCBqgMFBQUFBQUFBQUFBQUFBSUlG8mG6tD3oxAAAAAElFTkSuQmCC";
 
 const ADS = [
@@ -252,7 +370,8 @@ const ADS = [
   { label: "WAR ART", href: "#", gif: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGtqeXlneGRncndxb3JwMmN2MzY2Mzh5dmppZ2QzOWFiZ3lwZzQyaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Obp3D49Jjrp3cSNPqc/giphy.gif" },
   { label: "ZEF DEMONS", href: "#", gif: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDIxd21ocDNrcGhrYnh5MnFpaGE5YWtyYm1tcGozOG9oZnZvOGZtMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ccPxUOXjNMfnRe7qPP/giphy.gif" },
   { label: "HEY ON LENS", href: "https://hey.xyz/u/wooden", gif: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNG44Ync4cTQyZWY2emV6d3Z1NGJqNGF5ZnZwN2YxcG50dGhyb3BlaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/0zAV0pUI1CjTCgr8FB/giphy.gif" },
-  { label: "SHADOW PROTOCOL", href: "https://420360.xyz/null-vesper/shadow-protocol/", gif: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWd2N2c3eHJlNmIxOGRrdmhrOXdjeng4cHkxYWp3aW5xYzhzN2s1ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3PLAXg1osLVVttjRTN/giphy.gif"}
+  { label: "SHADOW PROTOCOL", href: "https://420360.xyz/null-vesper/shadow-protocol/", gif: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWd2N2c3eHJlNmIxOGRrdmhrOXdjeng4cHkxYWp3aW5xYzhzN2s1ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3PLAXg1osLVVttjRTN/giphy.gif"},
+  { label: "TIM ORACLE", href: "__INTERNAL_ORACLE__", gif: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYW5iM2lsNjR1NGt4NjI0aHk4cWZrcWFicWNpeHQxZmRzMGNrNTNiYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7AA8vvC4ZPOsmOphuc/giphy.gif" }
 ];
 
 const POPUP_INTERVAL_MS = 1000;    // auto spawn interval
@@ -454,7 +573,7 @@ function makePopup(ad){
       <div class="close" role="button" aria-label="Close popup" tabindex="0">×</div>
     </div>
     <div class="content">
-      <a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer">
+  <a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer" data-ad-link>
         <img src="${escapeHtml(ad.gif)}" alt="${escapeHtml(ad.label)} animation">
       </a>
     </div>
@@ -466,6 +585,12 @@ function makePopup(ad){
   closeBtn.addEventListener('keydown', (ev)=> { if(ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); removePopupElement(p); } });
 
   document.body.appendChild(p);
+  // Internal oracle override
+  const link = p.querySelector('[data-ad-link]');
+  if (ad.href === '__INTERNAL_ORACLE__' && link) {
+    link.removeAttribute('target');
+    link.addEventListener('click', (e)=>{ e.preventDefault(); openOracle(); });
+  }
   activePopups.push(p);
 
   // schedule lifetime removal
@@ -540,6 +665,8 @@ if (!document.hidden) startIntervals();
 let lastClick = 0;
 document.addEventListener('click', (ev)=>{
   const now = Date.now();
+  // Skip spawning if click is inside an integrated overlay (About / Oracle / Game)
+  if (ev.target.closest('.integrated-overlay')) return;
   if (now - lastClick > 120) { spawnPopup(); lastClick = now; }
 });
 

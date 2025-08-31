@@ -15,7 +15,7 @@
             --danger: #ff0040;
             --success: #00ff40;
         }
-
+ 
         * { box-sizing: border-box; }
         html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Press Start 2P', 'Courier New', monospace; image-rendering: pixelated; display:flex; align-items:center; justify-content:center; flex-direction:column; }
         .game-container { text-align:center; padding:20px; }
@@ -65,7 +65,6 @@
             <button id="startBtn" class="btn">START GAME</button>
             <button id="pauseBtn" class="btn">PAUSE</button>
             <button id="resetBtn" class="btn">RESET</button>
-            <button id="nextPattern" class="btn">CHANGE PATTERN</button>
         </div>
 
         <div class="mobile-controls">
@@ -140,7 +139,17 @@ const PATTERNS = [
         return r>5? (c>=4 && c<=6?1:0) : 0;
     } }
 ];
-let patternIndex = 0;
+// pick an initial random pattern
+function getRandomPatternIndex(exclude){
+    if(typeof exclude === 'number' && PATTERNS.length <= 1) return 0;
+    let idx = Math.floor(Math.random()*PATTERNS.length);
+    if(typeof exclude === 'number'){
+        let attempts = 0;
+        while(idx === exclude && attempts < 8){ idx = Math.floor(Math.random()*PATTERNS.length); attempts++; }
+    }
+    return idx;
+}
+let patternIndex = getRandomPatternIndex();
 
 // Powerup types
 const POWERUP_TYPES = ['expand','shrink','multi','slow','life','sticky','scorex2'];
@@ -174,7 +183,7 @@ function pauseGame(){
 }
 
 function resetGame(){
-    score = 0; lives = 3; level = 1; patternIndex = 0; activeEffects = {}; powerups=[]; balls = [];
+    score = 0; lives = 3; level = 1; patternIndex = getRandomPatternIndex(); activeEffects = {}; powerups=[]; balls = [];
     paddle.width = 100; paddle.sticky = false; balls = [ball];
     createBricks(); resetBall(); updateStats(); draw();
     if(gameLoop) clearInterval(gameLoop); gameRunning = false;
@@ -276,7 +285,11 @@ function gameTick(){
 
     // check level complete
     if(bricks.every(b=>b.destroyed)){
-        level++; patternIndex++; createBricks(); // refresh pattern maybe
+    level++;
+    // pick a new random pattern for next level, avoid repeating current when possible
+    const old = patternIndex;
+    patternIndex = getRandomPatternIndex(old);
+    createBricks(); // refresh pattern
         // speed up a bit
         for(let b of balls){ b.speedX *= 1.05; b.speedY *= 1.05; }
         resetBall(); updateStats(); showMessage('LEVEL COMPLETE', `Starting Level ${level}`, 'CONTINUE'); setTimeout(()=>hideMessage(),1200);
@@ -310,18 +323,43 @@ function draw(){
     for(const p of powerups){ ctx.fillStyle = '#ffffff'; ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size); ctx.fillStyle='#000'; ctx.font='10px monospace'; ctx.fillText(p.label, p.x-6, p.y+3); }
 }
 
+let lastMessageAction = null; // controls what the message button will do when clicked
+
 function gameOver(){
     gameRunning = false; clearInterval(gameLoop);
-    if(score > highScore){ highScore = score; localStorage.setItem('breakoutHighScore', highScore.toString()); updateStats(); showWinMessage('NEW HIGH SCORE!', `Final Score: ${score}`); }
-    else showLoseMessage('GAME OVER', `Final Score: ${score}`);
+    if(score > highScore){
+        highScore = score; localStorage.setItem('breakoutHighScore', highScore.toString()); updateStats();
+        showWinMessage('NEW HIGH SCORE!', `Final Score: ${score}`);
+        lastMessageAction = 'restart';
+    } else {
+        showLoseMessage('GAME OVER', `Final Score: ${score}`);
+        lastMessageAction = 'restart';
+    }
 }
 
 function updateStats(){ document.getElementById('score').textContent = score; document.getElementById('lives').textContent = lives; document.getElementById('level').textContent = level; document.getElementById('highScore').textContent = highScore; }
 
 function showMessage(title,text,btnText=''){
-    document.getElementById('messageTitle').textContent = title; document.getElementById('messageText').textContent = text; const gm = document.getElementById('gameMessage'); gm.className='game-message'; document.getElementById('messageBtn').textContent = btnText || 'OK'; gm.style.display='block'; }
-function showWinMessage(title,text){ document.getElementById('messageTitle').textContent = title; document.getElementById('messageText').textContent = text; const gm=document.getElementById('gameMessage'); gm.className='game-message win-message'; document.getElementById('messageBtn').textContent='PLAY AGAIN'; gm.style.display='block'; }
-function showLoseMessage(title,text){ document.getElementById('messageTitle').textContent = title; document.getElementById('messageText').textContent = text; const gm=document.getElementById('gameMessage'); gm.className='game-message lose-message'; document.getElementById('messageBtn').textContent='RETRY'; gm.style.display='block'; }
+    lastMessageAction = null;
+    document.getElementById('messageTitle').textContent = title;
+    document.getElementById('messageText').textContent = text;
+    const gm = document.getElementById('gameMessage'); gm.className='game-message';
+    document.getElementById('messageBtn').textContent = btnText || 'OK'; gm.style.display='block';
+}
+function showWinMessage(title,text){
+    lastMessageAction = 'restart';
+    document.getElementById('messageTitle').textContent = title;
+    document.getElementById('messageText').textContent = text;
+    const gm=document.getElementById('gameMessage'); gm.className='game-message win-message';
+    document.getElementById('messageBtn').textContent='PLAY AGAIN'; gm.style.display='block';
+}
+function showLoseMessage(title,text){
+    lastMessageAction = 'restart';
+    document.getElementById('messageTitle').textContent = title;
+    document.getElementById('messageText').textContent = text;
+    const gm=document.getElementById('gameMessage'); gm.className='game-message lose-message';
+    document.getElementById('messageBtn').textContent='RESTART'; gm.style.display='block';
+}
 function hideMessage(){ document.getElementById('gameMessage').style.display='none'; }
 
 function spawnPowerup(x,y){ const type = POWERUP_TYPES[Math.floor(Math.random()*POWERUP_TYPES.length)]; const label = {expand:'E',shrink:'s',multi:'M',slow:'S',life:'L',sticky:'T',scorex2:'x2'}[type]||'?'; powerups.push({ x, y, type, size:18, label, speed:2 }); }
@@ -370,11 +408,18 @@ setInterval(()=>{ if(paddleMoving==='left') paddle.x = Math.max(0, paddle.x - pa
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('pauseBtn').addEventListener('click', pauseGame);
 document.getElementById('resetBtn').addEventListener('click', resetGame);
-document.getElementById('messageBtn').addEventListener('click', ()=>{ hideMessage(); if(!gameRunning) startGame(); });
-document.getElementById('nextPattern').addEventListener('click', ()=>{ patternIndex = (patternIndex+1)%PATTERNS.length; createBricks(); draw(); });
-
-// expose change pattern button too
-
+document.getElementById('messageBtn').addEventListener('click', ()=>{
+    const action = lastMessageAction;
+    hideMessage();
+    if(action === 'restart'){
+        // full restart then start
+        resetGame();
+        startGame();
+        lastMessageAction = null;
+        return;
+    }
+    if(!gameRunning) startGame();
+});
 // init
 initGame();
 </script>

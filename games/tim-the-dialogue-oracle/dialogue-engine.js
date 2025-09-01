@@ -13,6 +13,11 @@ class DialogueEngine {
   _clone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
   reset() {
+    // Play reset sound
+    if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+      GameSounds.sounds.GAME_START();
+    }
+    
     this.pack = this._clone(this.originalPack);
     this.state = { flags: {}, history: [] };
     this.currentNodeId = this.pack.startsWith;
@@ -20,6 +25,11 @@ class DialogueEngine {
   }
 
   loadPack(pack) {
+    // Play pack loading sound
+    if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+      GameSounds.sounds.POWER_UP();
+    }
+    
     this.originalPack = pack;
     this.reset();
   }
@@ -47,6 +57,12 @@ class DialogueEngine {
     if (!node || node.end) return;
     const choice = node.choices?.[index];
     if (!choice) return;
+    
+    // Play choice selection sound
+    if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+      GameSounds.sounds.MENU_SELECT();
+    }
+    
     const target = this.resolveTo(choice.to);
     if (!target) return;
     this.state.history.push({ from: this.currentNodeId, choice: index, to: target });

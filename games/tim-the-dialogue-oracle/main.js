@@ -1,3 +1,12 @@
+// Initialize sound system on first interaction
+function initializeSound() {
+  if (typeof GameSounds !== 'undefined') {
+    GameSounds.enableAudio();
+  }
+}
+
+let soundInitialized = false;
+
 // Using globals PACKS, SCHEMA_SNIPPET, DialogueEngine injected by prior scripts.
 
 const textEl = document.getElementById('text');
@@ -62,7 +71,13 @@ function renderNode(payload, state) {
       btn.className = 'choice-btn pixel-font fade-in';
       btn.textContent = (idx+1) + '. ' + c.text + (c.ending ? ' •' : '');
       if (c.ending) btn.dataset.ending = 'true';
-      btn.addEventListener('click', () => engine.choose(idx));
+      btn.addEventListener('click', () => {
+        if (!soundInitialized) {
+          initializeSound();
+          soundInitialized = true;
+        }
+        engine.choose(idx);
+      });
       li.appendChild(btn);
       choicesEl.appendChild(li);
     });

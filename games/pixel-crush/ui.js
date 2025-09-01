@@ -254,6 +254,78 @@
             }
         }
 
+        showLevelInfo(level, specialFeature) {
+            // Show level transition with special feature info
+            if (!specialFeature) return;
+            
+            const featureDescriptions = {
+                'more_colors': 'Enhanced Color Variety!',
+                'power_boost': 'Power-Up Boost Active!',
+                'combo_bonus': 'Combo Bonus Multiplier!',
+                'time_pressure': 'Pressure Mode Engaged!',
+                'mega_combos': 'Mega Combos Enabled!',
+                'chain_reaction': 'Chain Reaction Bonus!',
+                'cascade_bonus': 'Cascade Bonus Active!',
+                'master_mode': 'Master Mode - All Bonuses!',
+                'perfect_challenge': 'Perfect Challenge Mode!'
+            };
+            
+            const description = featureDescriptions[specialFeature] || 'Special Level!';
+            
+            // Create a temporary notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--secondary);
+                color: var(--text);
+                padding: 20px;
+                border: 3px solid var(--primary);
+                box-shadow: 0 0 0 3px var(--highlight);
+                font-family: 'Press Start 2P', monospace;
+                font-size: 12px;
+                text-align: center;
+                z-index: 10000;
+                border-radius: 8px;
+                animation: levelInfoPulse 0.5s ease-in-out;
+            `;
+            
+            notification.innerHTML = `
+                <div style="margin-bottom: 10px; color: var(--highlight);">LEVEL ${level}</div>
+                <div>${description}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Add CSS animation if not already present
+            if (!document.getElementById('levelInfoStyles')) {
+                const style = document.createElement('style');
+                style.id = 'levelInfoStyles';
+                style.textContent = `
+                    @keyframes levelInfoPulse {
+                        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+                        100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                notification.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
         animateValueChange(element) {
             if (!element) return;
             

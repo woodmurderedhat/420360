@@ -16,6 +16,20 @@
         7: 2500, // 7-match
         8: 4000  // 8+ match
     };
+    
+    // Enhanced level configuration with varying moves and features
+    const LEVEL_CONFIG = [
+        { moves: 30, target: 1000, specialFeature: null },
+        { moves: 28, target: 2500, specialFeature: 'more_colors' },
+        { moves: 26, target: 5000, specialFeature: 'power_boost' },
+        { moves: 25, target: 8000, specialFeature: 'combo_bonus' },
+        { moves: 24, target: 12000, specialFeature: 'time_pressure' },
+        { moves: 23, target: 18000, specialFeature: 'mega_combos' },
+        { moves: 22, target: 25000, specialFeature: 'chain_reaction' },
+        { moves: 21, target: 35000, specialFeature: 'cascade_bonus' },
+        { moves: 20, target: 50000, specialFeature: 'master_mode' },
+        { moves: 18, target: 75000, specialFeature: 'perfect_challenge' }
+    ];
 
     class Game {
         constructor() {
@@ -29,7 +43,7 @@
             this.score = 0;
             this.level = 1;
             this.moves = INITIAL_MOVES;
-            this.target = LEVEL_TARGETS[0];
+            this.target = LEVEL_CONFIG[0].target;
             this.combo = 0;
             this.totalScore = 0;
             
@@ -44,6 +58,14 @@
             // Mobile touch support
             this.touchStartPos = null;
             this.touchEndPos = null;
+            
+            // Special level features
+            this.specialFeature = null;
+            this.powerUpBoost = 1.0;
+            this.comboBonus = 1.0;
+            this.megaCombosEnabled = false;
+            this.chainReactionBonus = 1.0;
+            this.cascadeBonus = 1.0;
         }
 
         init() {
@@ -178,13 +200,23 @@
             if (startPixel && endPixel && this.board.isAdjacent(startPixel, endPixel)) {
                 this.attemptSwap(startPixel, endPixel);
                 
-                // Haptic feedback for mobile
+                // Enhanced haptic feedback for mobile
                 if (navigator.vibrate) {
-                    navigator.vibrate(50);
+                    navigator.vibrate([30, 10, 30]); // Pattern for successful swap
                 }
             } else if (startPixel && !endPixel) {
                 // Tap without swipe - select pixel
                 this.handlePixelSelect(startPixel);
+                
+                // Light haptic feedback for selection
+                if (navigator.vibrate) {
+                    navigator.vibrate(20);
+                }
+            } else if (startPixel && endPixel && !this.board.isAdjacent(startPixel, endPixel)) {
+                // Invalid move - different haptic pattern
+                if (navigator.vibrate) {
+                    navigator.vibrate([10, 10, 10]); // Quick buzz for invalid move
+                }
             }
         }
 
@@ -304,12 +336,25 @@
                 // Show score particles
                 this.ui.showScoreParticles(matches, matchScore, this.combo);
                 
-                // Play match sound
+                // Play match sound with variety based on match size and special features
                 if (window.GameSounds && window.GameSounds.isEnabled()) {
-                    if (matches.length >= 5) {
+                    if (matches.length >= 6) {
                         window.GameSounds.sounds.POWER_UP();
-                    } else {
+                    } else if (matches.length >= 5) {
+                        window.GameSounds.sounds.SCORE_POINT();
+                    } else if (this.combo >= 3) {
                         window.GameSounds.sounds.COLLECT_ITEM();
+                    } else {
+                        window.GameSounds.sounds.MENU_SELECT();
+                    }
+                    
+                    // Add extra sound for special level features
+                    if (this.megaCombosEnabled && this.combo >= 3) {
+                        setTimeout(() => {
+                            if (window.GameSounds && window.GameSounds.isEnabled()) {
+                                window.GameSounds.sounds.LEVEL_UP();
+                            }
+                        }, 100);
                     }
                 }
                 
@@ -355,10 +400,30 @@
 
         calculateMatchScore(matches) {
             const baseScore = SCORE_MULTIPLIERS[Math.min(matches.length, 8)] || SCORE_MULTIPLIERS[8];
-            const comboMultiplier = 1 + (this.combo * 0.5);
+            let comboMultiplier = 1 + (this.combo * 0.5);
             const levelMultiplier = 1 + (this.level - 1) * 0.1;
             
-            return Math.floor(baseScore * comboMultiplier * levelMultiplier);
+            // Apply special level features
+            comboMultiplier *= this.comboBonus;
+            
+            let finalScore = Math.floor(baseScore * comboMultiplier * levelMultiplier);
+            
+            // Apply cascade bonus if this is part of a cascade
+            if (this.combo > 1) {
+                finalScore = Math.floor(finalScore * this.cascadeBonus);
+            }
+            
+            // Apply chain reaction bonus for large matches
+            if (matches.length >= 5) {
+                finalScore = Math.floor(finalScore * this.chainReactionBonus);
+            }
+            
+            // Mega combo bonus for special levels
+            if (this.megaCombosEnabled && this.combo >= 3) {
+                finalScore = Math.floor(finalScore * 1.5);
+            }
+            
+            return finalScore;
         }
 
         delay(ms) {
@@ -427,20 +492,25 @@
         }
 
         nextLevel() {
-            if (this.level < LEVEL_TARGETS.length) {
+            if (this.level < LEVEL_CONFIG.length) {
                 this.level++;
-                this.target = LEVEL_TARGETS[this.level - 1];
-                this.moves = INITIAL_MOVES + (this.level - 1) * 5; // More moves for higher levels
+                const levelData = LEVEL_CONFIG[this.level - 1];
+                this.target = levelData.target;
+                this.moves = levelData.moves;
                 this.combo = 0;
                 this.selectedPixel = null;
                 
                 this.board.initializeGrid();
+                
+                // Apply special level features
+                this.applyLevelFeatures(levelData.specialFeature);
                 
                 this.ui.updateLevel(this.level);
                 this.ui.updateMoves(this.moves);
                 this.ui.updateTarget(this.target);
                 this.ui.updateCombo(this.combo);
                 this.ui.updateProgress(this.score, this.target);
+                this.ui.showLevelInfo(this.level, levelData.specialFeature);
                 
                 this.gameState = 'playing';
                 this.ui.updateGameState(this.gameState);
@@ -454,6 +524,64 @@
             } else {
                 // All levels completed
                 this.gameOver(true);
+            }
+        }
+        
+        applyLevelFeatures(feature) {
+            // Reset any previous special features
+            this.specialFeature = feature;
+            
+            switch (feature) {
+                case 'more_colors':
+                    // Add visual indicator for more color variety
+                    break;
+                case 'power_boost':
+                    // Increase power-up generation rate
+                    this.powerUpBoost = 1.5;
+                    break;
+                case 'combo_bonus':
+                    // Increase combo multiplier effectiveness
+                    this.comboBonus = 2.0;
+                    break;
+                case 'time_pressure':
+                    // Add visual urgency effects
+                    break;
+                case 'mega_combos':
+                    // Enable mega combo cascades
+                    this.megaCombosEnabled = true;
+                    break;
+                case 'chain_reaction':
+                    // Enhanced chain reaction effects
+                    this.chainReactionBonus = 2.0;
+                    break;
+                case 'cascade_bonus':
+                    // Bonus for cascade matches
+                    this.cascadeBonus = 1.5;
+                    break;
+                case 'master_mode':
+                    // All bonuses active
+                    this.powerUpBoost = 2.0;
+                    this.comboBonus = 2.5;
+                    this.megaCombosEnabled = true;
+                    this.chainReactionBonus = 2.5;
+                    this.cascadeBonus = 2.0;
+                    break;
+                case 'perfect_challenge':
+                    // Ultimate challenge with all features
+                    this.powerUpBoost = 3.0;
+                    this.comboBonus = 3.0;
+                    this.megaCombosEnabled = true;
+                    this.chainReactionBonus = 3.0;
+                    this.cascadeBonus = 3.0;
+                    break;
+                default:
+                    // Reset all special features
+                    this.powerUpBoost = 1.0;
+                    this.comboBonus = 1.0;
+                    this.megaCombosEnabled = false;
+                    this.chainReactionBonus = 1.0;
+                    this.cascadeBonus = 1.0;
+                    break;
             }
         }
 

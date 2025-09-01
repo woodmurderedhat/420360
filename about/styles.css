@@ -2,7 +2,7 @@
 /* Reuse styles from tim-the-dialogue-oracle with minimal tweaks */
 :root { --bg:#181825; --panel-bg:#23272b; --panel-bg-alt:#2e3238; --stroke:#ff00ea; --stroke2:#00fff7; --accent:#fff700; --text:#f0f0f0; --font:'Press Start 2P', monospace; }
 html,body{height:100%;margin:0;}
-body{background:var(--bg);font-family:var(--font);color:var(--text);image-rendering:pixelated;display:flex;flex-direction:column;min-height:100vh;overflow:hidden;}
+body{background:var(--bg);font-family:var(--font);color:var(--text);image-rendering:pixelated;display:flex;flex-direction:column;min-height:100vh;overflow:auto;}
 .pixel-font{font-family:var(--font);} .pixel-font.small{font-size:10px;} .pixel-font.tiny{font-size:9px;}
 .arcade-header{ text-align:center; padding:8px 4px 4px; border-bottom:4px solid var(--stroke2); box-shadow:0 0 0 4px var(--stroke2),0 0 8px var(--stroke),4px 4px 0 0 var(--accent),0 0 0 8px #000; background:var(--panel-bg); position:relative; z-index:10; }
 .title{ font-size:16px; letter-spacing:2px; background:linear-gradient(90deg,var(--stroke),var(--accent),var(--stroke2)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }

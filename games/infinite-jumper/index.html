@@ -227,6 +227,11 @@
         };
 
         function startGame() {
+            // Enable audio on first user interaction
+            if (typeof GameSounds !== 'undefined') {
+                GameSounds.enableAudio();
+            }
+            
             // Reset game state
             player.x = canvas.width / 2 - 10;
             player.y = canvas.height - 100;
@@ -246,6 +251,11 @@
             
             if (gameLoop) clearInterval(gameLoop);
             gameLoop = setInterval(update, 1000/60); // 60 FPS
+            
+            // Play game start sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.GAME_START();
+            }
             
             document.getElementById('startBtn').textContent = 'RESTART';
         }
@@ -296,6 +306,12 @@
 
         function jump() {
             if (!gameRunning || !player.grounded) return;
+            
+            // Play jump sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.JUMP();
+            }
+            
             player.velY = player.jumpPower;
             player.grounded = false;
         }
@@ -351,6 +367,12 @@
                     player.y = platform.y - player.height;
                     player.velY = 0;
                     player.grounded = true;
+                    
+                    // Play landing sound (soft bounce)
+                    if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                        GameSounds.sounds.BOUNCE();
+                    }
+                    
                     break;
                 }
             }
@@ -364,6 +386,12 @@
                     player.y + player.height > powerup.y) {
                     
                     score += powerup.points;
+                    
+                    // Play powerup collection sound
+                    if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                        GameSounds.sounds.COLLECT_ITEM();
+                    }
+                    
                     powerups.splice(i, 1);
                 }
             }
@@ -459,6 +487,11 @@
             gameRunning = false;
             clearInterval(gameLoop);
             
+            // Play game over sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.GAME_OVER();
+            }
+            
             finalScoreElement.textContent = score;
             finalHeightElement.textContent = maxHeight;
             
@@ -512,5 +545,8 @@
         // Initial draw
         draw();
     </script>
+    
+    <!-- Sound system -->
+    <script src="../../assets/js/game-sounds.js"></script>
 </body>
 </html>

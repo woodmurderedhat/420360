@@ -220,6 +220,11 @@
         };
 
         function startGame() {
+            // Enable audio on first user interaction
+            if (typeof GameSounds !== 'undefined') {
+                GameSounds.enableAudio();
+            }
+            
             // Reset game state
             ship.x = canvas.width / 2;
             ship.y = canvas.height / 2;
@@ -239,6 +244,11 @@
             
             if (gameLoop) clearInterval(gameLoop);
             gameLoop = setInterval(update, 1000/60); // 60 FPS
+            
+            // Play game start sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.GAME_START();
+            }
             
             document.getElementById('startBtn').textContent = 'RESTART';
         }
@@ -276,6 +286,11 @@
         function shoot() {
             if (!gameRunning) return;
             
+            // Play shooting sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.BUTTON_CLICK();
+            }
+            
             const bulletSpeed = 10;
             bullets.push({
                 x: ship.x,
@@ -288,6 +303,12 @@
 
         function thrust() {
             if (!gameRunning) return;
+            
+            // Play thrust sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.MOVE();
+            }
+            
             ship.thrust = true;
             setTimeout(() => ship.thrust = false, 100);
         }
@@ -345,6 +366,12 @@
                     
                     if (distance < asteroid.size * 8) {
                         score += asteroid.points;
+                        
+                        // Play asteroid destruction sound
+                        if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                            GameSounds.sounds.BREAK();
+                        }
+                        
                         splitAsteroid(asteroid, j);
                         bullets.splice(i, 1);
                         break;
@@ -367,6 +394,11 @@
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
                 if (distance < asteroid.size * 8 + ship.size) {
+                    // Play collision sound
+                    if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                        GameSounds.sounds.HIT();
+                    }
+                    
                     lives--;
                     
                     if (lives <= 0) {
@@ -381,6 +413,11 @@
             
             // Check if all asteroids destroyed
             if (asteroids.length === 0) {
+                // Play level completion sound
+                if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                    GameSounds.sounds.LEVEL_UP();
+                }
+                
                 // Create new wave with more asteroids
                 createAsteroids();
             }
@@ -501,6 +538,11 @@
             gameRunning = false;
             clearInterval(gameLoop);
             
+            // Play game over sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.GAME_OVER();
+            }
+            
             finalScoreElement.textContent = score;
             
             if (score > highScore) {
@@ -553,5 +595,8 @@
         // Initial draw
         draw();
     </script>
+    
+    <!-- Sound system -->
+    <script src="../../assets/js/game-sounds.js"></script>
 </body>
 </html>

@@ -69,7 +69,8 @@ const GAMES = [
 	{ id:'infinite-jumper', name:'INFINITE JUMPER', url:'infinite-jumper/', tags:['arcade','retro'], blurb:'Jump to infinite heights.', gif:'https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif', scoreKey:'infiniteJumperHighScore', scoreType:'score' },
 	{ id:'generative-art', name:'GENERATIVE ART', url:'generative-art/', tags:['experimental'], blurb:'Procedural visuals.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif' },
 	{ id:'tim-the-dialogue-oracle', name:'TIM • ORACLE', url:'../tim-the-dialogue-oracle/', tags:['experimental'], blurb:'Conversational mystic.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif' },
-	{ id:'noctis-reverie', name:'NOCTIS REVERIE', url:'noctis-reverie/', tags:['experimental'], blurb:'Dreamlike voyage.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif' }
+	{ id:'noctis-reverie', name:'NOCTIS REVERIE', url:'noctis-reverie/', tags:['experimental'], blurb:'Dreamlike voyage.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif' },
+	{ id:'pixel-crush', name:'PIXEL CRUSH', url:'pixel-crush/', tags:['puzzle','experimental'], blurb:'Match-3 pixel mayhem.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif', scoreKey:'pixelCrushProgress', scoreType:'total' }
 ];
 
 const grid = document.getElementById('gamesGrid');
@@ -89,6 +90,9 @@ function getGameScore(game) {
 			case 'leaderboard':
 				const scores = JSON.parse(stored);
 				return scores.length > 0 ? scores[0].score : null;
+			case 'total':
+				const progress = JSON.parse(stored);
+				return progress.bestScores ? progress.bestScores.total : null;
 			case 'score':
 			case 'level':
 			case 'wins':

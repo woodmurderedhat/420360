@@ -65,5 +65,32 @@
     <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
 
     <script type="module" src="./js/main.js"></script>
+    
+    <!-- Sound system -->
+    <script src="../../assets/js/game-sounds.js"></script>
+    <script>
+        // Initialize sound when any button is clicked
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (typeof GameSounds !== 'undefined') {
+                        GameSounds.enableAudio();
+                        
+                        // Play different sounds for different actions
+                        if (this.id === 'randomSeedButton' || this.id === 'mobileRandomizeButton') {
+                            if (GameSounds.isEnabled()) GameSounds.sounds.POWER_UP();
+                        } else if (this.id === 'regenerateButton') {
+                            if (GameSounds.isEnabled()) GameSounds.sounds.SUCCESS();
+                        } else if (this.id === 'exportButton' || this.id === 'mobileExportButton') {
+                            if (GameSounds.isEnabled()) GameSounds.sounds.COLLECT_ITEM();
+                        } else {
+                            if (GameSounds.isEnabled()) GameSounds.sounds.MENU_SELECT();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

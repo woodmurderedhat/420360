@@ -421,6 +421,11 @@
         }
 
         function startGame() {
+            // Enable audio on first user interaction
+            if (typeof GameSounds !== 'undefined') {
+                GameSounds.enableAudio();
+            }
+            
             resetGame();
             gameRunning = true;
             gameOverElement.style.display = 'none';
@@ -433,6 +438,11 @@
             
             startPixelSpawn();
             updateDisplay();
+            
+            // Play game start sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.GAME_START();
+            }
             
             document.getElementById('startBtn').textContent = 'RESTART';
         }
@@ -567,6 +577,11 @@
             pixels.splice(index, 1);
             collected++;
             
+            // Play collection sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.COLLECT_ITEM();
+            }
+            
             // Store collected pixel for pattern creation
             collectedPixels.push({
                 x: pixel.x / canvas.width,
@@ -584,6 +599,10 @@
                 // Special effect for high combos
                 if (combo >= 5) {
                     triggerSpecialEffect();
+                    // Play special combo sound
+                    if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                        GameSounds.sounds.POWER_UP();
+                    }
                 }
             } else {
                 combo = 1;
@@ -629,6 +648,11 @@
             gameRunning = false;
             clearInterval(pixelSpawnTimer);
             clearInterval(gameTimer);
+            
+            // Play game completion sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.SUCCESS();
+            }
             
             // Update best score
             if (score > bestScore) {
@@ -741,5 +765,8 @@
         updateCollectorPosition();
         draw();
     </script>
+    
+    <!-- Sound system -->
+    <script src="../../assets/js/game-sounds.js"></script>
 </body>
 </html>

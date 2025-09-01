@@ -395,6 +395,11 @@
         function glitchMaze() {
             if (!gameRunning) return;
             
+            // Play glitch sound effect
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.ERROR();
+            }
+            
             // Add glitch effect to canvas
             canvas.classList.add('glitch-effect');
             setTimeout(() => canvas.classList.remove('glitch-effect'), 200);
@@ -421,6 +426,11 @@
         }
 
         function startGame() {
+            // Enable audio on first user interaction
+            if (typeof GameSounds !== 'undefined') {
+                GameSounds.enableAudio();
+            }
+            
             generateMaze();
             player = { x: 1, y: 1 };
             exit = { x: MAZE_SIZE - 2, y: MAZE_SIZE - 2 };
@@ -438,6 +448,11 @@
             
             gameTimer = setInterval(updateTimer, 100);
             glitchTimer = setInterval(glitchMaze, 3000 - (level * 200)); // Glitches get more frequent
+            
+            // Play game start sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.GAME_START();
+            }
             
             document.getElementById('startBtn').textContent = 'RESTART';
         }
@@ -492,12 +507,22 @@
                 player.x = newX;
                 player.y = newY;
                 
+                // Play movement sound
+                if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                    GameSounds.sounds.MOVE();
+                }
+                
                 // Check if reached exit
                 if (player.x === exit.x && player.y === exit.y) {
                     levelComplete();
                 }
                 
                 draw();
+            } else {
+                // Play collision sound when hitting wall
+                if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                    GameSounds.sounds.ERROR();
+                }
             }
         }
 
@@ -505,6 +530,11 @@
             gameRunning = false;
             clearInterval(gameTimer);
             clearInterval(glitchTimer);
+            
+            // Play level completion sound
+            if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                GameSounds.sounds.SUCCESS();
+            }
             
             // Update best level if current level is higher
             if (level > bestLevel) {
@@ -590,5 +620,8 @@
         generateMaze();
         draw();
     </script>
+    
+    <!-- Sound system -->
+    <script src="../../assets/js/game-sounds.js"></script>
 </body>
 </html>

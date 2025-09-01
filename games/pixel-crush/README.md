@@ -27,9 +27,10 @@ A colorful Candy Crush-style match-3 puzzle game built for the 420360 retro gami
 - **Combo System**: Chain matches for score multipliers
 
 #### Progression
-- **10 Levels**: Each with increasing difficulty and score targets
-- **Move Limits**: Strategic gameplay with limited moves per level
-- **Score Targets**: Reach specific point goals to advance
+- **Infinite Levels**: Endless gameplay with progressively increasing difficulty
+- **Exponential Scaling**: Score targets and challenge increase exponentially after level 10
+- **Move Limits**: Strategic gameplay with limited moves per level that gradually decrease
+- **Dynamic Targets**: Score requirements scale automatically for infinite progression
 
 #### Visual Themes
 - **Classic**: Traditional bright colors
@@ -148,9 +149,11 @@ Customize power-up generation in `board.js`:
 - **Power-ups**: 50 points per affected pixel
 
 ### Level Progression
-- Moves increase slightly with each level (+5 per level)
-- Score targets follow an exponential curve
-- Level multiplier increases by 10% per level
+- First 10 levels use predefined configurations
+- Levels 11+ are generated dynamically with exponential difficulty scaling
+- Score targets increase by ~40% per level + additional scaling factor
+- Moves gradually decrease (minimum 12) to increase challenge
+- Special features cycle through all available types for variety
 
 ### Combo System
 - Each consecutive match increases combo counter

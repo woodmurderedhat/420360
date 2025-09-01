@@ -448,8 +448,8 @@
             this.gameState = 'playing';
             this.score = 0;
             this.level = 1;
-            this.moves = INITIAL_MOVES;
-            this.target = LEVEL_TARGETS[0];
+            this.moves = LEVEL_CONFIG[0].moves;
+            this.target = LEVEL_CONFIG[0].target;
             this.combo = 0;
             this.selectedPixel = null;
             
@@ -492,39 +492,75 @@
         }
 
         nextLevel() {
-            if (this.level < LEVEL_CONFIG.length) {
-                this.level++;
-                const levelData = LEVEL_CONFIG[this.level - 1];
-                this.target = levelData.target;
-                this.moves = levelData.moves;
-                this.combo = 0;
-                this.selectedPixel = null;
-                
-                this.board.initializeGrid();
-                
-                // Apply special level features
-                this.applyLevelFeatures(levelData.specialFeature);
-                
-                this.ui.updateLevel(this.level);
-                this.ui.updateMoves(this.moves);
-                this.ui.updateTarget(this.target);
-                this.ui.updateCombo(this.combo);
-                this.ui.updateProgress(this.score, this.target);
-                this.ui.showLevelInfo(this.level, levelData.specialFeature);
-                
-                this.gameState = 'playing';
-                this.ui.updateGameState(this.gameState);
-                
-                // Play level up sound
-                if (window.GameSounds && window.GameSounds.isEnabled()) {
-                    window.GameSounds.sounds.LEVEL_UP();
-                }
-                
-                this.render();
+            this.level++;
+            
+            // Use predefined config for first 10 levels, then generate infinite levels
+            let levelData;
+            if (this.level <= LEVEL_CONFIG.length) {
+                levelData = LEVEL_CONFIG[this.level - 1];
             } else {
-                // All levels completed
-                this.gameOver(true);
+                // Generate infinite level progression with exponentially increasing difficulty
+                levelData = this.generateInfiniteLevel(this.level);
             }
+            
+            this.target = levelData.target;
+            this.moves = levelData.moves;
+            this.combo = 0;
+            this.selectedPixel = null;
+            
+            this.board.initializeGrid();
+            
+            // Apply special level features
+            this.applyLevelFeatures(levelData.specialFeature);
+            
+            this.ui.updateLevel(this.level);
+            this.ui.updateMoves(this.moves);
+            this.ui.updateTarget(this.target);
+            this.ui.updateCombo(this.combo);
+            this.ui.updateProgress(this.score, this.target);
+            this.ui.showLevelInfo(this.level, levelData.specialFeature);
+            
+            this.gameState = 'playing';
+            this.ui.updateGameState(this.gameState);
+            
+            // Play level up sound
+            if (window.GameSounds && window.GameSounds.isEnabled()) {
+                window.GameSounds.sounds.LEVEL_UP();
+            }
+            
+            this.render();
+        }
+        
+        generateInfiniteLevel(level) {
+            // Base values from the last predefined level
+            const baseTarget = LEVEL_CONFIG[LEVEL_CONFIG.length - 1].target; // 75000
+            const baseMoves = LEVEL_CONFIG[LEVEL_CONFIG.length - 1].moves; // 18
+            
+            // Calculate how many levels beyond the predefined ones
+            const infiniteLevel = level - LEVEL_CONFIG.length;
+            
+            // Exponentially increasing target - gets significantly harder
+            // Each level beyond 10 increases target by 40% + additional scaling
+            const targetMultiplier = Math.pow(1.4, infiniteLevel) * (1 + infiniteLevel * 0.1);
+            const target = Math.floor(baseTarget * targetMultiplier);
+            
+            // Gradually decreasing moves - but not too harsh
+            // Minimum moves is 12, decreases by 1 every 3 levels
+            const moveReduction = Math.floor(infiniteLevel / 3);
+            const moves = Math.max(12, baseMoves - moveReduction);
+            
+            // Cycle through special features for variety
+            const specialFeatures = [
+                'more_colors', 'power_boost', 'combo_bonus', 'time_pressure',
+                'mega_combos', 'chain_reaction', 'cascade_bonus', 'master_mode', 'perfect_challenge'
+            ];
+            const specialFeature = specialFeatures[infiniteLevel % specialFeatures.length];
+            
+            return {
+                moves: moves,
+                target: target,
+                specialFeature: specialFeature
+            };
         }
         
         applyLevelFeatures(feature) {

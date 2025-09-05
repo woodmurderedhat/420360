@@ -1,0 +1,8 @@
+{
+  "name": "casino-sim",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "node tests/run-tests.js"
+  }
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Casino Dice Simulation</title>
+  <link rel="icon" href="../../assets/images/favicon.ico" />
+  <link rel="stylesheet" href="./styles.css" />
+  <!-- Casino Dice Game (M0-M1) -->
+  <!-- Proof-of-concept only: pseudo-random, no real money, educational simulation -->
+</head>
+<body>
+  <header class="top-bar">
+    <a href="../../index.html" class="back">← 420360</a>
+    <h1>Dice Casino (Sim)</h1>
+    <div class="status" id="autoplayStatus">stopped</div>
+  </header>
+
+  <main id="casino">
+    <div id="warnBanner" style="display:none;padding:6px;margin:4px 0;background:#c0392b;color:#fff;font-weight:bold;border-radius:4px;">Invariant violation</div>
+    <!-- REAL PLAYER AREA -->
+    <section id="realPlayer" class="panel">
+      <h2>Real Player (P0)</h2>
+      <div class="subgroup">
+        <h3 class="subhead">Session</h3>
+        <div class="row">
+          <button id="btnInit">Init</button>
+          <button id="btnStep">Step</button>
+          <button id="btnAutoStart">Auto ▶</button>
+          <button id="btnAutoStop" disabled>Stop ■</button>
+          <label>Speed <input id="speedInput" type="number" min="50" step="50" value="400" /> ms</label>
+          <label style="margin-left:auto"> <input type="checkbox" id="chkAutoP0" /> Auto Bet P0</label>
+        </div>
+        <div class="row" style="margin-top:4px;gap:6px;flex-wrap:wrap">
+          <button id="btnToggleAutoReactivate" title="Automatically reactivate busted players when they rebuy or regain funds">Auto Reactivate: OFF</button>
+          <label style="display:flex;align-items:center;gap:4px">Rebuy When Bal <input id="rebuyThreshold" type="number" value="50" style="width:70px" title="If player balance (display units) falls below this, attempt rebuy"/></label>
+          <label style="display:flex;align-items:center;gap:4px">Rebuy Amount <input id="rebuyAmount" type="number" value="500" style="width:70px" title="Amount (display units) credited on rebuy"/></label>
+          <button id="btnApplyRebuy">Apply Rebuy Settings</button>
+        </div>
+      </div>
+      <div class="subgroup">
+        <h3 class="subhead">Manual Betting</h3>
+        <div class="row">
+          <label>Manual Bet <input id="manualBet" type="number" value="100" min="10" /></label>
+          <button id="btnManualBet">Bet</button>
+          <select id="player0Strategy">
+            <option value="fixed">fixed</option>
+            <option value="random">random</option>
+            <option value="martingale">martingale</option>
+            <option value="antiMartingale">anti-martingale</option>
+            <option value="dAlembert">d'Alembert</option>
+            <option value="fibonacci">fibonacci</option>
+            <option value="kelly">kelly</option>
+            <option value="stopAfterNWins">stop-after-N-wins</option>
+            <option value="reverseLabouchere">reverse-labouchere</option>
+          </select>
+          <label class="odds-field">Roll&lt; <input id="rollUnderInput" type="number" step="0.1" value="49.5" min="1" max="99" style="width:60px" disabled /></label>
+        </div>
+        <div class="row">
+          <label>StopLoss <input id="stopLossInput" type="number" placeholder="balance" style="width:70px" /></label>
+          <label>TakeProfit <input id="takeProfitInput" type="number" placeholder="balance" style="width:70px" /></label>
+          <button id="btnApplyStops">Apply Stops</button>
+        </div>
+      </div>
+      <div class="subgroup">
+        <h3 class="subhead">Liquidity Actions</h3>
+        <div class="row">
+          <label>LP# <input id="lpId" type="number" min="0" value="0" style="width:40px" /></label>
+          <label>Amount <input id="lpAmount" type="number" value="500" style="width:70px" /></label>
+          <label>Lock(s) <input id="lpLockSecs" type="number" value="0" min="0" style="width:60px" title="Minimum lock duration for new stake/deposit"/></label>
+          <button id="btnLPDeposit" title="If LP owned by P0: stake from player balance; else deposit from LP available cash">Deposit/Stake</button>
+          <button id="btnLPWithdraw" title="If LP owned by P0: unstake back to player balance; else withdraw to LP cash">Withdraw/Unstake</button>
+          <button id="btnLPClaim">Claim Cash</button>
+        </div>
+      </div>
+      <div class="subgroup">
+        <h3 class="subhead">Seed & Persistence</h3>
+        <div class="row">
+          <label>Seed <input id="seedInput" type="text" placeholder="optional" style="width:90px" /></label>
+          <button id="btnApplySeed">Set</button>
+          <button id="btnRevealSeed" title="Rotate & reveal current server seed">Reveal</button>
+          <button id="btnSave">Save</button>
+          <button id="btnLoad">Load</button>
+          <button id="btnClear">Clear</button>
+        </div>
+      </div>
+      <div class="subgroup" id="playerStake">
+        <h3 class="subhead">LP Stake (Owned)</h3>
+        <div class="row">
+          <label>Owned LP ID: <span id="ownedLpId">-</span></label>
+        </div>
+        <div class="row">
+          <label>Stake <input id="stakeAmount" type="number" value="500" style="width:80px" /></label>
+          <button id="btnStakeMax" title="Stake entire player balance">Max</button>
+          <button id="btnStakeDo">Stake</button>
+        </div>
+        <div class="row">
+          <label>Unstake <input id="unstakeAmount" type="number" value="500" style="width:80px" /></label>
+          <button id="btnUnstakeMax" title="Unstake all LP funds (owned)">Max</button>
+          <button id="btnUnstakeDo">Unstake</button>
+        </div>
+        <div id="stakeStatus" class="mono" style="min-height:18px;color:#888"></div>
+      </div>
+    </section>
+
+    <!-- SIMULATION PLAYERS -->
+    <section id="simPlayers" class="panel">
+      <h2>Simulation Players</h2>
+      <div id="playersGrid" class="grid"></div>
+    </section>
+
+    <section id="lp-pool" class="panel">
+      <h2>Liquidity Pool</h2>
+      <div class="lp-stats">
+        <div>Total Liquidity: <span id="lpTotal">0</span></div>
+        <div>Reserved: <span id="lpReserved">0</span></div>
+        <div>Token Price: <span id="tokenPrice">-</span></div>
+      </div>
+      <div id="lpList" class="grid"></div>
+    </section>
+
+    <section id="owner" class="panel">
+      <h2>Owner</h2>
+      <div>Fees: <span id="ownerFees">0</span></div>
+      <div>House Profit: <span id="houseProfit">0</span></div>
+    </section>
+
+    <section id="analytics" class="panel">
+      <h2>Analytics <button id="btnExportAnalytics" style="float:right">Export</button> <button id="btnExportCSV" style="float:right;margin-right:4px">CSV</button></h2>
+      <div class="stats">
+        <div>Total Bets: <span id="aTotalBets">0</span></div>
+        <div>Wins: <span id="aWins">0</span></div>
+        <div>Losses: <span id="aLosses">0</span></div>
+        <div>Longest Win Streak: <span id="aLongestWin">0</span></div>
+        <div>Longest Loss Streak: <span id="aLongestLoss">0</span></div>
+        <div>Realized Edge: <span id="aEdge">0</span></div>
+        <div>Total Value: <span id="aTotalValue">0</span> Δ <span id="aValueDelta">0</span></div>
+        <div>Odds: <span id="aProb">0</span>% • Multiplier: <span id="aMult">0</span></div>
+        <div>Volatility (Δ std dev): <span id="aVol">0</span></div>
+        <div class="sparkline-row">Liquidity <canvas id="sparkLiquidity" width="120" height="30"></canvas></div>
+        <div class="sparkline-row">House Profit <canvas id="sparkHouse" width="120" height="30"></canvas></div>
+        <div>RNG Archive:</div>
+        <pre id="rngArchive" class="mono" style="max-height:80px;overflow:auto"></pre>
+        <div>Histogram:</div>
+        <pre id="aHistogram" class="mono" style="max-height:120px;overflow:auto"></pre>
+        <div>Streak Histogram:</div>
+        <pre id="aStreakHistogram" class="mono" style="max-height:80px;overflow:auto"></pre>
+      </div>
+    </section>
+
+    <section id="anomalies" class="panel">
+      <h2>Anomalies</h2>
+      <pre id="aAnomalies" class="mono" style="max-height:80px;overflow:auto"></pre>
+    </section>
+
+    <section id="log" class="panel">
+      <h2>Log</h2>
+      <pre id="logLines" class="mono"></pre>
+    </section>
+
+  </main>
+
+  <footer class="footer">Pseudo-random demo • No real wagering • v0.1</footer>
+
+  <script type="module" src="./main.js"></script>
+  <script src="../../assets/js/game-sounds.js"></script>
+</body>
+</html>

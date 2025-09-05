@@ -137,13 +137,18 @@ export function getBetRequest(player) {
   }
 
   amount = clamp(amount, cfg.minBet, cfg.maxBet);
+  // Apply simulator limits for sim players
+  if (player.isSim) {
+    amount = clamp(amount, cfg.simMinBet, cfg.simMaxBet);
+  }
   // Ensure we do not exceed balance (convert cents to display)
   const balDisplay = fromCents(player.wallet.balance);
   amount = Math.min(amount, balDisplay);
   // stop-loss / take-profit enforcement
   if (player.stopLoss !== null && player.wallet.balance <= player.stopLoss) { player.disableReason='stopLoss'; return null; }
   if (player.takeProfit !== null && player.wallet.balance >= player.takeProfit) { player.disableReason='takeProfit'; return null; }
-  if (amount < cfg.minBet) { player.disableReason='insufficient'; return null; } // can't bet
+  const effectiveMinBet = player.isSim ? cfg.simMinBet : cfg.minBet;
+  if (amount < effectiveMinBet) { player.disableReason='insufficient'; return null; } // can't bet
   return { amount, odds, rollUnder };
 }
 

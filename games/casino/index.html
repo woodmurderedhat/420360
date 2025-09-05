@@ -22,6 +22,14 @@
     <section id="realPlayer" class="panel">
       <h2>Real Player (P0)</h2>
       <div class="subgroup">
+        <h3 class="subhead">Player Wallet</h3>
+        <div class="player-wallet" id="playerWallet">
+          <div class="wallet-balance">Balance: <span id="playerBalance">2000.00</span></div>
+          <div class="wallet-net">Net P&L: <span id="playerNet">+0.00</span></div>
+          <div class="wallet-strategy">Strategy: <span id="playerCurrentStrategy">fixed</span></div>
+        </div>
+      </div>
+      <div class="subgroup">
         <h3 class="subhead">Session</h3>
         <div class="row">
           <button id="btnInit">Init</button>
@@ -106,6 +114,15 @@
     <!-- SIMULATION PLAYERS -->
     <section id="simPlayers" class="panel">
       <h2>Simulation Players</h2>
+      <div class="subgroup">
+        <h3 class="subhead">Simulator Controls</h3>
+        <div class="row">
+          <label>Min Bet <input id="simMinBet" type="number" value="10" min="1" style="width:70px" /></label>
+          <label>Max Bet <input id="simMaxBet" type="number" value="500" min="10" style="width:70px" /></label>
+          <button id="btnApplySimLimits">Apply Limits</button>
+          <label style="margin-left:auto">Active Players: <span id="activePlayers">9</span></label>
+        </div>
+      </div>
       <div id="playersGrid" class="grid"></div>
     </section>
 

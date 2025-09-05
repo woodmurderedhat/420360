@@ -10,6 +10,9 @@ export const State = {
   currentRollUnder: 49.5,
     minBet: 10,
     maxBet: 5000,
+  // Simulator betting limits
+  simMinBet: 10,
+  simMaxBet: 500,
   maxExposureRatio: 0.25,
   cheatUnlocked: false,
   lpTokenization: true,

@@ -31,6 +31,22 @@ function renderPlayers(){
   const grid = el('playersGrid'); if (!grid) return;
   const real = State.players.find(p=> p.id===0);
   const sims = State.players.filter(p=> p.id!==0);
+  
+  // Render real player (P0) wallet info
+  if (real) {
+    const balanceEl = el('playerBalance');
+    const netEl = el('playerNet');
+    const strategyEl = el('playerCurrentStrategy');
+    
+    if (balanceEl) balanceEl.textContent = fmt(real.wallet.balance);
+    if (netEl) {
+      const net = real.wallet.balance - (real.initialBalance || 20000); // 20000 cents = 2000 display
+      netEl.textContent = (net >= 0 ? '+' : '') + fmt(net);
+      netEl.style.color = net >= 0 ? '#8f8' : '#f88';
+    }
+    if (strategyEl) strategyEl.textContent = real.strategy || 'fixed';
+  }
+  
   // update owned LP id display
   const ownedSpan = document.getElementById('ownedLpId');
   if (ownedSpan){ const owned = State.lps.find(l=> l.ownerPlayerId===0); ownedSpan.textContent = owned? owned.id: '-'; }
@@ -49,6 +65,12 @@ function renderPlayers(){
       reason+
       `</div>`;
   }
+  
+  // Update active players count
+  const activeCount = sims.filter(p => p.active).length;
+  const activeEl = el('activePlayers');
+  if (activeEl) activeEl.textContent = activeCount;
+  
   grid.innerHTML = sims.map(card).join('');
 }
 

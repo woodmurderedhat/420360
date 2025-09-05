@@ -142,6 +142,19 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnUnstakeDo').addEventListener('click', ()=>{ unstakeFromPanel(); });
   const chkAuto = document.getElementById('chkAutoP0');
   if (chkAuto){ chkAuto.addEventListener('change', e=>{ State.config.autoP0Enabled = e.target.checked; }); }
+  // Simulator controls
+  document.getElementById('btnApplySimLimits').addEventListener('click', ()=>{
+    const minBet = parseFloat(document.getElementById('simMinBet').value) || 10;
+    const maxBet = parseFloat(document.getElementById('simMaxBet').value) || 500;
+    if (minBet > 0 && maxBet >= minBet) {
+      State.config.simMinBet = minBet;
+      State.config.simMaxBet = maxBet;
+      log(`Simulator betting limits: ${minBet} - ${maxBet}`);
+      renderAll();
+    } else {
+      log('Invalid betting limits: min must be > 0 and max >= min');
+    }
+  });
   init();
   setupCheatListener();
 });

@@ -142,6 +142,27 @@
       <div>House Profit: <span id="houseProfit">0</span></div>
     </section>
 
+    <section id="cryptoMarket" class="panel">
+      <h2>Crypto Market</h2>
+      <div class="subgroup">
+        <h3 class="subhead">Token Price (USD)</h3>
+        <div class="crypto-price" id="cryptoPrice">
+          <div class="price-current">$<span id="currentPrice">50000</span></div>
+          <div class="price-change">24h: <span id="priceChange">+0.00%</span></div>
+          <div class="market-trend">Trend: <span id="marketTrend">Neutral</span></div>
+        </div>
+      </div>
+      <div class="subgroup">
+        <h3 class="subhead">Market Controls</h3>
+        <div class="row">
+          <label>Volatility <input id="cryptoVolatility" type="number" step="0.01" value="0.02" min="0" max="0.1" style="width:60px" /> %</label>
+          <button id="btnBullish">Bullish</button>
+          <button id="btnNeutral">Neutral</button>
+          <button id="btnBearish">Bearish</button>
+        </div>
+      </div>
+    </section>
+
     <section id="analytics" class="panel">
       <h2>Analytics <button id="btnExportAnalytics" style="float:right">Export</button> <button id="btnExportCSV" style="float:right;margin-right:4px">CSV</button></h2>
       <div class="stats">

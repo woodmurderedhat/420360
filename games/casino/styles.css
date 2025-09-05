@@ -32,3 +32,7 @@ input[type=text] { font-family:inherit; }
 .wallet-balance { font-size:.75rem; font-weight:600; color:#5cf; margin-bottom:.2rem; }
 .wallet-net { font-size:.65rem; color:#ddd; margin-bottom:.2rem; }
 .wallet-strategy { font-size:.6rem; color:#aaa; }
+.crypto-price { background:#1a2a1a; border:1px solid #4a5; padding:.5rem; border-radius:4px; margin:.25rem 0; }
+.price-current { font-size:.8rem; font-weight:600; color:#5f5; margin-bottom:.2rem; }
+.price-change { font-size:.65rem; margin-bottom:.2rem; }
+.market-trend { font-size:.6rem; color:#aaa; }

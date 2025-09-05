@@ -9,6 +9,7 @@ import { processBet, log } from './bet-engine.js';
 import { AutoPlay } from './autoplay.js';
 import { stepRound } from './main-loop.js';
 import { RNG } from './rng.js';
+import { initCryptoMarket, updateCryptoPrice, setCryptoTrend, setCryptoVolatility } from './crypto-market.js';
 
 function init(){
   resetState();
@@ -51,6 +52,7 @@ function init(){
   // give all LPs some initial availableCash = 0 (explicit)
   State.lps.forEach(lp=>{ lp.availableCash = lp.availableCash||0; });
   recomputeShares();
+  initCryptoMarket();
   log('Initialized state');
   renderAll();
   const chk = document.getElementById('chkAutoP0'); if (chk) chk.checked = !!State.config.autoP0Enabled;
@@ -154,6 +156,14 @@ window.addEventListener('DOMContentLoaded', () => {
     } else {
       log('Invalid betting limits: min must be > 0 and max >= min');
     }
+  });
+  // Crypto market controls
+  document.getElementById('btnBullish').addEventListener('click', () => setCryptoTrend(1));
+  document.getElementById('btnNeutral').addEventListener('click', () => setCryptoTrend(0));
+  document.getElementById('btnBearish').addEventListener('click', () => setCryptoTrend(-1));
+  document.getElementById('cryptoVolatility').addEventListener('change', e => {
+    const vol = parseFloat(e.target.value) || 0.02;
+    setCryptoVolatility(vol);
   });
   init();
   setupCheatListener();

@@ -3,6 +3,7 @@ import { State } from './state.js';
 import { realizedEdge } from './analytics.js';
 import { RNG } from './rng.js';
 import { fmt, fromCents } from './money.js';
+import { getCrypto24hChange } from './crypto-market.js';
 
 const el = id => document.getElementById(id);
 
@@ -21,6 +22,7 @@ export function renderAll(){
   renderPlayers();
   renderLPs();
   renderOwner();
+  renderCryptoMarket();
   renderAnalytics();
   renderLog();
   renderSparklines();
@@ -99,6 +101,29 @@ function renderLPs(){
 function renderOwner(){
   el('ownerFees').textContent = fmt(State.owner.feeBalance);
   el('houseProfit').textContent = fmt(State.analytics.houseProfit);
+}
+
+function renderCryptoMarket(){
+  const cfg = State.config;
+  const currentPriceEl = el('currentPrice');
+  const priceChangeEl = el('priceChange');
+  const marketTrendEl = el('marketTrend');
+  
+  if (currentPriceEl) currentPriceEl.textContent = cfg.cryptoPrice.toFixed(0);
+  
+  if (priceChangeEl) {
+    const change24h = getCrypto24hChange();
+    const changePercent = (change24h * 100).toFixed(2);
+    priceChangeEl.textContent = (change24h >= 0 ? '+' : '') + changePercent + '%';
+    priceChangeEl.style.color = change24h >= 0 ? '#5f5' : '#f55';
+  }
+  
+  if (marketTrendEl) {
+    const trend = cfg.cryptoTrend;
+    const trendText = trend > 0 ? 'Bullish 🐂' : trend < 0 ? 'Bearish 🐻' : 'Neutral ⚖️';
+    marketTrendEl.textContent = trendText;
+    marketTrendEl.style.color = trend > 0 ? '#5f5' : trend < 0 ? '#f55' : '#aaa';
+  }
 }
 
 function renderAnalytics(){

@@ -7,6 +7,7 @@ import { renderAll } from './ui-render.js';
 import { getBetRequest } from './strategies.js';
 import { processBet, log } from './bet-engine.js';
 import { AutoPlay } from './autoplay.js';
+import { PlayerAutoBet } from './player-autobet.js';
 import { stepRound } from './main-loop.js';
 import { RNG } from './rng.js';
 import { initCryptoMarket, updateCryptoPrice, setCryptoTrend, setCryptoVolatility } from './crypto-market.js';
@@ -72,6 +73,8 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnInit').addEventListener('click', init);
   document.getElementById('btnStep').addEventListener('click', ()=> stepRound());
   document.getElementById('btnManualBet').addEventListener('click', manualBet);
+  document.getElementById('btnP0AutoStart').addEventListener('click', ()=> PlayerAutoBet.start());
+  document.getElementById('btnP0AutoStop').addEventListener('click', ()=> PlayerAutoBet.stop());
   document.getElementById('btnAutoStart').addEventListener('click', ()=>{ AutoPlay.start(); toggleAutoButtons(true); });
   document.getElementById('btnAutoStop').addEventListener('click', ()=>{ AutoPlay.stop(); toggleAutoButtons(false); });
   document.getElementById('speedInput').addEventListener('change', e=> AutoPlay.setSpeed(parseInt(e.target.value)||400));

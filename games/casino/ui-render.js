@@ -3,6 +3,7 @@ import { State } from './state.js';
 import { realizedEdge } from './analytics.js';
 import { RNG } from './rng.js';
 import { fmt, fromCents } from './money.js';
+import { getCrypto24hChange } from './crypto-market.js';
 
 const el = id => document.getElementById(id);
 
@@ -21,6 +22,7 @@ export function renderAll(){
   renderPlayers();
   renderLPs();
   renderOwner();
+  renderCryptoMarket();
   renderAnalytics();
   renderLog();
   renderSparklines();
@@ -31,6 +33,22 @@ function renderPlayers(){
   const grid = el('playersGrid'); if (!grid) return;
   const real = State.players.find(p=> p.id===0);
   const sims = State.players.filter(p=> p.id!==0);
+  
+  // Render real player (P0) wallet info
+  if (real) {
+    const balanceEl = el('playerBalance');
+    const netEl = el('playerNet');
+    const strategyEl = el('playerCurrentStrategy');
+    
+    if (balanceEl) balanceEl.textContent = fmt(real.wallet.balance);
+    if (netEl) {
+      const net = real.wallet.balance - (real.initialBalance || 20000); // 20000 cents = 2000 display
+      netEl.textContent = (net >= 0 ? '+' : '') + fmt(net);
+      netEl.style.color = net >= 0 ? '#8f8' : '#f88';
+    }
+    if (strategyEl) strategyEl.textContent = real.strategy || 'fixed';
+  }
+  
   // update owned LP id display
   const ownedSpan = document.getElementById('ownedLpId');
   if (ownedSpan){ const owned = State.lps.find(l=> l.ownerPlayerId===0); ownedSpan.textContent = owned? owned.id: '-'; }
@@ -49,6 +67,12 @@ function renderPlayers(){
       reason+
       `</div>`;
   }
+  
+  // Update active players count
+  const activeCount = sims.filter(p => p.active).length;
+  const activeEl = el('activePlayers');
+  if (activeEl) activeEl.textContent = activeCount;
+  
   grid.innerHTML = sims.map(card).join('');
 }
 
@@ -77,6 +101,29 @@ function renderLPs(){
 function renderOwner(){
   el('ownerFees').textContent = fmt(State.owner.feeBalance);
   el('houseProfit').textContent = fmt(State.analytics.houseProfit);
+}
+
+function renderCryptoMarket(){
+  const cfg = State.config;
+  const currentPriceEl = el('currentPrice');
+  const priceChangeEl = el('priceChange');
+  const marketTrendEl = el('marketTrend');
+  
+  if (currentPriceEl) currentPriceEl.textContent = cfg.cryptoPrice.toFixed(0);
+  
+  if (priceChangeEl) {
+    const change24h = getCrypto24hChange();
+    const changePercent = (change24h * 100).toFixed(2);
+    priceChangeEl.textContent = (change24h >= 0 ? '+' : '') + changePercent + '%';
+    priceChangeEl.style.color = change24h >= 0 ? '#5f5' : '#f55';
+  }
+  
+  if (marketTrendEl) {
+    const trend = cfg.cryptoTrend;
+    const trendText = trend > 0 ? 'Bullish 🐂' : trend < 0 ? 'Bearish 🐻' : 'Neutral ⚖️';
+    marketTrendEl.textContent = trendText;
+    marketTrendEl.style.color = trend > 0 ? '#5f5' : trend < 0 ? '#f55' : '#aaa';
+  }
 }
 
 function renderAnalytics(){

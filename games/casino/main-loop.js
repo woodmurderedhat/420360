@@ -4,6 +4,7 @@ import { getBetRequest } from './strategies.js';
 import { processBet, log } from './bet-engine.js';
 import { AutoPlay } from './autoplay.js';
 import { renderAll } from './ui-render.js';
+import { updateCryptoPrice } from './crypto-market.js';
 
 export function stepRound(){
   State.round++;
@@ -39,6 +40,9 @@ export function stepRound(){
         log(`P${p.id} DISABLED (${reason})`);
       }
     }
+  // Update crypto market price each round
+  updateCryptoPrice();
+  
   // Attempt auto-reactivation / rebuy for inactive players
   State.players.forEach(p=>{
     if (!p.isSim) return;

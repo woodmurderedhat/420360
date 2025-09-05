@@ -10,6 +10,13 @@ export const State = {
   currentRollUnder: 49.5,
     minBet: 10,
     maxBet: 5000,
+  // Simulator betting limits
+  simMinBet: 10,
+  simMaxBet: 500,
+  // Crypto market simulation
+  cryptoPrice: 50000, // Starting price in USD (e.g., Bitcoin)
+  cryptoVolatility: 0.02, // 2% volatility per round
+  cryptoTrend: 0, // -1 bearish, 0 neutral, 1 bullish
   maxExposureRatio: 0.25,
   cheatUnlocked: false,
   lpTokenization: true,

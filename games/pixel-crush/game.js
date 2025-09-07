@@ -82,6 +82,9 @@
             this.board = new window.PixelCrushBoard();
             this.ui = new window.PixelCrushUI(this);
             
+            // Set up responsive canvas
+            this.setupResponsiveCanvas();
+            
             // Set up event listeners
             this.setupEventListeners();
             
@@ -93,6 +96,44 @@
             
             console.log('Pixel Crush initialized');
             return true;
+        }
+
+        setupResponsiveCanvas() {
+            // Set up responsive canvas sizing
+            this.resizeCanvas();
+            
+            // Listen for window resize events
+            window.addEventListener('resize', () => this.resizeCanvas());
+        }
+
+        resizeCanvas() {
+            const container = this.canvas.parentElement;
+            
+            // Calculate optimal canvas size
+            const maxWidth = container.clientWidth - 20; // Leave some margin
+            const maxHeight = window.innerHeight * 0.6; // Max 60% of screen height
+            
+            // Maintain square aspect ratio
+            const size = Math.min(maxWidth, maxHeight, 600); // Cap at 600px for desktop
+            
+            // Update canvas size
+            this.canvas.style.width = size + 'px';
+            this.canvas.style.height = size + 'px';
+            
+            // Set internal resolution (keep high for crisp graphics)
+            const pixelRatio = window.devicePixelRatio || 1;
+            const internalSize = 480 * pixelRatio;
+            
+            this.canvas.width = internalSize;
+            this.canvas.height = internalSize;
+            
+            // Scale context for high DPI displays
+            this.ctx.scale(pixelRatio, pixelRatio);
+            
+            // Re-render after resize
+            if (this.board) {
+                this.render();
+            }
         }
 
         setupEventListeners() {
@@ -701,7 +742,9 @@
 
         drawGrid() {
             const grid = this.board.getGrid();
-            const pixelSize = this.canvas.width / 8;
+            const pixelRatio = window.devicePixelRatio || 1;
+            const baseSize = 480; // Base internal canvas size
+            const pixelSize = baseSize / 8;
             
             for (let row = 0; row < 8; row++) {
                 for (let col = 0; col < 8; col++) {

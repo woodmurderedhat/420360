@@ -57,6 +57,13 @@
             background: #000;
             margin: 0 auto 20px auto;
             position: relative;
+            max-width: 100%;
+        }
+
+        #gameCanvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
         }
 
         .score-display {
@@ -243,7 +250,7 @@
         </div>
         
         <div class="game-board">
-            <canvas id="gameCanvas" width="600" height="400"></canvas>
+            <canvas id="gameCanvas"></canvas>
             <div id="gameMessage" class="game-message">
                 <h2 id="messageTitle">GET READY</h2>
                 <p id="messageText">Press SPACE to start</p>
@@ -286,12 +293,48 @@
         const messageTitleElement = document.getElementById('messageTitle');
         const messageTextElement = document.getElementById('messageText');
 
-        const CANVAS_WIDTH = 600;
-        const CANVAS_HEIGHT = 400;
+        let CANVAS_WIDTH = 600;
+        let CANVAS_HEIGHT = 400;
         const PADDLE_WIDTH = 20;
         const PADDLE_HEIGHT = 80;
         const BALL_SIZE = 20;
         const WINNING_SCORE = 5;
+
+        // Set up responsive canvas
+        function setupResponsiveCanvas() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const maxWidth = container.clientWidth - 20;
+            const maxHeight = window.innerHeight * 0.6;
+            
+            // Maintain 3:2 aspect ratio (600:400)
+            const aspectRatio = 600 / 400;
+            let width = Math.min(maxWidth, maxHeight * aspectRatio, 600);
+            let height = width / aspectRatio;
+            
+            // Update canvas size
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            
+            // Set internal resolution
+            const pixelRatio = window.devicePixelRatio || 1;
+            canvas.width = width * pixelRatio;
+            canvas.height = height * pixelRatio;
+            
+            // Update game constants
+            CANVAS_WIDTH = width;
+            CANVAS_HEIGHT = height;
+            
+            // Scale context for high DPI displays
+            ctx.scale(pixelRatio, pixelRatio);
+        }
+
+        // Initialize responsive canvas
+        setupResponsiveCanvas();
 
         let gameRunning = false;
         let gameLoop = null;

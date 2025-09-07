@@ -455,6 +455,7 @@
                 height: auto !important;
                 max-width: 320px;
                 border-radius: 4px;
+                touch-action: manipulation; /* Prevent zoom on touch */
             }
             
             /* Better mobile typography */
@@ -465,6 +466,30 @@
             .info-item > div:first-child {
                 font-weight: bold;
                 color: var(--highlight);
+            }
+            
+            /* Improve mobile accessibility */
+            .btn:focus,
+            .theme-option:focus {
+                outline: 2px solid var(--highlight);
+                outline-offset: 2px;
+            }
+            
+            /* Enhanced visual feedback for mobile */
+            .game-board-container {
+                position: relative;
+            }
+            
+            .game-board-container::before {
+                content: "";
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: linear-gradient(45deg, var(--primary), var(--secondary));
+                border-radius: 10px;
+                z-index: -1;
             }
         }
     </style>

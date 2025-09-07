@@ -883,6 +883,11 @@
             if (this.gameState === 'paused') {
                 this.drawPauseOverlay();
             }
+            
+            // Request next frame for smooth animations
+            if (this.gameState === 'playing' && (this.levelEffects.sparkle || this.levelEffects.powerGlow || this.levelEffects.allEffects)) {
+                requestAnimationFrame(() => this.render());
+            }
         }
 
         drawGrid() {

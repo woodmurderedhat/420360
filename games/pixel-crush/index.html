@@ -118,6 +118,7 @@
             align-items: center;
             justify-content: center;
             min-width: 320px;
+            padding: 10px;
         }
 
         .game-board {
@@ -129,11 +130,14 @@
             background: #000;
             position: relative;
             margin: 0 auto;
+            max-width: 100%;
         }
 
         #gameCanvas {
             display: block;
             cursor: pointer;
+            max-width: 100%;
+            height: auto;
         }
 
         .sidebar {
@@ -325,7 +329,15 @@
                 flex-direction: column;
             }
             
+            .game-board-container {
+                order: 1; /* Prioritize game board */
+                margin-bottom: 15px;
+                min-width: auto;
+                width: 100%;
+            }
+            
             .sidebar {
+                order: 2;
                 width: 100%;
                 flex-direction: row;
                 flex-wrap: wrap;
@@ -335,6 +347,7 @@
                 flex: 1;
                 min-width: 200px;
                 padding: 10px;
+                margin: 5px;
             }
             
             h1 {
@@ -368,9 +381,14 @@
         }
 
         @media (max-width: 480px) {
+            .game-container {
+                padding: 3px;
+            }
+            
             .game-info {
                 flex-direction: column;
                 gap: 5px;
+                margin-bottom: 10px;
             }
             
             .info-item {
@@ -380,6 +398,11 @@
             
             .sidebar {
                 flex-direction: column;
+            }
+            
+            .game-board-container {
+                margin-bottom: 10px;
+                padding: 5px;
             }
             
             /* Extra mobile optimizations */
@@ -392,10 +415,6 @@
             .panel h3 {
                 font-size: 10px;
                 margin-bottom: 8px;
-            }
-            
-            .game-board-container {
-                margin-bottom: 10px;
             }
         }
     </style>
@@ -434,7 +453,7 @@
         <div class="main-content">
             <div class="game-board-container">
                 <div class="game-board">
-                    <canvas id="gameCanvas" width="480" height="480"></canvas>
+                    <canvas id="gameCanvas"></canvas>
                 </div>
                 <div class="combo-display" id="comboDisplay">
                     COMBO x<span id="comboMultiplier">2</span>!

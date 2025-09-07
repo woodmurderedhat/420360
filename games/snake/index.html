@@ -57,6 +57,13 @@
             background: #000;
             margin: 0 auto 20px auto;
             position: relative;
+            max-width: 100%;
+        }
+
+        #gameCanvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
         }
 
         .score-display {
@@ -202,6 +209,10 @@
         }
 
         @media (max-width: 768px) {
+            .game-container {
+                padding: 10px;
+            }
+            
             .mobile-controls {
                 display: grid;
             }
@@ -218,6 +229,14 @@
                 font-size: 8px;
                 padding: 6px 12px;
             }
+            
+            .game-board {
+                margin-bottom: 15px;
+            }
+            
+            .controls {
+                margin-bottom: 15px;
+            }
         }
     </style>
 </head>
@@ -233,7 +252,7 @@
         </div>
         
         <div class="game-board">
-            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            <canvas id="gameCanvas"></canvas>
             <div id="gameOver" class="game-over">
                 <h2>GAME OVER</h2>
                 <p>Final Score: <span id="finalScore">0</span></p>
@@ -273,8 +292,8 @@
         const finalScoreElement = document.getElementById('finalScore');
 
         const GRID_SIZE = 20;
-        const CANVAS_SIZE = 400;
-        const GRID_COUNT = CANVAS_SIZE / GRID_SIZE;
+        let CANVAS_SIZE = 400; // This will be updated by responsive resizing
+        let GRID_COUNT = CANVAS_SIZE / GRID_SIZE;
 
         let snake = [{ x: 10, y: 10 }];
         let direction = { x: 0, y: 0 };
@@ -293,6 +312,47 @@
             food: '#fff700',
             background: '#000000'
         };
+
+        // Set up responsive canvas
+        function setupResponsiveCanvas() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const maxWidth = container.clientWidth - 20; // Leave some margin
+            const maxHeight = window.innerHeight * 0.6; // Max 60% of screen height
+            
+            // Maintain square aspect ratio
+            const size = Math.min(maxWidth, maxHeight, 500); // Cap at 500px for desktop
+            
+            // Update canvas size
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+            
+            // Set internal resolution
+            const pixelRatio = window.devicePixelRatio || 1;
+            const internalSize = Math.floor(size * pixelRatio);
+            
+            canvas.width = internalSize;
+            canvas.height = internalSize;
+            
+            // Update game constants
+            CANVAS_SIZE = internalSize;
+            GRID_COUNT = Math.floor(CANVAS_SIZE / (GRID_SIZE * pixelRatio));
+            
+            // Scale context for high DPI displays
+            ctx.scale(pixelRatio, pixelRatio);
+            
+            // Re-draw if game is running
+            if (gameRunning) {
+                draw();
+            }
+        }
+
+        // Initialize responsive canvas
+        setupResponsiveCanvas();
 
         function startGame() {
             // Initialize audio on user interaction
@@ -376,17 +436,22 @@
         function draw() {
             // Clear canvas
             ctx.fillStyle = COLORS.background;
-            ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+            ctx.fillRect(0, 0, canvas.style.width.replace('px', ''), canvas.style.height.replace('px', ''));
+
+            // Calculate responsive grid size
+            const pixelRatio = window.devicePixelRatio || 1;
+            const displaySize = parseFloat(canvas.style.width);
+            const gridSize = displaySize / GRID_COUNT;
 
             // Draw snake
             ctx.fillStyle = COLORS.snake;
             snake.forEach(segment => {
-                ctx.fillRect(segment.x * GRID_SIZE, segment.y * GRID_SIZE, GRID_SIZE - 2, GRID_SIZE - 2);
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
             });
 
             // Draw food
             ctx.fillStyle = COLORS.food;
-            ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE - 2, GRID_SIZE - 2);
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
         }
 
         function gameOver() {

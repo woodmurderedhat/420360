@@ -58,6 +58,9 @@
             // Mobile touch support
             this.touchStartPos = null;
             this.touchEndPos = null;
+            this.touchStartTime = 0;
+            this.touchMoved = false;
+            this.touchHighlight = null;
             
             // Special level features
             this.specialFeature = null;
@@ -66,6 +69,7 @@
             this.megaCombosEnabled = false;
             this.chainReactionBonus = 1.0;
             this.cascadeBonus = 1.0;
+            this.levelEffects = {};
         }
 
         init() {
@@ -209,10 +213,48 @@
                 x: (touch.clientX - rect.left) / rect.width * this.canvas.width,
                 y: (touch.clientY - rect.top) / rect.height * this.canvas.height
             };
+            
+            this.touchStartTime = Date.now();
+            this.touchMoved = false;
+            
+            // Visual feedback for touch start
+            const pixel = this.getPixelPosition(this.touchStartPos.x, this.touchStartPos.y);
+            if (pixel) {
+                this.touchHighlight = pixel;
+                this.render();
+            }
         }
 
         handleTouchMove(e) {
             e.preventDefault();
+            if (!this.touchStartPos || this.gameState !== 'playing' || this.isAnimating) return;
+            
+            this.touchMoved = true;
+            
+            const touch = e.touches[0];
+            const rect = this.canvas.getBoundingClientRect();
+            
+            const currentPos = {
+                x: (touch.clientX - rect.left) / rect.width * this.canvas.width,
+                y: (touch.clientY - rect.top) / rect.height * this.canvas.height
+            };
+            
+            // Calculate movement distance for better gesture recognition
+            const dx = currentPos.x - this.touchStartPos.x;
+            const dy = currentPos.y - this.touchStartPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Threshold for minimum movement to trigger gesture
+            const minSwipeDistance = 20;
+            
+            if (distance > minSwipeDistance) {
+                const endPixel = this.getPixelPosition(currentPos.x, currentPos.y);
+                if (endPixel && endPixel !== this.touchHighlight) {
+                    this.touchEndPos = currentPos;
+                    this.touchHighlight = endPixel;
+                    this.render();
+                }
+            }
         }
 
         handleTouchEnd(e) {
@@ -227,9 +269,31 @@
                 y: (touch.clientY - rect.top) / rect.height * this.canvas.height
             };
             
-            this.handleSwipeGesture();
+            const touchDuration = Date.now() - this.touchStartTime;
+            
+            // Distinguish between tap and swipe based on movement and duration
+            if (!this.touchMoved && touchDuration < 300) {
+                // Quick tap - handle as selection
+                const pixel = this.getPixelPosition(this.touchStartPos.x, this.touchStartPos.y);
+                if (pixel) {
+                    this.handlePixelSelect(pixel);
+                    
+                    // Light haptic feedback for selection
+                    if (navigator.vibrate) {
+                        navigator.vibrate(20);
+                    }
+                }
+            } else if (this.touchMoved) {
+                // Movement detected - handle as swipe
+                this.handleSwipeGesture();
+            }
+            
+            // Clean up touch state
             this.touchStartPos = null;
             this.touchEndPos = null;
+            this.touchHighlight = null;
+            this.touchMoved = false;
+            this.render();
         }
 
         handleSwipeGesture() {
@@ -238,25 +302,45 @@
             const startPixel = this.getPixelPosition(this.touchStartPos.x, this.touchStartPos.y);
             const endPixel = this.getPixelPosition(this.touchEndPos.x, this.touchEndPos.y);
             
+            // Calculate swipe distance and direction
+            const dx = this.touchEndPos.x - this.touchStartPos.x;
+            const dy = this.touchEndPos.y - this.touchStartPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Minimum distance for a valid swipe
+            const minSwipeDistance = 30;
+            
+            if (distance < minSwipeDistance) {
+                // Too small movement, treat as tap
+                if (startPixel) {
+                    this.handlePixelSelect(startPixel);
+                    if (navigator.vibrate) {
+                        navigator.vibrate(20);
+                    }
+                }
+                return;
+            }
+            
             if (startPixel && endPixel && this.board.isAdjacent(startPixel, endPixel)) {
                 this.attemptSwap(startPixel, endPixel);
                 
-                // Enhanced haptic feedback for mobile
+                // Enhanced haptic feedback for successful swap
                 if (navigator.vibrate) {
                     navigator.vibrate([30, 10, 30]); // Pattern for successful swap
-                }
-            } else if (startPixel && !endPixel) {
-                // Tap without swipe - select pixel
-                this.handlePixelSelect(startPixel);
-                
-                // Light haptic feedback for selection
-                if (navigator.vibrate) {
-                    navigator.vibrate(20);
                 }
             } else if (startPixel && endPixel && !this.board.isAdjacent(startPixel, endPixel)) {
                 // Invalid move - different haptic pattern
                 if (navigator.vibrate) {
                     navigator.vibrate([10, 10, 10]); // Quick buzz for invalid move
+                }
+                
+                // Show visual feedback for invalid move
+                this.showInvalidMoveEffect(startPixel, endPixel);
+            } else if (startPixel && !endPixel) {
+                // Swipe started on valid pixel but ended outside board
+                this.handlePixelSelect(startPixel);
+                if (navigator.vibrate) {
+                    navigator.vibrate(20);
                 }
             }
         }
@@ -294,6 +378,19 @@
                 return { row, col };
             }
             return null;
+        }
+
+        showInvalidMoveEffect(startPixel, endPixel) {
+            // Add visual feedback for invalid moves
+            this.invalidMovePixels = [startPixel, endPixel];
+            this.invalidMoveTime = Date.now();
+            this.render();
+            
+            // Clear the effect after a short duration
+            setTimeout(() => {
+                this.invalidMovePixels = null;
+                this.render();
+            }, 500);
         }
 
         handlePixelSelect(pixelPos) {
@@ -441,27 +538,40 @@
 
         calculateMatchScore(matches) {
             const baseScore = SCORE_MULTIPLIERS[Math.min(matches.length, 8)] || SCORE_MULTIPLIERS[8];
-            let comboMultiplier = 1 + (this.combo * 0.5);
-            const levelMultiplier = 1 + (this.level - 1) * 0.1;
+            let comboMultiplier = 1 + (this.combo * 0.6);
+            const levelMultiplier = 1 + (this.level - 1) * 0.12;
             
             // Apply special level features
             comboMultiplier *= this.comboBonus;
             
             let finalScore = Math.floor(baseScore * comboMultiplier * levelMultiplier);
             
-            // Apply cascade bonus if this is part of a cascade
+            // Enhanced cascade bonus if this is part of a cascade
             if (this.combo > 1) {
-                finalScore = Math.floor(finalScore * this.cascadeBonus);
+                const cascadeMultiplier = this.cascadeBonus * (1 + this.combo * 0.2);
+                finalScore = Math.floor(finalScore * cascadeMultiplier);
             }
             
-            // Apply chain reaction bonus for large matches
+            // Enhanced chain reaction bonus for large matches
             if (matches.length >= 5) {
-                finalScore = Math.floor(finalScore * this.chainReactionBonus);
+                const chainMultiplier = this.chainReactionBonus * (1 + (matches.length - 5) * 0.3);
+                finalScore = Math.floor(finalScore * chainMultiplier);
             }
             
-            // Mega combo bonus for special levels
+            // Mega combo bonus for special levels with escalating bonus
             if (this.megaCombosEnabled && this.combo >= 3) {
-                finalScore = Math.floor(finalScore * 1.5);
+                const megaMultiplier = 1.5 + (this.combo - 3) * 0.3;
+                finalScore = Math.floor(finalScore * megaMultiplier);
+            }
+            
+            // Perfect mode super bonus
+            if (this.levelEffects.perfectMode && this.combo >= 5) {
+                finalScore = Math.floor(finalScore * 2.0);
+            }
+            
+            // Master mode bonus for high combos
+            if (this.levelEffects.masterGlow && this.combo >= 4) {
+                finalScore = Math.floor(finalScore * 1.3);
             }
             
             return finalScore;
@@ -473,8 +583,8 @@
 
         checkGameEndConditions() {
             if (this.score >= this.target) {
-                // Level completed
-                this.levelComplete();
+                // Automatically advance to next level for infinite gameplay
+                this.autoAdvanceLevel();
             } else if (this.moves <= 0) {
                 // Check if player can still make moves
                 if (!this.board.canMakeMove()) {
@@ -530,6 +640,49 @@
             this.ui.updateGameState(this.gameState);
             this.ui.hideGameOver();
             this.render();
+        }
+
+        autoAdvanceLevel() {
+            this.level++;
+            
+            // Use predefined config for first 10 levels, then generate infinite levels
+            let levelData;
+            if (this.level <= LEVEL_CONFIG.length) {
+                levelData = LEVEL_CONFIG[this.level - 1];
+            } else {
+                // Generate infinite level progression with exponentially increasing difficulty
+                levelData = this.generateInfiniteLevel(this.level);
+            }
+            
+            // Update target for next level but keep current score
+            this.target = levelData.target;
+            
+            // Award bonus moves for level completion (5 bonus moves)
+            this.moves += 5;
+            
+            // Reset combo for new level
+            this.combo = 0;
+            
+            // Apply special level features
+            this.applyLevelFeatures(levelData.specialFeature);
+            
+            // Update UI
+            this.ui.updateLevel(this.level);
+            this.ui.updateMoves(this.moves);
+            this.ui.updateTarget(this.target);
+            this.ui.updateCombo(this.combo);
+            this.ui.updateProgress(this.score, this.target);
+            
+            // Show brief level advancement notification
+            this.ui.showLevelAdvancement(this.level, levelData.specialFeature);
+            
+            // Play level up sound
+            if (window.GameSounds && window.GameSounds.isEnabled()) {
+                window.GameSounds.sounds.LEVEL_UP();
+            }
+            
+            // Save progress
+            this.saveProgress();
         }
 
         nextLevel() {
@@ -607,49 +760,69 @@
         applyLevelFeatures(feature) {
             // Reset any previous special features
             this.specialFeature = feature;
+            this.powerUpBoost = 1.0;
+            this.comboBonus = 1.0;
+            this.megaCombosEnabled = false;
+            this.chainReactionBonus = 1.0;
+            this.cascadeBonus = 1.0;
+            this.levelEffects = {};
             
             switch (feature) {
                 case 'more_colors':
-                    // Add visual indicator for more color variety
+                    // Add more color variety and sparkle effects
+                    this.levelEffects.sparkle = true;
+                    this.levelEffects.colorVariety = true;
                     break;
                 case 'power_boost':
-                    // Increase power-up generation rate
-                    this.powerUpBoost = 1.5;
+                    // Increase power-up generation rate with visual effects
+                    this.powerUpBoost = 1.8;
+                    this.levelEffects.powerGlow = true;
                     break;
                 case 'combo_bonus':
-                    // Increase combo multiplier effectiveness
-                    this.comboBonus = 2.0;
+                    // Increase combo multiplier effectiveness with enhanced feedback
+                    this.comboBonus = 2.2;
+                    this.levelEffects.comboTrail = true;
                     break;
                 case 'time_pressure':
-                    // Add visual urgency effects
+                    // Add visual urgency effects and screen shake
+                    this.levelEffects.urgency = true;
+                    this.levelEffects.screenShake = true;
                     break;
                 case 'mega_combos':
-                    // Enable mega combo cascades
+                    // Enable mega combo cascades with explosive effects
                     this.megaCombosEnabled = true;
+                    this.comboBonus = 1.5;
+                    this.levelEffects.explosions = true;
                     break;
                 case 'chain_reaction':
-                    // Enhanced chain reaction effects
-                    this.chainReactionBonus = 2.0;
+                    // Enhanced chain reaction effects with particle trails
+                    this.chainReactionBonus = 2.2;
+                    this.levelEffects.chainTrails = true;
                     break;
                 case 'cascade_bonus':
-                    // Bonus for cascade matches
-                    this.cascadeBonus = 1.5;
+                    // Bonus for cascade matches with flowing effects
+                    this.cascadeBonus = 1.8;
+                    this.levelEffects.cascadeFlow = true;
                     break;
                 case 'master_mode':
-                    // All bonuses active
-                    this.powerUpBoost = 2.0;
-                    this.comboBonus = 2.5;
+                    // All bonuses active with enhanced visuals
+                    this.powerUpBoost = 2.2;
+                    this.comboBonus = 2.8;
                     this.megaCombosEnabled = true;
                     this.chainReactionBonus = 2.5;
-                    this.cascadeBonus = 2.0;
+                    this.cascadeBonus = 2.2;
+                    this.levelEffects.masterGlow = true;
+                    this.levelEffects.allEffects = true;
                     break;
                 case 'perfect_challenge':
-                    // Ultimate challenge with all features
-                    this.powerUpBoost = 3.0;
-                    this.comboBonus = 3.0;
+                    // Ultimate challenge with maximum effects
+                    this.powerUpBoost = 3.2;
+                    this.comboBonus = 3.5;
                     this.megaCombosEnabled = true;
                     this.chainReactionBonus = 3.0;
                     this.cascadeBonus = 3.0;
+                    this.levelEffects.perfectMode = true;
+                    this.levelEffects.allEffects = true;
                     break;
                 default:
                     // Reset all special features
@@ -734,9 +907,29 @@
                 this.drawSelectionHighlight(this.selectedPixel);
             }
             
+            // Draw touch highlight for mobile
+            if (this.touchHighlight && this.gameState === 'playing') {
+                this.drawTouchHighlight(this.touchHighlight);
+            }
+            
+            // Draw invalid move effect
+            if (this.invalidMovePixels && this.gameState === 'playing') {
+                this.drawInvalidMoveEffect(this.invalidMovePixels);
+            }
+            
+            // Draw special level effects
+            if (this.levelEffects && this.gameState === 'playing') {
+                this.drawLevelEffects();
+            }
+            
             // Draw pause overlay
             if (this.gameState === 'paused') {
                 this.drawPauseOverlay();
+            }
+            
+            // Request next frame for smooth animations
+            if (this.gameState === 'playing' && (this.levelEffects.sparkle || this.levelEffects.powerGlow || this.levelEffects.allEffects)) {
+                requestAnimationFrame(() => this.render());
             }
         }
 
@@ -798,6 +991,99 @@
             const alpha = 0.3 + 0.3 * Math.sin(time);
             this.ctx.fillStyle = `rgba(255, 255, 0, ${alpha})`;
             this.ctx.fillRect(x + 1, y + 1, pixelSize - 2, pixelSize - 2);
+        }
+
+        drawTouchHighlight(pixel) {
+            const pixelSize = this.canvas.width / 8;
+            const x = pixel.col * pixelSize;
+            const y = pixel.row * pixelSize;
+            
+            // Draw a pulsing blue highlight for touch
+            this.ctx.strokeStyle = '#00ccff';
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeRect(x + 2, y + 2, pixelSize - 4, pixelSize - 4);
+            
+            // Add a subtle glow effect
+            const time = Date.now() * 0.008;
+            const alpha = 0.2 + 0.2 * Math.sin(time);
+            this.ctx.fillStyle = `rgba(0, 204, 255, ${alpha})`;
+            this.ctx.fillRect(x + 2, y + 2, pixelSize - 4, pixelSize - 4);
+        }
+
+        drawInvalidMoveEffect(pixels) {
+            const pixelSize = this.canvas.width / 8;
+            
+            // Draw red highlights for invalid moves
+            this.ctx.strokeStyle = '#ff3366';
+            this.ctx.lineWidth = 3;
+            
+            pixels.forEach(pixel => {
+                const x = pixel.col * pixelSize;
+                const y = pixel.row * pixelSize;
+                
+                // Animate with a shake effect
+                const offset = Math.sin(Date.now() * 0.02) * 1.5;
+                this.ctx.strokeRect(x + 1 + offset, y + 1, pixelSize - 2, pixelSize - 2);
+                
+                // Add red tint
+                this.ctx.fillStyle = 'rgba(255, 51, 102, 0.3)';
+                this.ctx.fillRect(x + 1, y + 1, pixelSize - 2, pixelSize - 2);
+            });
+        }
+
+        drawLevelEffects() {
+            const time = Date.now() * 0.005;
+            
+            // Master mode glow
+            if (this.levelEffects.masterGlow || this.levelEffects.allEffects) {
+                this.ctx.shadowColor = '#ffd700';
+                this.ctx.shadowBlur = 15 + Math.sin(time) * 5;
+                this.ctx.strokeStyle = '#ffd700';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(2, 2, this.canvas.width - 4, this.canvas.height - 4);
+                this.ctx.shadowBlur = 0;
+            }
+            
+            // Perfect mode effects
+            if (this.levelEffects.perfectMode) {
+                this.ctx.shadowColor = '#ff00ff';
+                this.ctx.shadowBlur = 20 + Math.sin(time * 1.5) * 10;
+                this.ctx.strokeStyle = '#ff00ff';
+                this.ctx.lineWidth = 3;
+                this.ctx.strokeRect(1, 1, this.canvas.width - 2, this.canvas.height - 2);
+                this.ctx.shadowBlur = 0;
+            }
+            
+            // Power glow effects
+            if (this.levelEffects.powerGlow && this.combo > 0) {
+                const alpha = 0.3 + 0.2 * Math.sin(time * 2);
+                this.ctx.fillStyle = `rgba(0, 255, 255, ${alpha})`;
+                this.ctx.fillRect(0, 0, this.canvas.width, 5);
+                this.ctx.fillRect(0, this.canvas.height - 5, this.canvas.width, 5);
+                this.ctx.fillRect(0, 0, 5, this.canvas.height);
+                this.ctx.fillRect(this.canvas.width - 5, 0, 5, this.canvas.height);
+            }
+            
+            // Sparkle effects for color variety
+            if (this.levelEffects.sparkle && Math.random() < 0.1) {
+                this.drawSparkles();
+            }
+        }
+
+        drawSparkles() {
+            const sparkleCount = 3;
+            for (let i = 0; i < sparkleCount; i++) {
+                const x = Math.random() * this.canvas.width;
+                const y = Math.random() * this.canvas.height;
+                const size = 2 + Math.random() * 3;
+                
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillRect(x, y, size, size);
+                
+                // Add colored sparkle
+                this.ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                this.ctx.fillRect(x + 1, y + 1, size - 1, size - 1);
+            }
         }
 
         drawPauseOverlay() {

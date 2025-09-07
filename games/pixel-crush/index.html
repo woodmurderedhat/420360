@@ -405,16 +405,91 @@
                 padding: 5px;
             }
             
-            /* Extra mobile optimizations */
+            /* Enhanced mobile optimizations */
             .btn {
                 min-height: 48px; /* Larger touch targets for small screens */
-                font-size: 9px;
-                margin: 3px 0;
+                font-size: 10px;
+                margin: 4px 0;
+                padding: 12px 16px;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+            }
+            
+            .btn:hover, .btn:focus {
+                transform: scale(1.02);
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
             }
             
             .panel h3 {
                 font-size: 10px;
                 margin-bottom: 8px;
+            }
+            
+            /* Improve touch targets for theme options */
+            .theme-option {
+                min-height: 44px;
+                padding: 10px 16px;
+                margin: 3px 2px;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+            }
+            
+            .theme-option:active {
+                transform: scale(0.95);
+            }
+            
+            /* Enhanced mobile game board */
+            .game-board {
+                max-width: 320px;
+                margin: 0 auto;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            }
+            
+            #gameCanvas {
+                width: 100% !important;
+                height: auto !important;
+                max-width: 320px;
+                border-radius: 4px;
+                touch-action: manipulation; /* Prevent zoom on touch */
+            }
+            
+            /* Better mobile typography */
+            .game-info {
+                font-size: 8px;
+            }
+            
+            .info-item > div:first-child {
+                font-weight: bold;
+                color: var(--highlight);
+            }
+            
+            /* Improve mobile accessibility */
+            .btn:focus,
+            .theme-option:focus {
+                outline: 2px solid var(--highlight);
+                outline-offset: 2px;
+            }
+            
+            /* Enhanced visual feedback for mobile */
+            .game-board-container {
+                position: relative;
+            }
+            
+            .game-board-container::before {
+                content: "";
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: linear-gradient(45deg, var(--primary), var(--secondary));
+                border-radius: 10px;
+                z-index: -1;
             }
         }
     </style>

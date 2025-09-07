@@ -326,6 +326,87 @@
             }, 3000);
         }
 
+        showLevelAdvancement(level, specialFeature) {
+            // Show brief level advancement notification for infinite gameplay
+            const featureDescriptions = {
+                'more_colors': 'Enhanced Color Variety!',
+                'power_boost': 'Power-Up Boost Active!',
+                'combo_bonus': 'Combo Bonus Multiplier!',
+                'time_pressure': 'Pressure Mode Engaged!',
+                'mega_combos': 'Mega Combos Enabled!',
+                'chain_reaction': 'Chain Reaction Bonus!',
+                'cascade_bonus': 'Cascade Bonus Active!',
+                'master_mode': 'Master Mode - All Bonuses!',
+                'perfect_challenge': 'Perfect Challenge Mode!'
+            };
+            
+            const description = featureDescriptions[specialFeature] || 'New Level!';
+            
+            // Create a smaller, less intrusive notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, var(--success), var(--highlight));
+                color: var(--bg);
+                padding: 15px 25px;
+                border: 2px solid var(--text);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+                font-family: 'Press Start 2P', monospace;
+                font-size: 10px;
+                text-align: center;
+                z-index: 10000;
+                border-radius: 6px;
+                animation: levelAdvancePulse 0.8s ease-out;
+                text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+            `;
+            
+            notification.innerHTML = `
+                <div style="margin-bottom: 8px; font-size: 12px; color: var(--bg);">LEVEL ${level}!</div>
+                <div style="font-size: 8px;">${description}</div>
+                <div style="font-size: 7px; margin-top: 5px; opacity: 0.8;">+5 Bonus Moves!</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Add CSS animation if not already present
+            if (!document.getElementById('levelAdvanceStyles')) {
+                const style = document.createElement('style');
+                style.id = 'levelAdvanceStyles';
+                style.textContent = `
+                    @keyframes levelAdvancePulse {
+                        0% { 
+                            opacity: 0; 
+                            transform: translate(-50%, -50%) scale(0.5) rotate(-5deg); 
+                        }
+                        50% { 
+                            opacity: 1; 
+                            transform: translate(-50%, -50%) scale(1.1) rotate(2deg); 
+                        }
+                        100% { 
+                            opacity: 1; 
+                            transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Remove notification after 2 seconds (shorter than level info)
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                notification.style.transition = 'all 0.4s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 400);
+            }, 2000);
+        }
+
         animateValueChange(element) {
             if (!element) return;
             

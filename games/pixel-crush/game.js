@@ -583,8 +583,8 @@
 
         checkGameEndConditions() {
             if (this.score >= this.target) {
-                // Level completed
-                this.levelComplete();
+                // Automatically advance to next level for infinite gameplay
+                this.autoAdvanceLevel();
             } else if (this.moves <= 0) {
                 // Check if player can still make moves
                 if (!this.board.canMakeMove()) {
@@ -640,6 +640,49 @@
             this.ui.updateGameState(this.gameState);
             this.ui.hideGameOver();
             this.render();
+        }
+
+        autoAdvanceLevel() {
+            this.level++;
+            
+            // Use predefined config for first 10 levels, then generate infinite levels
+            let levelData;
+            if (this.level <= LEVEL_CONFIG.length) {
+                levelData = LEVEL_CONFIG[this.level - 1];
+            } else {
+                // Generate infinite level progression with exponentially increasing difficulty
+                levelData = this.generateInfiniteLevel(this.level);
+            }
+            
+            // Update target for next level but keep current score
+            this.target = levelData.target;
+            
+            // Award bonus moves for level completion (5 bonus moves)
+            this.moves += 5;
+            
+            // Reset combo for new level
+            this.combo = 0;
+            
+            // Apply special level features
+            this.applyLevelFeatures(levelData.specialFeature);
+            
+            // Update UI
+            this.ui.updateLevel(this.level);
+            this.ui.updateMoves(this.moves);
+            this.ui.updateTarget(this.target);
+            this.ui.updateCombo(this.combo);
+            this.ui.updateProgress(this.score, this.target);
+            
+            // Show brief level advancement notification
+            this.ui.showLevelAdvancement(this.level, levelData.specialFeature);
+            
+            // Play level up sound
+            if (window.GameSounds && window.GameSounds.isEnabled()) {
+                window.GameSounds.sounds.LEVEL_UP();
+            }
+            
+            // Save progress
+            this.saveProgress();
         }
 
         nextLevel() {

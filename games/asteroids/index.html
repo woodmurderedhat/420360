@@ -47,6 +47,13 @@
             border: 4px solid var(--primary); 
             box-shadow: 0 0 0 4px var(--secondary), 8px 8px 0 0 var(--highlight), 0 0 0 8px #000; 
             background: #000; margin: 0 auto 20px auto; position: relative; 
+            max-width: 100%;
+        }
+
+        #gameCanvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
         }
 
         .controls { 
@@ -146,7 +153,7 @@
         </div>
         
         <div class="game-board">
-            <canvas id="gameCanvas" width="600" height="500"></canvas>
+            <canvas id="gameCanvas"></canvas>
             <div id="gameOver" class="game-message">
                 <h2>GAME OVER</h2>
                 <p>Final Score: <span id="finalScore">0</span></p>
@@ -186,6 +193,38 @@
         const livesElement = document.getElementById('lives');
         const finalScoreElement = document.getElementById('finalScore');
         const gameOverElement = document.getElementById('gameOver');
+
+        // Set up responsive canvas
+        function setupResponsiveCanvas() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const maxWidth = container.clientWidth - 20;
+            const maxHeight = window.innerHeight * 0.6;
+            
+            // Maintain 6:5 aspect ratio (600:500)
+            const aspectRatio = 600 / 500;
+            let width = Math.min(maxWidth, maxHeight * aspectRatio, 600);
+            let height = width / aspectRatio;
+            
+            // Update canvas size
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            
+            // Set internal resolution
+            const pixelRatio = window.devicePixelRatio || 1;
+            canvas.width = width * pixelRatio;
+            canvas.height = height * pixelRatio;
+            
+            // Scale context for high DPI displays
+            ctx.scale(pixelRatio, pixelRatio);
+        }
+
+        // Initialize responsive canvas
+        setupResponsiveCanvas();
 
         // Game variables
         let gameRunning = false;

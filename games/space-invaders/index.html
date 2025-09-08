@@ -136,7 +136,9 @@
             .instructions { font-size: 8px; } 
             h1 { font-size: 18px; } 
             .game-stats { font-size: 10px; } 
-            .stat-value { font-size: 14px; } 
+            .stat-value { font-size: 14px; }
+            .game-board { margin: 0 auto 80px auto; } /* Space for mobile controls */
+            .controls { margin-bottom: 10px; }
         }
 
         .header { 
@@ -215,8 +217,10 @@
         <div class="instructions">
             <p><strong>How to Play:</strong></p>
             <p>• Use ARROW KEYS or A/D to move left/right</p>
-            <p>• Press SPACE to shoot</p>
-            <p>• Destroy all aliens to advance to the next wave</p>
+            <p>• Press SPACE to shoot (or hold 🚀 for rapid fire)</p>
+            <p>• Collect power-ups: ⚡Spread Shot, 🛡️Shield, 🔥Piercing, 💥Rapid Fire</p>
+            <p>• Destroy all aliens to advance • Boss battles every 5 waves!</p>
+            <p>• Build combos for score multipliers • Use barriers as cover</p>
             <p>• Don't let aliens reach the bottom!</p>
         </div>
     </div>
@@ -266,6 +270,8 @@
         let alienBullets = [];
         let powerUps = [];
         let particles = [];
+        let boss = null;
+        let barriers = [];
 
         // Power-up system
         const POWER_UP_TYPES = {
@@ -314,6 +320,41 @@
             lastHitTime: 0,
             comboTimeWindow: 1000 // 1 second to maintain combo
         };
+
+        // Boss system
+        const BOSS_TYPES = {
+            MOTHER_SHIP: {
+                health: 50,
+                maxHealth: 50,
+                width: 120,
+                height: 60,
+                color: '#ff0040',
+                points: 1000,
+                attackPatterns: ['laser_sweep', 'missile_barrage', 'teleport_attack'],
+                weakPoints: [
+                    { x: 30, y: 20, width: 20, height: 20, health: 10 },
+                    { x: 70, y: 20, width: 20, height: 20, health: 10 }
+                ]
+            }
+        };
+
+        // Barrier system for dynamic environments
+        function createBarriers() {
+            barriers = [];
+            for (let i = 0; i < 4; i++) {
+                barriers.push({
+                    x: 100 + i * 120,
+                    y: canvas.height - 150,
+                    width: 60,
+                    height: 40,
+                    health: 5,
+                    maxHealth: 5,
+                    moving: wave >= 5, // Moving barriers on wave 5+
+                    direction: Math.random() > 0.5 ? 1 : -1,
+                    speed: 1
+                });
+            }
+        }
 
         // Alien grid
         const alienRows = 5;
@@ -377,6 +418,9 @@
             player.x = canvas.width / 2 - 20;
             bullets = [];
             alienBullets = [];
+            powerUps = [];
+            particles = [];
+            boss = null;
             score = 0;
             lives = 3;
             wave = 1;
@@ -384,7 +428,19 @@
             gameOverElement.style.display = 'none';
             gameWinElement.style.display = 'none';
             
+            // Reset power-ups
+            Object.keys(playerPowerUps).forEach(key => {
+                playerPowerUps[key].active = false;
+                playerPowerUps[key].endTime = 0;
+            });
+            
+            // Reset combo system
+            comboSystem.count = 0;
+            comboSystem.multiplier = 1;
+            comboSystem.lastHitTime = 0;
+            
             createAliens();
+            createBarriers();
             updateDisplay();
             
             if (gameLoop) clearInterval(gameLoop);
@@ -527,6 +583,101 @@
                     continue;
                 }
                 
+                // Check collision with barriers
+                let bulletHitBarrier = false;
+                for (const barrier of barriers) {
+                    if (barrier.health > 0 &&
+                        bullet.x < barrier.x + barrier.width &&
+                        bullet.x + bullet.width > barrier.x &&
+                        bullet.y < barrier.y + barrier.height &&
+                        bullet.y + bullet.height > barrier.y) {
+                        
+                        barrier.health--;
+                        if (!bullet.piercing) {
+                            bullets.splice(i, 1);
+                            bulletHitBarrier = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (bulletHitBarrier) continue;
+                
+                // Check collision with boss
+                if (boss && bullet.x < boss.x + boss.width &&
+                    bullet.x + bullet.width > boss.x &&
+                    bullet.y < boss.y + boss.height &&
+                    bullet.y + bullet.height > boss.y) {
+                    
+                    // Check weak points first
+                    let hitWeakPoint = false;
+                    for (const weakPoint of boss.weakPoints) {
+                        if (!weakPoint.destroyed &&
+                            bullet.x < boss.x + weakPoint.x + weakPoint.width &&
+                            bullet.x + bullet.width > boss.x + weakPoint.x &&
+                            bullet.y < boss.y + weakPoint.y + weakPoint.height &&
+                            bullet.y + bullet.height > boss.y + weakPoint.y) {
+                            
+                            weakPoint.health--;
+                            if (weakPoint.health <= 0) {
+                                weakPoint.destroyed = true;
+                                boss.health -= 10; // Extra damage for destroying weak point
+                            }
+                            boss.health--;
+                            hitWeakPoint = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!hitWeakPoint) {
+                        boss.health--; // Normal damage to boss body
+                    }
+                    
+                    // Handle combo and scoring
+                    comboSystem.count++;
+                    comboSystem.lastHitTime = currentTime;
+                    comboSystem.multiplier = 1 + (comboSystem.count * 0.1);
+                    
+                    const baseScore = hitWeakPoint ? 100 : 50;
+                    score += Math.floor(baseScore * comboSystem.multiplier);
+                    
+                    // Create hit particles
+                    createHitParticles(bullet.x, bullet.y, boss.color);
+                    
+                    if (boss.health <= 0) {
+                        // Boss defeated
+                        score += Math.floor(boss.points * comboSystem.multiplier);
+                        createHitParticles(boss.x + boss.width/2, boss.y + boss.height/2, boss.color);
+                        
+                        // Drop multiple power-ups
+                        for (let j = 0; j < 3; j++) {
+                            const powerUpTypes = Object.keys(POWER_UP_TYPES);
+                            const randomType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+                            
+                            powerUps.push({
+                                x: boss.x + (j * 30) + 30,
+                                y: boss.y + boss.height / 2,
+                                width: 20,
+                                height: 20,
+                                type: randomType,
+                                data: POWER_UP_TYPES[randomType],
+                                fallSpeed: 2
+                            });
+                        }
+                        
+                        boss = null;
+                        
+                        if (typeof GameSounds !== 'undefined' && GameSounds.isEnabled()) {
+                            GameSounds.sounds.LEVEL_UP();
+                        }
+                    }
+                    
+                    if (!bullet.piercing) {
+                        bullets.splice(i, 1);
+                        continue;
+                    }
+                }
+                
                 // Check collision with aliens
                 for (let j = aliens.length - 1; j >= 0; j--) {
                     const alien = aliens[j];
@@ -575,12 +726,38 @@
             // Update alien bullets
             for (let i = alienBullets.length - 1; i >= 0; i--) {
                 const bullet = alienBullets[i];
+                
+                // Handle special bullet types
+                if (bullet.homing && bullet.target) {
+                    // Simple homing logic
+                    const dx = bullet.target.x - bullet.x;
+                    bullet.x += Math.sign(dx) * 0.5;
+                }
+                
+                if (bullet.angle) {
+                    bullet.x += Math.sin(bullet.angle) * bullet.speed * 0.5;
+                }
+                
                 bullet.y += bullet.speed;
                 
                 // Remove bullets that go off screen
-                if (bullet.y > canvas.height) {
+                if (bullet.y > canvas.height || bullet.x < 0 || bullet.x > canvas.width) {
                     alienBullets.splice(i, 1);
                     continue;
+                }
+                
+                // Check collision with barriers
+                for (const barrier of barriers) {
+                    if (barrier.health > 0 &&
+                        bullet.x < barrier.x + barrier.width &&
+                        bullet.x + bullet.width > barrier.x &&
+                        bullet.y < barrier.y + barrier.height &&
+                        bullet.y + bullet.height > barrier.y) {
+                        
+                        barrier.health--;
+                        alienBullets.splice(i, 1);
+                        break;
+                    }
                 }
                 
                 // Check collision with player (unless shielded)
@@ -612,6 +789,14 @@
             // Move aliens with behaviors
             updateAlienMovement(currentTime);
             
+            // Update boss
+            if (boss) {
+                updateBoss(currentTime);
+            }
+            
+            // Update barriers
+            updateBarriers();
+            
             // Random alien shooting
             for (const alien of aliens) {
                 if (Math.random() < alien.type.shootChance) {
@@ -629,7 +814,11 @@
             updateParticles();
             
             // Check win condition
-            if (aliens.length === 0) {
+            if (!boss && aliens.length === 0) {
+                waveWin();
+                return;
+            } else if (boss && boss.health <= 0) {
+                boss = null; // Boss already handled in bullet collision
                 waveWin();
                 return;
             }
@@ -810,6 +999,81 @@
             }
         }
 
+        function updateBoss(currentTime) {
+            // Boss movement
+            boss.x += boss.movement.direction * boss.movement.speed;
+            
+            // Boundary check
+            if (boss.x <= 0 || boss.x >= canvas.width - boss.width) {
+                boss.movement.direction *= -1;
+            }
+            
+            // Boss attacks
+            boss.attackTimer += 16; // Roughly 60 FPS
+            
+            if (boss.attackTimer >= boss.attackCooldown) {
+                performBossAttack();
+                boss.attackTimer = 0;
+                boss.currentAttack = (boss.currentAttack + 1) % 3;
+            }
+        }
+
+        function performBossAttack() {
+            switch (boss.currentAttack) {
+                case 0: // Laser sweep
+                    for (let i = 0; i < 5; i++) {
+                        alienBullets.push({
+                            x: boss.x + (i * 25) + 10,
+                            y: boss.y + boss.height,
+                            width: 6,
+                            height: 12,
+                            speed: 4
+                        });
+                    }
+                    break;
+                    
+                case 1: // Missile barrage
+                    for (let i = 0; i < 3; i++) {
+                        alienBullets.push({
+                            x: boss.x + boss.width / 2 - 3,
+                            y: boss.y + boss.height,
+                            width: 6,
+                            height: 15,
+                            speed: 2 + i,
+                            homing: true,
+                            target: player
+                        });
+                    }
+                    break;
+                    
+                case 2: // Spread attack
+                    for (let i = -2; i <= 2; i++) {
+                        alienBullets.push({
+                            x: boss.x + boss.width / 2 - 2,
+                            y: boss.y + boss.height,
+                            width: 4,
+                            height: 10,
+                            speed: 3,
+                            angle: i * 0.5
+                        });
+                    }
+                    break;
+            }
+        }
+
+        function updateBarriers() {
+            for (const barrier of barriers) {
+                if (barrier.moving && barrier.health > 0) {
+                    barrier.x += barrier.direction * barrier.speed;
+                    
+                    // Boundary check for moving barriers
+                    if (barrier.x <= 0 || barrier.x >= canvas.width - barrier.width) {
+                        barrier.direction *= -1;
+                    }
+                }
+            }
+        }
+
         function draw() {
             // Clear canvas
             ctx.fillStyle = COLORS.background;
@@ -891,6 +1155,66 @@
                 ctx.fillText(powerUp.data.icon, powerUp.x + powerUp.width/2, powerUp.y + powerUp.height/2 + 6);
             });
             
+            // Draw barriers
+            barriers.forEach(barrier => {
+                if (barrier.health > 0) {
+                    const healthRatio = barrier.health / barrier.maxHealth;
+                    ctx.fillStyle = healthRatio > 0.5 ? '#415a77' : '#778da9';
+                    ctx.fillRect(barrier.x, barrier.y, barrier.width, barrier.height);
+                    
+                    // Draw damage cracks
+                    if (healthRatio < 1) {
+                        ctx.fillStyle = '#000';
+                        for (let i = 0; i < (5 - barrier.health); i++) {
+                            const crackX = barrier.x + Math.random() * barrier.width;
+                            const crackY = barrier.y + Math.random() * barrier.height;
+                            ctx.fillRect(crackX, crackY, 3, 3);
+                        }
+                    }
+                }
+            });
+            
+            // Draw boss
+            if (boss) {
+                // Main boss body
+                ctx.fillStyle = boss.color;
+                ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
+                
+                // Boss health bar
+                const healthBarWidth = boss.width;
+                const healthBarHeight = 8;
+                const healthRatio = boss.health / boss.maxHealth;
+                
+                // Background
+                ctx.fillStyle = '#333';
+                ctx.fillRect(boss.x, boss.y - 15, healthBarWidth, healthBarHeight);
+                
+                // Health
+                ctx.fillStyle = healthRatio > 0.5 ? '#06ffa5' : '#d62828';
+                ctx.fillRect(boss.x, boss.y - 15, healthBarWidth * healthRatio, healthBarHeight);
+                
+                // Draw weak points
+                boss.weakPoints.forEach(weakPoint => {
+                    if (!weakPoint.destroyed) {
+                        ctx.fillStyle = '#fff700';
+                        ctx.fillRect(boss.x + weakPoint.x, boss.y + weakPoint.y, weakPoint.width, weakPoint.height);
+                        
+                        // Weak point health indicator
+                        if (weakPoint.health < 10) {
+                            ctx.fillStyle = '#ff0040';
+                            ctx.font = '12px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(weakPoint.health, boss.x + weakPoint.x + weakPoint.width/2, boss.y + weakPoint.y + weakPoint.height/2 + 4);
+                        }
+                    }
+                });
+                
+                // Boss decorations
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(boss.x + 10, boss.y + 10, 4, 4);
+                ctx.fillRect(boss.x + boss.width - 14, boss.y + 10, 4, 4);
+            }
+            
             // Draw particles
             particles.forEach(particle => {
                 const alpha = particle.life / particle.maxLife;
@@ -960,11 +1284,44 @@
 
         function nextWave() {
             wave++;
-            alienSpeed += 0.5; // Increase difficulty
-            createAliens();
+            alienSpeed += 0.3; // Gradual difficulty increase
+            
+            // Create barriers for new wave
+            createBarriers();
+            
+            // Boss waves every 5 waves
+            if (wave % 5 === 0) {
+                createBoss();
+            } else {
+                createAliens();
+            }
+            
             gameWinElement.style.display = 'none';
             gameRunning = true;
             gameLoop = setInterval(update, 1000/60);
+        }
+
+        function createBoss() {
+            const bossType = BOSS_TYPES.MOTHER_SHIP;
+            boss = {
+                x: canvas.width / 2 - bossType.width / 2,
+                y: 50,
+                width: bossType.width,
+                height: bossType.height,
+                health: bossType.health,
+                maxHealth: bossType.maxHealth,
+                color: bossType.color,
+                points: bossType.points,
+                attackTimer: 0,
+                attackCooldown: 2000, // 2 seconds between attacks
+                currentAttack: 0,
+                weakPoints: bossType.weakPoints.map(wp => ({...wp, destroyed: false})),
+                movement: {
+                    direction: 1,
+                    speed: 1,
+                    pattern: 'horizontal'
+                }
+            };
         }
 
         function gameOver() {

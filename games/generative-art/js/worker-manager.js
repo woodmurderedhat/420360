@@ -137,17 +137,14 @@ function recoverFromWorkerError(taskType) {
     switch (taskType) {
         case 'processNoise':
             // Fallback to main thread processing for noise
-            console.log('Falling back to main thread for noise processing');
             break;
             
         case 'generateFractal':
             // Fallback to simpler fractal algorithm
-            console.log('Falling back to simplified fractal generation');
             break;
             
         default:
             // General recovery - restart worker
-            console.log('Attempting to restart worker');
             // Implementation for worker restart
     }
 }

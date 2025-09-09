@@ -108,7 +108,6 @@ function logError(errorObject) {
             console.error(`${logPrefix} ${message}`, { timestamp, stack, details });
             break;
         default:
-            console.log(`${logPrefix} ${message}`, { timestamp, details });
     }
 }
 

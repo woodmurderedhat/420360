@@ -9,7 +9,12 @@
       "action": "create",
       "thoughtId": "thought_2",
       "timestamp": "2025-09-09T15:13:14.947Z"
+    },
+    {
+      "action": "create",
+      "thoughtId": "thought_3",
+      "timestamp": "2025-09-09T16:03:15.449Z"
     }
   ],
-  "totalThoughts": 2
+  "totalThoughts": 3
 }

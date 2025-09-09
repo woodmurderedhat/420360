@@ -28,6 +28,10 @@
 <!-- Pixel font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
+<!-- Global Highscore System -->
+<script src="assets/js/highscore-service.js"></script>
+<script src="assets/js/global-leaderboard.js"></script>
+
 <style>
 :root{
   --bg: #1a1f1a;
@@ -222,6 +226,10 @@ html,body{
     <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">GAMES</span>
     <span style="color:var(--secondary);">🕹️</span>
   </div>
+  <div id="leaderboard-control" class="ctrl-btn" style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 10px;cursor:pointer;user-select:none;" role="button" tabindex="0" title="Global Leaderboard (L)" aria-label="Show global leaderboard">
+    <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">LEADERBOARD</span>
+    <span style="color:var(--secondary);">🏆</span>
+  </div>
 </div>
 <!-- Bottom Controls: Issues (left), Music & SFX (right cluster) -->
 <div id="issue-report" style="position:fixed;bottom:10px;left:10px;z-index:5000;display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 10px;cursor:pointer;user-select:none;" role="button" tabindex="0" title="Report an issue on GitHub (I)" aria-label="Report an issue on GitHub">
@@ -263,6 +271,11 @@ html,body{
 </div>
 
 <div class="blurb" id="blurb" aria-live="polite"></div>
+
+<!-- Global Leaderboard Container -->
+<div id="globalLeaderboardContainer" style="display: none; position: fixed; top: 15%; left: 50%; transform: translateX(-50%); z-index: 5500; width: 90%; max-width: 600px;">
+  <!-- Leaderboard content will be populated by GlobalLeaderboard class -->
+</div>
 
 <script>
 /* ========== CONFIG ========== */
@@ -379,8 +392,8 @@ function reloadFrame(id){ const el=document.getElementById(id); if(!el) return; 
 function pauseBackground(){ stopIntervals(); }
 function resumeBackgroundIfNone(){ const anyOpen = document.querySelectorAll('.integrated-overlay:not(.hidden)').length>0; if(!anyOpen) startIntervals(); }
 
-// Keyboard shortcut: press A for About, O for Oracle (when not typing inside overlays)
-window.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'|| e.target.tagName==='TEXTAREA') return; if(e.key==='a'||e.key==='A'){ openAbout(); } if(e.key==='g'||e.key==='G'){ openGamesIndex(); } if(e.key==='o'||e.key==='O'){ openOracle(); } if(e.key==='Escape'){ document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>closeOverlay(el.id)); } });
+  // Keyboard shortcut: press A for About, O for Oracle (when not typing inside overlays)
+window.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'|| e.target.tagName==='TEXTAREA') return; if(e.key==='a'||e.key==='A'){ openAbout(); } if(e.key==='g'||e.key==='G'){ openGamesIndex(); } if(e.key==='o'||e.key==='O'){ openOracle(); } if(e.key==='l'||e.key==='L'){ toggleLeaderboard(); } if(e.key==='Escape'){ document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>closeOverlay(el.id)); hideLeaderboard(); } });
 
 // Intercept clicks on any popup link to open in overlay (internal or external)
 document.addEventListener('click', (e)=>{
@@ -811,6 +824,7 @@ document.addEventListener('click', (ev)=>{
 (()=>{
   const aboutBtn = document.getElementById('about-control');
   const gamesBtn = document.getElementById('games-control');
+  const leaderboardBtn = document.getElementById('leaderboard-control');
   if(aboutBtn){
     const act = ()=>{ openAbout(); };
     aboutBtn.addEventListener('click', e=>{ e.stopPropagation(); act(); });
@@ -821,7 +835,37 @@ document.addEventListener('click', (ev)=>{
     gamesBtn.addEventListener('click', e=>{ e.stopPropagation(); actG(); });
     gamesBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); actG(); }});
   }
+  if(leaderboardBtn){
+    const actL = ()=>{ toggleLeaderboard(); };
+    leaderboardBtn.addEventListener('click', e=>{ e.stopPropagation(); actL(); });
+    leaderboardBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); actL(); }});
+  }
 })();
+
+// Global Leaderboard functionality
+let globalLeaderboard = null;
+
+function toggleLeaderboard() {
+  if (!globalLeaderboard) {
+    const container = document.getElementById('globalLeaderboardContainer');
+    globalLeaderboard = new GlobalLeaderboard(container);
+  }
+  globalLeaderboard.toggle();
+  
+  // Pause background activity when leaderboard is visible
+  if (globalLeaderboard.isVisible) {
+    pauseBackground();
+  } else {
+    resumeBackgroundIfNone();
+  }
+}
+
+function hideLeaderboard() {
+  if (globalLeaderboard && globalLeaderboard.isVisible) {
+    globalLeaderboard.hide();
+    resumeBackgroundIfNone();
+  }
+}
 
 </script>
 <script>

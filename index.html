@@ -28,6 +28,16 @@
 <!-- Pixel font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
+<!-- Supabase Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<!-- Fallback for when CDN is unavailable -->
+<script>
+if (typeof window.supabase === 'undefined') {
+    console.warn('Supabase CDN unavailable, using localStorage fallback mode');
+    window.supabase = { createClient: () => null };
+}
+</script>
+
 <!-- Global Highscore System -->
 <script src="assets/js/highscore-service.js"></script>
 <script src="assets/js/global-leaderboard.js"></script>

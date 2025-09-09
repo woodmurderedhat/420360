@@ -6,12 +6,13 @@
 
 class HighscoreService {
     constructor() {
-        // Supabase configuration (using a public read/anon key for the demo)
-        this.supabaseUrl = 'https://lcjlvfvltaaayeruvtbw.supabase.co'; // Will be replaced with actual URL
-        this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxjamx2ZnZsdGFhYXllcnV2dGJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MzI3MjUsImV4cCI6MjA3MzAwODcyNX0.GBSvJFoQ63sAlou5HRpbP22gU8A5Y5i0ZfwKBYwje6Y'; // Will be replaced with actual anon key
+        // Supabase configuration
+        this.supabaseUrl = 'https://lcjlvfvltaaayeruvtbw.supabase.co';
+        this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxjamx2ZnZsdGFhYXllcnV2dGJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MzI3MjUsImV4cCI6MjA3MzAwODcyNX0.GBSvJFoQ63sAlou5HRpbP22gU8A5Y5i0ZfwKBYwje6Y';
         this.tableName = 'highscores';
         this.initialized = false;
         this.fallbackMode = true; // Start in fallback mode, switch to online if available
+        this.supabase = null;
         
         // Cache for reducing API calls
         this.scoreCache = new Map();
@@ -23,13 +24,31 @@ class HighscoreService {
     
     async init() {
         try {
-            // For now, we'll use a simple JSON-based backend simulation
-            // In a real implementation, this would connect to Supabase
-            this.initialized = true;
-            console.log('HighscoreService initialized in demo mode');
+            // Initialize Supabase client
+            if (typeof window.supabase !== 'undefined') {
+                this.supabase = window.supabase.createClient(this.supabaseUrl, this.supabaseKey);
+                
+                // Test database connection by trying to select from the table
+                const { data, error } = await this.supabase
+                    .from(this.tableName)
+                    .select('id')
+                    .limit(1);
+                
+                if (error) {
+                    console.warn('HighscoreService: Database test failed, using localStorage fallback:', error.message);
+                    this.fallbackMode = true;
+                } else {
+                    this.fallbackMode = false;
+                    this.initialized = true;
+                    console.log('HighscoreService initialized with database connection');
+                }
+            } else {
+                throw new Error('Supabase client not available');
+            }
         } catch (error) {
-            console.warn('HighscoreService: Failed to initialize online mode, using localStorage fallback');
+            console.warn('HighscoreService: Failed to initialize database connection, using localStorage fallback:', error.message);
             this.fallbackMode = true;
+            this.initialized = true;
         }
     }
     
@@ -61,17 +80,27 @@ class HighscoreService {
                 session_id: this.getSessionId()
             };
             
-            // In a real implementation, this would submit to Supabase
-            // For now, simulate with localStorage for demo
-            this.saveToGlobalStorage(scoreEntry);
+            // Submit to Supabase database
+            const { data, error } = await this.supabase
+                .from(this.tableName)
+                .insert([scoreEntry]);
+            
+            if (error) {
+                console.warn('Failed to submit to database:', error.message);
+                // Fall back to localStorage simulation for this submission
+                this.saveToGlobalStorage(scoreEntry);
+                return { success: true, source: 'localStorage_fallback' };
+            }
             
             // Clear cache to force refresh
             this.scoreCache.clear();
             
-            return { success: true, source: 'global' };
+            return { success: true, source: 'database' };
         } catch (error) {
             console.warn('Failed to submit to global leaderboard:', error);
-            return { success: true, source: 'localStorage' };
+            // Fall back to localStorage simulation
+            this.saveToGlobalStorage(scoreEntry);
+            return { success: true, source: 'localStorage_fallback' };
         }
     }
     
@@ -95,11 +124,28 @@ class HighscoreService {
         }
         
         try {
-            // In a real implementation, this would query Supabase
-            const scores = this.getFromGlobalStorage(gameId, limit, scoreType);
-            this.scoreCache.set(cacheKey, scores);
+            // Query Supabase for game-specific leaderboard
+            let query = this.supabase
+                .from(this.tableName)
+                .select('*')
+                .eq('game_id', gameId)
+                .order('score_value', { ascending: false })
+                .limit(limit);
+            
+            if (scoreType) {
+                query = query.eq('score_type', scoreType);
+            }
+            
+            const { data, error } = await query;
+            
+            if (error) {
+                console.warn('Failed to fetch leaderboard from database:', error.message);
+                return this.getFromGlobalStorage(gameId, limit, scoreType);
+            }
+            
+            this.scoreCache.set(cacheKey, data);
             this.lastCacheUpdate = Date.now();
-            return scores;
+            return data;
         } catch (error) {
             console.warn('Failed to fetch global leaderboard:', error);
             return this.getLocalLeaderboard(gameId, limit);
@@ -115,8 +161,40 @@ class HighscoreService {
         }
         
         try {
-            // In a real implementation, this would query all games from Supabase
-            return this.getAllGlobalScores(limit);
+            // Query all games from Supabase, ordered by score
+            const { data, error } = await this.supabase
+                .from(this.tableName)
+                .select('*')
+                .order('score_value', { ascending: false })
+                .limit(limit);
+            
+            if (error) {
+                console.warn('Failed to fetch global leaderboard from database:', error.message);
+                return this.getAllGlobalScores(limit);
+            }
+            
+            // Add game names for display
+            const gameNameMap = {
+                'snake': 'Snake',
+                'breakout': 'Breakout',
+                'pong': 'Pong',
+                'flappy-bird': 'Flappy Bird',
+                'space-invaders': 'Space Invaders',
+                'asteroids': 'Asteroids',
+                'infinite-jumper': 'Infinite Jumper',
+                'memory': 'Memory Cards',
+                'neon-simon': 'Neon Simon',
+                'pixel-rain': 'Pixel Rain',
+                'glitch-maze': 'Glitch Maze',
+                'tarot-tetromino': 'Tarot Tetromino',
+                'pixel-crush': 'Pixel Crush'
+            };
+            
+            return data.map(score => ({
+                ...score,
+                game_name: gameNameMap[score.game_id] || score.game_id,
+                source: 'database'
+            }));
         } catch (error) {
             console.warn('Failed to fetch global leaderboard:', error);
             return this.getAllLocalScores(limit);

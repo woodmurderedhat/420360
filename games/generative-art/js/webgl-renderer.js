@@ -151,7 +151,6 @@ function initWebGL(targetCanvas) {
     }
 
     isInitialized = true;
-    console.log('WebGL initialized successfully');
     return true;
 }
 

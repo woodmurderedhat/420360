@@ -15,7 +15,6 @@ import { CreditsModal } from './CreditsModal.js';
 
 // Initialize the application when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('Initializing Noctis Reverie...');
   
   // Create event bus for communication between modules
   const eventBus = new EventBus();
@@ -68,7 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   controlsPanel.init();
   creditsModal.init();
   
-  console.log('Noctis Reverie initialized successfully');
 });
 
 /**

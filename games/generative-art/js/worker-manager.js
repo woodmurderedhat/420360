@@ -62,9 +62,8 @@ function initWorkers() {
             console.error('Error creating worker:', error);
         }
     }
-    
+
     isInitialized = true;
-    console.log(`Initialized ${workers.length} workers`);
     
     // Process any queued tasks
     processQueue();
@@ -257,7 +256,6 @@ function terminateWorkers() {
     
     workers = [];
     isInitialized = false;
-    console.log('All workers terminated');
 }
 
 // Export worker functions

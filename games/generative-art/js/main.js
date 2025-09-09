@@ -235,7 +235,6 @@ window.addEventListener('load', () => {
         // Initialize canvas
         initCanvas();
 
-        console.log('Application initialized successfully');
     } catch (error) {
         handleError(error, ErrorType.INITIALIZATION, ErrorSeverity.CRITICAL, {
             component: 'main',

@@ -3,6 +3,14 @@
  * Provides consistent error logging, user feedback, and error recovery
  */
 
+// Utility function to escape HTML
+function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[&<>"']/g, function(m) { 
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; 
+    });
+}
+
 // Error types
 export const ErrorType = {
     RENDERING: 'rendering',
@@ -100,7 +108,6 @@ function logError(errorObject) {
             console.error(`${logPrefix} ${message}`, { timestamp, stack, details });
             break;
         default:
-            console.log(`${logPrefix} ${message}`, { timestamp, details });
     }
 }
 
@@ -122,7 +129,7 @@ function showUserFeedback(errorObject) {
         <div class="error-icon">${getErrorIcon(severity)}</div>
         <div class="error-content">
             <div class="error-title">${getErrorTitle(severity)}</div>
-            <div class="error-message">${userMessage}</div>
+            <div class="error-message">${escapeHtml(userMessage)}</div>
         </div>
         <button class="error-close">&times;</button>
     `;

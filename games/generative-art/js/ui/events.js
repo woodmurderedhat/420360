@@ -8,6 +8,14 @@ import { getState, updateState } from '../state.js';
 import { handleError, ErrorType, ErrorSeverity } from '../error-service.js';
 import { debounce, throttle } from '../utils.js';
 
+// Utility function to escape HTML
+function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/[&<>"']/g, function(m) { 
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; 
+    });
+}
+
 // Private module state
 const _eventHandlers = new Map();
 const _eventListeners = [];
@@ -160,8 +168,8 @@ function showShortcutFeedback(key) {
     
     // Update content and show
     feedback.innerHTML = `
-        <div class="key">${displayKey}</div>
-        <div class="action">${action}</div>
+        <div class="key">${escapeHtml(displayKey)}</div>
+        <div class="action">${escapeHtml(action)}</div>
     `;
     feedback.classList.add('visible');
     

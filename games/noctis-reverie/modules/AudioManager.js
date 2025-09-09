@@ -33,7 +33,6 @@ export class AudioManager {
       this.masterGain.connect(this.ctx.destination);
       
       this.initialized = true;
-      console.log('Audio context initialized');
     } catch (error) {
       console.error('Failed to initialize audio context:', error);
     }

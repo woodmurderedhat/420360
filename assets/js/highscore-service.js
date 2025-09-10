@@ -8,7 +8,7 @@ class HighscoreService {
     constructor() {
         // Supabase configuration (using a public read/anon key for the demo)
         this.supabaseUrl = 'https://lcjlvfvltaaayeruvtbw.supabase.co'; // Will be replaced with actual URL
-        this.supabaseKey = secrets.SUPABASE; // Will be replaced with actual anon key
+        this.supabaseKey = null; // Will be replaced with actual anon key when Supabase is configured
         this.tableName = 'highscores';
         this.initialized = false;
         this.fallbackMode = true; // Start in fallback mode, switch to online if available
@@ -23,13 +23,20 @@ class HighscoreService {
     
     async init() {
         try {
-            // For now, we'll use a simple JSON-based backend simulation
-            // In a real implementation, this would connect to Supabase
+            // Check if Supabase key is available for real database connection
+            if (this.supabaseKey) {
+                // In a real implementation, this would connect to Supabase
+                console.log('HighscoreService: Supabase connection would be established here');
+                this.fallbackMode = false;
+            } else {
+                console.log('HighscoreService: No Supabase key configured, using localStorage fallback');
+                this.fallbackMode = true;
+            }
             this.initialized = true;
-            console.log('HighscoreService initialized in demo mode');
         } catch (error) {
             console.warn('HighscoreService: Failed to initialize online mode, using localStorage fallback');
             this.fallbackMode = true;
+            this.initialized = true; // Always mark as initialized to prevent further errors
         }
     }
     

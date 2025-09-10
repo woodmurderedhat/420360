@@ -8,7 +8,7 @@ class HighscoreService {
     constructor() {
         // Supabase configuration (using a public read/anon key for the demo)
         this.supabaseUrl = 'https://lcjlvfvltaaayeruvtbw.supabase.co'; // Will be replaced with actual URL
-        this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxjamx2ZnZsdGFhYXllcnV2dGJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MzI3MjUsImV4cCI6MjA3MzAwODcyNX0.GBSvJFoQ63sAlou5HRpbP22gU8A5Y5i0ZfwKBYwje6Y'; // Will be replaced with actual anon key
+        this.supabaseKey = secrets.SUPABASE; // Will be replaced with actual anon key
         this.tableName = 'highscores';
         this.initialized = false;
         this.fallbackMode = true; // Start in fallback mode, switch to online if available

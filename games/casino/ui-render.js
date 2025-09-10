@@ -5,14 +5,6 @@ import { RNG } from './rng.js';
 import { fmt, fromCents } from './money.js';
 import { getCrypto24hChange } from './crypto-market.js';
 
-// Utility function to escape HTML
-function escapeHtml(str) {
-  if (typeof str !== 'string') return '';
-  return str.replace(/[&<>"']/g, function(m) { 
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; 
-  });
-}
-
 const el = id => document.getElementById(id);
 
 const sparkData = {
@@ -63,9 +55,9 @@ function renderPlayers(){
   function card(p){
     const bets = p.totalBet || 0; // cents
     const net = p.wallet.balance - (p.initialBalance||0);
-    const reason = (!p.active && p.disableReason)? `<div style="color:#e67e22;font-size:10px">${escapeHtml(p.disableReason)}</div>`:'';
+    const reason = (!p.active && p.disableReason)? `<div style="color:#e67e22;font-size:10px">${p.disableReason}</div>`:'';
     return `<div class="player ${p.isSim? 'sim':''} ${!p.active?'disabled':''}">`+
-  `<div class="badge">${escapeHtml(p.name||p.strategy||('P'+p.id))}</div>`+
+  `<div class="badge">${p.name||p.strategy||('P'+p.id)}</div>`+
   `<div style="font-size:10px;opacity:0.7">id P${p.id}</div>`+
   `<div>bal ${fmt(p.wallet.balance)}</div>`+
   `<div>str ${p.currentStreak}</div>`+

@@ -34,6 +34,7 @@ export class AssetManager {
       
       // Wait for all assets to load
       await Promise.all(this.loadingPromises);
+      console.log('All assets loaded successfully');
       
       return true;
     } catch (error) {

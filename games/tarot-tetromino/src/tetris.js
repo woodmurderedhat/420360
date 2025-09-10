@@ -8,6 +8,7 @@ window.TarotTetris = window.TarotTetris || {};
 
 // Initialize the game when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Tarot Tetromino game initialized');
     
     // Check if all required elements exist
     const requiredElements = [

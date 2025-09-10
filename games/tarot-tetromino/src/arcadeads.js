@@ -12,14 +12,6 @@
  */
 
 (function (global) {
-    // Utility function to escape HTML
-    function escapeHtml(str) {
-        if (typeof str !== 'string') return '';
-        return str.replace(/[&<>"']/g, function(m) { 
-            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; 
-        });
-    }
-
     const AD_SLOGANS = [
         "Insert Coin at woodmurderedhat.com",
         "Unleash the Metal—Click for Power-Ups!",
@@ -42,7 +34,7 @@
         a.target = "_blank";
         a.rel = "noopener";
         a.setAttribute("data-slogan", slogan);
-        a.innerHTML = `<span>${escapeHtml(slogan)}</span>`;
+        a.innerHTML = `<span>${slogan}</span>`;
         a.addEventListener('click', function (e) {
             e.preventDefault();
             // Award score bonus

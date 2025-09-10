@@ -95,6 +95,7 @@ function initializeGame() {
             // Update coyote time based on upgrade level
             coyoteTime = getCoyoteTime();
 
+            console.log('Loaded upgrade levels:', upgrades);
         }
     } catch (e) {
         console.error('Error loading upgrade levels:', e);
@@ -362,6 +363,7 @@ function handleGameOver() {
         // Update the displayed leaderboard
         leaderboard.saveScores();
         leaderboard.displayScores();
+        console.log(`Score recorded: ${playerName} - ${TarotTetris.score}`);
     } else {
         console.error('Leaderboard functionality not available');
     }

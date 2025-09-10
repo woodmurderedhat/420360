@@ -193,6 +193,7 @@ function setupLazyLoadingSections(state) {
  * @param {Object} state - The application state
  */
 function initializeAdvancedControls(state) {
+    console.log('Initializing advanced controls');
     
     // Get advanced control elements
     const blendModeSelector = document.getElementById('blendModeSelector');
@@ -229,6 +230,7 @@ function initializeAdvancedControls(state) {
  * @param {Object} state - The application state
  */
 function initializeLayerControls(state) {
+    console.log('Initializing layer controls');
     
     // Initialize layer opacity controls
     const opacityControls = [
@@ -263,6 +265,7 @@ function initializeLayerControls(state) {
  * @param {Object} state - The application state
  */
 function initializeAnimationControls(state) {
+    console.log('Initializing animation controls');
     
     // Get animation control elements
     const animationToggle = document.getElementById('animationToggle');

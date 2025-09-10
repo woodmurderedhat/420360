@@ -12,14 +12,6 @@ import { setSeed } from './utils.js';
 // Import the UI module
 import * as UI from './ui/index.js';
 
-// Utility function to escape HTML
-function escapeHtml(str) {
-    if (typeof str !== 'string') return '';
-    return str.replace(/[&<>"']/g, function(m) { 
-        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; 
-    });
-}
-
 /**
  * Initialize the canvas dimensions and sets up event listeners.
  */
@@ -243,6 +235,7 @@ window.addEventListener('load', () => {
         // Initialize canvas
         initCanvas();
 
+        console.log('Application initialized successfully');
     } catch (error) {
         handleError(error, ErrorType.INITIALIZATION, ErrorSeverity.CRITICAL, {
             component: 'main',
@@ -255,7 +248,7 @@ window.addEventListener('load', () => {
             errorContainer.innerHTML = `
                 <div class="error-message">
                     <h3>Error Initializing Application</h3>
-                    <p>${escapeHtml(error.message)}</p>
+                    <p>${error.message}</p>
                     <p>Please try refreshing the page. If the problem persists, contact support.</p>
                 </div>
             `;

@@ -73,6 +73,7 @@
                     window.coyoteTime = window.getCoyoteTime();
                 }
 
+                console.log('Loaded upgrade levels:', upgrades);
             }
         } catch (e) {
             console.error('Error loading game upgrades:', e);
@@ -646,6 +647,7 @@
         window.upgradeTetrimino = upgradeTetrimino;
         window.unlockTetrimino = unlockTetrimino;
 
+        console.log('Shop system initialized with game upgrades');
     }
 
     // Open the shop

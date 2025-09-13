@@ -98,7 +98,6 @@
             // Initial render
             this.render();
             
-            console.log('Pixel Crush initialized');
             return true;
         }
 

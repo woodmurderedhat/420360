@@ -387,12 +387,6 @@ let lastMessageAction = null; // controls what the message button will do when c
 
 function gameOver(){
     gameRunning = false; clearInterval(gameLoop);
-    
-    // Submit score to global leaderboard system
-    if (window.parent && window.parent.HighscoreService) {
-        window.parent.HighscoreService.submitScore('breakout', 'Player', score, 'score');
-    }
-    
     if(score > highScore){
         highScore = score; localStorage.setItem('breakoutHighScore', highScore.toString()); updateStats();
         showWinMessage('NEW HIGH SCORE!', `Final Score: ${score}`);

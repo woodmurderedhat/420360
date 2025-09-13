@@ -74,7 +74,6 @@
         // Load settings from local storage
         loadSettings();
 
-        console.log('Sound system initialized in silent mode - no sound files available');
 
         // Load available sounds and music (which will be empty)
         loadSoundFiles();
@@ -90,7 +89,6 @@
     function loadSoundFiles() {
         // Currently no sound files are available
         // This function is intentionally left empty to prevent errors
-        console.log('Sound system disabled - no sound files available');
     }
 
     /**
@@ -103,7 +101,6 @@
         musicPlaylist.tracks = [];
         musicPlaylist.currentIndex = 0;
 
-        console.log('Music system disabled - no music files available');
     }
 
     /**
@@ -141,7 +138,6 @@
     function setupEventListeners() {
         // Sound system is disabled - no event listeners needed
         // This function is intentionally left empty to prevent errors
-        console.log('Sound event listeners disabled - no sound files available');
     }
 
     /**

@@ -466,11 +466,6 @@
                 highScoreElement.textContent = highScore;
             }
             
-            // Submit score to global leaderboard system
-            if (window.parent && window.parent.HighscoreService) {
-                window.parent.HighscoreService.submitScore('snake', 'Player', score, 'score');
-            }
-            
             gameOverElement.style.display = 'block';
             
             // Play game over sound

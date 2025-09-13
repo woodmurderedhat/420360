@@ -160,17 +160,21 @@
       const y = Math.floor((e.clientY - offsetY) / scale);
       if (x<0 || y<0 || x>=gridSize || y>=gridSize) return;
       const color = colorPicker.value;
-      if (grid[y]) grid[y][x] = color;
-      draw();
 
       try {
-        await fetch(API_URL, {
+        const res = await fetch(API_URL, {
           method: "POST",
           headers: {"Content-Type":"application/json"},
           body: JSON.stringify({x,y,color}),
         });
+        if (res.ok) {
+          // Only update local grid after server confirms
+          await loadPixels();
+        } else {
+          alert("Failed to place pixel. Server error.");
+        }
       } catch (e) {
-        // ignore network errors in local mode
+        alert("Network error: Could not place pixel.");
       }
     });
 

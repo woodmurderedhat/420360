@@ -72,7 +72,7 @@
     const colorPicker = document.getElementById("colorPicker");
 
   // API routing: local dev uses the proxy, production (GitHub Pages) hits Apps Script directly
-  const PROD_API = "https://script.google.com/macros/s/AKfycby39Tl8KgZplSh9d50YCe_Lw4qQc4SLRO-ulPzc9Dwov8u6UxuF959Wm5YXJdqg6jEetA/exec";
+  const PROD_API = "https://script.google.com/macros/s/AKfycbyr-cmbZ_GEvPKr__TGsdL43aEI075y6vsZqy2jBa4VUy1F-ESqqFpcX-sZ1JWExFQEDA/exec";
   const IS_LOCAL = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
   const API_URL = IS_LOCAL ? "/api/board" : PROD_API;
 

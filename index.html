@@ -222,6 +222,10 @@ html,body{
     <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">GAMES</span>
     <span style="color:var(--secondary);">🕹️</span>
   </div>
+  <div id="board-control" class="ctrl-btn" style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 10px;cursor:pointer;user-select:none;" role="button" tabindex="0" title="Board (B)" aria-label="Open pixel board">
+    <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">BOARD</span>
+    <span style="color:var(--secondary);">🧩</span>
+  </div>
 </div>
 <!-- Bottom Controls: Issues (left), Music & SFX (right cluster) -->
 <div id="issue-report" style="position:fixed;bottom:10px;left:10px;z-index:5000;display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 10px;cursor:pointer;user-select:none;" role="button" tabindex="0" title="Report an issue on GitHub (I)" aria-label="Report an issue on GitHub">
@@ -326,6 +330,7 @@ function makeDraggableOverlay(el){
 function openAbout(){ createOverlay('aboutOverlay','ABOUT • 420360','about/index.html'); showOverlay('aboutOverlay'); }
 function openOracle(){ createOverlay('oracleOverlay','TIM • DIALOGUE ORACLE','games/tim-the-dialogue-oracle/index.html'); showOverlay('oracleOverlay'); }
 function openGamesIndex(){ createOverlay('gamesIndexOverlay','GAMES • 420360','games/index.html'); showOverlay('gamesIndexOverlay'); }
+function openBoardIndex(){ createOverlay('boardIndexOverlay','BOARD • 420360','board/index.html'); showOverlay('boardIndexOverlay'); }
 function openGameOverlay(label, url){
   // Normalize internal absolute URLs to relative
   const rel = url.replace(/^https?:\/\/420360\.xyz\//,'');
@@ -380,7 +385,7 @@ function pauseBackground(){ stopIntervals(); }
 function resumeBackgroundIfNone(){ const anyOpen = document.querySelectorAll('.integrated-overlay:not(.hidden)').length>0; if(!anyOpen) startIntervals(); }
 
 // Keyboard shortcut: press A for About, O for Oracle (when not typing inside overlays)
-window.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'|| e.target.tagName==='TEXTAREA') return; if(e.key==='a'||e.key==='A'){ openAbout(); } if(e.key==='g'||e.key==='G'){ openGamesIndex(); } if(e.key==='o'||e.key==='O'){ openOracle(); } if(e.key==='Escape'){ document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>closeOverlay(el.id)); } });
+window.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'|| e.target.tagName==='TEXTAREA') return; if(e.key==='a'||e.key==='A'){ openAbout(); } if(e.key==='g'||e.key==='G'){ openGamesIndex(); } if(e.key==='b'||e.key==='B'){ openBoardIndex(); } if(e.key==='o'||e.key==='O'){ openOracle(); } if(e.key==='Escape'){ document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>closeOverlay(el.id)); } });
 
 // Intercept clicks on any popup link to open in overlay (internal or external)
 document.addEventListener('click', (e)=>{
@@ -811,6 +816,7 @@ document.addEventListener('click', (ev)=>{
 (()=>{
   const aboutBtn = document.getElementById('about-control');
   const gamesBtn = document.getElementById('games-control');
+  const boardBtn = document.getElementById('board-control');
   if(aboutBtn){
     const act = ()=>{ openAbout(); };
     aboutBtn.addEventListener('click', e=>{ e.stopPropagation(); act(); });
@@ -820,6 +826,11 @@ document.addEventListener('click', (ev)=>{
     const actG = ()=>{ openGamesIndex(); };
     gamesBtn.addEventListener('click', e=>{ e.stopPropagation(); actG(); });
     gamesBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); actG(); }});
+  }
+  if(boardBtn){
+    const actB = ()=>{ openBoardIndex(); };
+    boardBtn.addEventListener('click', e=>{ e.stopPropagation(); actB(); });
+    boardBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); actB(); }});
   }
 })();
 

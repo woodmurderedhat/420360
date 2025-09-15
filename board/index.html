@@ -71,10 +71,12 @@
     const ctx = canvas.getContext("2d");
     const colorPicker = document.getElementById("colorPicker");
 
-  // API routing: local dev uses the proxy, production (GitHub Pages) hits Apps Script directly
-  const PROD_API = "https://script.google.com/macros/s/AKfycbwVPS2tPS3HXgeLQAGNlJlLv9Qy9v70u2C4O-pgMS0GEG-OX1Wd1CmqqNgrKh6J6QTaQg/exec";
-  const IS_LOCAL = /^(localhost|127\.0\.0\.1)$/i.test(location.hostname);
-  const API_URL = IS_LOCAL ? "/api/board" : PROD_API;
+  // API routing: use Netlify function proxy in production. When running locally
+  // without Netlify, you can still point to the direct Apps Script URL.
+  const NETLIFY_PROXY_URL = '/.netlify/functions/proxy';
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVPS2tPS3HXgeLQAGNlJlLv9Qy9v70u2C4O-pgMS0GEG-OX1Wd1CmqqNgrKh6J6QTaQg/exec";
+  const IS_NETLIFY = location.hostname.endsWith('netlify.app') || location.hostname.endsWith('localhost');
+  const API_URL = IS_NETLIFY ? NETLIFY_PROXY_URL : APPS_SCRIPT_URL;
 
     // Resize canvas to window
     function resizeCanvas() {

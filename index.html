@@ -393,7 +393,7 @@ document.addEventListener('click', (e)=>{
   // Oracle special
   if(href === '__INTERNAL_ORACLE__'){ e.preventDefault(); openOracle(); return; }
   // Blocklist: let these open in new tab (X-Frame-Options / CSP issues)
-  const OVERLAY_BLOCKLIST = [/youtube\.com/i, /youtu\.be/i, /discord\.gg/i, /giphy\.com/i];
+  const OVERLAY_BLOCKLIST = [/youtube\.com/i, /youtu\.be/i, /discord\.gg/i, /giphy\.com/i, /redbubble\.com/i];
   if (OVERLAY_BLOCKLIST.some(r => r.test(href))) {
     // Ensure it opens in a new tab
     a.setAttribute('target','_blank');
@@ -432,8 +432,10 @@ const ICON_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAA
 // NOTE: All GIFs below must originate from the woodmurderedhat Giphy channel per project policy.
 // Curated list of known woodmurderedhat GIF IDs (can expand as more are uploaded):
 // 3PLAXg1osLVVttjRTN, WveGOgFwcI6uTn2khE, eYDnuFt0MckAb3xdSH, DfqSbJVYLHmO8QFn1R,
-// 7Ti0iZdo5QCiWJfMvA, qxJ9pAQCBIJLxfelCv, HtCcDJ134eAICJZjLb, JeEjGpM2TVZGaM5BuE
+// 7Ti0iZdo5QCiWJfMvA, qxJ9pAQCBIJLxfelCv, HtCcDJ134eAICJZjLb, JeEjGpM2TVZGaM5BuE,
+// R7roNpEGCKqzjs1kkO (Redbubble shop ad)
 const ADS = [
+  { label: "SHOP • REDBUBBLE", href: "https://www.redbubble.com/shop/ap/174665816?asc=u", gif: "https://media.giphy.com/media/R7roNpEGCKqzjs1kkO/giphy.gif" },
   { label: "NOCTIS REVERIE", href: "https://420360.xyz/games/noctis-reverie/index.html", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif" },
   { label: "247420", href: "https://discord.gg/an-entrypoint-367741339393327104", gif: "https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif" },
   { label: "GIPHY", href: "https://giphy.com/woodmurderedhat", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" },

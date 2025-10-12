@@ -278,6 +278,17 @@ overlayStyles.textContent = `
   .integrated-overlay header button:hover{background:var(--primary);color:#000;}
   .integrated-overlay iframe{flex:1;border:0;background:#000;image-rendering:pixelated;}
   @media (max-width:900px){ .integrated-overlay{width:96vw;height:86vh;top:6%;} }
+  
+  .floating-window{position:fixed;bottom:20px;right:20px;width:420px;height:320px;background:var(--bg);border:4px solid var(--secondary);box-shadow:0 0 0 4px var(--primary),8px 8px 0 0 var(--highlight),0 0 0 8px #000;z-index:3000;display:flex;flex-direction:column;transition:height 0.3s ease, width 0.3s ease;}
+  .floating-window.minimized{height:auto;width:320px;}
+  .floating-window.minimized iframe{display:none;}
+  .floating-window.hidden{display:none;}
+  .floating-window header{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;font-size:9px;background:var(--secondary);color:var(--bg);border-bottom:4px solid var(--primary);cursor:move;}
+  .floating-window header span{font-size:10px;letter-spacing:1px;color:var(--highlight);text-shadow:2px 2px 0 var(--primary);}
+  .floating-window header button{font-family:'Press Start 2P', monospace;font-size:9px;cursor:pointer;background:var(--bg);color:var(--highlight);border:2px solid var(--primary);padding:3px 5px;margin-left:3px;}
+  .floating-window header button:hover{background:var(--primary);color:#000;}
+  .floating-window iframe{flex:1;border:0;background:#000;image-rendering:pixelated;}
+  @media (max-width:768px){ .floating-window{width:90vw;height:50vh;bottom:10px;right:50%;transform:translateX(50%);} }
 `;
 document.head.appendChild(overlayStyles);
 
@@ -322,6 +333,66 @@ function makeDraggableOverlay(el){
   header.addEventListener('mousedown',e=>{isDown=true;ox=e.clientX - el.offsetLeft; oy=e.clientY - el.offsetTop;});
   window.addEventListener('mouseup',()=>isDown=false);
   window.addEventListener('mousemove',e=>{ if(!isDown) return; el.style.left=(e.clientX-ox)+'px'; el.style.top=(Math.max(0,e.clientY-oy))+'px'; el.style.transform='translateX(0)'; });
+}
+
+function createFloatingWindow(id, label, src){
+  if(document.getElementById(id)) return;
+  const wrap = document.createElement('div');
+  wrap.id = id; wrap.className = 'floating-window';
+  wrap.innerHTML = `<header><span>${label}</span><div style="display:flex;gap:3px;">
+    <button data-act="minimize" title="Minimize">_</button>
+    <button data-act="external" title="Open in new tab">↗</button>
+    <button data-act="close" title="Close">✕</button>
+  </div></header><iframe src="${src}" loading="lazy" title="${label}"></iframe>`;
+  document.body.appendChild(wrap);
+  makeDraggableFloatingWindow(wrap);
+  // Button handlers
+  wrap.querySelector('[data-act="minimize"]').addEventListener('click', e=>{ e.stopPropagation(); toggleMinimizeFloatingWindow(id); });
+  wrap.querySelector('[data-act="close"]').addEventListener('click', e=>{ e.stopPropagation(); closeFloatingWindow(id); });
+  wrap.querySelector('[data-act="external"]').addEventListener('click', e=>{ e.stopPropagation(); const ifr=wrap.querySelector('iframe'); if(ifr) window.open(ifr.src,'_blank','noopener'); });
+}
+
+function makeDraggableFloatingWindow(el){
+  let isDown=false,ox=0,oy=0; const header=el.querySelector('header');
+  header.addEventListener('mousedown',e=>{
+    // Only drag if clicking on header, not buttons
+    if(e.target.tagName==='BUTTON' || e.target.closest('button')) return;
+    isDown=true;ox=e.clientX - el.offsetLeft; oy=e.clientY - el.offsetTop;
+  });
+  window.addEventListener('mouseup',()=>isDown=false);
+  window.addEventListener('mousemove',e=>{ 
+    if(!isDown) return; 
+    const newLeft = e.clientX-ox;
+    const newTop = e.clientY-oy;
+    // Keep window within viewport bounds
+    const maxLeft = window.innerWidth - el.offsetWidth;
+    const maxTop = window.innerHeight - el.offsetHeight;
+    el.style.left=Math.max(0, Math.min(newLeft, maxLeft))+'px'; 
+    el.style.top=Math.max(0, Math.min(newTop, maxTop))+'px'; 
+    el.style.transform='none';
+    el.style.right='auto';
+    el.style.bottom='auto';
+  });
+}
+
+function toggleMinimizeFloatingWindow(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.toggle('minimized');
+  const btn = el.querySelector('[data-act="minimize"]');
+  if(btn) btn.textContent = el.classList.contains('minimized') ? '□' : '_';
+}
+
+function closeFloatingWindow(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('hidden');
+}
+
+function showFloatingWindow(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('hidden');
 }
 
 function openAbout(){ createOverlay('aboutOverlay','ABOUT • 420360','about/index.html'); showOverlay('aboutOverlay'); }
@@ -788,6 +859,9 @@ window.addEventListener('pageshow', ()=> { if (!document.hidden) startIntervals(
 /* ========== INITIAL BOOT ========== */
 // initial intervals start only when page visible
 if (!document.hidden) startIntervals();
+
+// Create floating video window on page load
+createFloatingWindow('videoThreadWindow', 'VIDEOS • SCHWEPE', 'https://schwepe.247420.xyz/videos-thread.html');
 
 // immediate spawn on first load for effect
 // spawnPopup();

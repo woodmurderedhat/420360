@@ -1,0 +1,350 @@
+/**
+ * Gamification System for Daughters of Zion
+ * Tracks progress, achievements, and interactive elements
+ * Philosophy: Combine 420360 retro interactivity with spiritual progression
+ */
+
+class DaughtersGamification {
+    constructor() {
+        this.storageKey = 'daughters_of_zion_progress';
+        this.progress = this.loadProgress();
+        this.achievements = {
+            'first_visit': { name: 'Seeker', desc: 'First visit to the archive', icon: '✦' },
+            'veil_1': { name: 'Dust Walker', desc: 'Explored the First Veil', icon: '◇' },
+            'veil_2': { name: 'Ash Bearer', desc: 'Explored the Second Veil', icon: '◇' },
+            'veil_3': { name: 'Water Keeper', desc: 'Explored the Third Veil', icon: '◇' },
+            'veil_4': { name: 'Oil Anointed', desc: 'Explored the Fourth Veil', icon: '◇' },
+            'veil_5': { name: 'Wine Blessed', desc: 'Explored the Fifth Veil', icon: '◇' },
+            'veil_6': { name: 'Milk Nourished', desc: 'Explored the Sixth Veil', icon: '◇' },
+            'veil_7': { name: 'Light Unveiled', desc: 'Explored the Seventh Veil', icon: '◇' },
+            'all_veils': { name: 'Veil Master', desc: 'Explored all Seven Veils', icon: '✧' },
+            'history': { name: 'Chronicler', desc: 'Read the History', icon: '📜' },
+            'rituals': { name: 'Ritualist', desc: 'Studied the Rituals', icon: '🕯️' },
+            'hidden_names': { name: 'Name Keeper', desc: 'Discovered Hidden Names', icon: '👁️' },
+            'circle_mothers': { name: 'Circle Initiate', desc: 'Met the Circle Mothers', icon: '⭕' },
+            'library': { name: 'Librarian', desc: 'Entered the Library', icon: '📚' },
+            'explorer': { name: 'Explorer', desc: 'Visited all main sections', icon: '🗺️' }
+        };
+        this.init();
+    }
+
+    init() {
+        this.createProgressBar();
+        this.createStatsPanel();
+        this.createShortcutsHint();
+        this.trackPageVisit();
+        this.setupKeyboardShortcuts();
+        this.markVisitedCards();
+        this.setupInteractiveElements();
+        this.updateStats();
+        
+        // Check for first visit achievement
+        if (!this.progress.achievements.includes('first_visit')) {
+            this.unlockAchievement('first_visit');
+        }
+    }
+
+    loadProgress() {
+        const saved = localStorage.getItem(this.storageKey);
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        return {
+            visitedPages: [],
+            achievements: [],
+            veilsUnlocked: [],
+            hiddenNamesRevealed: [],
+            totalVisits: 0,
+            lastVisit: null
+        };
+    }
+
+    saveProgress() {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
+    }
+
+    trackPageVisit() {
+        const currentPage = window.location.pathname;
+        if (!this.progress.visitedPages.includes(currentPage)) {
+            this.progress.visitedPages.push(currentPage);
+        }
+        this.progress.totalVisits++;
+        this.progress.lastVisit = new Date().toISOString();
+        
+        // Check for page-specific achievements
+        if (currentPage.includes('seven-veils')) {
+            for (let i = 1; i <= 7; i++) {
+                this.unlockAchievement(`veil_${i}`);
+            }
+            // Check if all veils unlocked
+            const allVeils = [1,2,3,4,5,6,7].every(i => this.progress.achievements.includes(`veil_${i}`));
+            if (allVeils) this.unlockAchievement('all_veils');
+        }
+        if (currentPage.includes('history')) this.unlockAchievement('history');
+        if (currentPage.includes('rituals')) this.unlockAchievement('rituals');
+        if (currentPage.includes('hidden-names')) this.unlockAchievement('hidden_names');
+        if (currentPage.includes('circle-mothers')) this.unlockAchievement('circle_mothers');
+        if (currentPage.includes('library')) this.unlockAchievement('library');
+        
+        // Check explorer achievement
+        const mainPages = ['history', 'rituals', 'hidden-names', 'circle-mothers', 'library', 'seven-veils'];
+        const visitedMain = mainPages.filter(p => this.progress.visitedPages.some(vp => vp.includes(p)));
+        if (visitedMain.length >= mainPages.length) {
+            this.unlockAchievement('explorer');
+        }
+        
+        this.saveProgress();
+        this.updateProgressBar();
+    }
+
+    unlockAchievement(achievementId) {
+        if (!this.progress.achievements.includes(achievementId)) {
+            this.progress.achievements.push(achievementId);
+            this.saveProgress();
+            this.showAchievementToast(achievementId);
+            this.updateStats();
+        }
+    }
+
+    showAchievementToast(achievementId) {
+        const achievement = this.achievements[achievementId];
+        if (!achievement) return;
+        
+        const toast = document.createElement('div');
+        toast.className = 'achievement-toast';
+        toast.innerHTML = `
+            <span class="achievement-icon">${achievement.icon}</span>
+            <strong>${achievement.name}</strong><br>
+            <small>${achievement.desc}</small>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    createProgressBar() {
+        const container = document.createElement('div');
+        container.className = 'progress-container';
+        container.innerHTML = '<div class="progress-bar" id="progressBar"></div>';
+        document.body.insertBefore(container, document.body.firstChild);
+        this.updateProgressBar();
+    }
+
+    updateProgressBar() {
+        const totalAchievements = Object.keys(this.achievements).length;
+        const unlockedAchievements = this.progress.achievements.length;
+        const percentage = (unlockedAchievements / totalAchievements) * 100;
+        
+        const progressBar = document.getElementById('progressBar');
+        if (progressBar) {
+            progressBar.style.width = percentage + '%';
+        }
+    }
+
+    createStatsPanel() {
+        const panel = document.createElement('div');
+        panel.className = 'stats-panel';
+        panel.id = 'statsPanel';
+        panel.innerHTML = `
+            <h3>PROGRESS</h3>
+            <div class="stat-item">
+                <span class="stat-label">Veils:</span>
+                <span class="stat-value" id="statVeils">0/7</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Pages:</span>
+                <span class="stat-value" id="statPages">0/6</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Achievements:</span>
+                <span class="stat-value" id="statAchievements">0/${Object.keys(this.achievements).length}</span>
+            </div>
+        `;
+        document.body.appendChild(panel);
+    }
+
+    updateStats() {
+        const veilsUnlocked = [1,2,3,4,5,6,7].filter(i =>
+            this.progress.achievements.includes(`veil_${i}`)
+        ).length;
+
+        const mainPages = ['history', 'rituals', 'hidden-names', 'circle-mothers', 'library', 'seven-veils'];
+        const pagesVisited = mainPages.filter(p =>
+            this.progress.visitedPages.some(vp => vp.includes(p))
+        ).length;
+
+        const statVeils = document.getElementById('statVeils');
+        const statPages = document.getElementById('statPages');
+        const statAchievements = document.getElementById('statAchievements');
+
+        if (statVeils) statVeils.textContent = `${veilsUnlocked}/7`;
+        if (statPages) statPages.textContent = `${pagesVisited}/6`;
+        if (statAchievements) {
+            statAchievements.textContent = `${this.progress.achievements.length}/${Object.keys(this.achievements).length}`;
+        }
+    }
+
+    createShortcutsHint() {
+        const hint = document.createElement('div');
+        hint.className = 'shortcuts-hint';
+        hint.innerHTML = `
+            <strong>SHORTCUTS:</strong><br>
+            <kbd>H</kbd> Home<br>
+            <kbd>V</kbd> Veils<br>
+            <kbd>R</kbd> Rituals<br>
+            <kbd>L</kbd> Library<br>
+            <kbd>?</kbd> Help
+        `;
+        document.body.appendChild(hint);
+    }
+
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Don't trigger if typing in input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            const key = e.key.toLowerCase();
+            const basePath = window.location.pathname.includes('/pages/') ? '../' : '';
+
+            switch(key) {
+                case 'h':
+                    window.location.href = basePath + 'index.html';
+                    break;
+                case 'v':
+                    window.location.href = basePath + 'pages/seven-veils.html';
+                    break;
+                case 'r':
+                    window.location.href = basePath + 'pages/rituals.html';
+                    break;
+                case 'l':
+                    window.location.href = basePath + 'pages/library.html';
+                    break;
+                case 'a':
+                    window.location.href = basePath + 'pages/about.html';
+                    break;
+                case 'c':
+                    window.location.href = basePath + 'pages/circle-mothers.html';
+                    break;
+                case 'n':
+                    window.location.href = basePath + 'pages/hidden-names.html';
+                    break;
+                case '?':
+                    this.showHelp();
+                    break;
+            }
+        });
+    }
+
+    showHelp() {
+        alert(`DAUGHTERS OF ZION - NAVIGATION HELP
+
+Keyboard Shortcuts:
+H - Home
+V - Seven Veils
+R - Rituals
+L - Library
+A - About
+C - Circle Mothers
+N - Hidden Names
+? - This help
+
+Progress Tracking:
+Your exploration progress is automatically saved.
+Unlock achievements by visiting different sections.
+Complete all Seven Veils to become a Veil Master.
+
+Interactive Elements:
+Click on cards to mark them as visited.
+Hover over elements for additional effects.
+Hidden names can be revealed by clicking.`);
+    }
+
+    markVisitedCards() {
+        const cards = document.querySelectorAll('.feature-card');
+        cards.forEach(card => {
+            const link = card.querySelector('a');
+            if (link) {
+                const href = link.getAttribute('href');
+                if (this.progress.visitedPages.some(p => p.includes(href))) {
+                    card.classList.add('visited');
+                }
+            }
+
+            // Add click tracking
+            card.addEventListener('click', () => {
+                card.classList.add('visited');
+            });
+        });
+    }
+
+    setupInteractiveElements() {
+        // Make veil symbols interactive
+        const veilSymbols = document.querySelectorAll('.veil-symbol');
+        veilSymbols.forEach((symbol, index) => {
+            symbol.classList.add('interactive-element');
+            symbol.addEventListener('click', () => {
+                symbol.classList.add('veil-unlock');
+                setTimeout(() => symbol.classList.remove('veil-unlock'), 500);
+            });
+        });
+
+        // Setup hidden name reveals
+        const hiddenNames = document.querySelectorAll('.hidden-name');
+        hiddenNames.forEach(name => {
+            name.addEventListener('click', () => {
+                if (!name.classList.contains('revealed')) {
+                    name.classList.add('revealed');
+                    const nameText = name.textContent;
+                    if (!this.progress.hiddenNamesRevealed.includes(nameText)) {
+                        this.progress.hiddenNamesRevealed.push(nameText);
+                        this.saveProgress();
+                    }
+                }
+            });
+        });
+
+        // Add interactive glow to feature icons
+        const featureIcons = document.querySelectorAll('.feature-icon');
+        featureIcons.forEach(icon => {
+            icon.classList.add('interactive-element');
+        });
+    }
+
+    // Public method to manually unlock a veil
+    unlockVeil(veilNumber) {
+        if (veilNumber >= 1 && veilNumber <= 7) {
+            this.unlockAchievement(`veil_${veilNumber}`);
+        }
+    }
+
+    // Public method to get current progress
+    getProgress() {
+        return {
+            ...this.progress,
+            percentage: (this.progress.achievements.length / Object.keys(this.achievements).length) * 100
+        };
+    }
+
+    // Public method to reset progress (for testing)
+    resetProgress() {
+        if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+            localStorage.removeItem(this.storageKey);
+            location.reload();
+        }
+    }
+}
+
+// Initialize gamification system when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.daughtersGame = new DaughtersGamification();
+    });
+} else {
+    window.daughtersGame = new DaughtersGamification();
+}
+
+// Expose to window for console access
+window.DaughtersGamification = DaughtersGamification;
+

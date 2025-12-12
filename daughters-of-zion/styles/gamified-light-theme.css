@@ -58,15 +58,37 @@ body {
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Press Start 2P', monospace;
     color: var(--text-dark);
-    text-shadow: 2px 2px 0 var(--accent-gold);
     letter-spacing: 2px;
     margin-bottom: 1rem;
 }
 
-h1 { font-size: 20px; line-height: 1.6; }
-h2 { font-size: 16px; line-height: 1.6; }
-h3 { font-size: 14px; line-height: 1.6; }
-h4 { font-size: 12px; line-height: 1.6; }
+h1 {
+    font-size: 20px;
+    line-height: 1.6;
+    color: #1a0f08; /* Darker for better legibility */
+    text-shadow:
+        1px 1px 0 var(--primary-brown),
+        3px 3px 0 var(--accent-gold);
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 16px;
+    line-height: 1.6;
+    text-shadow: 2px 2px 0 var(--accent-gold);
+}
+
+h3 {
+    font-size: 14px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 0 var(--accent-gold);
+}
+
+h4 {
+    font-size: 12px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 0 var(--accent-gold);
+}
 
 p, li {
     font-size: 12px; /* Increased from 10px */
@@ -106,20 +128,25 @@ p, li {
 }
 
 .hero-title {
-    color: var(--text-dark);
-    text-shadow: 3px 3px 0 var(--accent-gold);
+    color: #1a0f08; /* Darker than text-dark for better legibility */
+    text-shadow:
+        2px 2px 0 var(--primary-brown),
+        4px 4px 0 var(--accent-gold);
     font-size: 20px;
+    font-weight: bold;
 }
 
 .hero-subtitle {
-    color: var(--primary-brown);
+    color: #654321; /* Darker brown for better legibility */
     font-size: 12px;
-    text-shadow: 1px 1px 0 var(--highlight-amber);
+    text-shadow: 1px 1px 0 var(--accent-gold);
+    font-weight: bold;
 }
 
 .hero-description {
-    color: var(--text-dark);
-    font-size: 10px;
+    color: #2c1810; /* Darker for better legibility */
+    font-size: 11px; /* Slightly larger */
+    text-shadow: none; /* Remove shadow for clarity */
 }
 
 .veil-symbol {

@@ -45,9 +45,13 @@ class DaughtersGamification {
     }
 
     loadProgress() {
-        const saved = localStorage.getItem(this.storageKey);
-        if (saved) {
-            return JSON.parse(saved);
+        try {
+            const saved = localStorage.getItem(this.storageKey);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        } catch (error) {
+            console.warn('Failed to load progress from localStorage:', error);
         }
         return {
             visitedPages: [],
@@ -60,7 +64,11 @@ class DaughtersGamification {
     }
 
     saveProgress() {
-        localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
+        try {
+            localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
+        } catch (error) {
+            console.warn('Failed to save progress to localStorage:', error);
+        }
     }
 
     trackPageVisit() {
@@ -109,16 +117,18 @@ class DaughtersGamification {
     showAchievementToast(achievementId) {
         const achievement = this.achievements[achievementId];
         if (!achievement) return;
-        
+
         const toast = document.createElement('div');
         toast.className = 'achievement-toast';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
         toast.innerHTML = `
-            <span class="achievement-icon">${achievement.icon}</span>
+            <span class="achievement-icon" aria-hidden="true">${achievement.icon}</span>
             <strong>${achievement.name}</strong><br>
             <small>${achievement.desc}</small>
         `;
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.remove();
         }, 3000);
@@ -127,6 +137,8 @@ class DaughtersGamification {
     createProgressBar() {
         const container = document.createElement('div');
         container.className = 'progress-container';
+        container.setAttribute('role', 'progressbar');
+        container.setAttribute('aria-label', 'Overall exploration progress');
         container.innerHTML = '<div class="progress-bar" id="progressBar"></div>';
         document.body.insertBefore(container, document.body.firstChild);
         this.updateProgressBar();
@@ -136,10 +148,18 @@ class DaughtersGamification {
         const totalAchievements = Object.keys(this.achievements).length;
         const unlockedAchievements = this.progress.achievements.length;
         const percentage = (unlockedAchievements / totalAchievements) * 100;
-        
+
         const progressBar = document.getElementById('progressBar');
+        const container = document.querySelector('.progress-container');
+
         if (progressBar) {
             progressBar.style.width = percentage + '%';
+        }
+
+        if (container) {
+            container.setAttribute('aria-valuenow', Math.round(percentage));
+            container.setAttribute('aria-valuemin', '0');
+            container.setAttribute('aria-valuemax', '100');
         }
     }
 
@@ -147,19 +167,21 @@ class DaughtersGamification {
         const panel = document.createElement('div');
         panel.className = 'stats-panel';
         panel.id = 'statsPanel';
+        panel.setAttribute('role', 'complementary');
+        panel.setAttribute('aria-label', 'Progress statistics');
         panel.innerHTML = `
             <h3>PROGRESS</h3>
             <div class="stat-item">
                 <span class="stat-label">Veils:</span>
-                <span class="stat-value" id="statVeils">0/7</span>
+                <span class="stat-value" id="statVeils" aria-live="polite">0/7</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Pages:</span>
-                <span class="stat-value" id="statPages">0/6</span>
+                <span class="stat-value" id="statPages" aria-live="polite">0/6</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Achievements:</span>
-                <span class="stat-value" id="statAchievements">0/${Object.keys(this.achievements).length}</span>
+                <span class="stat-value" id="statAchievements" aria-live="polite">0/${Object.keys(this.achievements).length}</span>
             </div>
         `;
         document.body.appendChild(panel);

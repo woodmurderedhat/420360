@@ -43,7 +43,7 @@ body {
     background: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.8;
-    font-size: 10px;
+    font-size: 12px; /* Increased from 10px for better legibility */
     margin: 0;
     padding: 0;
 }
@@ -63,20 +63,20 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 1rem;
 }
 
-h1 { font-size: 18px; line-height: 1.6; }
-h2 { font-size: 14px; line-height: 1.6; }
-h3 { font-size: 12px; line-height: 1.6; }
-h4 { font-size: 10px; line-height: 1.6; }
+h1 { font-size: 20px; line-height: 1.6; }
+h2 { font-size: 16px; line-height: 1.6; }
+h3 { font-size: 14px; line-height: 1.6; }
+h4 { font-size: 12px; line-height: 1.6; }
 
 p, li {
-    font-size: 10px;
+    font-size: 12px; /* Increased from 10px */
     line-height: 1.8;
     margin-bottom: 1rem;
     color: var(--text-dark);
 }
 
 .lead {
-    font-size: 12px;
+    font-size: 14px; /* Increased from 12px */
     color: var(--primary-brown);
     font-weight: bold;
 }
@@ -159,6 +159,7 @@ p, li {
     padding: 8px 12px;
     transition: all 0.2s;
     border: 2px solid transparent;
+    position: relative;
 }
 
 .nav-links a:hover,
@@ -167,6 +168,11 @@ p, li {
     background: var(--primary-brown);
     border: 2px solid var(--border-dark);
     box-shadow: 2px 2px 0 0 var(--accent-gold);
+}
+
+.nav-links a:focus {
+    outline: 2px dashed var(--accent-gold);
+    outline-offset: 4px;
 }
 
 /* Sections - Light boxes with dark borders */
@@ -243,6 +249,16 @@ section {
     background: var(--secondary-purple);
     transform: translate(-1px, -1px);
     box-shadow: 4px 4px 0 0 var(--accent-gold);
+}
+
+.btn:focus {
+    outline: 2px dashed var(--accent-gold);
+    outline-offset: 4px;
+}
+
+.btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 0 var(--accent-gold);
 }
 
 /* Quote Section */
@@ -592,5 +608,281 @@ footer a:hover {
         text-shadow: 2px 2px 0 var(--primary-brown), 0 0 12px var(--achievement-glow);
         transform: scale(1);
     }
+}
+
+/* ========== RESPONSIVE DESIGN FOR GAMIFICATION ========== */
+
+/* Tablet and below */
+@media (max-width: 992px) {
+    body {
+        font-size: 11px;
+    }
+
+    h1 { font-size: 18px; }
+    h2 { font-size: 15px; }
+    h3 { font-size: 13px; }
+
+    .stats-panel {
+        font-size: 7px;
+        min-width: 160px;
+        padding: 12px;
+    }
+
+    .shortcuts-hint {
+        font-size: 6px;
+        padding: 8px;
+    }
+
+    .achievement-toast {
+        font-size: 8px;
+        padding: 12px 16px;
+        right: 10px;
+        bottom: 10px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    body {
+        font-size: 10px;
+    }
+
+    h1 { font-size: 16px; }
+    h2 { font-size: 14px; }
+    h3 { font-size: 12px; }
+    h4 { font-size: 10px; }
+
+    p, li {
+        font-size: 10px;
+    }
+
+    .lead {
+        font-size: 12px;
+    }
+
+    /* Hide stats panel on mobile to save space */
+    .stats-panel {
+        display: none;
+    }
+
+    /* Reposition shortcuts hint */
+    .shortcuts-hint {
+        top: auto;
+        bottom: 10px;
+        right: 10px;
+        font-size: 6px;
+        padding: 6px;
+        opacity: 0.5;
+    }
+
+    /* Smaller achievement toasts */
+    .achievement-toast {
+        font-size: 7px;
+        padding: 10px 12px;
+        right: 10px;
+        bottom: 60px; /* Above shortcuts hint */
+        max-width: 200px;
+    }
+
+    /* Adjust progress bar height */
+    .progress-container {
+        height: 6px;
+    }
+
+    /* Make sections more compact */
+    section {
+        margin: 10px;
+        padding: 20px;
+    }
+
+    .hero {
+        min-height: 300px;
+    }
+
+    .hero-title {
+        font-size: 16px;
+    }
+
+    .hero-subtitle {
+        font-size: 11px;
+    }
+
+    .hero-description {
+        font-size: 9px;
+    }
+
+    /* Adjust navigation for mobile */
+    .nav-links a {
+        font-size: 8px;
+        padding: 6px 8px;
+    }
+
+    /* Make buttons more touch-friendly */
+    .btn {
+        font-size: 8px;
+        padding: 12px 16px;
+        min-height: 44px; /* iOS touch target size */
+    }
+
+    /* Adjust feature cards */
+    .feature-card {
+        padding: 16px;
+    }
+
+    .feature-icon {
+        font-size: 28px;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    body {
+        font-size: 9px;
+    }
+
+    h1 { font-size: 14px; }
+    h2 { font-size: 12px; }
+    h3 { font-size: 11px; }
+
+    .hero-title {
+        font-size: 14px;
+    }
+
+    .hero-subtitle {
+        font-size: 10px;
+    }
+
+    .nav-links a {
+        font-size: 7px;
+        padding: 5px 6px;
+    }
+
+    .btn {
+        font-size: 7px;
+        padding: 10px 14px;
+    }
+
+    section {
+        margin: 8px;
+        padding: 16px;
+    }
+
+    /* Hide shortcuts hint on very small screens */
+    .shortcuts-hint {
+        display: none;
+    }
+
+    .achievement-toast {
+        font-size: 6px;
+        padding: 8px 10px;
+        max-width: 160px;
+    }
+}
+
+/* ========== PRINT STYLES ========== */
+@media print {
+    /* Hide gamification elements when printing */
+    .progress-container,
+    .stats-panel,
+    .shortcuts-hint,
+    .achievement-toast {
+        display: none !important;
+    }
+
+    /* Simplify colors for print */
+    body {
+        background: white;
+        color: black;
+        font-size: 12pt;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: black;
+        text-shadow: none;
+    }
+
+    /* Remove borders and shadows for cleaner print */
+    section,
+    .feature-card,
+    .card,
+    .veil-card {
+        border: 1px solid #ccc;
+        box-shadow: none;
+    }
+
+    /* Ensure links are visible */
+    a {
+        color: black;
+        text-decoration: underline;
+    }
+
+    /* Page breaks */
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+
+    .feature-card,
+    .veil-card {
+        page-break-inside: avoid;
+    }
+}
+
+/* ========== ACCESSIBILITY IMPROVEMENTS ========== */
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .veil-symbol {
+        animation: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --text-dark: #000000;
+        --bg-parchment: #ffffff;
+        --accent-gold: #b8860b;
+        --primary-brown: #654321;
+    }
+
+    body {
+        border: 2px solid var(--text-dark);
+    }
+
+    .btn,
+    .nav-links a {
+        border-width: 3px;
+    }
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+    outline: 3px dashed var(--accent-gold);
+    outline-offset: 4px;
+}
+
+/* Skip to main content link for screen readers */
+.skip-to-main {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: 1em;
+    background-color: var(--primary-brown);
+    color: var(--bg-parchment);
+    text-decoration: none;
+}
+
+.skip-to-main:focus {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 10px;
 }
 

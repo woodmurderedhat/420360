@@ -24,8 +24,31 @@ class DaughtersGamification {
             'circle_mothers': { name: 'Circle Initiate', desc: 'Met the Circle Mothers', icon: '⭕' },
             'library': { name: 'Librarian', desc: 'Entered the Library', icon: '📚' },
             'moon_calendar': { name: 'Moon Watcher', desc: 'Consulted the Moon Calendar', icon: '🌙' },
-            'explorer': { name: 'Explorer', desc: 'Visited all main sections', icon: '🗺️' }
+            'explorer': { name: 'Explorer', desc: 'Visited all main sections', icon: '🗺️' },
+            // Moon phase achievements
+            'moon_new': { name: 'Veiled Visitor', desc: 'Visited during New Moon', icon: '🌑' },
+            'moon_waxing': { name: 'Ascending Soul', desc: 'Visited during Waxing Moon', icon: '🌒' },
+            'moon_full': { name: 'Illuminated One', desc: 'Visited during Full Moon', icon: '🌕' },
+            'moon_waning': { name: 'Returning Spirit', desc: 'Visited during Waning Moon', icon: '🌘' },
+            'moon_all_phases': { name: 'Lunar Adept', desc: 'Visited during all moon phases', icon: '🌙✨' },
+            // Streak achievements
+            'streak_3': { name: 'Devoted', desc: '3-day visit streak', icon: '🔥' },
+            'streak_7': { name: 'Faithful', desc: '7-day visit streak', icon: '🔥🔥' },
+            'streak_30': { name: 'Consecrated', desc: '30-day visit streak', icon: '🔥🔥🔥' },
+            // Engagement achievements
+            'visits_10': { name: 'Regular Visitor', desc: '10 total visits', icon: '👣' },
+            'visits_50': { name: 'Dedicated Student', desc: '50 total visits', icon: '👣👣' },
+            'visits_100': { name: 'Circle Sister', desc: '100 total visits', icon: '👣👣👣' }
         };
+
+        this.ranks = [
+            { level: 1, name: 'Initiate', minPoints: 0, icon: '◇' },
+            { level: 2, name: 'Seeker', minPoints: 5, icon: '◇◇' },
+            { level: 3, name: 'Student', minPoints: 10, icon: '◇◇◇' },
+            { level: 4, name: 'Sister', minPoints: 20, icon: '✦' },
+            { level: 5, name: 'Keeper', minPoints: 35, icon: '✦✦' },
+            { level: 6, name: 'Circle Mother', minPoints: 50, icon: '✦✦✦' }
+        ];
         this.init();
     }
 
@@ -60,7 +83,12 @@ class DaughtersGamification {
             veilsUnlocked: [],
             hiddenNamesRevealed: [],
             totalVisits: 0,
-            lastVisit: null
+            lastVisit: null,
+            moonPhasesVisited: [],
+            visitDates: [],
+            currentStreak: 0,
+            longestStreak: 0,
+            intentions: []
         };
     }
 
@@ -79,7 +107,25 @@ class DaughtersGamification {
         }
         this.progress.totalVisits++;
         this.progress.lastVisit = new Date().toISOString();
-        
+
+        // Initialize arrays if they don't exist
+        if (!this.progress.visitDates) {
+            this.progress.visitDates = [];
+        }
+        if (!this.progress.moonPhasesVisited) {
+            this.progress.moonPhasesVisited = [];
+        }
+
+        // Track visit date for streak calculation
+        const today = new Date().toDateString();
+        if (!this.progress.visitDates.includes(today)) {
+            this.progress.visitDates.push(today);
+            this.calculateStreak();
+        }
+
+        // Track moon phase
+        this.trackMoonPhase();
+
         // Check for page-specific achievements
         if (currentPage.includes('seven-veils')) {
             for (let i = 1; i <= 7; i++) {
@@ -102,9 +148,98 @@ class DaughtersGamification {
         if (visitedMain.length >= mainPages.length) {
             this.unlockAchievement('explorer');
         }
-        
+
+        // Check visit count achievements
+        if (this.progress.totalVisits >= 10) this.unlockAchievement('visits_10');
+        if (this.progress.totalVisits >= 50) this.unlockAchievement('visits_50');
+        if (this.progress.totalVisits >= 100) this.unlockAchievement('visits_100');
+
         this.saveProgress();
         this.updateProgressBar();
+    }
+
+    trackMoonPhase() {
+        // Initialize moonPhasesVisited if it doesn't exist
+        if (!this.progress.moonPhasesVisited) {
+            this.progress.moonPhasesVisited = [];
+        }
+
+        // Calculate current moon phase
+        const now = new Date();
+        const knownNewMoon = new Date('2024-01-11T11:57:00Z');
+        const lunarCycle = 29.53058867;
+        const daysSinceNew = (now - knownNewMoon) / (1000 * 60 * 60 * 24);
+        const moonAge = daysSinceNew % lunarCycle;
+
+        let currentPhase;
+        if (moonAge < 1.84566 || moonAge >= 27.68493) {
+            currentPhase = 'new';
+        } else if (moonAge < 14.76529) {
+            currentPhase = 'waxing';
+        } else if (moonAge < 16.61095) {
+            currentPhase = 'full';
+        } else {
+            currentPhase = 'waning';
+        }
+
+        // Track this phase if not already tracked
+        if (!this.progress.moonPhasesVisited.includes(currentPhase)) {
+            this.progress.moonPhasesVisited.push(currentPhase);
+            this.unlockAchievement(`moon_${currentPhase}`);
+
+            // Check if all phases visited
+            if (this.progress.moonPhasesVisited.length >= 4) {
+                this.unlockAchievement('moon_all_phases');
+            }
+        }
+    }
+
+    calculateStreak() {
+        const dates = this.progress.visitDates.map(d => new Date(d)).sort((a, b) => b - a);
+        if (dates.length === 0) {
+            this.progress.currentStreak = 0;
+            return;
+        }
+
+        let streak = 1;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Check if last visit was today or yesterday
+        const lastVisit = new Date(dates[0]);
+        lastVisit.setHours(0, 0, 0, 0);
+        const daysDiff = Math.floor((today - lastVisit) / (1000 * 60 * 60 * 24));
+
+        if (daysDiff > 1) {
+            // Streak broken
+            this.progress.currentStreak = 1;
+        } else {
+            // Count consecutive days
+            for (let i = 1; i < dates.length; i++) {
+                const current = new Date(dates[i]);
+                current.setHours(0, 0, 0, 0);
+                const previous = new Date(dates[i - 1]);
+                previous.setHours(0, 0, 0, 0);
+                const diff = Math.floor((previous - current) / (1000 * 60 * 60 * 24));
+
+                if (diff === 1) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            this.progress.currentStreak = streak;
+        }
+
+        // Update longest streak
+        if (this.progress.currentStreak > this.progress.longestStreak) {
+            this.progress.longestStreak = this.progress.currentStreak;
+        }
+
+        // Check streak achievements
+        if (this.progress.currentStreak >= 3) this.unlockAchievement('streak_3');
+        if (this.progress.currentStreak >= 7) this.unlockAchievement('streak_7');
+        if (this.progress.currentStreak >= 30) this.unlockAchievement('streak_30');
     }
 
     unlockAchievement(achievementId) {
@@ -173,13 +308,21 @@ class DaughtersGamification {
         panel.setAttribute('aria-label', 'Progress statistics');
         panel.innerHTML = `
             <h3>PROGRESS</h3>
+            <div class="stat-item stat-rank">
+                <span class="stat-label">Rank:</span>
+                <span class="stat-value" id="statRank" aria-live="polite">Initiate</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Streak:</span>
+                <span class="stat-value" id="statStreak" aria-live="polite">0 🔥</span>
+            </div>
             <div class="stat-item">
                 <span class="stat-label">Veils:</span>
                 <span class="stat-value" id="statVeils" aria-live="polite">0/7</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Pages:</span>
-                <span class="stat-value" id="statPages" aria-live="polite">0/6</span>
+                <span class="stat-label">Moon Phases:</span>
+                <span class="stat-value" id="statMoonPhases" aria-live="polite">0/4</span>
             </div>
             <div class="stat-item">
                 <span class="stat-label">Achievements:</span>
@@ -198,6 +341,30 @@ class DaughtersGamification {
         const pagesVisited = mainPages.filter(p =>
             this.progress.visitedPages.some(vp => vp.includes(p))
         ).length;
+
+        // Calculate rank
+        const points = this.progress.achievements.length;
+        const currentRank = this.ranks.slice().reverse().find(r => points >= r.minPoints) || this.ranks[0];
+
+        // Update rank display
+        const rankEl = document.getElementById('statRank');
+        if (rankEl) {
+            rankEl.textContent = `${currentRank.icon} ${currentRank.name}`;
+        }
+
+        // Update streak display
+        const streakEl = document.getElementById('statStreak');
+        if (streakEl) {
+            const streakIcon = this.progress.currentStreak >= 7 ? '🔥🔥' :
+                              this.progress.currentStreak >= 3 ? '🔥' : '';
+            streakEl.textContent = `${this.progress.currentStreak} ${streakIcon}`;
+        }
+
+        // Update moon phases
+        const moonPhasesEl = document.getElementById('statMoonPhases');
+        if (moonPhasesEl) {
+            moonPhasesEl.textContent = `${this.progress.moonPhasesVisited.length}/4`;
+        }
 
         const statVeils = document.getElementById('statVeils');
         const statPages = document.getElementById('statPages');

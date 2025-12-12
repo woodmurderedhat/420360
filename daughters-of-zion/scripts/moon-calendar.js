@@ -131,14 +131,18 @@ class MoonCalendar {
 
     init() {
         this.calculateMoonPhase();
-        this.updateDisplay();
-        this.highlightCurrentPhase();
-        
-        // Update every hour
-        setInterval(() => {
-            this.calculateMoonPhase();
+
+        // Only update display if we're on the moon calendar page
+        if (document.getElementById('currentPhase')) {
             this.updateDisplay();
-        }, 3600000);
+            this.highlightCurrentPhase();
+
+            // Update every hour
+            setInterval(() => {
+                this.calculateMoonPhase();
+                this.updateDisplay();
+            }, 3600000);
+        }
     }
 
     calculateMoonPhase() {
@@ -253,8 +257,10 @@ class MoonCalendar {
     }
 }
 
-// Initialize when DOM is ready
+// Initialize when DOM is ready - only on moon calendar page
 document.addEventListener('DOMContentLoaded', () => {
-    new MoonCalendar();
+    if (document.getElementById('currentPhase')) {
+        new MoonCalendar();
+    }
 });
 

@@ -1,0 +1,161 @@
+/**
+ * Moon Widget Styles for Homepage
+ * Prominent display of current lunar phase
+ */
+
+.moon-widget-section {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.03) 0%, rgba(74, 47, 189, 0.08) 100%);
+    padding: 3rem 0;
+    margin: 0;
+    border-top: 3px solid var(--accent-color);
+    border-bottom: 3px solid var(--accent-color);
+}
+
+.moon-widget {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    padding: 2rem;
+    background: rgba(254, 253, 251, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(74, 47, 189, 0.15);
+    border: 2px solid var(--accent-color);
+}
+
+.moon-widget-visual {
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.moon-widget-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(74, 47, 189, 0.4),
+                inset 0 0 30px rgba(0, 0, 0, 0.2);
+    margin: 0 auto 1rem;
+    position: relative;
+    transition: all 0.5s ease;
+}
+
+.moon-widget-circle::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 25%;
+    width: 25px;
+    height: 25px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    filter: blur(4px);
+}
+
+.moon-widget-phase-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.moon-widget-content {
+    flex: 1;
+}
+
+.moon-widget-content h2 {
+    margin: 0 0 1rem 0;
+    color: var(--accent-color);
+    font-size: 2rem;
+}
+
+.moon-widget-motto {
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--primary-color);
+    margin: 0.5rem 0 1rem 0;
+    font-weight: bold;
+}
+
+.moon-widget-date {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin: 0.5rem 0 1.5rem 0;
+    opacity: 0.8;
+}
+
+.moon-widget-guidance {
+    background: rgba(74, 47, 189, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-color);
+    margin: 1.5rem 0;
+}
+
+.moon-widget-guidance p {
+    margin: 0.5rem 0;
+    line-height: 1.8;
+}
+
+.moon-widget-guidance strong {
+    color: var(--accent-color);
+}
+
+.btn-moon {
+    display: inline-block;
+    margin-top: 1rem;
+    background: var(--accent-color);
+    color: var(--text-dark);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: 2px solid var(--accent-color);
+}
+
+.btn-moon:hover {
+    background: transparent;
+    color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 47, 189, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .moon-widget {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+    
+    .moon-widget-circle {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .moon-widget-content h2 {
+        font-size: 1.5rem;
+    }
+    
+    .moon-widget-motto {
+        font-size: 1.1rem;
+    }
+}
+
+/* Animation for moon widget */
+@keyframes moonGlow {
+    0%, 100% {
+        box-shadow: 0 0 40px rgba(74, 47, 189, 0.4),
+                    inset 0 0 30px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 60px rgba(74, 47, 189, 0.6),
+                    inset 0 0 30px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.moon-widget-circle {
+    animation: moonGlow 4s ease-in-out infinite;
+}
+

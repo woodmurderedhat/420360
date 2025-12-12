@@ -87,6 +87,8 @@
     <link rel="stylesheet" href="styles/responsive.css">
     <!-- Light theme with gamification for better legibility -->
     <link rel="stylesheet" href="styles/gamified-light-theme.css">
+    <link rel="stylesheet" href="styles/gamification-enhanced.css">
+    <link rel="stylesheet" href="styles/moon-widget.css">
 </head>
 <body>
     <!-- Skip to main content for accessibility -->
@@ -135,6 +137,27 @@
     </header>
 
     <main id="main-content">
+        <!-- Moon Calendar Widget -->
+        <section class="moon-widget-section">
+            <div class="container">
+                <div class="moon-widget">
+                    <div class="moon-widget-visual">
+                        <div class="moon-widget-circle" id="homePageMoonCircle"></div>
+                        <div class="moon-widget-phase-name" id="homePagePhaseName">Loading...</div>
+                    </div>
+                    <div class="moon-widget-content">
+                        <h2>🌙 Current Lunar Phase</h2>
+                        <p class="moon-widget-motto" id="homePageMotto"></p>
+                        <p class="moon-widget-date" id="homePageDate"></p>
+                        <div class="moon-widget-guidance" id="homePageGuidance">
+                            <p>Calculating current moon phase...</p>
+                        </div>
+                        <a href="pages/moon-calendar.html" class="btn btn-moon">View Full Moon Calendar →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="intro-section">
             <div class="container">
                 <h2>The Hidden Lineage</h2>
@@ -216,6 +239,8 @@
     <script src="scripts/main.js"></script>
     <!-- Gamification system for progress tracking and interactivity -->
     <script src="scripts/gamification.js"></script>
+    <script src="scripts/moon-calendar.js"></script>
+    <script src="scripts/moon-widget.js"></script>
 </body>
 </html>
 

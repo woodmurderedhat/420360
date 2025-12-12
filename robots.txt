@@ -1,0 +1,42 @@
+# robots.txt for 420360.xyz
+# Welcome, web crawlers! 🤖
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://420360.xyz/sitemap.xml
+
+# Crawl-delay for polite bots (optional)
+Crawl-delay: 1
+
+# Disallow test pages and development files
+Disallow: /testpages/
+Disallow: /*.txt$
+Disallow: /context.txt
+Disallow: /devlog.txt
+
+# Allow all games and main content
+Allow: /games/
+Allow: /about/
+Allow: /daughters-of-zion/
+Allow: /null-vesper/
+Allow: /assets/
+
+# Common bot-specific rules
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Block bad bots (optional - add as needed)
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+

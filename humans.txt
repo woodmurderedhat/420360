@@ -1,0 +1,62 @@
+/* TEAM */
+
+Creator: woodmurderedhat
+Site: https://woodmurderedhat.com/social
+Location: Digital Realm
+
+/* THANKS */
+
+Inspiration: 90s web culture, glitch art, retro gaming
+Community: 247420 Discord
+Platforms: YouTube (@woodenhat), Lens Protocol (hey.xyz/u/wooden)
+
+/* SITE */
+
+Last update: 2025/12/12
+Language: English
+Doctype: HTML5
+IDE: Various
+Standards: HTML5, CSS3, Vanilla JavaScript
+Components: Retro arcade games, interactive narratives, generative art
+Software: Hand-coded with love and nostalgia
+
+/* PHILOSOPHY */
+
+Mission: Curate playful, low-friction experiments rekindling curiosity + contemplative drift
+Aesthetic: 90s retro web popups, glitch art, digital nostalgia
+Ethos: Output > Hype. Pixels were our stars in the night sky.
+
+/* SPECIAL PROJECTS */
+
+- Daughters of Zion: A symbolic reconstruction of a secret female order
+- Null Vesper: Interactive cyberpunk narratives (Sandra, Shadow Protocol)
+- Tarot Tetromino: Arcana-fused falling blocks
+- Noctis Reverie: Generative art experience
+- Tim the Dialogue Oracle: Interactive corporate lore archive
+
+/* TECH STACK */
+
+Frontend: Pure HTML5, CSS3, JavaScript (ES6+)
+Graphics: Canvas API, WebGL (where applicable)
+Audio: Web Audio API
+Storage: LocalStorage for game saves
+Fonts: Press Start 2P (Google Fonts)
+Hosting: Static site deployment
+
+/* CONTACT */
+
+GitHub: https://github.com/woodmurderedhat/420360
+Issues: https://github.com/woodmurderedhat/420360/issues
+Giphy: https://giphy.com/woodmurderedhat
+Shop: https://www.redbubble.com/shop/ap/174665816
+
+                               .--.
+                              |o_o |
+                              |:_/ |
+                             //   \ \
+                            (|     | )
+                           /'\_   _/`\
+                           \___)=(___/
+
+            Welcome to 420360 - Where pixels meet nostalgia
+

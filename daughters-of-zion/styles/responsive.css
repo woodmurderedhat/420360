@@ -1,0 +1,139 @@
+/* Responsive Design */
+
+/* Tablet */
+@media (max-width: 992px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+    }
+
+    .feature-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .timeline::before {
+        left: 20px;
+    }
+
+    .timeline-item {
+        width: 100%;
+        padding-left: 60px !important;
+        padding-right: 0 !important;
+    }
+
+    .timeline-item .timeline-marker {
+        left: 10px !important;
+        right: auto !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.25rem; }
+
+    .hero {
+        height: 60vh;
+        min-height: 400px;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    .hero-symbols {
+        gap: 0.5rem;
+    }
+
+    .veil-symbol {
+        font-size: 1.2rem;
+    }
+
+    section {
+        padding: 2rem 0;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .veil-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .featured-quote {
+        font-size: 1.2rem;
+    }
+
+    .page-header {
+        padding: 3rem 0 2rem;
+    }
+
+    .content-wrapper {
+        padding: 0 15px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 1.75rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .feature-card,
+    .veil-card,
+    .card {
+        padding: 1.5rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    nav, footer, .btn {
+        display: none;
+    }
+
+    .hero {
+        height: auto;
+        min-height: auto;
+        padding: 2rem;
+    }
+
+    section {
+        page-break-inside: avoid;
+    }
+
+    .feature-card,
+    .veil-card,
+    .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+

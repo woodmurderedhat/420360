@@ -1,0 +1,362 @@
+/* 420360 Retro Theme Override for Daughters of Zion */
+
+/* Import pixel font */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    /* Override with 420360 color scheme */
+    --bg: #1a1f1a;
+    --primary: #4a8c3a;
+    --secondary: #7b5e8b;
+    --accent: #8fbc8f;
+    --text: #e8f5e8;
+    --highlight: #d4af37;
+    
+    /* Keep some original colors for accents */
+    --primary-color: var(--primary);
+    --secondary-color: var(--secondary);
+    --accent-color: var(--highlight);
+    --text-color: var(--text);
+    --light-bg: var(--bg);
+    --white: var(--text);
+}
+
+* {
+    image-rendering: pixelated;
+}
+
+body {
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 10px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Typography with pixel aesthetic */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Press Start 2P', monospace;
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--primary);
+    letter-spacing: 2px;
+}
+
+h1 { font-size: 18px; line-height: 1.6; }
+h2 { font-size: 14px; line-height: 1.6; }
+h3 { font-size: 12px; line-height: 1.6; }
+h4 { font-size: 10px; line-height: 1.6; }
+
+p, li {
+    font-size: 10px;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+.lead {
+    font-size: 12px;
+    color: var(--accent);
+}
+
+/* Hero Section - Retro Style */
+.hero {
+    background: var(--bg);
+    border: 4px solid var(--secondary);
+    box-shadow: 
+        0 0 0 4px var(--primary),
+        8px 8px 0 0 var(--accent),
+        0 0 0 8px #000;
+    position: relative;
+    min-height: 400px;
+}
+
+.hero-overlay {
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(122, 94, 139, 0.03) 0px,
+        rgba(122, 94, 139, 0.03) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+}
+
+.hero-title {
+    color: var(--accent);
+    text-shadow: 3px 3px 0 var(--primary), 0 0 10px var(--secondary);
+    font-size: 20px;
+}
+
+.hero-subtitle {
+    color: var(--text);
+    font-size: 12px;
+}
+
+.hero-description {
+    color: var(--accent);
+    font-size: 10px;
+}
+
+.veil-symbol {
+    color: var(--highlight);
+    animation: pulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px var(--primary));
+}
+
+/* Navigation - Retro Pixel Style */
+#main-nav {
+    background: var(--bg);
+    border-bottom: 4px solid var(--secondary);
+    box-shadow: 0 4px 0 0 var(--primary);
+}
+
+.logo {
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--primary);
+}
+
+.nav-links a {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: var(--text);
+    text-decoration: none;
+    padding: 8px 12px;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--accent);
+    background: var(--primary);
+    border: 2px solid var(--secondary);
+    box-shadow: 2px 2px 0 0 var(--highlight);
+}
+
+/* Sections */
+section {
+    background: var(--bg);
+    border: 3px solid var(--primary);
+    margin: 20px 0;
+    padding: 30px;
+    box-shadow: 4px 4px 0 0 var(--secondary);
+}
+
+.intro-section,
+.features-section,
+.quote-section {
+    background: var(--bg);
+}
+
+/* Feature Cards - Retro Boxes */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.feature-card {
+    background: var(--bg);
+    border: 3px solid var(--secondary);
+    box-shadow: 
+        0 0 0 3px var(--primary),
+        6px 6px 0 0 var(--accent);
+    padding: 20px;
+    transition: transform 0.2s;
+}
+
+.feature-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow:
+        0 0 0 3px var(--primary),
+        8px 8px 0 0 var(--accent);
+}
+
+.feature-icon {
+    font-size: 32px;
+    filter: drop-shadow(2px 2px 0 var(--primary));
+}
+
+/* Buttons - Retro Pixel Style */
+.btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    background: var(--primary);
+    color: var(--text);
+    border: 3px solid var(--secondary);
+    box-shadow: 3px 3px 0 0 var(--accent);
+    padding: 10px 16px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: var(--secondary);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 0 var(--accent);
+}
+
+/* Quote Section */
+.featured-quote {
+    background: var(--bg);
+    border: 3px solid var(--highlight);
+    padding: 30px;
+    box-shadow: 4px 4px 0 0 var(--primary);
+}
+
+.featured-quote p {
+    color: var(--accent);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.featured-quote cite {
+    color: var(--highlight);
+    font-size: 10px;
+}
+
+/* Footer */
+footer {
+    background: var(--bg);
+    border-top: 4px solid var(--secondary);
+    box-shadow: 0 -4px 0 0 var(--primary);
+    color: var(--text);
+    padding: 30px 0;
+}
+
+footer a {
+    color: var(--highlight);
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--primary);
+}
+
+/* Content Pages */
+.page-header {
+    background: var(--bg);
+    border: 4px solid var(--secondary);
+    box-shadow:
+        0 0 0 4px var(--primary),
+        8px 8px 0 0 var(--accent);
+    margin-bottom: 20px;
+}
+
+.content-wrapper {
+    background: var(--bg);
+    border: 3px solid var(--primary);
+    padding: 30px;
+    box-shadow: 4px 4px 0 0 var(--secondary);
+}
+
+.content-wrapper h2 {
+    border-bottom: 3px solid var(--highlight);
+    padding-bottom: 10px;
+}
+
+.content-wrapper blockquote {
+    border-left: 4px solid var(--highlight);
+    background: rgba(122, 94, 139, 0.1);
+    padding: 15px;
+    margin: 20px 0;
+}
+
+/* Cards */
+.card,
+.veil-card {
+    background: var(--bg);
+    border: 3px solid var(--secondary);
+    box-shadow:
+        0 0 0 3px var(--primary),
+        5px 5px 0 0 var(--accent);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.veil-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow:
+        0 0 0 3px var(--primary),
+        7px 7px 0 0 var(--accent);
+}
+
+.veil-number {
+    background: var(--highlight);
+    color: var(--bg);
+    border: 2px solid var(--primary);
+    box-shadow: 2px 2px 0 0 var(--secondary);
+    font-family: 'Press Start 2P', monospace;
+}
+
+/* Timeline - Pixel Style */
+.timeline::before {
+    background: var(--highlight);
+    box-shadow: 0 0 4px var(--primary);
+}
+
+.timeline-marker {
+    background: var(--highlight);
+    border: 3px solid var(--primary);
+    box-shadow: 0 0 0 2px var(--secondary);
+}
+
+.timeline-content {
+    background: var(--bg);
+    border: 3px solid var(--secondary);
+    box-shadow: 4px 4px 0 0 var(--accent);
+}
+
+.timeline-date {
+    color: var(--highlight);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+}
+
+/* Mobile menu toggle */
+.mobile-menu-toggle span {
+    background: var(--accent);
+    box-shadow: 1px 1px 0 0 var(--primary);
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px var(--primary));
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+        filter: drop-shadow(0 0 8px var(--highlight));
+    }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg);
+    border: 2px solid var(--primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--secondary);
+    border: 2px solid var(--primary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}
+
+

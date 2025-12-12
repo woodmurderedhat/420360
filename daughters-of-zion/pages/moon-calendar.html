@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moon Calendar - The Daughters of Zion</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/navigation.css">
+    <link rel="stylesheet" href="../styles/responsive.css">
+    <link rel="stylesheet" href="../styles/gamified-light-theme.css">
+    <link rel="stylesheet" href="../styles/moon-calendar.css">
+</head>
+<body>
+    <nav id="main-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="symbol">✦</span>
+                <span class="title">Daughters of Zion</span>
+            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="history.html">History</a></li>
+                <li><a href="seven-veils.html">Seven Veils</a></li>
+                <li><a href="rituals.html">Rituals</a></li>
+                <li><a href="hidden-names.html">Hidden Names</a></li>
+                <li><a href="circle-mothers.html">Circle Mothers</a></li>
+                <li><a href="library.html">Library</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <h1>🌙 The Moon Calendar of Zion</h1>
+            <p class="subtitle">Live Lunar Guidance for the Daughters</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="content-section">
+            <div class="content-wrapper">
+                <blockquote>
+                    <p>"The sun governs the years, but the moon governs the soul."</p>
+                    <cite>— The Mother of Mothers</cite>
+                </blockquote>
+
+                <!-- Current Moon Phase Display -->
+                <div class="moon-display-container">
+                    <div class="moon-visual" id="moonVisual">
+                        <div class="moon-circle" id="moonCircle"></div>
+                    </div>
+                    <div class="moon-info">
+                        <h2 id="currentPhase">Calculating...</h2>
+                        <p class="moon-date" id="moonDate"></p>
+                        <p class="moon-illumination" id="moonIllumination"></p>
+                        <p class="moon-age" id="moonAge"></p>
+                    </div>
+                </div>
+
+                <!-- Phase Guidance -->
+                <div class="phase-guidance" id="phaseGuidance">
+                    <h2>Current Guidance</h2>
+                    <div id="guidanceContent">
+                        <p>Loading lunar guidance...</p>
+                    </div>
+                </div>
+
+                <!-- Moon Phase Calendar -->
+                <div class="moon-phases-overview">
+                    <h2>The Four Sacred Phases</h2>
+                    <div class="phases-grid">
+                        <div class="phase-card" data-phase="new">
+                            <div class="phase-icon">🌑</div>
+                            <h3>New Moon</h3>
+                            <p class="phase-subtitle">The Veiled Phase</p>
+                            <p class="phase-motto">"In darkness we listen."</p>
+                            <div class="phase-details">
+                                <p><strong>Color:</strong> Black or deep indigo</p>
+                                <p><strong>Element:</strong> Dust</p>
+                                <p><strong>Theme:</strong> Silence, introspection, hidden beginnings</p>
+                            </div>
+                        </div>
+
+                        <div class="phase-card" data-phase="waxing">
+                            <div class="phase-icon">🌒</div>
+                            <h3>Waxing Moon</h3>
+                            <p class="phase-subtitle">The Ascending Phase</p>
+                            <p class="phase-motto">"Let strength gather."</p>
+                            <div class="phase-details">
+                                <p><strong>Color:</strong> Blue or silver</p>
+                                <p><strong>Element:</strong> Water</p>
+                                <p><strong>Theme:</strong> Growth, intention, clarity, strengthening</p>
+                            </div>
+                        </div>
+
+                        <div class="phase-card" data-phase="full">
+                            <div class="phase-icon">🌕</div>
+                            <h3>Full Moon</h3>
+                            <p class="phase-subtitle">The Revealing Phase</p>
+                            <p class="phase-motto">"What is hidden becomes seen."</p>
+                            <div class="phase-details">
+                                <p><strong>Color:</strong> White or gold</p>
+                                <p><strong>Element:</strong> Light</p>
+                                <p><strong>Theme:</strong> Revelation, prophecy, joy, clarity, community</p>
+                            </div>
+                        </div>
+
+                        <div class="phase-card" data-phase="waning">
+                            <div class="phase-icon">🌘</div>
+                            <h3>Waning Moon</h3>
+                            <p class="phase-subtitle">The Returning Phase</p>
+                            <p class="phase-motto">"Release what must return to dust."</p>
+                            <div class="phase-details">
+                                <p><strong>Color:</strong> Brown or grey</p>
+                                <p><strong>Element:</strong> Ash</p>
+                                <p><strong>Theme:</strong> Letting go, introspection, endings, rebalancing</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Link to full calendar -->
+                <div style="margin-top: 3rem; text-align: center;">
+                    <a href="../library/calendar-of-zion.html" class="btn">📖 Read the Complete Liturgical Calendar</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 The Daughters of Zion Chronicle. A modern interpretation and documentation.</p>
+            <p class="footer-note">This is a symbolic reconstruction based on scriptural echoes and historical research.</p>
+            <p class="footer-note">Hosted by <a href="https://420360.xyz" target="_blank" style="color: var(--accent-color); text-decoration: none;">420360.xyz</a></p>
+        </div>
+    </footer>
+
+    <script src="../scripts/navigation.js"></script>
+    <script src="../scripts/main.js"></script>
+    <script src="../scripts/gamification.js"></script>
+    <script src="../scripts/moon-calendar.js"></script>
+</body>
+</html>
+

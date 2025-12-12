@@ -23,6 +23,7 @@ class DaughtersGamification {
             'hidden_names': { name: 'Name Keeper', desc: 'Discovered Hidden Names', icon: '👁️' },
             'circle_mothers': { name: 'Circle Initiate', desc: 'Met the Circle Mothers', icon: '⭕' },
             'library': { name: 'Librarian', desc: 'Entered the Library', icon: '📚' },
+            'moon_calendar': { name: 'Moon Watcher', desc: 'Consulted the Moon Calendar', icon: '🌙' },
             'explorer': { name: 'Explorer', desc: 'Visited all main sections', icon: '🗺️' }
         };
         this.init();
@@ -93,9 +94,10 @@ class DaughtersGamification {
         if (currentPage.includes('hidden-names')) this.unlockAchievement('hidden_names');
         if (currentPage.includes('circle-mothers')) this.unlockAchievement('circle_mothers');
         if (currentPage.includes('library')) this.unlockAchievement('library');
-        
+        if (currentPage.includes('moon-calendar')) this.unlockAchievement('moon_calendar');
+
         // Check explorer achievement
-        const mainPages = ['history', 'rituals', 'hidden-names', 'circle-mothers', 'library', 'seven-veils'];
+        const mainPages = ['history', 'rituals', 'hidden-names', 'circle-mothers', 'library', 'seven-veils', 'moon-calendar'];
         const visitedMain = mainPages.filter(p => this.progress.visitedPages.some(vp => vp.includes(p)));
         if (visitedMain.length >= mainPages.length) {
             this.unlockAchievement('explorer');

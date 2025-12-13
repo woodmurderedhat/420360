@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarot - The Golden Dawn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2d1b4e 0%, #0f0519 100%);
+            color: #e8d7f1;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        nav {
+            background: rgba(45, 27, 78, 0.95);
+            padding: 1rem 0;
+            border-bottom: 3px solid #6b4c9a;
+            margin-bottom: 3rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d4af37;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #e8d7f1;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #e0aaff;
+            text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 0;
+            border-bottom: 3px solid #6b4c9a;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: #d4af37;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #e0aaff;
+        }
+
+        h2 {
+            color: #d4af37;
+            margin: 2rem 0 1rem;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #6b4c9a;
+            padding-bottom: 0.5rem;
+        }
+
+        .tarot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .tarot-card {
+            background: rgba(107, 76, 154, 0.1);
+            border: 2px solid #6b4c9a;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .tarot-card:hover {
+            background: rgba(107, 76, 154, 0.2);
+            border-color: #e0aaff;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.3);
+        }
+
+        .card-num {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .card-name {
+            color: #e0aaff;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-link {
+            display: inline-block;
+            padding: 0.5rem 0.75rem;
+            background: #6b4c9a;
+            color: #e0aaff;
+            text-decoration: none;
+            border: 1px solid #e0aaff;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.7rem;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .card-link:hover {
+            background: #9d4edd;
+            text-shadow: 0 0 10px rgba(224, 170, 255, 0.8);
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #6b4c9a;
+            text-align: center;
+            color: #d4af37;
+        }
+
+        .nav-buttons {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .nav-buttons a {
+            padding: 0.7rem 1.5rem;
+            background: #6b4c9a;
+            color: #e0aaff;
+            text-decoration: none;
+            border: 1px solid #e0aaff;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .nav-buttons a:hover {
+            background: #9d4edd;
+            text-shadow: 0 0 10px rgba(224, 170, 255, 0.8);
+        }
+
+        .intro {
+            font-size: 1.1rem;
+            color: #d4d4d4;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(107, 76, 154, 0.05);
+            border-left: 3px solid #d4af37;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.8rem;
+            }
+
+            .tarot-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">✨ Golden Dawn</div>
+            <ul class="nav-links">
+                <li><a href="../../index.html">← 420360</a></li>
+                <li><a href="../index.html">← Esoteric Hub</a></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="grades.html">Grades</a></li>
+                <li><a href="tarot.html" class="active">Tarot</a></li>
+                <li><a href="kabbalah.html">Kabbalah</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>🎴 The Golden Dawn Tarot</h1>
+            <p class="subtitle">22 Keys to Mystical Understanding</p>
+        </header>
+
+        <div class="intro">
+            <p>The Major Arcana of tarot represents the journey of spiritual transformation. In the Golden Dawn system, each of the 22 Major Arcana cards corresponds to paths on the Tree of Life and reveals profound mysteries of the human soul and the cosmos. Journey through The Fool's journey and unlock the wisdom of each card.</p>
+        </div>
+
+        <h2>🔮 The Major Arcana</h2>
+        
+        <div class="tarot-grid">
+            <div class="tarot-card">
+                <span class="card-num">0</span>
+                <span class="card-name">The Fool</span>
+                <a href="tarot/tarot-0.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">I</span>
+                <span class="card-name">Magician</span>
+                <a href="tarot/tarot-1.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">II</span>
+                <span class="card-name">Priestess</span>
+                <a href="tarot/tarot-2.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">III</span>
+                <span class="card-name">Empress</span>
+                <a href="tarot/tarot-3.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">IV</span>
+                <span class="card-name">Emperor</span>
+                <a href="tarot/tarot-4.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">V</span>
+                <span class="card-name">Hierophant</span>
+                <a href="tarot/tarot-5.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">VI</span>
+                <span class="card-name">Lovers</span>
+                <a href="tarot/tarot-6.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">VII</span>
+                <span class="card-name">Chariot</span>
+                <a href="tarot/tarot-7.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">VIII</span>
+                <span class="card-name">Strength</span>
+                <a href="tarot/tarot-8.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">IX</span>
+                <span class="card-name">Hermit</span>
+                <a href="tarot/tarot-9.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">X</span>
+                <span class="card-name">Wheel</span>
+                <a href="tarot/tarot-10.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XI</span>
+                <span class="card-name">Justice</span>
+                <a href="tarot/tarot-11.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XII</span>
+                <span class="card-name">Hanged Man</span>
+                <a href="tarot/tarot-12.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XIII</span>
+                <span class="card-name">Death</span>
+                <a href="tarot/tarot-13.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XIV</span>
+                <span class="card-name">Temperance</span>
+                <a href="tarot/tarot-14.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XV</span>
+                <span class="card-name">Devil</span>
+                <a href="tarot/tarot-15.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XVI</span>
+                <span class="card-name">Tower</span>
+                <a href="tarot/tarot-16.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XVII</span>
+                <span class="card-name">Star</span>
+                <a href="tarot/tarot-17.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XVIII</span>
+                <span class="card-name">Moon</span>
+                <a href="tarot/tarot-18.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XIX</span>
+                <span class="card-name">Sun</span>
+                <a href="tarot/tarot-19.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XX</span>
+                <span class="card-name">Judgement</span>
+                <a href="tarot/tarot-20.html" class="card-link">Explore</a>
+            </div>
+
+            <div class="tarot-card">
+                <span class="card-num">XXI</span>
+                <span class="card-name">World</span>
+                <a href="tarot/tarot-21.html" class="card-link">Explore</a>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="../index.html">← Back to Golden Dawn</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 The Golden Dawn. Part of the Esoteric Hub.</p>
+    </footer>
+</body>
+</html>

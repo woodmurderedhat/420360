@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kabbalah - The Golden Dawn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #2d1b4e 0%, #0f0519 100%);
+            color: #e8d7f1;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        nav {
+            background: rgba(45, 27, 78, 0.95);
+            padding: 1rem 0;
+            border-bottom: 3px solid #6b4c9a;
+            margin-bottom: 3rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #d4af37;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #e8d7f1;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #e0aaff;
+            text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 0;
+            border-bottom: 3px solid #6b4c9a;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: #d4af37;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #e0aaff;
+        }
+
+        h2 {
+            color: #d4af37;
+            margin: 2rem 0 1rem;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #6b4c9a;
+            padding-bottom: 0.5rem;
+        }
+
+        .kab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .kab-card {
+            background: rgba(107, 76, 154, 0.1);
+            border: 2px solid #6b4c9a;
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .kab-card:hover {
+            background: rgba(107, 76, 154, 0.2);
+            border-color: #e0aaff;
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.3);
+        }
+
+        .kab-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .kab-card h3 {
+            color: #e0aaff;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .kab-card p {
+            font-size: 0.9rem;
+            color: #d4d4d4;
+            margin-bottom: 1rem;
+        }
+
+        .kab-link {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background: #6b4c9a;
+            color: #e0aaff;
+            text-decoration: none;
+            border: 1px solid #e0aaff;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .kab-link:hover {
+            background: #9d4edd;
+            text-shadow: 0 0 10px rgba(224, 170, 255, 0.8);
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #6b4c9a;
+            text-align: center;
+            color: #d4af37;
+        }
+
+        .nav-buttons {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .nav-buttons a {
+            padding: 0.7rem 1.5rem;
+            background: #6b4c9a;
+            color: #e0aaff;
+            text-decoration: none;
+            border: 1px solid #e0aaff;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .nav-buttons a:hover {
+            background: #9d4edd;
+            text-shadow: 0 0 10px rgba(224, 170, 255, 0.8);
+        }
+
+        .intro {
+            font-size: 1.1rem;
+            color: #d4d4d4;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(107, 76, 154, 0.05);
+            border-left: 3px solid #d4af37;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .info-box {
+            background: rgba(107, 76, 154, 0.05);
+            border: 1px solid #6b4c9a;
+            padding: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            color: #e0aaff;
+            margin-bottom: 1rem;
+        }
+
+        .info-box p {
+            color: #d4d4d4;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.8rem;
+            }
+
+            .kab-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">✨ Golden Dawn</div>
+            <ul class="nav-links">
+                <li><a href="../../index.html">← 420360</a></li>
+                <li><a href="../index.html">← Esoteric Hub</a></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="grades.html">Grades</a></li>
+                <li><a href="tarot.html">Tarot</a></li>
+                <li><a href="kabbalah.html" class="active">Kabbalah</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>🔯 Kabbalah & The Tree of Life</h1>
+            <p class="subtitle">The Map of Divine Reality</p>
+        </header>
+
+        <div class="intro">
+            <p>Kabbalah is the mystical foundation of the Golden Dawn system. The Tree of Life, a geometric diagram of 10 Sephiroth (spheres) connected by 22 paths, represents the structure of the universe and the journey of the soul. Study the Tree, understand the correspondences, and unlock the deeper mysteries of creation.</p>
+        </div>
+
+        <h2>🌳 Core Teachings</h2>
+        
+        <div class="kab-grid">
+            <div class="kab-card">
+                <span class="kab-icon">🌳</span>
+                <h3>The Tree of Life</h3>
+                <p>The central map of Kabbalah. Learn about the 10 Sephiroth and their positions on the Tree, representing the descent of divinity into manifestation.</p>
+                <a href="../pages/tree-of-life.html" class="kab-link">Explore →</a>
+            </div>
+
+            <div class="kab-card">
+                <span class="kab-icon">🔯</span>
+                <h3>The Four Worlds</h3>
+                <p>Understand how the Tree operates across four levels: Atziluth (Emanation), Briah (Creation), Yetzirah (Formation), and Assiah (Action).</p>
+                <a href="#" class="kab-link">Learn More</a>
+            </div>
+
+            <div class="kab-card">
+                <span class="kab-icon">✨</span>
+                <h3>The Paths</h3>
+                <p>Explore the 22 paths connecting the Sephiroth, each corresponding to a Major Arcana tarot card and a letter of the Hebrew alphabet.</p>
+                <a href="#" class="kab-link">Study Paths</a>
+            </div>
+
+            <div class="kab-card">
+                <span class="kab-icon">⚡</span>
+                <h3>The Abyss</h3>
+                <p>The great divide between the supernal triad and the lower spheres. Understand the Abyss and what it means to cross from Duality into Unity.</p>
+                <a href="#" class="kab-link">Contemplate</a>
+            </div>
+        </div>
+
+        <h2>📚 Study Guides</h2>
+
+        <div class="info-grid">
+            <div class="info-box">
+                <h3>🔤 Hebrew Letters & Numerology</h3>
+                <p>Each letter of the Hebrew alphabet carries mystical significance. Learn correspondences, gematria (numerological values), and how letters relate to the paths of the Tree.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>🎴 Tarot Correspondences</h3>
+                <p>Every Major Arcana card corresponds to a path on the Tree of Life. Understand how the Tarot and Kabbalah work together as a unified system of divination and instruction.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>⚗️ Elemental Associations</h3>
+                <p>The four elements (Fire, Water, Air, Earth) and Spirit are mapped onto the Tree, revealing how divine forces manifest at different levels of reality.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>🕯️ Divine Names</h3>
+                <p>Each Sephirah has a divine name representing different aspects of the Godhead. Pronounce and meditate on these sacred names for profound spiritual insight.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>👼 Archangels & Angels</h3>
+                <p>Associated with each sphere are archangels and angelic orders. Learn to invoke and commune with these divine intelligences through Kabbalistic practice.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>⚖️ Correspondences Complete</h3>
+                <p>A comprehensive map of all correspondences: planets, zodiac signs, tarot cards, colors, sacred animals, and symbols associated with each Sephirah.</p>
+            </div>
+        </div>
+
+        <h2>🧘 Meditation Practices</h2>
+
+        <div class="kab-grid">
+            <div class="kab-card">
+                <span class="kab-icon">🧘</span>
+                <h3>Tree of Life Meditation</h3>
+                <p>Travel the paths of the Tree in profound meditation, ascending from Malkuth to Kether and descending back with new understanding.</p>
+                <a href="#" class="kab-link">Begin Practice</a>
+            </div>
+
+            <div class="kab-card">
+                <span class="kab-icon">🌊</span>
+                <h3>Sphere Contemplation</h3>
+                <p>Focus on each Sephirah individually. Study its qualities, divine name, archangel, and integrate its wisdom into your consciousness.</p>
+                <a href="#" class="kab-link">Start Sequence</a>
+            </div>
+
+            <div class="kab-card">
+                <span class="kab-icon">🔥</span>
+                <h3>Path Working</h3>
+                <p>Advanced practice: journey along the paths between Sephiroth, experiencing the teachings of each path directly through imagination and vision.</p>
+                <a href="#" class="kab-link">Advanced Study</a>
+            </div>
+
+            <div class="kab-card">
+                <span class="kab-icon">💫</span>
+                <h3>Contemplation of Unity</h3>
+                <p>The ultimate Kabbalistic practice: ascend beyond the individual Sephiroth to contemplate Ain Soph (Infinite Nothingness) and Ain (The Absolute).</p>
+                <a href="#" class="kab-link">Ultimate Goal</a>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="../index.html">← Back to Golden Dawn</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 The Golden Dawn. Part of the Esoteric Hub.</p>
+    </footer>
+</body>
+</html>

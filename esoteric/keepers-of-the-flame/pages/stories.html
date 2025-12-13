@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sacred Stories - Keepers of the Flame | 420360</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #2d1b0f 0%, #1a0f07 100%);
+            color: #f5e6d3;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        nav {
+            background: rgba(45, 27, 15, 0.95);
+            padding: 1rem 0;
+            border-bottom: 3px solid #ff6b35;
+            margin-bottom: 2rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fdb833;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: #f5e6d3;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #ff6b35;
+            text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 3px solid #ff6b35;
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: #ff6b35;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #fdb833;
+        }
+
+        h2 {
+            color: #ff6b35;
+            margin: 2.5rem 0 1.5rem;
+            font-size: 1.6rem;
+            border-bottom: 2px solid #ff6b35;
+            padding-bottom: 0.5rem;
+        }
+
+        .intro {
+            font-size: 1rem;
+            color: #e8d4b8;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(255, 107, 53, 0.05);
+            border-left: 3px solid #d4af37;
+            line-height: 1.8;
+        }
+
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .story-card {
+            background: rgba(45, 27, 15, 0.7);
+            border: 2px solid #ff6b35;
+            padding: 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .story-card:hover {
+            background: rgba(45, 27, 15, 0.9);
+            border-color: #fdb833;
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .story-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .story-card h3 {
+            color: #fdb833;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .story-card p {
+            font-size: 0.95rem;
+            color: #e8d4b8;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .story-meta {
+            font-size: 0.8rem;
+            color: #d4af37;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .meta-tag {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 2px;
+        }
+
+        .story-link {
+            display: inline-block;
+            padding: 0.7rem 1.2rem;
+            background: #ff6b35;
+            color: #2d1b0f;
+            text-decoration: none;
+            border: 1px solid #ff6b35;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.8rem;
+            font-family: 'Press Start 2P', cursive;
+            font-weight: bold;
+        }
+
+        .story-link:hover {
+            background: #fdb833;
+            border-color: #fdb833;
+            transform: scale(1.05);
+        }
+
+        .story-locked {
+            opacity: 0.6;
+        }
+
+        .locked-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid #d4af37;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            color: #d4af37;
+            margin-right: 0.5rem;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #ff6b35;
+            text-align: center;
+            color: #d4af37;
+        }
+
+        .nav-button {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .nav-button a {
+            padding: 0.7rem 1.5rem;
+            background: #ff6b35;
+            color: #2d1b0f;
+            text-decoration: none;
+            border: 2px solid #ff6b35;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            font-family: 'Press Start 2P', cursive;
+            display: inline-block;
+        }
+
+        .nav-button a:hover {
+            background: #d4af37;
+            border-color: #d4af37;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            .nav-links {
+                gap: 0.8rem;
+                font-size: 0.75rem;
+            }
+
+            .stories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🔥 Keepers</div>
+            <ul class="nav-links">
+                <li><a href="../../index.html">← 420360</a></li>
+                <li><a href="../index.html">← Esoteric Hub</a></li>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="stories.html" class="active">Stories</a></li>
+                <li><a href="traditions.html">Traditions</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>Sacred Stories</h1>
+            <p class="subtitle">The Eternal Flame Through Time</p>
+        </header>
+
+        <div class="intro">
+            <p>Gather around the Sacred Fire and listen to the tales of the Zoroastrian tradition. Each story carries the wisdom of Ahura Mazda and illuminates the eternal struggle between light and darkness, truth and deception, wisdom and ignorance. These are the stories that Keepers have shared since ancient times, passed from generation to generation, keeping the flame of knowledge alive.</p>
+        </div>
+
+        <h2>📖 The Eight Sacred Stories</h2>
+        
+        <div class="stories-grid">
+            <div class="story-card">
+                <span class="story-icon">✨</span>
+                <h3>The Creation Myth</h3>
+                <p>The primordial dance of Ahura Mazda and the forces of creation, establishing the cosmic order and the eternal conflict between good and evil.</p>
+                <div class="story-meta">
+                    <span class="meta-tag">🔓 Unlocked</span>
+                    <span class="meta-tag">Foundational</span>
+                </div>
+                <a href="stories/creation-myth.html" class="story-link">Read Story</a>
+            </div>
+
+            <div class="story-card">
+                <span class="story-icon">🧠</span>
+                <h3>Ahura Mazda's Wisdom</h3>
+                <p>The teachings of the supreme god concerning the nature of good, evil, moral choice, and the responsibility of humanity in the cosmic struggle.</p>
+                <div class="story-meta">
+                    <span class="meta-tag">🔓 Unlocked</span>
+                    <span class="meta-tag">Teaching</span>
+                </div>
+                <a href="stories/ahura-wisdom.html" class="story-link">Read Story</a>
+            </div>
+
+            <div class="story-card">
+                <span class="story-icon">⚔️</span>
+                <h3>Zarathustra's Journey</h3>
+                <p>The legendary prophet's quest for truth and his confrontation with the forces of darkness, leading to enlightenment and the foundation of the sacred fire worship.</p>
+                <div class="story-meta">
+                    <span class="meta-tag">🔓 Unlocked</span>
+                    <span class="meta-tag">Heroic Quest</span>
+                </div>
+                <a href="stories/zarathustra-journey.html" class="story-link">Read Story</a>
+            </div>
+
+            <div class="story-card">
+                <span class="story-icon">🔮</span>
+                <h3>Sacred Fire Prophecy</h3>
+                <p>Visions of the future ages and the ultimate triumph of light over darkness, revealing the destiny of the universe and the role of the Keepers.</p>
+                <div class="story-meta">
+                    <span class="meta-tag">🔓 Unlocked</span>
+                    <span class="meta-tag">Prophecy</span>
+                </div>
+                <a href="stories/fire-prophecy.html" class="story-link">Read Story</a>
+            </div>
+
+            <div class="story-card story-locked">
+                <span class="story-icon">🌱</span>
+                <h3>Nowruz: Season of Renewal</h3>
+                <p>The spring equinox festival celebrating new beginnings, rebirth, and the eternal cycle of transformation. Visit during Spring (Feb 20 - May 20) to unlock.</p>
+                <div class="story-meta">
+                    <span class="locked-badge">🔒 SEASONAL</span>
+                    <span class="meta-tag">Spring</span>
+                </div>
+                <a href="stories/nowruz-story.html" class="story-link">Visit in Spring</a>
+            </div>
+
+            <div class="story-card story-locked">
+                <span class="story-icon">🌞</span>
+                <h3>Tirgan: Courage Rekindled</h3>
+                <p>Summer's festival honoring courage, valor, and the triumph of will against adversity. Visit during Summer (May 21 - Aug 22) to unlock.</p>
+                <div class="story-meta">
+                    <span class="locked-badge">🔒 SEASONAL</span>
+                    <span class="meta-tag">Summer</span>
+                </div>
+                <a href="stories/tirgan-story.html" class="story-link">Visit in Summer</a>
+            </div>
+
+            <div class="story-card story-locked">
+                <span class="story-icon">🍂</span>
+                <h3>Mehregan: Friendship's Circle</h3>
+                <p>Autumn gathering celebrating friendship, gratitude, and community bonds around the sacred fire. Visit during Autumn (Aug 23 - Nov 21) to unlock.</p>
+                <div class="story-meta">
+                    <span class="locked-badge">🔒 SEASONAL</span>
+                    <span class="meta-tag">Autumn</span>
+                </div>
+                <a href="stories/mehregan-story.html" class="story-link">Visit in Autumn</a>
+            </div>
+
+            <div class="story-card story-locked">
+                <span class="story-icon">❄️</span>
+                <h3>Yalda: The Eternal Flame</h3>
+                <p>Winter's darkest night celebrated as the triumph of light, with stories that sustain hope through the long darkness. Visit during Winter (Nov 22 - Feb 19) to unlock.</p>
+                <div class="story-meta">
+                    <span class="locked-badge">🔒 SEASONAL</span>
+                    <span class="meta-tag">Winter</span>
+                </div>
+                <a href="stories/yalda-story.html" class="story-link">Visit in Winter</a>
+            </div>
+        </div>
+
+        <h2>🎯 Story Unlocking Guide</h2>
+        
+        <div class="intro">
+            <p><strong>The first four stories are always available</strong> for you to explore and learn from. These foundational tales contain the core wisdom of the Zoroastrian tradition.</p>
+            <p style="margin-top: 1rem;"><strong>The seasonal stories unlock automatically when you visit during their season:</strong></p>
+            <ul style="margin: 1rem 0 0 2rem; line-height: 2;">
+                <li>🌱 <strong>Nowruz</strong> (Spring Equinox): Feb 20 - May 20</li>
+                <li>🌞 <strong>Tirgan</strong> (Summer Solstice): May 21 - Aug 22</li>
+                <li>🍂 <strong>Mehregan</strong> (Autumn Equinox): Aug 23 - Nov 21</li>
+                <li>❄️ <strong>Yalda</strong> (Winter Solstice): Nov 22 - Feb 19</li>
+            </ul>
+        </div>
+
+        <div class="nav-button">
+            <a href="../index.html">← Back to Keepers of the Flame</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Keepers of the Flame. Part of the Esoteric Hub.</p>
+    </footer>
+</body>
+</html>

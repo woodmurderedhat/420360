@@ -317,8 +317,8 @@ html,body{
     <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">GAMES</span>
     <span style="color:var(--secondary);">🕹️</span>
   </div>
-  <div id="daughters-control" class="ctrl-btn" style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 10px;cursor:pointer;user-select:none;" role="button" tabindex="0" title="Daughters of Zion (D)" aria-label="Open Daughters of Zion">
-    <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">DAUGHTERS</span>
+  <div id="esoteric-control" class="ctrl-btn" style="display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Press Start 2P', monospace;background:var(--bg);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:6px 10px;cursor:pointer;user-select:none;" role="button" tabindex="0" title="Esoteric Hub (E)" aria-label="Open Esoteric Hub">
+    <span style="color:var(--highlight);text-shadow:2px 2px 0 var(--primary);">ESOTERIC</span>
     <span style="color:var(--secondary);">✦</span>
   </div>
 
@@ -498,7 +498,8 @@ function openAbout(){ createOverlay('aboutOverlay','ABOUT • 420360','about/ind
 function openOracle(){ createOverlay('oracleOverlay','TIM • DIALOGUE ORACLE','games/tim-the-dialogue-oracle/index.html'); showOverlay('oracleOverlay'); }
 function openGamesIndex(){ createOverlay('gamesIndexOverlay','GAMES • 420360','games/index.html'); showOverlay('gamesIndexOverlay'); }
 function openBoardIndex(){ createOverlay('boardIndexOverlay','BOARD • 420360','board/index.html'); showOverlay('boardIndexOverlay'); }
-function openDaughtersIndex(){ createOverlay('daughtersIndexOverlay','DAUGHTERS OF ZION • 420360','daughters-of-zion/index.html'); showOverlay('daughtersIndexOverlay'); }
+function openEsotericHub(){ createOverlay('esotericHubOverlay','ESOTERIC HUB • 420360','esoteric/index.html'); showOverlay('esotericHubOverlay'); }
+function openDaughtersIndex(){ openEsotericHub(); }
 function openGameOverlay(label, url){
   // Normalize internal absolute URLs to relative
   const rel = url.replace(/^https?:\/\/420360\.xyz\//,'');
@@ -553,7 +554,7 @@ function pauseBackground(){ stopIntervals(); }
 function resumeBackgroundIfNone(){ const anyOpen = document.querySelectorAll('.integrated-overlay:not(.hidden)').length>0; if(!anyOpen) startIntervals(); }
 
 // Keyboard shortcut: press A for About, O for Oracle (when not typing inside overlays)
-window.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'|| e.target.tagName==='TEXTAREA') return; if(e.key==='a'||e.key==='A'){ openAbout(); } if(e.key==='g'||e.key==='G'){ openGamesIndex(); } if(e.key==='b'||e.key==='B'){ openBoardIndex(); } if(e.key==='d'||e.key==='D'){ openDaughtersIndex(); } if(e.key==='o'||e.key==='O'){ openOracle(); } if(e.key==='Escape'){ document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>closeOverlay(el.id)); } });
+window.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'|| e.target.tagName==='TEXTAREA') return; if(e.key==='a'||e.key==='A'){ openAbout(); } if(e.key==='g'||e.key==='G'){ openGamesIndex(); } if(e.key==='b'||e.key==='B'){ openBoardIndex(); } if(e.key==='e'||e.key==='E'){ openEsotericHub(); } if(e.key==='d'||e.key==='D'){ openDaughtersIndex(); } if(e.key==='o'||e.key==='O'){ openOracle(); } if(e.key==='Escape'){ document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el=>closeOverlay(el.id)); } });
 
 // Intercept clicks on any popup link to open in overlay (internal or external)
 document.addEventListener('click', (e)=>{
@@ -623,7 +624,7 @@ const ADS = [
   { label: "SCHIZODIO", href: "https://schizodio.xyz/brobaker", gif: "https://media.giphy.com/media/8Javw7WzqetpyiT3ls/giphy.gif" },
   { label: "SHADOW PROTOCOL", href: "https://420360.xyz/null-vesper/shadow-protocol/", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif"},
   { label: "TIM ORACLE", href: "__INTERNAL_ORACLE__", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" },
-  { label: "DAUGHTERS OF ZION", href: "https://420360.xyz/daughters-of-zion/index.html", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" }
+  { label: "DAUGHTERS OF ZION", href: "https://420360.xyz/esoteric/daughters-of-zion/index.html", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" }
 ];
 
 const POPUP_INTERVAL_MS = 1000;    // auto spawn interval
@@ -991,6 +992,7 @@ document.addEventListener('click', (ev)=>{
   const aboutBtn = document.getElementById('about-control');
   const gamesBtn = document.getElementById('games-control');
   const boardBtn = document.getElementById('board-control');
+  const esotericBtn = document.getElementById('esoteric-control');
   const daughtersBtn = document.getElementById('daughters-control');
   if(aboutBtn){
     const act = ()=>{ openAbout(); };
@@ -1006,6 +1008,11 @@ document.addEventListener('click', (ev)=>{
     const actB = ()=>{ openBoardIndex(); };
     boardBtn.addEventListener('click', e=>{ e.stopPropagation(); actB(); });
     boardBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); actB(); }});
+  }
+  if(esotericBtn){
+    const actE = ()=>{ openEsotericHub(); };
+    esotericBtn.addEventListener('click', e=>{ e.stopPropagation(); actE(); });
+    esotericBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); actE(); }});
   }
   if(daughtersBtn){
     const actD = ()=>{ openDaughtersIndex(); };

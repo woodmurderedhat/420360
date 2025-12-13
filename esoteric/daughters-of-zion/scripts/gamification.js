@@ -61,10 +61,45 @@ class DaughtersGamification {
         this.markVisitedCards();
         this.setupInteractiveElements();
         this.updateStats();
+        this.signalToHub();
         
         // Check for first visit achievement
         if (!this.progress.achievements.includes('first_visit')) {
             this.unlockAchievement('first_visit');
+        }
+    }
+
+    /**
+     * Signal to the Esoteric Hub that user is exploring Daughters of Zion
+     * This allows the hub to update its unified tracking system
+     */
+    signalToHub() {
+        // Create a custom event that the hub can listen for
+        const signal = new CustomEvent('daughtersProgressUpdate', {
+            detail: {
+                visitedPages: this.progress.visitedPages,
+                achievements: this.progress.achievements,
+                totalVisits: this.progress.totalVisits,
+                timestamp: new Date().toISOString()
+            }
+        });
+        document.dispatchEvent(signal);
+        
+        // Also ensure hub localStorage is aware
+        try {
+            const hubKey = 'esoteric_hub_progress';
+            const hubProgress = localStorage.getItem(hubKey);
+            if (!hubProgress) {
+                // Initialize hub progress if it doesn't exist
+                localStorage.setItem(hubKey, JSON.stringify({
+                    hubVisits: 0,
+                    unlockedAchievements: [],
+                    projectProgress: {},
+                    lastVisit: null
+                }));
+            }
+        } catch (error) {
+            console.debug('Hub integration signal sent');
         }
     }
 
@@ -155,6 +190,7 @@ class DaughtersGamification {
         if (this.progress.totalVisits >= 100) this.unlockAchievement('visits_100');
 
         this.saveProgress();
+        this.signalToHub();
         this.updateProgressBar();
     }
 

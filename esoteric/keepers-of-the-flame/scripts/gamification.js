@@ -125,16 +125,89 @@ class KeepersOfTheFlamGamification {
         const day = this.currentDate.getDate();
         
         for (let [key, festival] of Object.entries(this.seasonalFestivals)) {
-            if (festival.month - 1 === month) {
-                const weekOfMonth = Math.floor(day / 7);
-                const seasonKey = `${key}_week_${weekOfMonth}`;
+            // Create a window around the festival date (±14 days)
+            const festivalMonth = festival.month - 1;
+            const festivalDay = festival.day;
+            const tolerance = 14;
+            
+            // Check if current date is within festival window
+            const festivalDate = new Date(this.currentDate.getFullYear(), festivalMonth, festivalDay);
+            const dayDiff = Math.abs(this.currentDate - festivalDate) / (1000 * 60 * 60 * 24);
+            
+            if (dayDiff <= tolerance) {
+                const seasonKey = `${key}_${this.currentDate.getFullYear()}`;
                 
                 if (!this.progress.seasonalVisits[seasonKey]) {
                     this.progress.seasonalVisits[seasonKey] = 0;
                 }
                 this.progress.seasonalVisits[seasonKey]++;
+                
+                // Apply seasonal bonuses
+                this.applySeasonalBonus(key);
             }
         }
+    }
+
+    /**
+     * Apply bonuses based on seasonal festival visit
+     */
+    applySeasonalBonus(festivalKey) {
+        const seasonalBonuses = {
+            'nowruz': { flameBonus: 1.5, achievementId: 'nowruz_blessing' },
+            'tirgan': { flameBonus: 1.3, achievementId: 'tirgan_blessing' },
+            'mehregan': { flameBonus: 1.2, achievementId: 'mehregan_blessing' },
+            'yalda': { flameBonus: 1.4, achievementId: 'yalda_blessing' }
+        };
+        
+        if (seasonalBonuses[festivalKey]) {
+            const bonus = seasonalBonuses[festivalKey];
+            // Bonus is applied through multiplier on flame streak gains
+            this.unlockAchievement(bonus.achievementId);
+        }
+    }
+
+    /**
+     * Get current season
+     */
+    getCurrentSeason() {
+        const month = this.currentDate.getMonth();
+        const seasons = [
+            'winter', 'winter', // Jan, Feb
+            'spring', 'spring', 'spring', // Mar, Apr, May
+            'summer', 'summer', 'summer', // Jun, Jul, Aug
+            'autumn', 'autumn', 'autumn', // Sep, Oct, Nov
+            'winter' // Dec
+        ];
+        return seasons[month];
+    }
+
+    /**
+     * Get active festival info
+     */
+    getActiveFestivalInfo() {
+        const month = this.currentDate.getMonth();
+        const day = this.currentDate.getDate();
+        
+        for (let [key, festival] of Object.entries(this.seasonalFestivals)) {
+            const festivalMonth = festival.month - 1;
+            const festivalDay = festival.day;
+            const tolerance = 14;
+            
+            const festivalDate = new Date(this.currentDate.getFullYear(), festivalMonth, festivalDay);
+            const dayDiff = Math.abs(this.currentDate - festivalDate) / (1000 * 60 * 60 * 24);
+            
+            if (dayDiff <= tolerance) {
+                const daysUntil = Math.ceil((festivalDate - this.currentDate) / (1000 * 60 * 60 * 24));
+                return {
+                    key: key,
+                    name: festival.name,
+                    daysUntil: daysUntil,
+                    active: true
+                };
+            }
+        }
+        
+        return { active: false };
     }
 
     /**
@@ -231,17 +304,85 @@ class KeepersOfTheFlamGamification {
     }
 
     /**
-     * Get rank information
+     * Get rank information with detailed descriptions
      */
     getRankInfo() {
         const ranks = [
-            { level: 0, name: 'Spark', icon: '✦', color: '#ff6b35' },
-            { level: 1, name: 'Ember', icon: '✦✦', color: '#f7931e' },
-            { level: 2, name: 'Flame', icon: '✦✦✦', color: '#fdb833' },
-            { level: 3, name: 'Bonfire', icon: '⭕✦⭕', color: '#d4af37' },
-            { level: 4, name: 'Sacred Fire', icon: '⭕✦✦✦⭕', color: '#ffb700' }
+            { 
+                level: 0, 
+                name: 'Spark', 
+                icon: '✦',
+                color: '#ff6b35',
+                title: 'The First Kindling',
+                description: 'You have just begun your journey as a Keeper. Like a spark from flint, your consciousness has awakened to the truth. The flame is small but it burns with hope.',
+                requirements: 'Initial rank - Your journey begins here',
+                powers: ['Access to basic stories', 'Daily flame tracking begins']
+            },
+            { 
+                level: 1, 
+                name: 'Ember', 
+                icon: '✦✦',
+                color: '#f7931e',
+                title: 'Glowing Embers',
+                description: 'Your flame has grown from a spark to glowing embers. You understand the basic principles and have visited often. You are becoming a steady presence among the Keepers.',
+                requirements: '30+ points (Stories unlocked + Visits + Streak)',
+                powers: ['Unlock seasonal story insights', 'Extended streak bonuses', 'Seasonal timing awareness']
+            },
+            { 
+                level: 2, 
+                name: 'Flame', 
+                icon: '✦✦✦',
+                color: '#fdb833',
+                title: 'Keeper\'s Flame',
+                description: 'Now you tend a true flame. It burns steadily, warming those around you. You have learned the deeper meanings of the stories and maintain discipline in your practice.',
+                requirements: '100+ points (Multiple stories, consistent visits)',
+                powers: ['Full story library access', '7+ day streaks grant bonuses', 'Seasonal festival bonuses active']
+            },
+            { 
+                level: 3, 
+                name: 'Bonfire', 
+                icon: '⭕✦⭕',
+                color: '#d4af37',
+                title: 'Circle\'s Bonfire',
+                description: 'Your flame has grown so bright that others gather around it. You are a teacher, a guide, a living embodiment of Zoroastrian wisdom. Your practice inspires community.',
+                requirements: '250+ points (Mastery of traditions, consistent practice)',
+                powers: ['Share insights with hub community', 'Multiplied seasonal bonuses', 'Access to advanced teachings']
+            },
+            { 
+                level: 4, 
+                name: 'Sacred Fire', 
+                icon: '⭕✦✦✦⭕',
+                color: '#ffb700',
+                title: 'The Eternal Flame',
+                description: 'You have become one with the Sacred Fire itself. Your wisdom runs deep as the roots of ancient oaks, your light shines far as stars. You are a Keeper of the timeless tradition.',
+                requirements: '500+ points (Complete mastery and sustained dedication)',
+                powers: ['Unlock all hidden teachings', 'Mentor lesser keepers', 'Participate in rare sacred ceremonies', 'Cosmic alignment bonuses']
+            }
         ];
         return ranks[this.progress.storytellerRank];
+    }
+
+    /**
+     * Get rank progression percentage
+     */
+    getRankProgressPercentage() {
+        const stories = this.progress.unlockedStories.length;
+        const streak = this.progress.currentFlameStreak;
+        const visits = this.progress.totalVisits;
+        const score = stories * 10 + streak * 5 + visits;
+        
+        const levels = [0, 30, 100, 250, 500];
+        const currentLevel = this.progress.storytellerRank;
+        const nextLevel = currentLevel + 1;
+        
+        if (nextLevel >= levels.length) return 100;
+        
+        const min = levels[currentLevel];
+        const max = levels[nextLevel];
+        const progress = Math.min(score - min, max - min);
+        const percentage = Math.round((progress / (max - min)) * 100);
+        
+        return Math.min(percentage, 99);
     }
 
     /**

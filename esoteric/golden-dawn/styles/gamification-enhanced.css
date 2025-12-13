@@ -1,0 +1,419 @@
+/**
+ * The Golden Dawn - Enhanced Gamification Styles
+ * Adds visualization and UI components for:
+ * - Elemental balance meter with warnings
+ * - Grade progression tracking
+ * - Tarot collection interface with rarities
+ * - Tree of Life visualization
+ * - Study session statistics
+ * - Ritual mastery tracking
+ */
+
+/* Elemental Balance Styles */
+#gd-elemental-balance {
+    display: grid;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 2px solid #9d4edd;
+}
+
+.gd-element-bar {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 4px;
+    border-left: 4px solid #9d4edd;
+}
+
+.gd-element-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.gd-element-icon {
+    font-size: 1.2rem;
+}
+
+.gd-element-meter {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gd-element-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+    border-radius: 4px;
+    position: relative;
+}
+
+.gd-element-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.gd-element-value {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.gd-element-warning {
+    grid-column: 1 / -1;
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-top: -8px;
+}
+
+/* Grade Progression Styles */
+#gd-grade-progress {
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(157, 78, 221, 0.1) 100%);
+    border-radius: 8px;
+    border: 2px solid #9d4edd;
+    margin: 20px 0;
+}
+
+.gd-grade-section {
+    display: grid;
+    gap: 15px;
+}
+
+.gd-grade-title {
+    font-weight: bold;
+    color: #e0aaff;
+    font-size: 1rem;
+}
+
+.gd-grade-bar-container {
+    width: 100%;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gd-grade-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6b4c9a, #e0aaff);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #000;
+    font-size: 0.9rem;
+}
+
+.gd-grade-percentage {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #e0aaff;
+    font-weight: bold;
+}
+
+/* Tarot Collection Grid */
+#gd-tarot-collection {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 8px;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 2px solid #6b4c9a;
+}
+
+.gd-tarot-card {
+    aspect-ratio: 3 / 4;
+    border: 2px solid #666;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 4px;
+}
+
+.gd-tarot-card.unlocked {
+    background: linear-gradient(135deg, rgba(157, 78, 221, 0.2) 0%, rgba(224, 170, 255, 0.1) 100%);
+    border-color: #9d4edd;
+}
+
+.gd-tarot-card.unlocked:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
+}
+
+.gd-tarot-card.locked {
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0.5;
+}
+
+.gd-card-number {
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #999;
+}
+
+.gd-card-rarity {
+    font-size: 0.6rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 2px;
+}
+
+.gd-card-locked {
+    font-size: 1.5rem;
+    color: #666;
+}
+
+/* Tree of Life Visualization */
+#gd-tree-visualization {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 2px solid #9d4edd;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+#gd-tree-canvas {
+    max-width: 100%;
+    height: auto;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+/* Study Statistics */
+#gd-study-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 2px solid #6b4c9a;
+}
+
+.gd-study-stat {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    background: rgba(157, 78, 221, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid #9d4edd;
+}
+
+.gd-stat-label {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.gd-stat-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #e0aaff;
+}
+
+/* Ritual Proficiency Display */
+.gd-ritual-proficiency {
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    margin: 10px 0;
+    border-left: 3px solid #9d4edd;
+}
+
+.gd-ritual-name {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #e0aaff;
+}
+
+.gd-ritual-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.gd-ritual-stat {
+    display: flex;
+    justify-content: space-between;
+}
+
+.gd-ritual-stat-label {
+    color: #999;
+}
+
+.gd-ritual-stat-value {
+    color: #e0aaff;
+    font-weight: bold;
+}
+
+.gd-proficiency-bar {
+    width: 100%;
+    height: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gd-proficiency-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6b4c9a, #e0aaff);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.gd-proficiency-level {
+    text-align: center;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    color: #999;
+}
+
+/* Study Session Tracker */
+.gd-study-session-logger {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 2px solid #6b4c9a;
+    margin: 20px 0;
+}
+
+.gd-study-session-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.gd-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.gd-form-group label {
+    font-size: 0.85rem;
+    color: #999;
+    font-weight: bold;
+}
+
+.gd-form-group input,
+.gd-form-group select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #6b4c9a;
+    background: rgba(0, 0, 0, 0.5);
+    color: #e8d7f1;
+    font-family: inherit;
+}
+
+.gd-form-group input:focus,
+.gd-form-group select:focus {
+    outline: none;
+    border-color: #9d4edd;
+    box-shadow: 0 0 8px rgba(157, 78, 221, 0.5);
+}
+
+.gd-submit-button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #6b4c9a, #9d4edd);
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gd-submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(157, 78, 221, 0.4);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .gd-element-bar {
+        grid-template-columns: 1fr;
+    }
+    
+    #gd-tarot-collection {
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        gap: 6px;
+        padding: 10px;
+    }
+    
+    .gd-tarot-card {
+        font-size: 0.8rem;
+    }
+    
+    .gd-grade-bar-fill {
+        font-size: 0.7rem;
+    }
+    
+    .gd-study-session-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .gd-element-bar {
+        padding: 8px;
+    }
+    
+    #gd-tarot-collection {
+        grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+        gap: 4px;
+        padding: 8px;
+    }
+    
+    .gd-card-number {
+        font-size: 0.6rem;
+    }
+    
+    .gd-card-rarity {
+        font-size: 0.5rem;
+    }
+    
+    .gd-grade-bar-container {
+        height: 25px;
+    }
+    
+    #gd-study-stats {
+        grid-template-columns: 1fr;
+    }
+}
+

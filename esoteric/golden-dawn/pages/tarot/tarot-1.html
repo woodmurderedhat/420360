@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Magician - 1 - The Golden Dawn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; background: linear-gradient(135deg, #3d2061 0%, #1a0f2e 100%); color: #e0aaff; line-height: 1.8; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: rgba(61, 32, 97, 0.95); border: 3px solid #9d4edd; padding: 40px; }
+        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #9d4edd; padding-bottom: 20px; }
+        h1 { font-family: 'Press Start 2P', cursive; color: #9d4edd; font-size: 20px; margin-bottom: 10px; }
+        .card-number { font-size: 28px; color: #d4af37; font-weight: bold; }
+        .card-frame { border: 3px solid #d4af37; padding: 20px; margin: 20px 0; background: rgba(212, 175, 55, 0.08); text-align: center; }
+        .card-image { font-size: 80px; margin: 20px 0; }
+        .card-meaning { background: rgba(212, 175, 55, 0.1); border-left: 4px solid #d4af37; padding: 15px; margin: 15px 0; font-size: 13px; }
+        .content { font-size: 14px; line-height: 2; margin: 20px 0; text-align: justify; }
+        .content p { margin-bottom: 15px; }
+        .content strong { color: #d4af37; }
+        h2 { font-family: 'Press Start 2P', cursive; color: #d4af37; font-size: 12px; margin: 20px 0 10px; }
+        ul { margin-left: 20px; font-size: 13px; line-height: 2; }
+        .correspondences { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .corr-item { background: rgba(157, 78, 221, 0.1); border: 1px solid #9d4edd; padding: 10px; font-size: 12px; }
+        .nav-buttons { margin-top: 30px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        a { display: inline-block; padding: 10px 15px; background: #9d4edd; color: #1a0f2e; text-decoration: none; border: 2px solid #9d4edd; font-family: 'Press Start 2P', cursive; font-size: 9px; cursor: pointer; transition: all 0.3s; }
+        a:hover { background: #d4af37; border-color: #d4af37; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>The Magician</h1>
+            <div class="card-number">1</div>
+            <div style="color: #d4af37; font-size: 12px; font-family: 'Press Start 2P', cursive;">Will in Action</div>
+        </header>
+
+        <div class="card-frame">
+            <div class="card-image">🎩✨</div>
+            <p style="color: #d4af37; font-family: 'Press Start 2P', cursive; font-size: 11px;">Mastery of the four elements</p>
+        </div>
+
+        <div class="content">
+            <p><strong>The Magician</strong> stands before his table bearing the four elemental tools: the wand (Fire/will), the cup (Water/emotion), the sword (Air/intellect), and the pentacle (Earth/manifestation). Above him shines the infinity symbol, declaring that his power flows from infinite source.</p>
+
+            <p>The Magician is <em>the master of conscious will.</em> He has learned that consciousness itself is creative force. By aligning his will with cosmic law, he can manifest anything. But the power comes only through discipline, knowledge, and understanding.</p>
+
+            <h2>Spiritual Meaning</h2>
+
+            <div class="card-meaning">
+                <p><strong>Upright:</strong> Resourcefulness, power, inspired action, will channeled toward manifestation</p>
+                <p><strong>Reversed:</strong> Manipulation, illusion, wasted potential, chaotic energy</p>
+            </div>
+
+            <h2>The Magician's Art</h2>
+
+            <p>Magic, in the true sense, is not supernatural—it is the art of causing change through will aligned with consciousness. The Magician understands that:</p>
+
+            <ul>
+                <li>✓ Thought creates reality</li>
+                <li>✓ Will focused becomes power</li>
+                <li>✓ Knowledge gives power</li>
+                <li>✓ Daring to act manifests intention</li>
+            </ul>
+
+            <h2>Correspondences</h2>
+
+            <div class="correspondences">
+                <div class="corr-item">
+                    <strong>Element:</strong> Mercury<br>
+                    <strong>Planet:</strong> Mercury<br>
+                    <strong>Color:</strong> Yellow
+                </div>
+                <div class="corr-item">
+                    <strong>Letter:</strong> Beth<br>
+                    <strong>Tree Path:</strong> Connecting Kether to Binah<br>
+                    <strong>Sephira:</strong> Chokmah
+                </div>
+            </div>
+
+            <p style="margin-top: 30px; text-align: center; color: #d4af37; font-family: 'Press Start 2P', cursive; font-size: 12px;">
+                Know yourself. Will clearly. Act with power.
+            </p>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="tarot-0.html">← The Fool</a>
+            <a href="tarot-2.html">The High Priestess →</a>
+        </div>
+    </div>
+
+    <script>
+        if (typeof TheGoldenDawnGamification !== 'undefined') {
+            const gamification = new TheGoldenDawnGamification();
+            gamification.trackPageVisit('tarot-1');
+            if (!gamification.progress.unlockedTarotCards.includes(1)) {
+                gamification.progress.unlockedTarotCards.push(1);
+                gamification.saveProgress();
+            }
+        }
+    </script>
+</body>
+</html>

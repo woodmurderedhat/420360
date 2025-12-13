@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Tree of Life - Interactive Kabbalah - The Golden Dawn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; background: linear-gradient(135deg, #3d2061 0%, #1a0f2e 100%); color: #e0aaff; line-height: 1.8; padding: 20px; }
+        .container { max-width: 950px; margin: 0 auto; background: rgba(61, 32, 97, 0.95); border: 3px solid #9d4edd; padding: 40px; }
+        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #9d4edd; padding-bottom: 20px; }
+        h1 { font-family: 'Press Start 2P', cursive; color: #9d4edd; font-size: 20px; margin-bottom: 10px; }
+        h2 { font-family: 'Press Start 2P', cursive; color: #d4af37; font-size: 12px; margin: 25px 0 15px; }
+        .content { font-size: 13px; line-height: 1.8; }
+        .content p { margin-bottom: 15px; }
+        .content strong { color: #d4af37; }
+        .tree-svg { border: 2px solid #d4af37; padding: 20px; margin: 20px 0; background: rgba(212, 175, 55, 0.08); border-radius: 5px; }
+        .sephira { cursor: pointer; text-decoration: underline; color: #d4af37; font-weight: bold; }
+        .sephira:hover { color: #ffdd00; }
+        .sephira-box { background: rgba(212, 175, 55, 0.1); border: 2px solid #d4af37; padding: 15px; margin: 15px 0; font-size: 12px; }
+        .sephira-box strong { display: block; color: #ffdd00; margin-bottom: 8px; }
+        .four-worlds { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .world-col { background: rgba(157, 78, 221, 0.1); border: 1px solid #9d4edd; padding: 10px; font-size: 11px; }
+        .world-col strong { display: block; color: #d4af37; margin-bottom: 5px; font-family: 'Press Start 2P', cursive; }
+        .world-col span { display: block; margin: 3px 0; }
+        ul { margin-left: 20px; font-size: 13px; line-height: 2; }
+        .nav-buttons { margin-top: 30px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        a { display: inline-block; padding: 10px 15px; background: #9d4edd; color: #1a0f2e; text-decoration: none; border: 2px solid #9d4edd; font-family: 'Press Start 2P', cursive; font-size: 9px; cursor: pointer; transition: all 0.3s; }
+        a:hover { background: #d4af37; border-color: #d4af37; transform: scale(1.05); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: rgba(61, 32, 97, 0.99); margin: 10% auto; padding: 20px; border: 3px solid #9d4edd; width: 90%; max-width: 600px; color: #e0aaff; max-height: 70vh; overflow-y: auto; }
+        .close { color: #d4af37; float: right; font-size: 20px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: #ffdd00; }
+        @media (max-width: 600px) { .container { padding: 20px; } h1 { font-size: 14px; } .four-worlds { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>The Tree of Life</h1>
+            <div style="color: #d4af37; font-size: 12px; font-family: 'Press Start 2P', cursive;">The Structure of All Things</div>
+        </header>
+
+        <div class="content">
+            <p><strong>The Tree of Life</strong> is the central symbol of Kabbalah and Western mystery traditions. It is not a belief system but a <em>map of consciousness</em>—showing how divine unity unfolds into multiplicity, and how individual consciousness can ascend back to unity.</p>
+
+            <p>The Tree consists of 10 Sephiroth (spheres) connected by 22 Paths. The Sephiroth represent different levels of reality and consciousness. The Paths represent the transitions between states of consciousness.</p>
+
+            <h2>The Structure</h2>
+
+            <div class="tree-svg" style="text-align: center;">
+                <svg width="100%" height="500" viewBox="0 0 400 500" style="max-width: 400px; margin: 0 auto; display: block;">
+                    <!-- Paths connecting sephiroth (lines) -->
+                    <line x1="200" y1="50" x2="100" y2="150" stroke="#9d4edd" stroke-width="2"/>
+                    <line x1="200" y1="50" x2="300" y2="150" stroke="#9d4edd" stroke-width="2"/>
+                    <line x1="100" y1="150" x2="200" y2="250" stroke="#9d4edd" stroke-width="2"/>
+                    <line x1="300" y1="150" x2="200" y2="250" stroke="#9d4edd" stroke-width="2"/>
+                    <line x1="100" y1="150" x2="50" y2="250" stroke="#9d4edd" stroke-width="2"/>
+                    <line x1="300" y1="150" x2="350" y2="250" stroke="#9d4edd" stroke-width="2"/>
+                    <line x1="200" y1="250" x2="100" y2="350" stroke="#9d4edd" stroke-width="2"/>
+                    <line x1="200" y1="250" x2="300" y2="350" stroke="#9d4edd" stroke-width="2"/>
+                    <line x1="100" y1="350" x2="200" y2="450" stroke="#9d4edd" stroke-width="2"/>
+                    <line x1="300" y1="350" x2="200" y2="450" stroke="#9d4edd" stroke-width="2"/>
+                    
+                    <!-- Sephiroth (circles) -->
+                    <circle cx="200" cy="50" r="25" fill="#d4af37" opacity="0.8"/>
+                    <text x="200" y="55" text-anchor="middle" fill="#1a0f2e" font-weight="bold" font-size="14">1</text>
+                    
+                    <circle cx="100" cy="150" r="25" fill="#d4af37" opacity="0.8"/>
+                    <text x="100" y="155" text-anchor="middle" fill="#1a0f2e" font-weight="bold" font-size="14">2</text>
+                    
+                    <circle cx="300" cy="150" r="25" fill="#d4af37" opacity="0.8"/>
+                    <text x="300" y="155" text-anchor="middle" fill="#1a0f2e" font-weight="bold" font-size="14">3</text>
+                    
+                    <circle cx="200" cy="250" r="25" fill="#d4af37" opacity="0.8"/>
+                    <text x="200" y="255" text-anchor="middle" fill="#1a0f2e" font-weight="bold" font-size="14">6</text>
+                    
+                    <circle cx="50" cy="250" r="25" fill="#9d4edd" opacity="0.8"/>
+                    <text x="50" y="255" text-anchor="middle" fill="#e0aaff" font-weight="bold" font-size="14">4</text>
+                    
+                    <circle cx="350" cy="250" r="25" fill="#9d4edd" opacity="0.8"/>
+                    <text x="350" y="255" text-anchor="middle" fill="#e0aaff" font-weight="bold" font-size="14">5</text>
+                    
+                    <circle cx="100" cy="350" r="25" fill="#d4af37" opacity="0.8"/>
+                    <text x="100" y="355" text-anchor="middle" fill="#1a0f2e" font-weight="bold" font-size="14">8</text>
+                    
+                    <circle cx="300" cy="350" r="25" fill="#d4af37" opacity="0.8"/>
+                    <text x="300" y="355" text-anchor="middle" fill="#1a0f2e" font-weight="bold" font-size="14">7</text>
+                    
+                    <circle cx="200" cy="450" r="25" fill="#d4af37" opacity="0.8"/>
+                    <text x="200" y="455" text-anchor="middle" fill="#1a0f2e" font-weight="bold" font-size="14">10</text>
+                </svg>
+            </div>
+
+            <p style="text-align: center; margin: 20px 0; color: #d4af37; font-size: 12px;">Click on any sphere number to learn more</p>
+
+            <h2>The Ten Sephiroth</h2>
+
+            <div class="sephira-box" style="border-color: #ffdd00;">
+                <strong>🔝 Kether (1) - The Crown</strong>
+                The source of all existence, the undifferentiated point of unity. Beyond personality and understanding.
+            </div>
+
+            <div class="sephira-box">
+                <strong>⚪ Chokmah (2) - The Father</strong>
+                Pure creative will, primordial potential, the first impulse toward manifestation.
+            </div>
+
+            <div class="sephira-box">
+                <strong>🌙 Binah (3) - The Mother</strong>
+                The womb of creation, receptive principle, the dark void from which form emerges.
+            </div>
+
+            <div class="sephira-box">
+                <strong>🔴 Gevurah (4) - Severity</strong>
+                Divine justice and force, the warrior principle, transformation through challenge.
+            </div>
+
+            <div class="sephira-box">
+                <strong>🟦 Chesed (5) - Mercy</strong>
+                Divine compassion and expansion, abundance, the sovereign lord of form.
+            </div>
+
+            <div class="sephira-box">
+                <strong>☀️ Tiphareth (6) - The Sun</strong>
+                The heart of the Tree, the individual self unified with divine consciousness, the seat of the Higher Self.
+            </div>
+
+            <div class="sephira-box">
+                <strong>🪐 Netzach (7) - Eternity</strong>
+                Art, beauty, emotion, desire, the realm of imagination and creation.
+            </div>
+
+            <div class="sephira-box">
+                <strong>💭 Hod (8) - Glory</strong>
+                Intellect and reason, logic and communication, the power of the mind to know.
+            </div>
+
+            <div class="sephira-box">
+                <strong>🌍 Yesod (9) - Foundation</strong>
+                The subconscious mind, dreams and visions, the link between physical and spiritual.
+            </div>
+
+            <div class="sephira-box">
+                <strong>🌎 Malkuth (10) - The Kingdom</strong>
+                Physical manifestation, the material world, where the divine becomes real in matter.
+            </div>
+
+            <h2>The Four Worlds</h2>
+
+            <div class="four-worlds">
+                <div class="world-col">
+                    <strong>Atziluth<br>(Emanation)</strong>
+                    <span>Pure divine being</span>
+                    <span>Sephiroth 1-3</span>
+                    <span>Pure thought</span>
+                </div>
+                <div class="world-col">
+                    <strong>Briah<br>(Creation)</strong>
+                    <span>Archangelic realm</span>
+                    <span>Sephiroth 2-6</span>
+                    <span>Pure spirit</span>
+                </div>
+                <div class="world-col">
+                    <strong>Yetzirah<br>(Formation)</strong>
+                    <span>Angelic realm</span>
+                    <span>Sephiroth 1-9</span>
+                    <span>Astral plane</span>
+                </div>
+                <div class="world-col">
+                    <strong>Assiyah<br>(Action)</strong>
+                    <span>Physical world</span>
+                    <span>All Sephiroth</span>
+                    <span>Matter itself</span>
+                </div>
+            </div>
+
+            <h2>The Path of the Seeker</h2>
+
+            <p>Your journey through the mysteries involves ascending the Tree of Life. You begin in Malkuth (physical consciousness) and ascend through the Sephiroth, crossing the Abyss at the appropriate time, until you achieve direct experience of Kether—unity consciousness.</p>
+
+            <ul>
+                <li>✓ Malkuth: Waking, material awareness</li>
+                <li>✓ Yesod: Dream consciousness, imagination</li>
+                <li>✓ Hod/Netzach: Intellect and emotion balanced</li>
+                <li>✓ Tiphareth: Individual enlightenment, the Higher Self</li>
+                <li>✓ Chokmah/Binah: Direct perception of creative forces</li>
+                <li>✓ Kether: Unity with the absolute</li>
+            </ul>
+
+            <p style="margin-top: 30px; text-align: center; color: #d4af37; font-family: 'Press Start 2P', cursive; font-size: 12px;">
+                The descent of light. The ascent of consciousness.
+            </p>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="../index.html">← Golden Dawn</a>
+            <a href="../rituals/">Rituals →</a>
+        </div>
+    </div>
+
+    <script>
+        if (typeof TheGoldenDawnGamification !== 'undefined') {
+            const gamification = new TheGoldenDawnGamification();
+            gamification.trackPageVisit('tree-of-life');
+            if (!gamification.progress.treeOfLifeProgress.includes('overview')) {
+                gamification.progress.treeOfLifeProgress.push('overview');
+                gamification.saveProgress();
+            }
+        }
+    </script>
+</body>
+</html>

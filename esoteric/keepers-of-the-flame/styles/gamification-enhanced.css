@@ -1,0 +1,395 @@
+/**
+ * Keepers of the Flame - Enhanced Gamification Styles
+ * Adds visualization and UI components for:
+ * - Interactive flame visualization
+ * - Story progress tracking
+ * - Festival countdown timers
+ * - Daily ritual tracking
+ * - Advanced rank display
+ */
+
+/* Flame Visualization Styles */
+.ktf-flame-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 2px solid #ff6b35;
+}
+
+.ktf-flame {
+    width: 60px;
+    border-radius: 50% 50% 25% 25%;
+    position: relative;
+    animation: flicker 2s ease-in-out infinite;
+    transition: all 0.3s ease;
+    min-height: 50px;
+}
+
+@keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 0.98;
+        filter: drop-shadow(0 0 10px currentColor);
+    }
+    20%, 24%, 55% {
+        opacity: 0.8;
+        filter: drop-shadow(0 0 5px currentColor);
+    }
+}
+
+.ktf-flame::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 5px;
+    width: 50px;
+    height: 20px;
+    background: rgba(255, 107, 53, 0.3);
+    border-radius: 50%;
+    filter: blur(10px);
+    animation: flameGlow 2s ease-in-out infinite;
+}
+
+@keyframes flameGlow {
+    0%, 100% {
+        width: 50px;
+        height: 20px;
+    }
+    50% {
+        width: 80px;
+        height: 30px;
+    }
+}
+
+.ktf-flame-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.ktf-flame-stat {
+    text-align: center;
+    padding: 10px;
+    background: rgba(255, 107, 53, 0.1);
+    border-radius: 4px;
+    font-weight: bold;
+    color: #ff6b35;
+}
+
+/* Story Progress Styles */
+#ktf-story-progress {
+    display: grid;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.ktf-story-bar {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.ktf-story-label {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #e8d7f1;
+}
+
+.ktf-progress-container {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ktf-progress-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.ktf-progress-text {
+    font-size: 0.85rem;
+    margin-top: 4px;
+    text-align: right;
+    color: #999;
+}
+
+/* Festival Countdown Styles */
+#ktf-festival-countdown {
+    margin: 20px 0;
+}
+
+.ktf-festival-active,
+.ktf-festival-upcoming {
+    padding: 15px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border-left: 4px solid;
+}
+
+.ktf-festival-active {
+    border-color: inherit;
+}
+
+.ktf-festival-upcoming {
+    border-color: #999;
+}
+
+.ktf-festival-header {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ktf-festival-progress {
+    margin-bottom: 10px;
+}
+
+.ktf-festival-days {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+/* Advanced Rank Display */
+.ktf-rank-display {
+    padding: 15px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(255, 107, 53, 0.1) 100%);
+    border-radius: 4px;
+    border: 2px solid #ff6b35;
+    margin: 20px 0;
+}
+
+.ktf-rank-main {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.ktf-rank-icon {
+    font-size: 3rem;
+    text-align: center;
+}
+
+.ktf-rank-info h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.ktf-rank-info .rank-title {
+    color: #fdb833;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.ktf-rank-progress-bar {
+    width: 100%;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.ktf-rank-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b35, #fdb833);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #000;
+    transition: width 0.5s ease;
+}
+
+.ktf-rank-powers {
+    margin-top: 15px;
+}
+
+.ktf-rank-powers-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #fdb833;
+}
+
+.ktf-rank-powers-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+}
+
+.ktf-rank-power-item {
+    padding: 8px;
+    background: rgba(255, 107, 53, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid #ff6b35;
+    font-size: 0.9rem;
+}
+
+/* Sub-Rank Display */
+.ktf-sub-rank {
+    padding: 10px;
+    background: rgba(255, 107, 53, 0.05);
+    border-radius: 4px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.ktf-sub-rank-name {
+    font-weight: bold;
+    color: #fdb833;
+    margin-bottom: 5px;
+}
+
+.ktf-sub-rank-description {
+    font-size: 0.85rem;
+    color: #bbb;
+    font-style: italic;
+}
+
+/* Daily Ritual Tracking */
+.ktf-ritual-tracker {
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    margin: 20px 0;
+    border: 1px solid rgba(255, 107, 53, 0.3);
+}
+
+.ktf-ritual-tracker h3 {
+    margin: 0 0 10px 0;
+    color: #ff6b35;
+}
+
+.ktf-ritual-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.ktf-ritual-day {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 4px;
+    text-align: center;
+    border: 1px solid rgba(255, 107, 53, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ktf-ritual-day:hover {
+    background: rgba(255, 107, 53, 0.1);
+    border-color: #ff6b35;
+}
+
+.ktf-ritual-day.active {
+    background: linear-gradient(135deg, #ff6b35, #fdb833);
+    color: #000;
+    font-weight: bold;
+}
+
+.ktf-ritual-day-date {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.ktf-ritual-day-count {
+    font-size: 0.9rem;
+    margin-top: 3px;
+}
+
+.ktf-ritual-streaks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.ktf-ritual-streak-item {
+    padding: 10px;
+    background: rgba(255, 107, 53, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid #ff6b35;
+}
+
+.ktf-ritual-streak-label {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 3px;
+}
+
+.ktf-ritual-streak-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fdb833;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .ktf-flame-container {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .ktf-rank-main {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .ktf-rank-icon {
+        font-size: 2rem;
+    }
+    
+    .ktf-rank-progress-bar {
+        height: 25px;
+    }
+    
+    .ktf-rank-powers-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .ktf-flame-container {
+        padding: 10px;
+    }
+    
+    .ktf-flame {
+        width: 45px;
+    }
+    
+    .ktf-progress-container {
+        height: 15px;
+    }
+    
+    .ktf-ritual-day {
+        padding: 8px;
+    }
+}
+

@@ -12,8 +12,12 @@ class EsotericGamification {
     constructor() {
         this.storageKey = 'esoteric_hub_progress';
         this.daughtersStorageKey = 'daughters_of_zion_progress';
+        this.keepersStorageKey = 'keepers_of_flame_progress';
+        this.goldenDawnStorageKey = 'golden_dawn_progress';
         this.progress = this.loadProgress();
         this.daughtersProgress = this.loadDaughtersProgress();
+        this.keepersProgress = this.loadKeepersProgress();
+        this.goldenDawnProgress = this.loadGoldenDawnProgress();
         
         // Define all esoteric projects
         this.projects = {
@@ -25,11 +29,32 @@ class EsotericGamification {
                     'veil_1', 'veil_2', 'veil_3', 'veil_4', 'veil_5', 'veil_6', 'veil_7',
                     'all_veils', 'history', 'rituals', 'hidden_names', 'circle_mothers', 'library', 'moon_calendar'
                 ]
+            },
+            'keepers-of-the-flame': {
+                name: 'Keepers of the Flame',
+                icon: '🔥',
+                sections: ['stories', 'traditions', 'about'],
+                achievements: [
+                    'story_creation_myth', 'story_ahura_wisdom', 'story_heroic_zarathustra', 'story_fire_prophecy',
+                    'story_seasonal_renewal', 'story_courage_tale', 'story_friendship_circle', 'story_yalda_eternal',
+                    'flame_keeper_week', 'storyteller_spark', 'storyteller_ember', 'storyteller_flame',
+                    'storyteller_bonfire', 'storyteller_sacred', 'all_stories', 'all_seasons'
+                ]
+            },
+            'golden-dawn': {
+                name: 'The Golden Dawn',
+                icon: '✨',
+                sections: ['grades', 'tarot', 'kabbalah', 'rituals', 'about'],
+                achievements: [
+                    'grade_neophyte', 'grade_initiate', 'grade_adept', 'grade_adeptus',
+                    'all_major_arcana', 'first_ritual', 'five_rituals', 'all_tools',
+                    'element_fire_200', 'element_water_200', 'element_air_200', 'element_earth_200', 'element_spirit_200',
+                    'tree_seeker', 'path_walker', 'golden_visionary'
+                ]
             }
-            // Future projects can be added here
         };
         
-        // Hub-level achievements
+        // Hub-level achievements - expanded for new projects
         this.hubAchievements = {
             'esoteric_explorer': { 
                 name: 'Esoteric Explorer', 
@@ -57,6 +82,48 @@ class EsotericGamification {
                 icon: '◇◇◇',
                 category: 'daughters',
                 requirement: () => this.countVisitedSections('daughters-of-zion') >= 8
+            },
+            'keepers_initiate': {
+                name: 'Keeper Initiate',
+                desc: 'Begin your journey with Keepers of the Flame',
+                icon: '🔥',
+                category: 'keepers',
+                requirement: () => this.keepersProgress.totalVisits >= 1
+            },
+            'keepers_storyteller': {
+                name: 'Accomplished Storyteller',
+                desc: 'Unlock 5 stories in Keepers of the Flame',
+                icon: '📖',
+                category: 'keepers',
+                requirement: () => this.keepersProgress.unlockedStories.length >= 5
+            },
+            'keepers_master': {
+                name: 'Sacred Fire Master',
+                desc: 'Unlock all 8 stories and reach highest rank',
+                icon: '🔥✦',
+                category: 'keepers',
+                requirement: () => this.keepersProgress.unlockedStories.length >= 8 && this.keepersProgress.currentFlameStreak >= 7
+            },
+            'golden_seeker': {
+                name: 'Golden Seeker',
+                desc: 'Begin your journey with The Golden Dawn',
+                icon: '✨',
+                category: 'golden-dawn',
+                requirement: () => this.goldenDawnProgress.totalVisits >= 1
+            },
+            'golden_adept': {
+                name: 'Adept of the Order',
+                desc: 'Achieve Adept grade in The Golden Dawn',
+                icon: '🔷',
+                category: 'golden-dawn',
+                requirement: () => this.goldenDawnProgress.currentGrade >= 4
+            },
+            'golden_master': {
+                name: 'Adeptus Major',
+                desc: 'Achieve the highest grade in The Golden Dawn',
+                icon: '⭐',
+                category: 'golden-dawn',
+                requirement: () => this.goldenDawnProgress.currentGrade >= 7
             },
             'spiritual_pilgrim': { 
                 name: 'Spiritual Pilgrim', 
@@ -165,6 +232,47 @@ class EsotericGamification {
     }
 
     /**
+     * Load Keepers of the Flame progress for aggregation
+     */
+    loadKeepersProgress() {
+        try {
+            const saved = localStorage.getItem(this.keepersStorageKey);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        } catch (error) {
+            console.warn('Failed to load keepers progress:', error);
+        }
+        return {
+            totalVisits: 0,
+            unlockedStories: [],
+            achievements: [],
+            currentFlameStreak: 0
+        };
+    }
+
+    /**
+     * Load The Golden Dawn progress for aggregation
+     */
+    loadGoldenDawnProgress() {
+        try {
+            const saved = localStorage.getItem(this.goldenDawnStorageKey);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        } catch (error) {
+            console.warn('Failed to load golden dawn progress:', error);
+        }
+        return {
+            totalVisits: 0,
+            currentGrade: 0,
+            unlockedTarotCards: [],
+            completedRituals: [],
+            achievements: []
+        };
+    }
+
+    /**
      * Save hub progress
      */
     saveProgress() {
@@ -214,6 +322,16 @@ class EsotericGamification {
             points += this.daughtersProgress.achievements.length;
         }
         
+        // 1 point per unlocked keepers achievement
+        if (this.keepersProgress && this.keepersProgress.achievements) {
+            points += this.keepersProgress.achievements.length;
+        }
+        
+        // 1 point per unlocked golden dawn achievement
+        if (this.goldenDawnProgress && this.goldenDawnProgress.achievements) {
+            points += this.goldenDawnProgress.achievements.length;
+        }
+        
         return points;
     }
 
@@ -224,6 +342,12 @@ class EsotericGamification {
         let total = this.progress.unlockedAchievements.length;
         if (this.daughtersProgress && this.daughtersProgress.achievements) {
             total += this.daughtersProgress.achievements.length;
+        }
+        if (this.keepersProgress && this.keepersProgress.achievements) {
+            total += this.keepersProgress.achievements.length;
+        }
+        if (this.goldenDawnProgress && this.goldenDawnProgress.achievements) {
+            total += this.goldenDawnProgress.achievements.length;
         }
         return total;
     }
@@ -280,6 +404,18 @@ class EsotericGamification {
         if (this.daughtersProgress && this.daughtersProgress.achievements && 
             this.daughtersProgress.achievements.length > 0) {
             projects.push('daughters-of-zion');
+        }
+        
+        // Check keepers achievements
+        if (this.keepersProgress && this.keepersProgress.achievements && 
+            this.keepersProgress.achievements.length > 0) {
+            projects.push('keepers-of-the-flame');
+        }
+        
+        // Check golden dawn achievements
+        if (this.goldenDawnProgress && this.goldenDawnProgress.achievements && 
+            this.goldenDawnProgress.achievements.length > 0) {
+            projects.push('golden-dawn');
         }
         
         return projects;

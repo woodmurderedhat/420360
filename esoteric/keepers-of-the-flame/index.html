@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keepers of the Flame - Sacred Stories | 420360</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Keepers of the Flame: A campfire storytelling tradition rooted in Zoroastrian fire worship. Explore sacred stories, maintain daily flame streaks, and unlock storyteller ranks." />
+    <meta name="keywords" content="Zoroastrian, storytelling, sacred fire, oral tradition, Keepers of the Flame, mythology, wisdom" />
+    <meta name="author" content="woodmurderedhat" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://420360.xyz/esoteric/keepers-of-the-flame/" />
+    <meta property="og:title" content="Keepers of the Flame - Sacred Stories" />
+    <meta property="og:description" content="Explore Zoroastrian storytelling tradition with sacred stories, flame streaks, and seasonal festivals." />
+    <meta property="og:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+    <meta property="og:site_name" content="420360" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://420360.xyz/esoteric/keepers-of-the-flame/" />
+    <meta name="twitter:title" content="Keepers of the Flame - Sacred Stories" />
+    <meta name="twitter:description" content="Explore Zoroastrian storytelling tradition with sacred stories, flame streaks, and seasonal festivals." />
+    <meta name="twitter:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://420360.xyz/esoteric/keepers-of-the-flame/" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../assets/images/favicon.ico" />
+
+    <!-- Humans.txt -->
+    <link rel="author" href="/humans.txt" />
+
+    <!-- Pixel font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <style>
+        :root {
+            --bg: #1a1f1a;
+            --fire-dark: #2d1b0f;
+            --fire-primary: #ff6b35;
+            --fire-secondary: #f7931e;
+            --fire-accent: #fdb833;
+            --fire-gold: #d4af37;
+            --text: #f5e6d3;
+            --text-dark: #3d2817;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--fire-dark) 0%, #1a1410 100%);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(45, 27, 15, 0.95);
+            padding: 1rem 0;
+            border-bottom: 3px solid var(--fire-primary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--fire-accent);
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .logo .symbol {
+            font-size: 1.8rem;
+            color: var(--fire-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--fire-primary);
+            text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 80px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--fire-dark) 0%, #4a2817 100%);
+            border-bottom: 5px solid var(--fire-primary);
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+            animation: glow-pulse 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            color: var(--fire-accent);
+            margin-bottom: 1rem;
+            font-family: 'Press Start 2P', cursive;
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--fire-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 2rem;
+        }
+
+        .hero-symbols {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            font-size: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 40px 20px;
+            background: rgba(45, 27, 15, 0.5);
+        }
+
+        .stats-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--fire-accent);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(247, 147, 30, 0.1) 100%);
+            border: 2px solid var(--fire-primary);
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 8px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--fire-secondary);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            color: var(--fire-accent);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Featured Sections */
+        .section {
+            padding: 60px 20px;
+            border-bottom: 3px solid var(--fire-primary);
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: var(--fire-accent);
+            margin-bottom: 2rem;
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .section-intro {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: var(--text);
+        }
+
+        /* Stories Grid */
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .story-card {
+            background: linear-gradient(135deg, rgba(247, 147, 30, 0.15) 0%, rgba(253, 184, 51, 0.1) 100%);
+            border: 2px solid var(--fire-secondary);
+            padding: 2rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .story-card:hover::before {
+            left: 100%;
+        }
+
+        .story-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+            border-color: var(--fire-primary);
+        }
+
+        .story-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .story-card h3 {
+            color: var(--fire-accent);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .story-card p {
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .story-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--fire-primary);
+            color: var(--text-dark);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .story-status.locked {
+            background: rgba(100, 100, 100, 0.5);
+            color: var(--text);
+        }
+
+        /* Seasonal Section */
+        .seasonal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .seasonal-card {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(253, 184, 51, 0.15) 100%);
+            border: 2px solid var(--fire-gold);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .seasonal-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+        }
+
+        .seasonal-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .seasonal-card h3 {
+            color: var(--fire-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Ranks Section */
+        .ranks-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .rank-badge {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2) 0%, rgba(212, 175, 55, 0.2) 100%);
+            border: 2px solid var(--fire-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 150px;
+            transition: all 0.3s;
+        }
+
+        .rank-badge:hover {
+            transform: scale(1.1);
+            border-color: var(--fire-primary);
+        }
+
+        .rank-symbol {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .rank-name {
+            color: var(--fire-accent);
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .rank-desc {
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+
+        /* Info Section */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: rgba(255, 107, 53, 0.05);
+            border: 1px solid var(--fire-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .info-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card h3 {
+            color: var(--fire-accent);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(45, 27, 15, 0.95);
+            border-top: 3px solid var(--fire-primary);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        footer a {
+            color: var(--fire-accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.8rem;
+            }
+
+            .section h2 {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid,
+            .stories-grid,
+            .seasonal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <span class="symbol">🔥</span>
+                <span class="title">Keepers</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../../index.html">← 420360</a></li>
+                <li><a href="../index.html">← Esoteric Hub</a></li>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="pages/stories.html">Stories</a></li>
+                <li><a href="pages/traditions.html">Traditions</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Keepers of the Flame</h1>
+            <p class="hero-subtitle">Sacred Storytelling Tradition</p>
+            <p class="hero-description">Rooted in Zoroastrian Fire Worship and Ancient Wisdom</p>
+            <div class="hero-symbols">
+                <span>🔥</span>
+                <span>✦</span>
+                <span>🔥</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <h2>Your Storyteller Journey</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📖</div>
+                    <div class="stat-label">Stories Unlocked</div>
+                    <div class="stat-value" id="ktf-stories-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-label">Flame Streak</div>
+                    <div class="stat-value" id="ktf-flame-streak">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-label">Current Rank</div>
+                    <div class="stat-value" id="ktf-current-rank">Spark</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👣</div>
+                    <div class="stat-label">Total Visits</div>
+                    <div class="stat-value" id="ktf-total-visits">0</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Content Section -->
+    <section class="section">
+        <div class="container">
+            <h2>Sacred Stories</h2>
+            <p class="section-intro">Unlock ancient tales through consistent visits and during seasonal celebrations</p>
+            
+            <div class="stories-grid">
+                <div class="story-card">
+                    <span class="story-icon">✨</span>
+                    <h3>The Creation Myth</h3>
+                    <p>The primordial dance of Ahura Mazda and the forces of creation, establishing the cosmic order.</p>
+                    <span class="story-status">Unlocked</span>
+                </div>
+
+                <div class="story-card">
+                    <span class="story-icon">🧠</span>
+                    <h3>Ahura Mazda's Wisdom</h3>
+                    <p>The teachings of the supreme god concerning the nature of good, evil, and moral choice.</p>
+                    <span class="story-status">Visit 5 times</span>
+                </div>
+
+                <div class="story-card">
+                    <span class="story-icon">⚔️</span>
+                    <h3>Zarathustra's Journey</h3>
+                    <p>The legendary prophet's quest for truth and his confrontation with the darkness of Ahriman.</p>
+                    <span class="story-status">Visit 10 times</span>
+                </div>
+
+                <div class="story-card">
+                    <span class="story-icon">🔮</span>
+                    <h3>Sacred Fire Prophecy</h3>
+                    <p>Visions of the future ages and the ultimate triumph of light over darkness.</p>
+                    <span class="story-status locked">Maintain 7-day streak</span>
+                </div>
+
+                <div class="story-card">
+                    <span class="story-icon">🌱</span>
+                    <h3>Nowruz: Season of Renewal</h3>
+                    <p>The spring equinox festival celebrating new beginnings and the eternal cycle of rebirth.</p>
+                    <span class="story-status locked">Visit during Spring</span>
+                </div>
+
+                <div class="story-card">
+                    <span class="story-icon">🌞</span>
+                    <h3>Tirgan: Courage Rekindled</h3>
+                    <p>Summer's festival honoring courage, valor, and the triumph of will against adversity.</p>
+                    <span class="story-status locked">Visit during Summer</span>
+                </div>
+
+                <div class="story-card">
+                    <span class="story-icon">🍂</span>
+                    <h3>Mehregan: Friendship's Circle</h3>
+                    <p>Autumn gathering celebrating friendship, gratitude, and community bonds around the sacred fire.</p>
+                    <span class="story-status locked">Visit during Autumn</span>
+                </div>
+
+                <div class="story-card">
+                    <span class="story-icon">❄️</span>
+                    <h3>Yalda: The Eternal Flame</h3>
+                    <p>Winter's darkest night celebrated as the triumph of light, with stories to sustain hope.</p>
+                    <span class="story-status locked">Visit during Winter</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Storyteller Ranks Section -->
+    <section class="section">
+        <div class="container">
+            <h2>Storyteller Ranks</h2>
+            <p class="section-intro">Progress through the sacred ranks as you collect stories and maintain your flame</p>
+            
+            <div class="ranks-container">
+                <div class="rank-badge">
+                    <div class="rank-symbol">✦</div>
+                    <div class="rank-name">Spark</div>
+                    <div class="rank-desc">First light of understanding</div>
+                </div>
+
+                <div class="rank-badge">
+                    <div class="rank-symbol">✦✦</div>
+                    <div class="rank-name">Ember</div>
+                    <div class="rank-desc">Growing warmth and knowledge</div>
+                </div>
+
+                <div class="rank-badge">
+                    <div class="rank-symbol">✦✦✦</div>
+                    <div class="rank-name">Flame</div>
+                    <div class="rank-desc">Steady keeper of wisdom</div>
+                </div>
+
+                <div class="rank-badge">
+                    <div class="rank-symbol">⭕✦⭕</div>
+                    <div class="rank-name">Bonfire</div>
+                    <div class="rank-desc">Guardian of the circle</div>
+                </div>
+
+                <div class="rank-badge">
+                    <div class="rank-symbol">⭕✦✦✦⭕</div>
+                    <div class="rank-name">Sacred Fire</div>
+                    <div class="rank-desc">Master of the tradition</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seasonal Festivals Section -->
+    <section class="section">
+        <div class="container">
+            <h2>Seasonal Festivals</h2>
+            <p class="section-intro">Visit during Zoroastrian celebrations to unlock exclusive stories and achieve seasonal mastery</p>
+            
+            <div class="seasonal-grid">
+                <div class="seasonal-card">
+                    <div class="seasonal-icon">🌱</div>
+                    <h3>Nowruz</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">March 20-21</p>
+                    <p>Spring Renewal & New Beginnings</p>
+                </div>
+
+                <div class="seasonal-card">
+                    <div class="seasonal-icon">🌞</div>
+                    <h3>Tirgan</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">June 15</p>
+                    <p>Summer's Courage & Valor</p>
+                </div>
+
+                <div class="seasonal-card">
+                    <div class="seasonal-icon">🍂</div>
+                    <h3>Mehregan</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">September 16</p>
+                    <p>Autumn's Friendship & Gratitude</p>
+                </div>
+
+                <div class="seasonal-card">
+                    <div class="seasonal-icon">❄️</div>
+                    <h3>Yalda</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">December 20-21</p>
+                    <p>Winter's Light & Hope</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Game Mechanics Section -->
+    <section class="section">
+        <div class="container">
+            <h2>Understanding Your Journey</h2>
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-icon">📖</div>
+                    <h3>Story Collection</h3>
+                    <p>Unlock new stories by visiting the site, maintaining streaks, and exploring during seasonal festivals.</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">🔥</div>
+                    <h3>Sacred Flame</h3>
+                    <p>Daily visits keep your flame burning. A 7-day streak unlocks the Sacred Fire Prophecy.</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">⭐</div>
+                    <h3>Rank Progression</h3>
+                    <p>Progress from Spark to Sacred Fire as you collect stories and maintain consistency.</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">📅</div>
+                    <h3>Seasonal Cycles</h3>
+                    <p>Visit during Zoroastrian festivals to unlock exclusive stories tied to each season's wisdom.</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">💾</div>
+                    <h3>Persistent Progress</h3>
+                    <p>Your journey is saved locally. Return anytime to continue where you left off.</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">🌍</div>
+                    <h3>Ancient Tradition</h3>
+                    <p>Honor the oral traditions of Zoroastrianism through modern interactive storytelling.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Keepers of the Flame. Part of <a href="../../index.html">420360.xyz</a></p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">An esoteric exploration of Zoroastrian fire worship and sacred storytelling traditions.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="scripts/gamification.js"></script>
+</body>
+</html>

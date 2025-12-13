@@ -12,42 +12,71 @@ A mystical gateway hub page that unifies all esoteric content on 420360 with cro
 - **URL**: `/esoteric/index.html`
 
 ### Browse Esoteric Content
-1. From Hub → Click "Daughters of Zion" card
-2. Explore sections (Seven Veils, Rituals, etc.)
-3. Return to Hub to check progress
+1. From Hub → Choose a project (Daughters, Keepers, or Golden Dawn)
+2. Explore sections and content
+3. Return to Hub to check unified progress
 
 ## 📊 Hub Dashboard
 
-**Displays Four Key Metrics:**
+**Displays Four Key Metrics (Across All Projects):**
 
 | Metric | Shows |
 |--------|-------|
-| Content Explored | Sections visited in all projects |
-| Achievements Unlocked | Total achievements earned |
+| Content Explored | Sections/pages visited in all 3 projects |
+| Achievements Unlocked | Total achievements earned (100+ possible) |
 | Current Rank | Your progression level (Initiate → Enlightened) |
 | Total Visits | Lifetime hub visits |
 
+### Available Projects
+
+| Project | Type | Content | Achievements |
+|---------|------|---------|--------------|
+| **Daughters of Zion** | Mystical Order | 8 Sections | 14 achievements |
+| **Keepers of the Flame** | Storytelling | 8 Stories | 16 achievements |
+| **The Golden Dawn** | Hermetic Magic | 8 Grades, 22 Tarot | 16 achievements |
+| **Hub Level** | Cross-Project | Navigation | 10 achievements |
+
 ## 🏆 Achievement System
 
-### How to Earn Achievements
+### How to Earn Achievements (Hub-Level)
 
 | Achievement | How to Unlock |
 |------------|--------------|
 | Esoteric Explorer | Visit the hub |
 | Daughters Initiate | Start exploring Daughters of Zion |
-| Daughters Seeker | Visit 5 different sections |
+| Daughters Seeker | Visit 5 different sections of Daughters |
 | Daughters Master | Visit all 8 Daughters sections |
-| Spiritual Pilgrim | Unlock 10+ achievements total |
-| Enlightened Soul | Unlock 25+ achievements total |
-| Mystical Collector | Earn achievements from multiple projects |
+| Keepers Initiate | Start exploring Keepers of the Flame |
+| Keepers Storyteller | Unlock 5 sacred stories |
+| Keepers Master | Unlock all 8 stories + reach Sacred Fire rank |
+| Golden Seeker | Start exploring The Golden Dawn |
+| Golden Adept | Achieve Adept grade in Golden Dawn |
+| Golden Master | Achieve Adeptus Major (highest) in Golden Dawn |
+| Spiritual Pilgrim | Unlock 10+ achievements across all projects |
+| Enlightened Soul | Unlock 25+ achievements across all projects |
+| Mystical Collector | Earn achievements from 2+ different projects |
 | Lunar Devotee | Unlock all moon phase achievements |
 | Dedicated Student | Make 10 hub visits |
 | Circle Sister | Make 50 hub visits |
+
+### Project-Specific Achievements
+
+Each project has its own achievement system:
+
+**Keepers of the Flame** (16 achievements):
+- Story unlocks, flame streaks, rank advancement
+
+**The Golden Dawn** (16 achievements):
+- Grade progression, tarot mastery, ritual completion, element mastery
+
+**Daughters of Zion** (14 achievements):
+- Section completion, veil mastery, library exploration
 
 ### Achievement Unlocking
 - ✓ Automatic - unlock when criteria met
 - 📢 Toast notification appears
 - 💾 Progress saved to browser
+- 🔄 Updates visible across all projects
 - 🎯 Shows in hub achievements grid
 
 ## ⭐ Ranking System
@@ -203,7 +232,16 @@ esoteric/
 - Main Site: `/index.html`
 - Games: `/games/index.html`
 - About: `/about/index.html`
-- Daughters of Zion: `/esoteric/daughters-of-zion/`
+- **Daughters of Zion**: `/esoteric/daughters-of-zion/`
+- **Keepers of the Flame**: `/esoteric/keepers-of-the-flame/`
+- **The Golden Dawn**: `/esoteric/golden-dawn/`
+
+### Documentation
+- **Full Integration Guide**: See `MULTI_PROJECT_INTEGRATION.md`
+- **Keepers README**: `/keepers-of-the-flame/README.md`
+- **Golden Dawn README**: `/golden-dawn/README.md`
+- **Hub Guide**: `ESOTERIC_HUB_GUIDE.md`
+- **Implementation**: `IMPLEMENTATION_SUMMARY.md`
 
 ---
 

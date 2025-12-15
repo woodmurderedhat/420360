@@ -389,6 +389,52 @@ class EnhancedEsotericGamification {
         this.setupMobileMenu();
         this.checkAndUnlockAchievements();
         this.updateProgressBar();
+
+        // Listen for project-level progress signals (custom events)
+        document.addEventListener('daughtersProgressUpdate', (e) => {
+            try {
+                const d = e.detail || {};
+                this.daughtersProgress = Object.assign({}, this.daughtersProgress, d);
+                this.progress.projectProgress['daughters-of-zion'] = {
+                    totalVisits: d.totalVisits || this.daughtersProgress.totalVisits || 0,
+                    achievements: (d.achievements && d.achievements.length) || this.daughtersProgress.achievements?.length || 0,
+                    visitedPages: (d.visitedPages && d.visitedPages.length) || this.daughtersProgress.visitedPages?.length || 0
+                };
+                this.saveProgress();
+                this.renderCrossProjectAchievements();
+            } catch (err) { console.warn('daughtersProgressUpdate handler error', err); }
+        });
+
+        document.addEventListener('keepersProgressUpdate', (e) => {
+            try {
+                const k = e.detail || {};
+                this.keepersProgress = Object.assign({}, this.keepersProgress, k);
+                this.progress.projectProgress['keepers-of-the-flame'] = {
+                    totalVisits: k.totalVisits || this.keepersProgress.totalVisits || 0,
+                    unlockedCount: (k.unlockedStories) ? k.unlockedStories.length : (this.keepersProgress.unlockedStories?.length || 0),
+                    achievements: (k.achievements && k.achievements.length) || this.keepersProgress.achievements?.length || 0,
+                    currentRank: k.currentRank || this.keepersProgress.currentRank || ''
+                };
+                this.saveProgress();
+                this.renderCrossProjectAchievements();
+            } catch (err) { console.warn('keepersProgressUpdate handler error', err); }
+        });
+
+        document.addEventListener('goldenDawnProgressUpdate', (e) => {
+            try {
+                const g = e.detail || {};
+                this.goldenDawnProgress = Object.assign({}, this.goldenDawnProgress, g);
+                this.progress.projectProgress['golden-dawn'] = {
+                    totalVisits: g.totalVisits || this.goldenDawnProgress.totalVisits || 0,
+                    currentGrade: g.currentGrade || this.goldenDawnProgress.currentGrade || 0,
+                    unlockedCards: (g.unlockedCards !== undefined) ? g.unlockedCards : (this.goldenDawnProgress.unlockedTarotCards?.length || 0),
+                    completedRituals: g.completedRituals || this.goldenDawnProgress.completedRituals?.length || 0,
+                    achievements: (g.achievements !== undefined) ? g.achievements : (this.goldenDawnProgress.achievements?.length || 0)
+                };
+                this.saveProgress();
+                this.renderCrossProjectAchievements();
+            } catch (err) { console.warn('goldenDawnProgressUpdate handler error', err); }
+        });
     }
 
     /**

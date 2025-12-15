@@ -20,6 +20,8 @@ class KeepersOfTheFlamGamification {
             'mehregan': { month: 9, day: 16, name: 'Mehregan (Friendship)' },
             'yalda': { month: 11, day: 30, name: 'Yalda Night (Winter)' }
         };
+        // Expose to window so standalone page-instantiated instances are discoverable
+        try { window.keepersOfTheFlamGamification = window.keepersOfTheFlamGamification || this; } catch (e) {}
     }
 
     /**
@@ -408,6 +410,19 @@ class KeepersOfTheFlamGamification {
             };
             window.esotericGamification.saveProgress();
         }
+
+        // Also dispatch an event so the hub can listen in if loaded differently
+        try {
+            const detail = {
+                totalVisits: this.progress.totalVisits,
+                unlockedStories: this.progress.unlockedStories,
+                achievements: this.progress.achievements,
+                currentRank: this.getRankInfo().name
+            };
+            document.dispatchEvent(new CustomEvent('keepersProgressUpdate', { detail }));
+        } catch (e) {
+            console.debug('Failed to dispatch keepersProgressUpdate', e);
+        }
     }
 
     /**
@@ -559,3 +574,49 @@ class KeepersOfTheFlamGamification {
 document.addEventListener('DOMContentLoaded', function() {
     window.keepersOfTheFlamGamification = new KeepersOfTheFlamGamification();
 });
+
+// Listen for embedded story postMessage events and process visits
+window.addEventListener('message', (event) => {
+    try {
+        const data = event.data;
+        if (!data || data.type !== 'story-visit' || !data.story) return;
+        if (window.keepersOfTheFlamGamification && typeof window.keepersOfTheFlamGamification.trackPageVisit === 'function') {
+            window.keepersOfTheFlamGamification.trackPageVisit(data.story);
+        }
+    } catch (err) { /* ignore */ }
+});
+
+// Ensure the Hub gamification script is available when this project loads directly
+(function ensureHubLoaded() {
+    if (window.esotericGamification) return;
+
+    const candidates = [
+        '/esoteric/scripts/esoteric-gamification-enhanced.js',
+        '../scripts/esoteric-gamification-enhanced.js',
+        '../../scripts/esoteric-gamification-enhanced.js',
+        '/scripts/esoteric-gamification-enhanced.js'
+    ];
+
+    function tryLoad(i) {
+        if (i >= candidates.length) return;
+        const s = document.createElement('script');
+        s.crossOrigin = 'anonymous';
+        s.src = candidates[i];
+        s.onload = function() {
+            try {
+                const Klass = window.EnhancedEsotericGamification || (typeof EnhancedEsotericGamification !== 'undefined' ? EnhancedEsotericGamification : null);
+                if (!window.esotericGamification && Klass) {
+                    window.esotericGamification = new Klass();
+                    window.esotericGamification.init();
+                }
+                if (window.keepersOfTheFlamGamification && window.esotericGamification) {
+                    window.keepersOfTheFlamGamification.signalHubUpdate();
+                }
+            } catch (e) { console.warn('Failed to signal or init hub after loading:', e); }
+        };
+        s.onerror = function() { tryLoad(i + 1); };
+        document.head.appendChild(s);
+    }
+
+    tryLoad(0);
+})();

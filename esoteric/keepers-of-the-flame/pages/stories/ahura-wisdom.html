@@ -226,7 +226,7 @@
 
         <div class="nav-buttons">
             <a href="creation-myth.html">← Previous Story</a>
-            <a href="../index.html">Back to Hub</a>
+            <a href="../../index.html">Back to Hub</a>
             <a href="zarathustra-journey.html">Next Story →</a>
         </div>
     </div>
@@ -240,6 +240,15 @@
                     timestamp: Date.now()
                 }, '*');
             }
+
+            try {
+                if (window.keepersOfTheFlamGamification) {
+                    window.keepersOfTheFlamGamification.trackPageVisit('ahura_wisdom');
+                } else if (typeof KeepersOfTheFlamGamification !== 'undefined') {
+                    const g = new KeepersOfTheFlamGamification();
+                    g.trackPageVisit('ahura_wisdom');
+                }
+            } catch (e) { console.warn('Gamification tracking failed', e); }
         });
     </script>
 </body>

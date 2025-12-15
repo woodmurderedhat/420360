@@ -13,6 +13,9 @@
         window.esotericGamification.init();
     });
 </script>
+
+Note: Project-level `scripts/gamification.js` files include a small loader that will auto-fetch `esoteric-gamification-enhanced.js` if a project page is opened directly (supports both hosted and relative local paths). Projects also dispatch custom events (`daughtersProgressUpdate`, `keepersProgressUpdate`, `goldenDawnProgressUpdate`) so the hub can aggregate progress regardless of load ordering.
+Note: Project constructors now expose their instance on `window` (e.g., `window.theGoldenDawnGamification`) so locally-instantiated objects are discoverable by the hub loader and scripts.
 ```
 
 **To Revert to Original System:**

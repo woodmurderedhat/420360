@@ -49,6 +49,8 @@ class DaughtersGamification {
             { level: 5, name: 'Keeper', minPoints: 35, icon: '✦✦' },
             { level: 6, name: 'Circle Mother', minPoints: 50, icon: '✦✦✦' }
         ];
+        // Expose instance to window so it's discoverable by the hub or other pages
+        try { window.daughtersGame = window.daughtersGame || this; } catch (e) {}
         this.init();
     }
 
@@ -574,4 +576,38 @@ if (document.readyState === 'loading') {
 
 // Expose to window for console access
 window.DaughtersGamification = DaughtersGamification;
+
+
+// Ensure the Hub gamification script is available when this project loads directly
+(function ensureHubLoaded() {
+    if (window.esotericGamification) return;
+
+    const candidates = [
+        '/esoteric/scripts/esoteric-gamification-enhanced.js',
+        '../scripts/esoteric-gamification-enhanced.js',
+        '../../scripts/esoteric-gamification-enhanced.js',
+        '/scripts/esoteric-gamification-enhanced.js'
+    ];
+
+    function tryLoad(i) {
+        if (i >= candidates.length) return;
+        const s = document.createElement('script');
+        s.crossOrigin = 'anonymous';
+        s.src = candidates[i];
+        s.onload = function() {
+            try {
+                const Klass = window.EnhancedEsotericGamification || (typeof EnhancedEsotericGamification !== 'undefined' ? EnhancedEsotericGamification : null);
+                if (!window.esotericGamification && Klass) {
+                    window.esotericGamification = new Klass();
+                    window.esotericGamification.init();
+                }
+                if (window.daughtersGame && window.esotericGamification) window.daughtersGame.signalToHub();
+            } catch (e) { console.warn('Failed to signal or init hub after loading:', e); }
+        };
+        s.onerror = function() { tryLoad(i + 1); };
+        document.head.appendChild(s);
+    }
+
+    tryLoad(0);
+})();
 

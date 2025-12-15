@@ -596,6 +596,19 @@ window.addEventListener('message', (event)=>{
     if(data.type === 'close-overlay' && data.id){
       closeOverlay(data.id);
     }
+    // Story pages embedded in iframes post a 'story-visit' message to their parent
+    if(data.type === 'story-visit' && data.story){
+      try {
+        // If parent is the project page, call its tracker if available
+        if (window.keepersOfTheFlamGamification && typeof window.keepersOfTheFlamGamification.trackPageVisit === 'function') {
+          window.keepersOfTheFlamGamification.trackPageVisit(data.story);
+        } else if (window.daughtersGame && typeof window.daughtersGame.trackPageVisit === 'function') {
+          window.daughtersGame.trackPageVisit(data.story);
+        } else if (window.goldenDawnGamification && typeof window.goldenDawnGamification.trackPageVisit === 'function') {
+          window.goldenDawnGamification.trackPageVisit(data.story);
+        }
+      } catch (err) { /* ignore errors from guest frames */ }
+    }
   }catch(err){ /* ignore */ }
 });
 

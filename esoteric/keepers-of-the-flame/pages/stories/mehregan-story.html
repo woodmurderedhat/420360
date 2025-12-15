@@ -236,7 +236,7 @@
 
         <div class="nav-buttons">
             <a href="tirgan-story.html">← Previous Story</a>
-            <a href="../index.html">Back to Hub</a>
+            <a href="../../index.html">Back to Hub</a>
             <a href="yalda-story.html">Next Story →</a>
         </div>
     </div>
@@ -250,6 +250,15 @@
                     timestamp: Date.now()
                 }, '*');
             }
+
+            try {
+                if (window.keepersOfTheFlamGamification) {
+                    window.keepersOfTheFlamGamification.trackPageVisit('mehregan');
+                } else if (typeof KeepersOfTheFlamGamification !== 'undefined') {
+                    const g = new KeepersOfTheFlamGamification();
+                    g.trackPageVisit('mehregan');
+                }
+            } catch (e) { console.warn('Gamification tracking failed', e); }
         });
     </script>
 </body>

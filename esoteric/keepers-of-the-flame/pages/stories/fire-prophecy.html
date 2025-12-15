@@ -234,7 +234,7 @@
 
         <div class="nav-buttons">
             <a href="zarathustra-journey.html">← Previous Story</a>
-            <a href="../index.html">Back to Hub</a>
+            <a href="../../index.html">Back to Hub</a>
             <a href="nowruz-story.html">Next Story →</a>
         </div>
     </div>
@@ -248,6 +248,15 @@
                     timestamp: Date.now()
                 }, '*');
             }
+
+            try {
+                if (window.keepersOfTheFlamGamification) {
+                    window.keepersOfTheFlamGamification.trackPageVisit('fire_prophecy');
+                } else if (typeof KeepersOfTheFlamGamification !== 'undefined') {
+                    const g = new KeepersOfTheFlamGamification();
+                    g.trackPageVisit('fire_prophecy');
+                }
+            } catch (e) { console.warn('Gamification tracking failed', e); }
         });
     </script>
 </body>

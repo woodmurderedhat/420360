@@ -222,7 +222,7 @@
 
         <div class="nav-buttons">
             <a href="fire-prophecy.html">← Previous Story</a>
-            <a href="../index.html">Back to Hub</a>
+            <a href="../../index.html">Back to Hub</a>
             <a href="tirgan-story.html">Next Story →</a>
         </div>
     </div>
@@ -236,6 +236,15 @@
                     timestamp: Date.now()
                 }, '*');
             }
+
+            try {
+                if (window.keepersOfTheFlamGamification) {
+                    window.keepersOfTheFlamGamification.trackPageVisit('nowruz');
+                } else if (typeof KeepersOfTheFlamGamification !== 'undefined') {
+                    const g = new KeepersOfTheFlamGamification();
+                    g.trackPageVisit('nowruz');
+                }
+            } catch (e) { console.warn('Gamification tracking failed', e); }
         });
     </script>
 </body>

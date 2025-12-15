@@ -14,6 +14,8 @@ class TheGoldenDawnGamification {
     constructor() {
         this.storageKey = 'golden_dawn_progress';
         this.progress = this.loadProgress();
+        // Expose to window so standalone page-instantiated instances are discoverable
+        try { window.theGoldenDawnGamification = window.theGoldenDawnGamification || this; } catch (e) {}
     }
 
     /**
@@ -261,6 +263,20 @@ class TheGoldenDawnGamification {
             };
             window.esotericGamification.saveProgress();
         }
+
+        // Dispatch event for hub listeners
+        try {
+            const detail = {
+                totalVisits: this.progress.totalVisits,
+                currentGrade: this.getCurrentGrade().name,
+                unlockedCards: this.progress.unlockedTarotCards.length,
+                completedRituals: this.progress.completedRituals.length,
+                achievements: this.progress.achievements.length
+            };
+            document.dispatchEvent(new CustomEvent('goldenDawnProgressUpdate', { detail }));
+        } catch (e) {
+            console.debug('Failed to dispatch goldenDawnProgressUpdate', e);
+        }
     }
 
     /**
@@ -340,3 +356,38 @@ class TheGoldenDawnGamification {
 document.addEventListener('DOMContentLoaded', function() {
     window.theGoldenDawnGamification = new TheGoldenDawnGamification();
 });
+
+// Ensure the Hub gamification script is available when this project loads directly
+(function ensureHubLoaded() {
+    if (window.esotericGamification) return;
+
+    const candidates = [
+        '/esoteric/scripts/esoteric-gamification-enhanced.js',
+        '../scripts/esoteric-gamification-enhanced.js',
+        '../../scripts/esoteric-gamification-enhanced.js',
+        '/scripts/esoteric-gamification-enhanced.js'
+    ];
+
+    function tryLoad(i) {
+        if (i >= candidates.length) return;
+        const s = document.createElement('script');
+        s.crossOrigin = 'anonymous';
+        s.src = candidates[i];
+        s.onload = function() {
+            try {
+                const Klass = window.EnhancedEsotericGamification || (typeof EnhancedEsotericGamification !== 'undefined' ? EnhancedEsotericGamification : null);
+                if (!window.esotericGamification && Klass) {
+                    window.esotericGamification = new Klass();
+                    window.esotericGamification.init();
+                }
+                if (window.theGoldenDawnGamification && window.esotericGamification) {
+                    window.theGoldenDawnGamification.signalHubUpdate();
+                }
+            } catch (e) { console.warn('Failed to signal or init hub after loading:', e); }
+        };
+        s.onerror = function() { tryLoad(i + 1); };
+        document.head.appendChild(s);
+    }
+
+    tryLoad(0);
+})();

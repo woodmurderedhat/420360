@@ -490,8 +490,10 @@
     <script>
         // Initialize gamification when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            if (window.EnhancedEsotericGamification) {
-                window.esotericGamification = new EnhancedEsotericGamification();
+            // Support class being available as a global identifier or as a window property
+            const Klass = window.EnhancedEsotericGamification || (typeof EnhancedEsotericGamification !== 'undefined' ? EnhancedEsotericGamification : null);
+            if (Klass) {
+                window.esotericGamification = new Klass();
                 window.esotericGamification.init();
             }
         });

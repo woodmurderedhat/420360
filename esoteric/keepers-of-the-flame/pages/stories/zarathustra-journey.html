@@ -235,7 +235,7 @@
 
         <div class="nav-buttons">
             <a href="ahura-wisdom.html">← Previous Story</a>
-            <a href="../index.html">Back to Hub</a>
+            <a href="../../index.html">Back to Hub</a>
             <a href="fire-prophecy.html">Next Story →</a>
         </div>
     </div>
@@ -249,6 +249,15 @@
                     timestamp: Date.now()
                 }, '*');
             }
+
+            try {
+                if (window.keepersOfTheFlamGamification) {
+                    window.keepersOfTheFlamGamification.trackPageVisit('heroic_zarathustra');
+                } else if (typeof KeepersOfTheFlamGamification !== 'undefined') {
+                    const g = new KeepersOfTheFlamGamification();
+                    g.trackPageVisit('heroic_zarathustra');
+                }
+            } catch (e) { console.warn('Gamification tracking failed', e); }
         });
     </script>
 </body>

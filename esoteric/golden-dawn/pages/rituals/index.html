@@ -1,27 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rituals — Golden Dawn</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rituals — The Golden Dawn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f0519 100%);
+            color: #e0aaff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Mystical Background */
+        .ritual-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: #d4af37;
+            border-radius: 50%;
+            animation: twinkle 4s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 2px solid #6b4c9a;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: #d4af37;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        .subtitle {
+            color: #9d4edd;
+            font-size: 0.9rem;
+        }
+
+        .intro {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: #c8a8e8;
+            font-size: 1rem;
+        }
+
+        /* Ritual Categories */
+        .ritual-category {
+            margin-bottom: 2.5rem;
+        }
+        .category-title {
+            font-family: 'Press Start 2P', cursive;
+            color: #d4af37;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #6b4c9a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .category-icon {
+            font-size: 1.2rem;
+        }
+
+        .ritual-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .ritual-card {
+            background: linear-gradient(135deg, rgba(61, 32, 97, 0.7) 0%, rgba(26, 15, 46, 0.9) 100%);
+            border: 2px solid #6b4c9a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+        .ritual-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.3);
+        }
+        .ritual-card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .ritual-card-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: #e0aaff;
+            margin-bottom: 0.5rem;
+        }
+        .ritual-card-desc {
+            font-size: 0.85rem;
+            color: #a888c8;
+            line-height: 1.5;
+        }
+        .ritual-card-grade {
+            display: inline-block;
+            margin-top: 0.8rem;
+            padding: 0.3rem 0.6rem;
+            background: rgba(157, 78, 221, 0.3);
+            border: 1px solid #9d4edd;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: #d4af37;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        .nav-buttons a {
+            padding: 0.8rem 1.5rem;
+            background: #6b4c9a;
+            color: #e0aaff;
+            text-decoration: none;
+            border: 2px solid #e0aaff;
+            border-radius: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            transition: all 0.3s;
+        }
+        .nav-buttons a:hover {
+            background: #9d4edd;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #6b4c9a;
+            font-size: 0.8rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.1rem; }
+            .ritual-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-  <main>
-    <h1>Rituals</h1>
-    <p>Browse the documented rituals of the Order.</p>
-    <ul>
-      <li><a href="ritual-zelator.html">Zelator Ritual</a></li>
-      <li><a href="ritual-practicus.html">Practicus Ritual</a></li>
-      <li><a href="ritual-theoricus.html">Theoricus Ritual</a></li>
-      <li><a href="ritual-philosophus.html">Philosophus Ritual</a></li>
-      <li><a href="ritual-portal.html">Portal Rite</a></li>
-      <li><a href="ritual-invoking-pentagram.html">Invoking Pentagram</a></li>
-      <li><a href="ritual-lbrp.html">LBRP</a></li>
-      <li><a href="ritual-lbrh.html">LBRH</a></li>
-      <li><a href="ritual-middle-pillar.html">Middle Pillar</a></li>
-      <li><a href="ritual-opening-by-watchtower.html">Opening by Watchtower</a></li>
-    </ul>
-    <p><a href="../../index.html">← Back to Golden Dawn</a></p>
-  </main>
+    <div class="ritual-bg" id="ritualBg"></div>
+
+    <div class="container">
+        <header>
+            <h1>✧ Sacred Rituals ✧</h1>
+            <div class="subtitle">of the Hermetic Order of the Golden Dawn</div>
+        </header>
+
+        <p class="intro">
+            The rituals of the Golden Dawn form a systematic path of spiritual development.
+            From foundational banishing practices to advanced grade ceremonies, each ritual
+            serves to elevate consciousness and connect the practitioner with divine forces.
+        </p>
+
+        <!-- Foundational Practices -->
+        <div class="ritual-category">
+            <h2 class="category-title"><span class="category-icon">⭐</span> Foundational Practices</h2>
+            <div class="ritual-grid">
+                <a href="ritual-lbrp.html" class="ritual-card">
+                    <div class="ritual-card-icon">✡</div>
+                    <div class="ritual-card-title">Lesser Banishing Ritual of the Pentagram</div>
+                    <div class="ritual-card-desc">The cornerstone of Western magical practice. Establishes sacred space and banishes unwanted influences.</div>
+                    <span class="ritual-card-grade">Essential Practice</span>
+                </a>
+                <a href="ritual-lbrh.html" class="ritual-card">
+                    <div class="ritual-card-icon">✡</div>
+                    <div class="ritual-card-title">Lesser Banishing Ritual of the Hexagram</div>
+                    <div class="ritual-card-desc">Works with planetary forces. A complement to the LBRP for more advanced work.</div>
+                    <span class="ritual-card-grade">Adeptus Minor</span>
+                </a>
+                <a href="ritual-middle-pillar.html" class="ritual-card">
+                    <div class="ritual-card-icon">🕯️</div>
+                    <div class="ritual-card-title">Middle Pillar Exercise</div>
+                    <div class="ritual-card-desc">Awakens the energy centers along the Middle Pillar of the Tree of Life within your body.</div>
+                    <span class="ritual-card-grade">Essential Practice</span>
+                </a>
+                <a href="ritual-invoking-pentagram.html" class="ritual-card">
+                    <div class="ritual-card-icon">⬆️</div>
+                    <div class="ritual-card-title">Invoking Pentagram Ritual</div>
+                    <div class="ritual-card-desc">Invokes elemental forces into the circle. Used to call upon specific energies for magical work.</div>
+                    <span class="ritual-card-grade">Practicus+</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Grade Ceremonies -->
+        <div class="ritual-category">
+            <h2 class="category-title"><span class="category-icon">🎭</span> Grade Initiation Ceremonies</h2>
+            <div class="ritual-grid">
+                <a href="ritual-zelator.html" class="ritual-card">
+                    <div class="ritual-card-icon">🌍</div>
+                    <div class="ritual-card-title">Zelator Ritual (1°=10□)</div>
+                    <div class="ritual-card-desc">Initiation into the grade of Earth. The aspirant begins the journey through the outer order.</div>
+                    <span class="ritual-card-grade">Malkuth</span>
+                </a>
+                <a href="ritual-theoricus.html" class="ritual-card">
+                    <div class="ritual-card-icon">🌬️</div>
+                    <div class="ritual-card-title">Theoricus Ritual (2°=9□)</div>
+                    <div class="ritual-card-desc">Initiation into the grade of Air. Development of mental faculties and theoretical understanding.</div>
+                    <span class="ritual-card-grade">Yesod</span>
+                </a>
+                <a href="ritual-practicus.html" class="ritual-card">
+                    <div class="ritual-card-icon">💧</div>
+                    <div class="ritual-card-title">Practicus Ritual (3°=8□)</div>
+                    <div class="ritual-card-desc">Initiation into the grade of Water. Emotional mastery and practical application begin.</div>
+                    <span class="ritual-card-grade">Hod</span>
+                </a>
+                <a href="ritual-philosophus.html" class="ritual-card">
+                    <div class="ritual-card-icon">🔥</div>
+                    <div class="ritual-card-title">Philosophus Ritual (4°=7□)</div>
+                    <div class="ritual-card-desc">Initiation into the grade of Fire. The final grade of the Outer Order before the Portal.</div>
+                    <span class="ritual-card-grade">Netzach</span>
+                </a>
+                <a href="ritual-portal.html" class="ritual-card">
+                    <div class="ritual-card-icon">🚪</div>
+                    <div class="ritual-card-title">Portal Grade Ritual</div>
+                    <div class="ritual-card-desc">The threshold between Outer and Inner Orders. Preparation for the mysteries of the Adepti.</div>
+                    <span class="ritual-card-grade">The Veil</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Advanced Ceremonies -->
+        <div class="ritual-category">
+            <h2 class="category-title"><span class="category-icon">🏛️</span> Advanced Ceremonies</h2>
+            <div class="ritual-grid">
+                <a href="ritual-opening-by-watchtower.html" class="ritual-card">
+                    <div class="ritual-card-icon">👁️</div>
+                    <div class="ritual-card-title">Opening by Watchtower</div>
+                    <div class="ritual-card-desc">A powerful temple opening invoking the Enochian Watchtowers. Used for major ceremonial work.</div>
+                    <span class="ritual-card-grade">Adeptus Minor</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="../index.html">← Golden Dawn Home</a>
+            <a href="../grades.html">Grade System →</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>✧ "The Universe is the emanation of a single luminous point." ✧</p>
+    </footer>
+
+    <script>
+        // Create twinkling stars
+        document.addEventListener('DOMContentLoaded', () => {
+            const bg = document.getElementById('ritualBg');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 4 + 's';
+                star.style.animationDuration = (2 + Math.random() * 3) + 's';
+                bg.appendChild(star);
+            }
+        });
+    </script>
 </body>
 </html>

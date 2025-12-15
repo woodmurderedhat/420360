@@ -7,53 +7,489 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Courier New', monospace; background: linear-gradient(135deg, #3d2061 0%, #1a0f2e 100%); color: #e0aaff; line-height: 1.8; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: rgba(61, 32, 97, 0.95); border: 3px solid #9d4edd; padding: 40px; }
-        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #9d4edd; padding-bottom: 20px; }
-        h1 { font-family: 'Press Start 2P', cursive; color: #9d4edd; font-size: 20px; margin-bottom: 10px; }
-        h2 { font-family: 'Press Start 2P', cursive; color: #d4af37; font-size: 12px; margin: 25px 0 15px; }
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f0519 100%);
+            color: #e0aaff;
+            line-height: 1.8;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Mystical Background */
+        .ritual-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at center, rgba(157, 78, 221, 0.1) 0%, transparent 70%);
+        }
+        .star-particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: #d4af37;
+            border-radius: 50%;
+            animation: twinkle 4s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px 0;
+        }
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: #d4af37;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        .subtitle {
+            color: #9d4edd;
+            font-size: 0.9rem;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: rgba(45, 27, 78, 0.7);
+            border: 2px solid #6b4c9a;
+            border-radius: 12px;
+        }
+        .control-btn {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #6b4c9a 0%, #9d4edd 100%);
+            color: #fff;
+            border: 2px solid #e0aaff;
+            border-radius: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(157, 78, 221, 0.5);
+        }
+        .control-btn.active {
+            background: linear-gradient(135deg, #d4af37 0%, #ff6b35 100%);
+            border-color: #d4af37;
+        }
+
+        /* Ritual Circle Visualization */
+        .ritual-circle-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem auto;
+            aspect-ratio: 1;
+        }
+        .ritual-circle-container.active { display: block; }
+
+        #ritualSVG {
+            width: 100%;
+            height: 100%;
+        }
+
+        .compass-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            fill: #d4af37;
+        }
+
+        .pentagram-path {
+            fill: none;
+            stroke: #4169e1;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 8px #4169e1);
+        }
+        .pentagram-path.drawing {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawPentagram 2s forwards ease-out;
+        }
+        @keyframes drawPentagram {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .circle-path {
+            fill: none;
+            stroke: #d4af37;
+            stroke-width: 2;
+            opacity: 0.5;
+        }
+        .circle-glow {
+            fill: none;
+            stroke: #d4af37;
+            stroke-width: 4;
+            opacity: 0;
+            filter: blur(4px);
+        }
+        .circle-glow.active {
+            animation: circleGlow 2s infinite ease-in-out;
+        }
+        @keyframes circleGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .archangel-zone {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        .archangel-zone.active { opacity: 1; }
+        .archangel-symbol {
+            font-size: 40px;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+        .archangel-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            text-anchor: middle;
+            fill: #e0aaff;
+        }
+        .archangel-glow {
+            fill: none;
+            stroke-width: 3;
+            opacity: 0;
+            filter: blur(8px);
+        }
+        .archangel-glow.active {
+            animation: archangelPulse 3s infinite ease-in-out;
+        }
+        @keyframes archangelPulse {
+            0%, 100% { opacity: 0.2; stroke-width: 3; }
+            50% { opacity: 0.6; stroke-width: 6; }
+        }
+
+        /* Guided Ritual Mode */
+        .guided-ritual {
+            display: none;
+            padding: 2rem;
+            background: rgba(26, 15, 46, 0.95);
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .guided-ritual.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #6b4c9a;
+            border: 2px solid #9d4edd;
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: #d4af37; border-color: #d4af37; transform: scale(1.3); }
+        .step-dot.completed { background: #9d4edd; }
+
+        .current-step-title {
+            font-family: 'Press Start 2P', cursive;
+            color: #d4af37;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .current-step-instruction {
+            font-size: 1.1rem;
+            color: #e8d7f1;
+            line-height: 1.8;
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+        .divine-name-display {
+            font-size: 2.5rem;
+            color: #d4af37;
+            font-weight: bold;
+            margin: 1.5rem 0;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            animation: vibrateName 0.5s ease-in-out;
+        }
+        @keyframes vibrateName {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); text-shadow: 0 0 30px rgba(212, 175, 55, 0.8); }
+        }
+        .hebrew-display {
+            font-size: 3rem;
+            color: #e0aaff;
+            margin-bottom: 1rem;
+        }
+
+        .ritual-timer {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            color: #9d4edd;
+            margin-top: 1rem;
+        }
+
+        .ritual-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .ritual-btn {
+            padding: 0.7rem 1.2rem;
+            background: #6b4c9a;
+            color: #e0aaff;
+            border: 2px solid #e0aaff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            transition: all 0.3s;
+        }
+        .ritual-btn:hover { background: #9d4edd; transform: translateY(-2px); }
+        .ritual-btn.primary { background: #d4af37; color: #1a0a2e; border-color: #d4af37; }
+
+        /* Content Sections */
+        .content-section {
+            background: rgba(61, 32, 97, 0.6);
+            border: 2px solid #6b4c9a;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        h2 {
+            font-family: 'Press Start 2P', cursive;
+            color: #d4af37;
+            font-size: 0.8rem;
+            margin: 0 0 1rem 0;
+        }
         .content { font-size: 13px; line-height: 1.8; }
         .content p { margin-bottom: 15px; }
         .content strong { color: #d4af37; }
-        .warning { background: rgba(255, 107, 53, 0.1); border-left: 4px solid #ff6b35; padding: 15px; margin: 20px 0; font-size: 12px; }
-        .step-box { background: rgba(157, 78, 221, 0.1); border: 2px solid #9d4edd; padding: 15px; margin: 15px 0; font-size: 12px; }
-        .step-box strong { display: block; color: #ffdd00; margin-bottom: 8px; font-family: 'Press Start 2P', cursive; font-size: 10px; }
-        .step-number { display: inline-block; background: #9d4edd; color: #e0aaff; padding: 5px 10px; border-radius: 3px; margin-right: 10px; font-weight: bold; }
-        .invocation { background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; padding: 12px; margin: 12px 0; font-size: 12px; font-style: italic; color: #ffdd00; }
+
+        .warning {
+            background: rgba(255, 107, 53, 0.15);
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 12px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .step-box {
+            background: rgba(157, 78, 221, 0.15);
+            border: 2px solid #9d4edd;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .step-box:hover {
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+        .step-box strong {
+            display: block;
+            color: #ffdd00;
+            margin-bottom: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+        }
+        .step-number {
+            display: inline-block;
+            background: #9d4edd;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .invocation {
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid #d4af37;
+            padding: 12px;
+            margin: 12px 0;
+            font-size: 14px;
+            font-style: italic;
+            color: #ffdd00;
+            border-radius: 6px;
+            text-align: center;
+        }
         ul, ol { margin-left: 20px; font-size: 13px; line-height: 2; }
-        .nav-buttons { margin-top: 30px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        a { display: inline-block; padding: 10px 15px; background: #9d4edd; color: #1a0f2e; text-decoration: none; border: 2px solid #9d4edd; font-family: 'Press Start 2P', cursive; font-size: 9px; cursor: pointer; transition: all 0.3s; }
-        a:hover { background: #d4af37; border-color: #d4af37; transform: scale(1.05); }
-        @media (max-width: 600px) { .container { padding: 20px; } h1 { font-size: 14px; } }
+
+        .nav-buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .nav-buttons a {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #6b4c9a;
+            color: #e0aaff;
+            text-decoration: none;
+            border: 2px solid #e0aaff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 6px;
+        }
+        .nav-buttons a:hover {
+            background: #9d4edd;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            h1 { font-size: 1rem; }
+            .control-btn { font-size: 0.55rem; padding: 0.6rem 1rem; }
+            .ritual-circle-container { max-width: 100%; }
+        }
     </style>
 </head>
 <body>
+    <!-- Mystical Background -->
+    <div class="ritual-bg" id="ritualBg"></div>
+
     <div class="container">
         <header>
-            <h1>The Lesser Banishing Ritual</h1>
-            <div style="color: #d4af37; font-size: 12px; font-family: 'Press Start 2P', cursive;">of the Pentagram (LBRP)</div>
+            <h1>✧ The Lesser Banishing Ritual ✧</h1>
+            <div class="subtitle">of the Pentagram (LBRP)</div>
         </header>
+
+        <!-- Interactive Control Panel -->
+        <div class="control-panel">
+            <button class="control-btn" onclick="toggleGuidedRitual()">🧙 Guided Ritual</button>
+            <button class="control-btn" onclick="toggleCircleView()">⭐ View Circle</button>
+            <button class="control-btn" onclick="drawPentagram()">✡ Draw Pentagram</button>
+            <button class="control-btn" onclick="invokeArchangels()">👼 Invoke Archangels</button>
+        </div>
+
+        <!-- Ritual Circle Visualization -->
+        <div class="ritual-circle-container" id="circleContainer">
+            <svg id="ritualSVG" viewBox="0 0 400 400">
+                <!-- Outer Circle -->
+                <circle class="circle-path" cx="200" cy="200" r="180" />
+                <circle class="circle-glow" id="circleGlow" cx="200" cy="200" r="180" />
+
+                <!-- Compass Directions -->
+                <text class="compass-label" x="200" y="30" text-anchor="middle">EAST ☿</text>
+                <text class="compass-label" x="380" y="205" text-anchor="end">SOUTH ♂</text>
+                <text class="compass-label" x="200" y="390" text-anchor="middle">WEST ☾</text>
+                <text class="compass-label" x="20" y="205" text-anchor="start">NORTH ♃</text>
+
+                <!-- Pentagrams at each quarter -->
+                <g id="pentagramEast" transform="translate(200, 55)">
+                    <path class="pentagram-path" id="pentEast" d="M0,-25 L15,20 L-24,-8 L24,-8 L-15,20 Z" style="stroke: #ffff00;" />
+                </g>
+                <g id="pentagramSouth" transform="translate(345, 200)">
+                    <path class="pentagram-path" id="pentSouth" d="M0,-25 L15,20 L-24,-8 L24,-8 L-15,20 Z" style="stroke: #ff4444;" />
+                </g>
+                <g id="pentagramWest" transform="translate(200, 345)">
+                    <path class="pentagram-path" id="pentWest" d="M0,-25 L15,20 L-24,-8 L24,-8 L-15,20 Z" style="stroke: #4444ff;" />
+                </g>
+                <g id="pentagramNorth" transform="translate(55, 200)">
+                    <path class="pentagram-path" id="pentNorth" d="M0,-25 L15,20 L-24,-8 L24,-8 L-15,20 Z" style="stroke: #44ff44;" />
+                </g>
+
+                <!-- Connecting circle between pentagrams -->
+                <circle class="circle-path" cx="200" cy="200" r="145" style="stroke-dasharray: 5 5; opacity: 0.3;" />
+
+                <!-- Archangels -->
+                <g class="archangel-zone" id="archangelRaphael">
+                    <circle class="archangel-glow" cx="200" cy="80" r="35" style="stroke: #ffff00;" />
+                    <text class="archangel-symbol" x="200" y="80" fill="#ffff00">🌬️</text>
+                    <text class="archangel-name" x="200" y="110">RAPHAEL</text>
+                </g>
+                <g class="archangel-zone" id="archangelMichael">
+                    <circle class="archangel-glow" cx="320" cy="200" r="35" style="stroke: #ff4444;" />
+                    <text class="archangel-symbol" x="320" y="200" fill="#ff4444">🔥</text>
+                    <text class="archangel-name" x="320" y="230">MICHAEL</text>
+                </g>
+                <g class="archangel-zone" id="archangelGabriel">
+                    <circle class="archangel-glow" cx="200" cy="320" r="35" style="stroke: #4444ff;" />
+                    <text class="archangel-symbol" x="200" y="320" fill="#4444ff">💧</text>
+                    <text class="archangel-name" x="200" y="350">GABRIEL</text>
+                </g>
+                <g class="archangel-zone" id="archangelUriel">
+                    <circle class="archangel-glow" cx="80" cy="200" r="35" style="stroke: #44ff44;" />
+                    <text class="archangel-symbol" x="80" y="200" fill="#44ff44">🌍</text>
+                    <text class="archangel-name" x="80" y="230">URIEL</text>
+                </g>
+
+                <!-- Center - The Practitioner -->
+                <circle cx="200" cy="200" r="15" fill="none" stroke="#d4af37" stroke-width="2" />
+                <text x="200" y="205" text-anchor="middle" fill="#d4af37" font-size="12">☉</text>
+            </svg>
+        </div>
+
+        <!-- Guided Ritual Mode -->
+        <div class="guided-ritual" id="guidedRitual">
+            <div class="step-indicator" id="stepIndicator"></div>
+            <div class="current-step-title" id="stepTitle">Preparation</div>
+            <div class="hebrew-display" id="hebrewDisplay"></div>
+            <div class="divine-name-display" id="divineNameDisplay"></div>
+            <div class="current-step-instruction" id="stepInstruction">
+                Stand facing East. Take three deep breaths to center yourself.
+            </div>
+            <div class="ritual-timer" id="ritualTimer"></div>
+            <div class="ritual-controls">
+                <button class="ritual-btn" onclick="prevStep()">← Previous</button>
+                <button class="ritual-btn primary" onclick="nextStep()">Next Step →</button>
+            </div>
+        </div>
 
         <div class="warning">
             <strong>⚠️ Important:</strong> This is a foundational ritual of Western magic. It is taught at the Practicus grade (Initiate 1°). Before practicing, ensure you understand the Tree of Life, the four elements, and the archangelic correspondences.
         </div>
 
-        <div class="content">
-            <p><strong>The Lesser Banishing Ritual of the Pentagram</strong> is the foundation of all practical Western magic. It accomplishes four essential goals:</p>
+        <div class="content-section">
+            <div class="content">
+                <p><strong>The Lesser Banishing Ritual of the Pentagram</strong> is the foundation of all practical Western magic. It accomplishes four essential goals:</p>
 
-            <ul>
-                <li>✓ Establishes sacred space free from negative influences</li>
-                <li>✓ Brings your consciousness into alignment with divine forces</li>
-                <li>✓ Awakens the four elements within your being</li>
-                <li>✓ Creates a magical circle protecting your work</li>
-            </ul>
+                <ul>
+                    <li>✧ Establishes sacred space free from negative influences</li>
+                    <li>✧ Brings your consciousness into alignment with divine forces</li>
+                    <li>✧ Awakens the four elements within your being</li>
+                    <li>✧ Creates a magical circle protecting your work</li>
+                </ul>
 
-            <p>This is not religious or supernatural. It is a psychological and energetic practice that develops consciousness and creates intentional space for spiritual work.</p>
+                <p>This is not religious or supernatural. It is a psychological and energetic practice that develops consciousness and creates intentional space for spiritual work.</p>
+            </div>
+        </div>
 
-            <h2>Preparation</h2>
-
+        <div class="content-section">
+            <h2>⚙️ Preparation</h2>
             <div class="step-box">
-                <strong>⚙️ Before You Begin</strong>
+                <strong>Before You Begin</strong>
                 <ul style="margin-top: 10px;">
                     <li>Find a quiet space where you won't be disturbed</li>
                     <li>Stand facing East (the direction of air and intellect)</li>
@@ -62,90 +498,100 @@
                     <li>Have clear intention: to establish sacred space</li>
                 </ul>
             </div>
+        </div>
 
-            <h2>The Ritual Steps</h2>
+        <div class="content-section">
+            <h2>📜 The Ritual Steps</h2>
 
-            <div class="step-box">
+            <div class="step-box" id="step1">
                 <strong><span class="step-number">1</span> Qabalistic Cross</strong>
-                <p>Touch your forehead and say: <span class="invocation">"Ateh" (Thine is)</span></p>
-                <p>Touch your genitals and say: <span class="invocation">"Malkuth" (The Kingdom)</span></p>
-                <p>Touch your right shoulder and say: <span class="invocation">"Ve-Geburah" (And the Power)</span></p>
-                <p>Touch your left shoulder and say: <span class="invocation">"Ve-Gedulah" (And the Glory)</span></p>
-                <p>Cross arms on chest and say: <span class="invocation">"Le-Olam, Amen" (Forever, Amen)</span></p>
-                <p style="margin-top: 10px; color: #e0aaff;"><em>This invokes the divine light from above, grounding it in your body.</em></p>
+                <p>Touch your forehead and say: <span class="invocation">"Ateh" (אתה - Thine is)</span></p>
+                <p>Touch your lower abdomen and say: <span class="invocation">"Malkuth" (מלכות - The Kingdom)</span></p>
+                <p>Touch your right shoulder and say: <span class="invocation">"Ve-Geburah" (וגבורה - And the Power)</span></p>
+                <p>Touch your left shoulder and say: <span class="invocation">"Ve-Gedulah" (וגדולה - And the Glory)</span></p>
+                <p>Cross arms on chest and say: <span class="invocation">"Le-Olam, Amen" (לעולם אמן - Forever, Amen)</span></p>
+                <p style="margin-top: 10px; color: #e0aaff;"><em>✧ This invokes the divine light from above, grounding it in your body.</em></p>
             </div>
 
-            <div class="step-box">
-                <strong><span class="step-number">2</span> Banish East (Air)</strong>
-                <p>Face East. Draw a pentagram in the air before you (beginning from top, down-left, up-right, down-right, up-left, back to top).</p>
-                <p>Point your finger into the center and vibrate: <span class="invocation">"ELOHIM" (The Powerful One)</span></p>
-                <p style="margin-top: 10px; color: #e0aaff;"><em>Visualize the pentagram glowing yellow-gold as you trace it.</em></p>
+            <div class="step-box" id="step2">
+                <strong><span class="step-number">2</span> Banish East (Air) 🌬️</strong>
+                <p>Face East. Draw a banishing Earth pentagram in the air (start from lower left, up to top, down to lower right, up to upper left, across to upper right, back to lower left).</p>
+                <p>Point your finger into the center and vibrate: <span class="invocation">"YHVH" (יהוה - Yod-Heh-Vav-Heh)</span></p>
+                <p style="margin-top: 10px; color: #ffff00;"><em>✧ Visualize the pentagram glowing brilliant yellow as you trace it.</em></p>
             </div>
 
-            <div class="step-box">
-                <strong><span class="step-number">3</span> Banish South (Fire)</strong>
-                <p>Turn South. Draw another pentagram.</p>
-                <p>Vibrate: <span class="invocation">"ADONAI" (The Lord)</span></p>
-                <p style="margin-top: 10px; color: #e0aaff;"><em>Visualize this pentagram glowing red.</em></p>
+            <div class="step-box" id="step3">
+                <strong><span class="step-number">3</span> Banish South (Fire) 🔥</strong>
+                <p>Turn clockwise to face South. Draw another pentagram.</p>
+                <p>Vibrate: <span class="invocation">"ADONAI" (אדני - The Lord)</span></p>
+                <p style="margin-top: 10px; color: #ff4444;"><em>✧ Visualize this pentagram glowing fiery red.</em></p>
             </div>
 
-            <div class="step-box">
-                <strong><span class="step-number">4</span> Banish West (Water)</strong>
-                <p>Turn West. Draw another pentagram.</p>
-                <p>Vibrate: <span class="invocation">"EHEIEH" (I Am)</span></p>
-                <p style="margin-top: 10px; color: #e0aaff;"><em>Visualize this pentagram glowing blue.</em></p>
+            <div class="step-box" id="step4">
+                <strong><span class="step-number">4</span> Banish West (Water) 💧</strong>
+                <p>Turn clockwise to face West. Draw another pentagram.</p>
+                <p>Vibrate: <span class="invocation">"EHEIEH" (אהיה - I Am That I Am)</span></p>
+                <p style="margin-top: 10px; color: #4444ff;"><em>✧ Visualize this pentagram glowing deep blue.</em></p>
             </div>
 
-            <div class="step-box">
-                <strong><span class="step-number">5</span> Banish North (Earth)</strong>
-                <p>Turn North. Draw another pentagram.</p>
-                <p>Vibrate: <span class="invocation">"AGLA" (Mighty One)</span></p>
-                <p style="margin-top: 10px; color: #e0aaff;"><em>Visualize this pentagram glowing green.</em></p>
+            <div class="step-box" id="step5">
+                <strong><span class="step-number">5</span> Banish North (Earth) 🌍</strong>
+                <p>Turn clockwise to face North. Draw another pentagram.</p>
+                <p>Vibrate: <span class="invocation">"AGLA" (אגלא - Ateh Gibor Le-Olam Adonai)</span></p>
+                <p style="margin-top: 10px; color: #44ff44;"><em>✧ Visualize this pentagram glowing emerald green.</em></p>
             </div>
 
-            <div class="step-box">
-                <strong><span class="step-number">6</span> Invoke the Archangels</strong>
-                <p>Return to East, arms outstretched. Say:</p>
-                <p class="invocation" style="margin: 10px 0;">
-                    "Before me, Raphael (pronounced Rah-fah-EL)<br>
-                    Behind me, Gabriel<br>
-                    To my right, Michael<br>
-                    To my left, Uriel<br>
-                    And above me shines the six-rayed star"
-                </p>
-                <p style="margin-top: 10px; color: #e0aaff;"><em>Visualize each archangel in their corresponding direction, radiating light.</em></p>
+            <div class="step-box" id="step6">
+                <strong><span class="step-number">6</span> Invoke the Archangels 👼</strong>
+                <p>Return to East, arms outstretched in the form of a cross. Intone:</p>
+                <div class="invocation" style="margin: 10px 0; text-align: left;">
+                    "Before me, <strong>RAPHAEL</strong> (רפאל) — Healer of God<br>
+                    Behind me, <strong>GABRIEL</strong> (גבריאל) — Strength of God<br>
+                    On my right hand, <strong>MICHAEL</strong> (מיכאל) — Who is like God<br>
+                    On my left hand, <strong>URIEL</strong> (אוריאל) — Light of God<br>
+                    <br>
+                    For about me flames the Pentagram,<br>
+                    And within me shines the Six-rayed Star!"
+                </div>
+                <p style="margin-top: 10px; color: #e0aaff;"><em>✧ Visualize each archangel towering in their quarter, radiating their elemental light.</em></p>
             </div>
 
-            <div class="step-box">
+            <div class="step-box" id="step7">
                 <strong><span class="step-number">7</span> Close with Qabalistic Cross</strong>
-                <p>Repeat the Qabalistic Cross (Step 1) to seal the space.</p>
+                <p>Repeat the Qabalistic Cross (Step 1) to seal and complete the ritual.</p>
+                <p style="margin-top: 10px; color: #d4af37;"><em>✧ Feel the sacred space you have created. You stand at the center of the universe.</em></p>
             </div>
+        </div>
 
-            <h2>After the Ritual</h2>
+        <div class="content-section">
+            <h2>✨ After the Ritual</h2>
+            <div class="content">
+                <p>Your sacred space is now established. You may:</p>
+                <ul>
+                    <li>✧ Perform meditation or other magical work</li>
+                    <li>✧ Study sacred texts within the circle</li>
+                    <li>✧ Practice pathworking on the Tree of Life</li>
+                    <li>✧ Simply rest in the presence of the divine</li>
+                </ul>
+                <p>When finished, ground yourself by touching the earth and taking a few normal breaths. The space remains protected until you consciously dismiss it.</p>
+            </div>
+        </div>
 
-            <p>Your sacred space is now established. You can:</p>
-            <ul>
-                <li>✓ Perform meditation or other magical work</li>
-                <li>✓ Study sacred texts</li>
-                <li>✓ Visualize ascents through the Tree of Life</li>
-                <li>✓ Develop your magical consciousness</li>
-            </ul>
+        <div class="content-section">
+            <h2>🔑 Key Points to Remember</h2>
+            <div class="content">
+                <ul>
+                    <li>✧ <strong>Vibrate</strong> the divine names from your heart and solar plexus, not just your throat</li>
+                    <li>✧ <strong>Visualization</strong> is essential — see the light clearly with your inner eye</li>
+                    <li>✧ <strong>Intention</strong> is everything — you are respectfully invoking, not commanding</li>
+                    <li>✧ <strong>Practice regularly</strong> — daily practice makes the ritual more powerful</li>
+                    <li>✧ <strong>Feel</strong> the presence of divine force; don't just say words mechanically</li>
+                </ul>
 
-            <p>When finished, ground yourself by touching the earth and taking a few normal breaths. The space remains protected until you close it with the Qabalistic Cross again.</p>
-
-            <h2>Key Points to Remember</h2>
-
-            <ul>
-                <li>✓ Vibrate the divine names from your heart, not just your throat</li>
-                <li>✓ Visualization is essential - see the light clearly</li>
-                <li>✓ Intention is everything - you are not commanding the archangels but respectfully invoking them</li>
-                <li>✓ Practice regularly - familiarity makes the ritual more powerful</li>
-                <li>✓ Feel the presence of divine force, don't just say words</li>
-            </ul>
-
-            <p style="margin-top: 30px; text-align: center; color: #d4af37; font-family: 'Press Start 2P', cursive; font-size: 12px;">
-                The light descends. The circle is sealed. The work begins.
-            </p>
+                <p style="margin-top: 30px; text-align: center; color: #d4af37; font-family: 'Press Start 2P', cursive; font-size: 11px;">
+                    ✧ The light descends. The circle is sealed. The work begins. ✧
+                </p>
+            </div>
         </div>
 
         <div class="nav-buttons">
@@ -155,6 +601,166 @@
     </div>
 
     <script>
+        // Ritual Steps Data
+        const ritualSteps = [
+            { title: 'Preparation', hebrew: '', name: '', instruction: 'Stand facing East. Ground yourself with three deep breaths. Feel your feet connected to the earth. Set your intention to create sacred space.', duration: 15 },
+            { title: 'Qabalistic Cross - Ateh', hebrew: 'אתה', name: 'ATEH', instruction: 'Touch your forehead. Visualize a brilliant sphere of white light above your head. Draw this light down as you vibrate "ATEH" (Thine is).', duration: 8 },
+            { title: 'Qabalistic Cross - Malkuth', hebrew: 'מלכות', name: 'MALKUTH', instruction: 'Touch your lower abdomen. Draw the light down through your body to your feet. Vibrate "MALKUTH" (The Kingdom). Feel the pillar of light within you.', duration: 8 },
+            { title: 'Qabalistic Cross - Ve-Geburah', hebrew: 'וגבורה', name: 'VE-GEBURAH', instruction: 'Touch your right shoulder. Extend the light to your right side. Vibrate "VE-GEBURAH" (And the Power). Feel strength flow through you.', duration: 8 },
+            { title: 'Qabalistic Cross - Ve-Gedulah', hebrew: 'וגדולה', name: 'VE-GEDULAH', instruction: 'Touch your left shoulder. Extend the light to your left side. Vibrate "VE-GEDULAH" (And the Glory). Feel the cross of light within you.', duration: 8 },
+            { title: 'Qabalistic Cross - Le-Olam Amen', hebrew: 'לעולם אמן', name: 'LE-OLAM, AMEN', instruction: 'Cross arms on chest. Vibrate "LE-OLAM, AMEN" (Forever, Amen). Feel the light sealed within your being.', duration: 8 },
+            { title: 'East Pentagram', hebrew: 'יהוה', name: 'YHVH', instruction: 'Face East. Draw a banishing pentagram in yellow-gold light. Point to the center and vibrate "YHVH" (Yod-Heh-Vav-Heh). See the pentagram blaze before you.', duration: 12 },
+            { title: 'South Pentagram', hebrew: 'אדני', name: 'ADONAI', instruction: 'Turn to the South. Draw a banishing pentagram in fiery red light. Vibrate "ADONAI" (The Lord). The flames of Michael guard this quarter.', duration: 12 },
+            { title: 'West Pentagram', hebrew: 'אהיה', name: 'EHEIEH', instruction: 'Turn to the West. Draw a banishing pentagram in deep blue light. Vibrate "EHEIEH" (I Am That I Am). The waters of Gabriel flow here.', duration: 12 },
+            { title: 'North Pentagram', hebrew: 'אגלא', name: 'AGLA', instruction: 'Turn to the North. Draw a banishing pentagram in emerald green light. Vibrate "AGLA" (Ateh Gibor Le-Olam Adonai). The strength of Uriel grounds this quarter.', duration: 12 },
+            { title: 'Invoke Archangels', hebrew: '', name: 'THE ARCHANGELS', instruction: 'Return to East, arms extended. Invoke: "Before me RAPHAEL, Behind me GABRIEL, On my right MICHAEL, On my left URIEL. About me flames the Pentagram, within me shines the Six-rayed Star."', duration: 20 },
+            { title: 'Closing Qabalistic Cross', hebrew: '', name: 'SEALING', instruction: 'Repeat the Qabalistic Cross to seal the ritual. You now stand at the center of a sacred circle, protected and empowered by divine light.', duration: 15 },
+            { title: 'Complete', hebrew: '✧', name: 'SO MOTE IT BE', instruction: 'The ritual is complete. Rest in the sacred space you have created. When ready, ground yourself and proceed with your work or meditation.', duration: 0 }
+        ];
+
+        let currentStep = 0;
+        let timerInterval = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initStars();
+            initStepIndicator();
+            updateStepDisplay();
+        });
+
+        // Create background stars
+        function initStars() {
+            const bg = document.getElementById('ritualBg');
+            for (let i = 0; i < 40; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-particle';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 4 + 's';
+                bg.appendChild(star);
+            }
+        }
+
+        // Initialize step indicator dots
+        function initStepIndicator() {
+            const indicator = document.getElementById('stepIndicator');
+            indicator.innerHTML = ritualSteps.map((_, i) =>
+                `<div class="step-dot" id="stepDot${i}"></div>`
+            ).join('');
+        }
+
+        // Update the step display
+        function updateStepDisplay() {
+            const step = ritualSteps[currentStep];
+            document.getElementById('stepTitle').textContent = step.title;
+            document.getElementById('hebrewDisplay').textContent = step.hebrew;
+            document.getElementById('divineNameDisplay').textContent = step.name;
+            document.getElementById('stepInstruction').textContent = step.instruction;
+
+            // Update step dots
+            document.querySelectorAll('.step-dot').forEach((dot, i) => {
+                dot.classList.remove('active', 'completed');
+                if (i < currentStep) dot.classList.add('completed');
+                if (i === currentStep) dot.classList.add('active');
+            });
+
+            // Timer display
+            if (step.duration > 0) {
+                document.getElementById('ritualTimer').textContent = `Hold for ${step.duration} seconds`;
+            } else {
+                document.getElementById('ritualTimer').textContent = '';
+            }
+
+            // Trigger visual effects based on step
+            triggerStepEffects();
+        }
+
+        function triggerStepEffects() {
+            const step = ritualSteps[currentStep];
+
+            // Reset all pentagrams and archangels
+            document.querySelectorAll('.pentagram-path').forEach(p => p.classList.remove('drawing'));
+            document.querySelectorAll('.archangel-zone').forEach(a => {
+                a.classList.remove('active');
+                a.querySelector('.archangel-glow').classList.remove('active');
+            });
+
+            // Activate based on step
+            if (step.title.includes('East Pentagram')) {
+                document.getElementById('pentEast').classList.add('drawing');
+            } else if (step.title.includes('South Pentagram')) {
+                document.getElementById('pentSouth').classList.add('drawing');
+            } else if (step.title.includes('West Pentagram')) {
+                document.getElementById('pentWest').classList.add('drawing');
+            } else if (step.title.includes('North Pentagram')) {
+                document.getElementById('pentNorth').classList.add('drawing');
+            } else if (step.title.includes('Archangels')) {
+                invokeArchangels();
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < ritualSteps.length - 1) {
+                currentStep++;
+                updateStepDisplay();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                updateStepDisplay();
+            }
+        }
+
+        // Toggle sections
+        function toggleGuidedRitual() {
+            const guided = document.getElementById('guidedRitual');
+            const circle = document.getElementById('circleContainer');
+            guided.classList.toggle('active');
+            if (guided.classList.contains('active')) {
+                circle.classList.add('active');
+                currentStep = 0;
+                updateStepDisplay();
+            }
+        }
+
+        function toggleCircleView() {
+            document.getElementById('circleContainer').classList.toggle('active');
+            document.getElementById('guidedRitual').classList.remove('active');
+        }
+
+        // Draw all pentagrams with animation
+        function drawPentagram() {
+            document.getElementById('circleContainer').classList.add('active');
+            const pentagrams = ['pentEast', 'pentSouth', 'pentWest', 'pentNorth'];
+            pentagrams.forEach((id, i) => {
+                setTimeout(() => {
+                    document.getElementById(id).classList.remove('drawing');
+                    void document.getElementById(id).offsetWidth; // Trigger reflow
+                    document.getElementById(id).classList.add('drawing');
+                }, i * 600);
+            });
+
+            // Activate circle glow
+            document.getElementById('circleGlow').classList.add('active');
+        }
+
+        // Invoke archangels with sequential animation
+        function invokeArchangels() {
+            document.getElementById('circleContainer').classList.add('active');
+            const archangels = ['archangelRaphael', 'archangelMichael', 'archangelGabriel', 'archangelUriel'];
+
+            archangels.forEach((id, i) => {
+                setTimeout(() => {
+                    const zone = document.getElementById(id);
+                    zone.classList.add('active');
+                    zone.querySelector('.archangel-glow').classList.add('active');
+                }, i * 500);
+            });
+        }
+
+        // Gamification integration
         if (typeof TheGoldenDawnGamification !== 'undefined') {
             const gamification = new TheGoldenDawnGamification();
             gamification.trackPageVisit('ritual-lbrp');

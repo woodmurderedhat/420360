@@ -6,32 +6,46 @@
     <title>Tarot - The Golden Dawn</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #2d1b4e 0%, #0f0519 100%);
             color: #e8d7f1;
             line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        /* Mystical Particle Background */
+        .mystical-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
         }
+        .star {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: #d4af37;
+            border-radius: 50%;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
 
         nav {
             background: rgba(45, 27, 78, 0.95);
             padding: 1rem 0;
             border-bottom: 3px solid #6b4c9a;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 100;
         }
-
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -40,129 +54,412 @@
             justify-content: space-between;
             align-items: center;
         }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #d4af37; font-family: 'Press Start 2P', cursive; }
+        .nav-links { display: flex; list-style: none; gap: 2rem; }
+        .nav-links a { color: #e8d7f1; text-decoration: none; transition: color 0.3s; font-size: 0.9rem; }
+        .nav-links a:hover, .nav-links a.active { color: #e0aaff; text-shadow: 0 0 10px rgba(157, 78, 221, 0.5); }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #d4af37;
-            font-family: 'Press Start 2P', cursive;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: #e8d7f1;
-            text-decoration: none;
-            transition: color 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: #e0aaff;
-            text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding: 3rem 0;
-            border-bottom: 3px solid #6b4c9a;
-        }
-
+        header { text-align: center; margin-bottom: 2rem; padding: 2rem 0; }
         h1 {
             font-family: 'Press Start 2P', cursive;
             color: #d4af37;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        .subtitle { font-size: 1.1rem; color: #e0aaff; }
+
+        /* Interactive Control Panel */
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(45, 27, 78, 0.6);
+            border: 2px solid #6b4c9a;
+            border-radius: 12px;
+        }
+        .control-btn {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #6b4c9a 0%, #9d4edd 100%);
+            color: #fff;
+            border: 2px solid #e0aaff;
+            border-radius: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(157, 78, 221, 0.5);
+            background: linear-gradient(135deg, #9d4edd 0%, #d4af37 100%);
+        }
+        .control-btn.active {
+            background: linear-gradient(135deg, #d4af37 0%, #ff6b35 100%);
+            border-color: #d4af37;
         }
 
-        .subtitle {
-            font-size: 1.2rem;
+        /* Daily Card Section */
+        .daily-card-section {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(45, 27, 78, 0.8);
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+        .daily-card-section.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .deck-container {
+            perspective: 1000px;
+            margin: 2rem auto;
+            width: 180px;
+            height: 280px;
+            cursor: pointer;
+        }
+        .deck {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+        }
+        .deck.shuffling { animation: shuffle 0.5s ease-in-out 3; }
+        @keyframes shuffle {
+            0%, 100% { transform: rotateY(0) translateX(0); }
+            25% { transform: rotateY(-15deg) translateX(-20px); }
+            75% { transform: rotateY(15deg) translateX(20px); }
+        }
+        .deck-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a0a2e 0%, #3d1f5c 50%, #1a0a2e 100%);
+            border: 3px solid #d4af37;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+        }
+        .deck-pattern {
+            width: 80%;
+            height: 80%;
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(212, 175, 55, 0.1) 10px, rgba(212, 175, 55, 0.1) 20px);
+        }
+        .deck-pattern::before { content: '✧'; font-size: 3rem; color: #d4af37; }
+
+        .drawn-card {
+            display: none;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #2d1b4e 0%, #4a2c7a 100%);
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            max-width: 400px;
+            animation: cardReveal 0.8s ease;
+        }
+        .drawn-card.active { display: block; }
+        @keyframes cardReveal {
+            0% { opacity: 0; transform: rotateY(90deg) scale(0.5); }
+            100% { opacity: 1; transform: rotateY(0) scale(1); }
+        }
+        .drawn-card-symbol { font-size: 5rem; margin-bottom: 1rem; }
+        .drawn-card-name { font-family: 'Press Start 2P', cursive; color: #d4af37; font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .drawn-card-hebrew { font-size: 2rem; color: #e0aaff; margin-bottom: 1rem; }
+        .drawn-card-message { color: #e8d7f1; font-style: italic; line-height: 1.8; }
+        .drawn-card-path { margin-top: 1rem; padding: 1rem; background: rgba(157, 78, 221, 0.2); border-radius: 8px; font-size: 0.9rem; }
+
+        /* Card Spread Section */
+        .spread-section {
+            display: none;
+            padding: 2rem;
+            background: rgba(45, 27, 78, 0.8);
+            border: 3px solid #9d4edd;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+        .spread-section.active { display: block; animation: fadeIn 0.5s ease; }
+        .spread-title { font-family: 'Press Start 2P', cursive; color: #d4af37; text-align: center; margin-bottom: 1.5rem; }
+        .spread-select {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .spread-option {
+            padding: 0.6rem 1.2rem;
+            background: rgba(107, 76, 154, 0.3);
+            border: 2px solid #6b4c9a;
+            border-radius: 8px;
             color: #e0aaff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
         }
-
-        h2 {
+        .spread-option:hover, .spread-option.active {
+            background: rgba(157, 78, 221, 0.5);
+            border-color: #d4af37;
             color: #d4af37;
-            margin: 2rem 0 1rem;
-            font-size: 1.8rem;
-            border-bottom: 2px solid #6b4c9a;
-            padding-bottom: 0.5rem;
         }
 
+        /* Three Card Spread */
+        .three-card-spread {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        .spread-position {
+            text-align: center;
+            cursor: pointer;
+        }
+        .spread-position-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            color: #d4af37;
+            margin-bottom: 0.5rem;
+        }
+        .spread-card-slot {
+            width: 120px;
+            height: 180px;
+            background: rgba(26, 15, 46, 0.8);
+            border: 2px dashed #6b4c9a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .spread-card-slot::before {
+            content: '?';
+            font-size: 2rem;
+            color: #6b4c9a;
+        }
+        .spread-card-slot.revealed {
+            border-style: solid;
+            border-color: #d4af37;
+            background: linear-gradient(135deg, #2d1b4e 0%, #4a2c7a 100%);
+        }
+        .spread-card-slot.revealed::before { content: none; }
+        .spread-card-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+        }
+        .spread-card-slot.revealed .spread-card-content { display: flex; }
+        .spread-card-symbol { font-size: 2.5rem; }
+        .spread-card-title { font-size: 0.7rem; color: #d4af37; margin-top: 0.3rem; font-weight: bold; }
+        .spread-card-slot:hover:not(.revealed) {
+            border-color: #e0aaff;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.4);
+        }
+
+        /* Meditation Section */
+        .meditation-section {
+            display: none;
+            padding: 2rem;
+            background: rgba(26, 15, 46, 0.95);
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .meditation-section.active { display: block; animation: fadeIn 0.5s ease; }
+        .meditation-card-display {
+            width: 200px;
+            height: 300px;
+            margin: 2rem auto;
+            background: linear-gradient(135deg, #2d1b4e 0%, #4a2c7a 100%);
+            border: 3px solid #d4af37;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: gentlePulse 4s infinite ease-in-out;
+        }
+        @keyframes gentlePulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.6); }
+        }
+        .meditation-symbol { font-size: 4rem; margin-bottom: 1rem; }
+        .meditation-name { font-family: 'Press Start 2P', cursive; color: #d4af37; font-size: 0.9rem; }
+        .meditation-guidance {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: rgba(107, 76, 154, 0.2);
+            border-radius: 10px;
+            font-style: italic;
+            line-height: 1.8;
+        }
+        .breath-guide {
+            width: 100px;
+            height: 100px;
+            margin: 2rem auto;
+            border-radius: 50%;
+            background: radial-gradient(circle, #d4af37 0%, transparent 70%);
+            animation: breathe 8s infinite ease-in-out;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(0.6); opacity: 0.4; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        .breath-text {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: #e0aaff;
+            animation: breatheText 8s infinite ease-in-out;
+        }
+        @keyframes breatheText {
+            0%, 45% { opacity: 1; }
+            46%, 49% { opacity: 0; }
+            50%, 95% { opacity: 1; }
+            96%, 100% { opacity: 0; }
+        }
+
+        h2 { color: #d4af37; margin: 2rem 0 1rem; font-size: 1.5rem; border-bottom: 2px solid #6b4c9a; padding-bottom: 0.5rem; }
+
+        /* Enhanced Tarot Grid */
         .tarot-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 1.5rem;
             margin: 2rem 0;
         }
-
         .tarot-card {
-            background: rgba(107, 76, 154, 0.1);
+            background: linear-gradient(135deg, rgba(45, 27, 78, 0.8) 0%, rgba(107, 76, 154, 0.3) 100%);
             border: 2px solid #6b4c9a;
             padding: 1rem;
-            border-radius: 8px;
-            transition: all 0.3s;
+            border-radius: 10px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-
+        .tarot-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tarot-card:hover::before { opacity: 1; }
         .tarot-card:hover {
-            background: rgba(107, 76, 154, 0.2);
-            border-color: #e0aaff;
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 0 20px rgba(157, 78, 221, 0.3);
+            transform: translateY(-8px) rotateX(5deg);
+            border-color: #d4af37;
+            box-shadow: 0 15px 35px rgba(157, 78, 221, 0.4), 0 0 20px rgba(212, 175, 55, 0.2);
         }
-
-        .card-num {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .card-name {
-            color: #e0aaff;
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
+        .card-symbol { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; transition: transform 0.3s; }
+        .tarot-card:hover .card-symbol { transform: scale(1.2); }
+        .card-num { font-size: 1rem; color: #d4af37; font-weight: bold; display: block; margin-bottom: 0.3rem; }
+        .card-name { color: #e0aaff; font-size: 0.8rem; font-weight: bold; margin-bottom: 0.3rem; }
+        .card-hebrew { font-size: 1.2rem; color: #d4af37; opacity: 0.8; }
+        .card-path { font-size: 0.65rem; color: #9d4edd; margin-top: 0.3rem; }
         .card-link {
             display: inline-block;
-            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+            padding: 0.4rem 0.6rem;
             background: #6b4c9a;
             color: #e0aaff;
             text-decoration: none;
             border: 1px solid #e0aaff;
             border-radius: 4px;
             transition: all 0.3s;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             font-family: 'Press Start 2P', cursive;
         }
+        .card-link:hover { background: #9d4edd; }
 
-        .card-link:hover {
-            background: #9d4edd;
-            text-shadow: 0 0 10px rgba(224, 170, 255, 0.8);
+        /* Card Modal */
+        .card-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 5, 25, 0.95);
+            z-index: 1000;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
         }
-
-        footer {
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 2px solid #6b4c9a;
-            text-align: center;
+        .card-modal.active { display: flex; align-items: center; justify-content: center; }
+        .card-modal-content {
+            background: linear-gradient(135deg, #2d1b4e 0%, #1a0f2e 100%);
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
             color: #d4af37;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .modal-close:hover { transform: rotate(90deg); }
+        .modal-card-header { text-align: center; margin-bottom: 1.5rem; }
+        .modal-symbol { font-size: 4rem; }
+        .modal-name { font-family: 'Press Start 2P', cursive; color: #d4af37; font-size: 1.2rem; margin: 0.5rem 0; }
+        .modal-hebrew { font-size: 2rem; color: #e0aaff; }
+        .modal-section { margin: 1.5rem 0; padding: 1rem; background: rgba(107, 76, 154, 0.15); border-radius: 8px; }
+        .modal-section h3 { color: #d4af37; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .modal-section p { color: #e8d7f1; font-size: 0.9rem; line-height: 1.6; }
+        .modal-correspondences { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+        .modal-corr-item { background: rgba(45, 27, 78, 0.5); padding: 0.8rem; border-radius: 6px; font-size: 0.85rem; }
+        .modal-corr-label { color: #9d4edd; font-size: 0.7rem; display: block; margin-bottom: 0.3rem; }
+        .modal-actions { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
+        .modal-btn {
+            padding: 0.7rem 1.2rem;
+            background: #6b4c9a;
+            color: #e0aaff;
+            border: 2px solid #e0aaff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            transition: all 0.3s;
+        }
+        .modal-btn:hover { background: #9d4edd; transform: translateY(-2px); }
+
+        .intro {
+            font-size: 1rem;
+            color: #d4d4d4;
+            margin: 1.5rem 0;
+            padding: 1.2rem;
+            background: rgba(107, 76, 154, 0.1);
+            border-left: 3px solid #d4af37;
         }
 
-        .nav-buttons {
-            text-align: center;
-            margin-top: 2rem;
-        }
-
+        footer { margin-top: 3rem; padding-top: 2rem; border-top: 2px solid #6b4c9a; text-align: center; color: #d4af37; }
+        .nav-buttons { text-align: center; margin-top: 2rem; }
         .nav-buttons a {
             padding: 0.7rem 1.5rem;
             background: #6b4c9a;
@@ -171,41 +468,25 @@
             border: 1px solid #e0aaff;
             border-radius: 4px;
             transition: all 0.3s;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-family: 'Press Start 2P', cursive;
         }
-
-        .nav-buttons a:hover {
-            background: #9d4edd;
-            text-shadow: 0 0 10px rgba(224, 170, 255, 0.8);
-        }
-
-        .intro {
-            font-size: 1.1rem;
-            color: #d4d4d4;
-            margin: 2rem 0;
-            padding: 1.5rem;
-            background: rgba(107, 76, 154, 0.05);
-            border-left: 3px solid #d4af37;
-        }
+        .nav-buttons a:hover { background: #9d4edd; }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-                font-size: 0.8rem;
-            }
-
-            .tarot-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
+            h1 { font-size: 1.4rem; }
+            .nav-links { gap: 0.8rem; font-size: 0.7rem; }
+            .tarot-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; }
+            .control-btn { font-size: 0.6rem; padding: 0.6rem 1rem; }
+            .three-card-spread { gap: 1rem; }
+            .spread-card-slot { width: 90px; height: 135px; }
         }
     </style>
 </head>
 <body>
+    <!-- Mystical Background -->
+    <div class="mystical-bg" id="mysticalBg"></div>
+
     <nav>
         <div class="nav-container">
             <div class="logo">✨ Golden Dawn</div>
@@ -226,144 +507,102 @@
             <p class="subtitle">22 Keys to Mystical Understanding</p>
         </header>
 
+        <!-- Interactive Control Panel -->
+        <div class="control-panel">
+            <button class="control-btn" onclick="toggleDailyCard()">🌅 Daily Card</button>
+            <button class="control-btn" onclick="toggleSpread()">🔮 Card Spread</button>
+            <button class="control-btn" onclick="toggleMeditation()">🧘 Card Meditation</button>
+            <button class="control-btn" onclick="shuffleDeck()">🔄 Shuffle Deck</button>
+        </div>
+
+        <!-- Daily Card Section -->
+        <div class="daily-card-section" id="dailyCardSection">
+            <h3 style="font-family: 'Press Start 2P', cursive; color: #d4af37; margin-bottom: 1rem;">🌅 Draw Your Daily Card</h3>
+            <p style="color: #e0aaff; margin-bottom: 1rem;">Click the deck to receive guidance for your day</p>
+
+            <div class="deck-container" onclick="drawDailyCard()">
+                <div class="deck" id="deck">
+                    <div class="deck-back">
+                        <div class="deck-pattern"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="drawn-card" id="drawnCard">
+                <div class="drawn-card-symbol" id="drawnSymbol"></div>
+                <div class="drawn-card-name" id="drawnName"></div>
+                <div class="drawn-card-hebrew" id="drawnHebrew"></div>
+                <div class="drawn-card-message" id="drawnMessage"></div>
+                <div class="drawn-card-path" id="drawnPath"></div>
+            </div>
+        </div>
+
+        <!-- Spread Section -->
+        <div class="spread-section" id="spreadSection">
+            <h3 class="spread-title">🔮 Tarot Spread</h3>
+            <div class="spread-select">
+                <div class="spread-option active" onclick="selectSpread('three')">Three Card</div>
+                <div class="spread-option" onclick="selectSpread('celtic')">Past-Present-Future</div>
+            </div>
+            <div class="three-card-spread" id="spreadArea">
+                <div class="spread-position" onclick="revealSpreadCard(0)">
+                    <div class="spread-position-label">PAST</div>
+                    <div class="spread-card-slot" id="spreadSlot0">
+                        <div class="spread-card-content">
+                            <div class="spread-card-symbol"></div>
+                            <div class="spread-card-title"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="spread-position" onclick="revealSpreadCard(1)">
+                    <div class="spread-position-label">PRESENT</div>
+                    <div class="spread-card-slot" id="spreadSlot1">
+                        <div class="spread-card-content">
+                            <div class="spread-card-symbol"></div>
+                            <div class="spread-card-title"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="spread-position" onclick="revealSpreadCard(2)">
+                    <div class="spread-position-label">FUTURE</div>
+                    <div class="spread-card-slot" id="spreadSlot2">
+                        <div class="spread-card-content">
+                            <div class="spread-card-symbol"></div>
+                            <div class="spread-card-title"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="control-btn" style="margin-top: 1.5rem;" onclick="resetSpread()">🔄 New Reading</button>
+        </div>
+
+        <!-- Meditation Section -->
+        <div class="meditation-section" id="meditationSection">
+            <h3 style="font-family: 'Press Start 2P', cursive; color: #d4af37; margin-bottom: 1rem;">🧘 Card Meditation</h3>
+            <p style="color: #e0aaff; margin-bottom: 1rem;">Select a card from below, then return here to meditate</p>
+
+            <div class="meditation-card-display" id="meditationCard">
+                <div class="meditation-symbol" id="medSymbol">?</div>
+                <div class="meditation-name" id="medName">Select a Card</div>
+            </div>
+
+            <div class="breath-guide"></div>
+            <div class="breath-text" id="breathText">Breathe deeply...</div>
+
+            <div class="meditation-guidance" id="medGuidance">
+                Click on any card in the Major Arcana below to begin your meditation journey.
+                Gaze upon the symbol, breathe with the rhythm, and open yourself to the card's wisdom.
+            </div>
+        </div>
+
         <div class="intro">
-            <p>The Major Arcana of tarot represents the journey of spiritual transformation. In the Golden Dawn system, each of the 22 Major Arcana cards corresponds to paths on the Tree of Life and reveals profound mysteries of the human soul and the cosmos. Journey through The Fool's journey and unlock the wisdom of each card.</p>
+            <p>The Major Arcana represents the <strong>Fool's Journey</strong> through spiritual transformation. Each of the 22 cards corresponds to a path on the <strong>Tree of Life</strong> and a Hebrew letter, revealing profound mysteries of the soul and cosmos.</p>
         </div>
 
         <h2>🔮 The Major Arcana</h2>
-        
-        <div class="tarot-grid">
-            <div class="tarot-card">
-                <span class="card-num">0</span>
-                <span class="card-name">The Fool</span>
-                <a href="tarot/tarot-0.html" class="card-link">Explore</a>
-            </div>
 
-            <div class="tarot-card">
-                <span class="card-num">I</span>
-                <span class="card-name">Magician</span>
-                <a href="tarot/tarot-1.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">II</span>
-                <span class="card-name">Priestess</span>
-                <a href="tarot/tarot-2.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">III</span>
-                <span class="card-name">Empress</span>
-                <a href="tarot/tarot-3.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">IV</span>
-                <span class="card-name">Emperor</span>
-                <a href="tarot/tarot-4.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">V</span>
-                <span class="card-name">Hierophant</span>
-                <a href="tarot/tarot-5.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">VI</span>
-                <span class="card-name">Lovers</span>
-                <a href="tarot/tarot-6.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">VII</span>
-                <span class="card-name">Chariot</span>
-                <a href="tarot/tarot-7.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">VIII</span>
-                <span class="card-name">Strength</span>
-                <a href="tarot/tarot-8.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">IX</span>
-                <span class="card-name">Hermit</span>
-                <a href="tarot/tarot-9.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">X</span>
-                <span class="card-name">Wheel</span>
-                <a href="tarot/tarot-10.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XI</span>
-                <span class="card-name">Justice</span>
-                <a href="tarot/tarot-11.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XII</span>
-                <span class="card-name">Hanged Man</span>
-                <a href="tarot/tarot-12.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XIII</span>
-                <span class="card-name">Death</span>
-                <a href="tarot/tarot-13.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XIV</span>
-                <span class="card-name">Temperance</span>
-                <a href="tarot/tarot-14.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XV</span>
-                <span class="card-name">Devil</span>
-                <a href="tarot/tarot-15.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XVI</span>
-                <span class="card-name">Tower</span>
-                <a href="tarot/tarot-16.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XVII</span>
-                <span class="card-name">Star</span>
-                <a href="tarot/tarot-17.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XVIII</span>
-                <span class="card-name">Moon</span>
-                <a href="tarot/tarot-18.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XIX</span>
-                <span class="card-name">Sun</span>
-                <a href="tarot/tarot-19.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XX</span>
-                <span class="card-name">Judgement</span>
-                <a href="tarot/tarot-20.html" class="card-link">Explore</a>
-            </div>
-
-            <div class="tarot-card">
-                <span class="card-num">XXI</span>
-                <span class="card-name">World</span>
-                <a href="tarot/tarot-21.html" class="card-link">Explore</a>
-            </div>
+        <div class="tarot-grid" id="tarotGrid">
+            <!-- Cards will be generated by JavaScript -->
         </div>
 
         <div class="nav-buttons">
@@ -371,8 +610,253 @@
         </div>
     </div>
 
+    <!-- Card Modal -->
+    <div class="card-modal" id="cardModal">
+        <div class="card-modal-content">
+            <span class="modal-close" onclick="closeCardModal()">✕</span>
+            <div class="modal-card-header">
+                <div class="modal-symbol" id="modalSymbol"></div>
+                <div class="modal-name" id="modalName"></div>
+                <div class="modal-hebrew" id="modalHebrew"></div>
+            </div>
+            <div class="modal-section">
+                <h3>Spiritual Meaning</h3>
+                <p id="modalMeaning"></p>
+            </div>
+            <div class="modal-section">
+                <h3>Meditation Guidance</h3>
+                <p id="modalGuidance"></p>
+            </div>
+            <div class="modal-correspondences" id="modalCorrespondences"></div>
+            <div class="modal-actions">
+                <button class="modal-btn" onclick="meditateOnCard()">🧘 Meditate</button>
+                <a class="modal-btn" id="modalExploreLink" href="#">📖 Full Study</a>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2025 The Golden Dawn. Part of the Esoteric Hub.</p>
     </footer>
+
+    <script>
+        // Complete Major Arcana Data with Golden Dawn Correspondences
+        const majorArcana = [
+            { num: 0, numeral: '0', name: 'The Fool', symbol: '🃏', hebrew: 'א', hebrewName: 'Aleph', path: 'Kether → Chokmah', element: 'Air', planet: 'Uranus', meaning: 'New beginnings, innocence, spontaneity, and the leap of faith into the unknown.', guidance: 'Embrace the unknown with childlike wonder. Release attachments to outcomes and trust in the journey itself.' },
+            { num: 1, numeral: 'I', name: 'The Magician', symbol: '🎩', hebrew: 'ב', hebrewName: 'Beth', path: 'Kether → Binah', element: 'Mercury', planet: 'Mercury', meaning: 'Willpower, manifestation, resourcefulness. As above, so below.', guidance: 'Focus your will upon your intention. You have all the tools you need—now channel them with purpose.' },
+            { num: 2, numeral: 'II', name: 'High Priestess', symbol: '🌙', hebrew: 'ג', hebrewName: 'Gimel', path: 'Kether → Tiphareth', element: 'Moon', planet: 'Moon', meaning: 'Intuition, sacred mysteries, the unconscious mind, divine feminine wisdom.', guidance: 'Sit in stillness and listen to the whispers of your soul. The answers lie within, not without.' },
+            { num: 3, numeral: 'III', name: 'The Empress', symbol: '👑', hebrew: 'ד', hebrewName: 'Daleth', path: 'Chokmah → Binah', element: 'Venus', planet: 'Venus', meaning: 'Fertility, abundance, nurturing, creative force of nature.', guidance: 'Connect with the earth and your body. Create beauty and allow yourself to receive abundance.' },
+            { num: 4, numeral: 'IV', name: 'The Emperor', symbol: '🏛️', hebrew: 'ה', hebrewName: 'Heh', path: 'Chokmah → Tiphareth', element: 'Aries', planet: 'Mars', meaning: 'Authority, structure, father figure, rational order and leadership.', guidance: 'Establish clear boundaries and take responsibility for your domain. Lead with wisdom, not force.' },
+            { num: 5, numeral: 'V', name: 'Hierophant', symbol: '⛪', hebrew: 'ו', hebrewName: 'Vav', path: 'Chokmah → Chesed', element: 'Taurus', planet: 'Venus', meaning: 'Tradition, spiritual wisdom, religious institutions, the bridge between worlds.', guidance: 'Seek teachings from established wisdom traditions. Consider what beliefs serve you and which need release.' },
+            { num: 6, numeral: 'VI', name: 'The Lovers', symbol: '💕', hebrew: 'ז', hebrewName: 'Zayin', path: 'Binah → Tiphareth', element: 'Gemini', planet: 'Mercury', meaning: 'Love, harmony, relationships, choices, union of opposites.', guidance: 'Examine the relationships in your life. What choices align with your highest truth?' },
+            { num: 7, numeral: 'VII', name: 'The Chariot', symbol: '🏇', hebrew: 'ח', hebrewName: 'Cheth', path: 'Binah → Geburah', element: 'Cancer', planet: 'Moon', meaning: 'Victory through willpower, determination, control of opposing forces.', guidance: 'Harness your emotions and will. Move forward with confidence despite inner conflicts.' },
+            { num: 8, numeral: 'VIII', name: 'Strength', symbol: '🦁', hebrew: 'ט', hebrewName: 'Teth', path: 'Chesed → Geburah', element: 'Leo', planet: 'Sun', meaning: 'Inner strength, courage, patience, compassion conquering fear.', guidance: 'True strength is gentle. Approach challenges with love rather than force.' },
+            { num: 9, numeral: 'IX', name: 'The Hermit', symbol: '🏔️', hebrew: 'י', hebrewName: 'Yod', path: 'Chesed → Tiphareth', element: 'Virgo', planet: 'Mercury', meaning: 'Solitude, inner guidance, wisdom, the light within the darkness.', guidance: 'Withdraw from the noise of the world. Seek your inner teacher in silence and contemplation.' },
+            { num: 10, numeral: 'X', name: 'Wheel of Fortune', symbol: '☸️', hebrew: 'כ', hebrewName: 'Kaph', path: 'Chesed → Netzach', element: 'Jupiter', planet: 'Jupiter', meaning: 'Cycles, fate, turning points, the eternal dance of change.', guidance: 'Accept the cycles of life. What rises must fall, and what falls shall rise again.' },
+            { num: 11, numeral: 'XI', name: 'Justice', symbol: '⚖️', hebrew: 'ל', hebrewName: 'Lamed', path: 'Geburah → Tiphareth', element: 'Libra', planet: 'Venus', meaning: 'Balance, fairness, truth, karma, cause and effect.', guidance: 'Examine your actions honestly. What adjustments bring you into greater alignment with truth?' },
+            { num: 12, numeral: 'XII', name: 'Hanged Man', symbol: '🙃', hebrew: 'מ', hebrewName: 'Mem', path: 'Geburah → Hod', element: 'Water', planet: 'Neptune', meaning: 'Surrender, new perspective, sacrifice, suspension between worlds.', guidance: 'Release your grip on how things "should" be. A new vision comes through letting go.' },
+            { num: 13, numeral: 'XIII', name: 'Death', symbol: '💀', hebrew: 'נ', hebrewName: 'Nun', path: 'Tiphareth → Netzach', element: 'Scorpio', planet: 'Pluto', meaning: 'Transformation, endings and beginnings, the death of the old self.', guidance: 'What must die so something new can be born? Embrace the transformation.' },
+            { num: 14, numeral: 'XIV', name: 'Temperance', symbol: '⚗️', hebrew: 'ס', hebrewName: 'Samekh', path: 'Tiphareth → Yesod', element: 'Sagittarius', planet: 'Jupiter', meaning: 'Balance, moderation, patience, the alchemical blending of opposites.', guidance: 'Practice patience and moderation. Blend the elements of your life into harmony.' },
+            { num: 15, numeral: 'XV', name: 'The Devil', symbol: '😈', hebrew: 'ע', hebrewName: 'Ayin', path: 'Tiphareth → Hod', element: 'Capricorn', planet: 'Saturn', meaning: 'Shadow self, bondage, materialism, facing inner demons.', guidance: 'Examine what chains bind you—they may be of your own making. Face your shadow with courage.' },
+            { num: 16, numeral: 'XVI', name: 'The Tower', symbol: '🗼', hebrew: 'פ', hebrewName: 'Peh', path: 'Netzach → Hod', element: 'Mars', planet: 'Mars', meaning: 'Sudden change, revelation, breaking down of false structures.', guidance: 'Sometimes destruction clears the way for truth. Let false foundations crumble.' },
+            { num: 17, numeral: 'XVII', name: 'The Star', symbol: '⭐', hebrew: 'צ', hebrewName: 'Tzaddi', path: 'Netzach → Yesod', element: 'Aquarius', planet: 'Uranus', meaning: 'Hope, inspiration, serenity, connection to the divine.', guidance: 'After the storm comes peace. Open yourself to hope and cosmic guidance.' },
+            { num: 18, numeral: 'XVIII', name: 'The Moon', symbol: '🌕', hebrew: 'ק', hebrewName: 'Qoph', path: 'Netzach → Malkuth', element: 'Pisces', planet: 'Neptune', meaning: 'Illusion, intuition, the unconscious, fear and fantasy.', guidance: 'Navigate the realm of dreams and shadow. Not all is as it seems—trust your deeper knowing.' },
+            { num: 19, numeral: 'XIX', name: 'The Sun', symbol: '☀️', hebrew: 'ר', hebrewName: 'Resh', path: 'Hod → Yesod', element: 'Sun', planet: 'Sun', meaning: 'Joy, success, vitality, the divine child within.', guidance: 'Celebrate life! Let your inner light shine forth without apology.' },
+            { num: 20, numeral: 'XX', name: 'Judgement', symbol: '📯', hebrew: 'ש', hebrewName: 'Shin', path: 'Hod → Malkuth', element: 'Fire/Spirit', planet: 'Pluto', meaning: 'Rebirth, inner calling, absolution, resurrection of the soul.', guidance: 'Heed the call of your higher self. Rise renewed and answer your true purpose.' },
+            { num: 21, numeral: 'XXI', name: 'The World', symbol: '🌍', hebrew: 'ת', hebrewName: 'Tav', path: 'Yesod → Malkuth', element: 'Saturn/Earth', planet: 'Saturn', meaning: 'Completion, integration, accomplishment, cosmic consciousness.', guidance: 'Celebrate your journey\'s completion. You have integrated the lessons—now a new cycle begins.' }
+        ];
+
+        let currentMeditationCard = null;
+        let spreadCards = [null, null, null];
+        let breathPhase = 'inhale';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initStars();
+            renderTarotGrid();
+            startBreathCycle();
+        });
+
+        // Create twinkling stars background
+        function initStars() {
+            const bg = document.getElementById('mysticalBg');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (2 + Math.random() * 2) + 's';
+                bg.appendChild(star);
+            }
+        }
+
+        // Render the enhanced tarot grid
+        function renderTarotGrid() {
+            const grid = document.getElementById('tarotGrid');
+            grid.innerHTML = majorArcana.map(card => `
+                <div class="tarot-card" onclick="openCardModal(${card.num})">
+                    <span class="card-symbol">${card.symbol}</span>
+                    <span class="card-num">${card.numeral}</span>
+                    <span class="card-name">${card.name}</span>
+                    <span class="card-hebrew">${card.hebrew}</span>
+                    <span class="card-path">${card.hebrewName}</span>
+                    <a href="tarot/tarot-${card.num}.html" class="card-link" onclick="event.stopPropagation()">Study →</a>
+                </div>
+            `).join('');
+        }
+
+        // Toggle sections
+        function toggleDailyCard() {
+            document.getElementById('dailyCardSection').classList.toggle('active');
+            document.getElementById('spreadSection').classList.remove('active');
+            document.getElementById('meditationSection').classList.remove('active');
+        }
+
+        function toggleSpread() {
+            document.getElementById('spreadSection').classList.toggle('active');
+            document.getElementById('dailyCardSection').classList.remove('active');
+            document.getElementById('meditationSection').classList.remove('active');
+        }
+
+        function toggleMeditation() {
+            document.getElementById('meditationSection').classList.toggle('active');
+            document.getElementById('dailyCardSection').classList.remove('active');
+            document.getElementById('spreadSection').classList.remove('active');
+        }
+
+        // Shuffle animation
+        function shuffleDeck() {
+            const deck = document.getElementById('deck');
+            deck.classList.add('shuffling');
+            setTimeout(() => deck.classList.remove('shuffling'), 1500);
+        }
+
+        // Draw daily card
+        function drawDailyCard() {
+            const deck = document.getElementById('deck');
+            deck.classList.add('shuffling');
+
+            setTimeout(() => {
+                deck.classList.remove('shuffling');
+                const randomCard = majorArcana[Math.floor(Math.random() * majorArcana.length)];
+
+                document.getElementById('drawnSymbol').textContent = randomCard.symbol;
+                document.getElementById('drawnName').textContent = `${randomCard.numeral} - ${randomCard.name}`;
+                document.getElementById('drawnHebrew').textContent = `${randomCard.hebrew} ${randomCard.hebrewName}`;
+                document.getElementById('drawnMessage').textContent = randomCard.guidance;
+                document.getElementById('drawnPath').innerHTML = `<strong>Tree of Life Path:</strong> ${randomCard.path}<br><strong>Element:</strong> ${randomCard.element}`;
+
+                document.getElementById('drawnCard').classList.add('active');
+            }, 1500);
+        }
+
+        // Card Spread Functions
+        function selectSpread(type) {
+            document.querySelectorAll('.spread-option').forEach(opt => opt.classList.remove('active'));
+            event.target.classList.add('active');
+            resetSpread();
+
+            const labels = document.querySelectorAll('.spread-position-label');
+            if (type === 'three') {
+                labels[0].textContent = 'PAST';
+                labels[1].textContent = 'PRESENT';
+                labels[2].textContent = 'FUTURE';
+            } else {
+                labels[0].textContent = 'SITUATION';
+                labels[1].textContent = 'CHALLENGE';
+                labels[2].textContent = 'OUTCOME';
+            }
+        }
+
+        function revealSpreadCard(position) {
+            const slot = document.getElementById(`spreadSlot${position}`);
+            if (slot.classList.contains('revealed')) return;
+
+            // Get unused cards
+            const usedNums = spreadCards.filter(c => c !== null).map(c => c.num);
+            const availableCards = majorArcana.filter(c => !usedNums.includes(c.num));
+            const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+
+            spreadCards[position] = randomCard;
+
+            slot.classList.add('revealed');
+            slot.querySelector('.spread-card-symbol').textContent = randomCard.symbol;
+            slot.querySelector('.spread-card-title').textContent = randomCard.name;
+        }
+
+        function resetSpread() {
+            spreadCards = [null, null, null];
+            for (let i = 0; i < 3; i++) {
+                const slot = document.getElementById(`spreadSlot${i}`);
+                slot.classList.remove('revealed');
+                slot.querySelector('.spread-card-symbol').textContent = '';
+                slot.querySelector('.spread-card-title').textContent = '';
+            }
+        }
+
+        // Card Modal
+        function openCardModal(cardNum) {
+            const card = majorArcana.find(c => c.num === cardNum);
+            if (!card) return;
+
+            document.getElementById('modalSymbol').textContent = card.symbol;
+            document.getElementById('modalName').textContent = `${card.numeral} - ${card.name}`;
+            document.getElementById('modalHebrew').textContent = `${card.hebrew} ${card.hebrewName}`;
+            document.getElementById('modalMeaning').textContent = card.meaning;
+            document.getElementById('modalGuidance').textContent = card.guidance;
+            document.getElementById('modalExploreLink').href = `tarot/tarot-${card.num}.html`;
+
+            document.getElementById('modalCorrespondences').innerHTML = `
+                <div class="modal-corr-item"><span class="modal-corr-label">Tree Path</span>${card.path}</div>
+                <div class="modal-corr-item"><span class="modal-corr-label">Element</span>${card.element}</div>
+                <div class="modal-corr-item"><span class="modal-corr-label">Planet</span>${card.planet}</div>
+                <div class="modal-corr-item"><span class="modal-corr-label">Hebrew Letter</span>${card.hebrew} (${card.hebrewName})</div>
+            `;
+
+            currentMeditationCard = card;
+            document.getElementById('cardModal').classList.add('active');
+        }
+
+        function closeCardModal() {
+            document.getElementById('cardModal').classList.remove('active');
+        }
+
+        function meditateOnCard() {
+            if (!currentMeditationCard) return;
+
+            closeCardModal();
+            document.getElementById('meditationSection').classList.add('active');
+            document.getElementById('dailyCardSection').classList.remove('active');
+            document.getElementById('spreadSection').classList.remove('active');
+
+            document.getElementById('medSymbol').textContent = currentMeditationCard.symbol;
+            document.getElementById('medName').textContent = currentMeditationCard.name;
+            document.getElementById('medGuidance').textContent = currentMeditationCard.guidance +
+                ' Gaze upon the symbol. Breathe with the light. Allow the wisdom of ' +
+                currentMeditationCard.name + ' to speak to your soul.';
+        }
+
+        // Breathing cycle for meditation
+        function startBreathCycle() {
+            const breathText = document.getElementById('breathText');
+            const phases = ['Breathe in...', 'Hold...', 'Breathe out...', 'Rest...'];
+            let phaseIndex = 0;
+
+            setInterval(() => {
+                breathText.textContent = phases[phaseIndex];
+                phaseIndex = (phaseIndex + 1) % phases.length;
+            }, 2000);
+        }
+
+        // Close modal on escape or outside click
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeCardModal();
+        });
+
+        document.getElementById('cardModal').addEventListener('click', (e) => {
+            if (e.target.id === 'cardModal') closeCardModal();
+        });
+    </script>
 </body>
 </html>

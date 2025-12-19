@@ -690,6 +690,11 @@ function openEsotericHub() {
   showOverlay('esotericHubOverlay');
 }
 
+function openBlog() {
+  // Navigate directly to Jekyll blog
+  window.location.href = '/420360/blog/';
+}
+
 function openDaughtersIndex() {
   openEsotericHub();
 }
@@ -1399,6 +1404,15 @@ function setupControlButtons() {
     videoBtn.addEventListener('click', e => { e.stopPropagation(); toggleVideoWindow(); });
     videoBtn.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleVideoWindow(); }
+    });
+  }
+
+  // Blog button
+  const blogBtn = document.getElementById('blog-control');
+  if (blogBtn) {
+    blogBtn.addEventListener('click', e => { e.stopPropagation(); openBlog(); });
+    blogBtn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBlog(); }
     });
   }
 }

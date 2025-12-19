@@ -1,0 +1,32 @@
+title: 420360
+description: Experience 90s retro web popups, glitch art, and digital nostalgia. Retro arcade games, interactive experiences, and a development blog.
+baseurl: "/420360"
+url: "https://woodmurderedhat.github.io"
+author: woodmurderedhat
+
+# Jekyll settings
+markdown: kramdown
+theme: minima
+permalink: /blog/:year/:month/:day/:title/
+
+# Collections and includes
+include:
+  - _pages
+
+# Exclude folders from processing
+exclude:
+  - .git
+  - .github
+  - node_modules
+  - venv
+  - .sequential-thoughts
+  - games
+  - esoteric
+  - about
+  - testpages
+  - null-vesper
+  - tools
+
+# Blog settings
+paginate: 10
+paginate_path: "/blog/page:num/"

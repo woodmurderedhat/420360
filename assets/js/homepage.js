@@ -1458,6 +1458,12 @@ function loadUserPreferences() {
     if (label) label.textContent = 'CHILL: ON';
   }
 
+  // MIGRATION: Reset popup state to default (off) for all users
+  // Remove this block after a few weeks once all users have been migrated
+  if (localStorage.getItem(CONFIG.STORAGE_KEYS.POPUPS_PAUSED) === 'false') {
+    localStorage.removeItem(CONFIG.STORAGE_KEYS.POPUPS_PAUSED);
+  }
+
   // Load popup pause state (default to true = off)
   state.popupsPaused = loadPreference(CONFIG.STORAGE_KEYS.POPUPS_PAUSED, true);
   const popupBtn = document.getElementById('popup-control');

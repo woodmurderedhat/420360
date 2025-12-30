@@ -21,15 +21,15 @@
     }
 
     const AD_SLOGANS = [
-        "Insert Coin at woodmurderedhat.com",
+        "Insert Coin at github.com/woodmurderedhat",
         "Unleash the Metal—Click for Power-Ups!",
         "Stage Dive into Deals!",
         "Shred High Scores, Shred Prices!",
         "Arcade Legends Shop Here!",
-        "Metal Up Your Game—woodmurderedhat.com",
+        "Metal Up Your Game—github.com/woodmurderedhat",
         "Combo Breaker Savings!"
     ];
-    const AD_LINK = "https://woodmurderedhat.com";
+    const AD_LINK = "https://github.com/woodmurderedhat";
     const AD_LOCATIONS = [
         { id: "sidebar-ad-container", max: 2 },
         { id: "below-board-ad-container", max: 2 }

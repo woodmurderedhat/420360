@@ -120,7 +120,7 @@ const ADS = [
   { label: "NOCTIS REVERIE", href: "https://420360.xyz/games/noctis-reverie/index.html", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif" },
   { label: "247420", href: "https://discord.gg/an-entrypoint-367741339393327104", gif: "https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif" },
   { label: "GIPHY", href: "https://giphy.com/woodmurderedhat", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" },
-  { label: "WOODMURDEREDHAT", href: "https://woodmurderedhat.com/social", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" },
+  { label: "WOODMURDEREDHAT", href: "https://github.com/woodmurderedhat", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" },
   { label: "YOUTUBE", href: "https://www.youtube.com/@woodenhat", gif: "https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif" },
   { label: "FRIDAY", href: "#", gif: "https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif" },
   { label: "SATURDAY", href: "#", gif: "https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif" },

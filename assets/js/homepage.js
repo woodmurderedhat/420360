@@ -60,7 +60,7 @@ const state = {
   musicEnabled: false,
   sfxEnabled: false,
   chillMode: false,
-  popupsPaused: false,
+  popupsPaused: true,  // Popups off by default
   
   // Runtime state
   reducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false,
@@ -1177,6 +1177,21 @@ function toggleChillMode() {
   restartIntervals();
 }
 
+/**
+ * Update chill button visibility based on popup state
+ */
+function updateChillButtonVisibility() {
+  const chillBtn = document.getElementById('chill-control');
+  if (chillBtn) {
+    // Show chill button only when popups are active
+    if (state.popupsPaused) {
+      chillBtn.style.display = 'none';
+    } else {
+      chillBtn.style.display = 'flex';
+    }
+  }
+}
+
 /* ============================================
    POPUP PAUSE TOGGLE
    ============================================ */
@@ -1189,8 +1204,11 @@ function togglePopupPause() {
   if (btn) {
     btn.classList.toggle('popups-paused', state.popupsPaused);
     const label = btn.querySelector('.ctrl-btn-label');
-    if (label) label.textContent = state.popupsPaused ? 'POPUPS: OFF' : 'POPUPS';
+    if (label) label.textContent = state.popupsPaused ? 'POPUPS: OFF' : 'POPUPS: ON';
   }
+
+  // Update chill button visibility
+  updateChillButtonVisibility();
 
   // If pausing, stop the popup interval; if resuming, restart
   if (state.popupsPaused) {
@@ -1440,14 +1458,22 @@ function loadUserPreferences() {
     if (label) label.textContent = 'CHILL: ON';
   }
 
-  // Load popup pause state
-  state.popupsPaused = loadPreference(CONFIG.STORAGE_KEYS.POPUPS_PAUSED, false);
+  // Load popup pause state (default to true = off)
+  state.popupsPaused = loadPreference(CONFIG.STORAGE_KEYS.POPUPS_PAUSED, true);
   const popupBtn = document.getElementById('popup-control');
-  if (popupBtn && state.popupsPaused) {
-    popupBtn.classList.add('popups-paused');
-    const label = popupBtn.querySelector('.ctrl-btn-label');
-    if (label) label.textContent = 'POPUPS: OFF';
+  if (popupBtn) {
+    if (state.popupsPaused) {
+      popupBtn.classList.add('popups-paused');
+      const label = popupBtn.querySelector('.ctrl-btn-label');
+      if (label) label.textContent = 'POPUPS: OFF';
+    } else {
+      const label = popupBtn.querySelector('.ctrl-btn-label');
+      if (label) label.textContent = 'POPUPS: ON';
+    }
   }
+
+  // Set initial chill button visibility
+  updateChillButtonVisibility();
 }
 
 /* ============================================

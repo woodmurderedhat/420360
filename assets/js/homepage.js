@@ -24,18 +24,18 @@ const CONFIG = {
   NON_OVERLAP_ATTEMPTS: 30,
   
   // Animation intervals
-  GLITCH_INTERVAL_DEFAULT: 200,
-  GLITCH_INTERVAL_CHILL: 800,
-  GLITCH_INTERVAL_REDUCED: 1500,
-  
+  GLITCH_INTERVAL_DEFAULT: 300,
+  GLITCH_INTERVAL_CHILL: 700,
+  GLITCH_INTERVAL_REDUCED: 1600,
+
   MORPH_INTERVAL_DEFAULT: 2500,
   MORPH_INTERVAL_CHILL: 5000,
   MORPH_INTERVAL_REDUCED: 10000,
   
   // Timing durations (ms)
   OVERLAY_FADE_DURATION: 190,
-  GLITCH_WORD_MIN_DURATION: 120,
-  GLITCH_WORD_MAX_DURATION: 420,
+  GLITCH_WORD_MIN_DURATION: 12000,
+  GLITCH_WORD_MAX_DURATION: 42000,
   MUSIC_FADE_DURATION: 1800,
   SFX_MIN_INTERVAL: 90,
   
@@ -75,40 +75,9 @@ const state = {
 };
 
 /* ============================================
-   SENTENCES FOR BLURB
-   ============================================ */
-const SENTENCES = [
-  "Welcome to the future of the internet ",
-  "Surf the web like it's 1996 ",
-  "Pixels were our stars in the night sky ",
-  "Error 404: meaning not found ",
-  "The modem's hum was a lullaby for the lost ",
-  "Reality pixelated in low-res confusion ",
-  "The cursor blinks, waiting for meaning ",
-  "Lost in the metadata of my own mind ",
-  "The blue screen of existential dread ",
-  "Loading life in 8-bit resolution ",
-  "Dial-up dreams in a broadband world ",
-  "My heart beats in ASCII code ",
-  "Pop-ups were portals to the unknown ",
-  "Neon hyperlinks light the way home ",
-  "Buffering thoughts in a digital haze ",
-  "Chatrooms echo with forgotten voices ",
-  "The web was wild, untamed, infinite ",
-  "Caffeine and code at 3AM ",
-  "My soul uploads at 56k speeds ",
-  "Lost packets, lost memories ",
-  "The homepage is where the heart is ",
-  "Right-click to save nostalgia ",
-  "Pop culture in pop-up windows ",
-  "The night glows with CRT static ",
-  "We surfed the chaos, byte by byte ",
-  "404: Sleep not found ",
-  "My dreams are animated GIFs ",
-  "The internet never forgets a meme ",
-  "Reality checks in Comic Sans ",
-  "I left my heart in a guestbook "
-];
+  SENTENCES FOR BLURB (global, loaded via script)
+  ============================================ */
+// SENTENCES is now loaded globally from sentences.js
 
 /* ============================================
    AD/POPUP DATA
@@ -840,6 +809,7 @@ function showFloatingWindow(id) {
 
 function startIntervals() {
   const intervals = getIntervals();
+  startColorChaos();
 
   if (!state.intervalIds.popup && intervals.popup > 0 && !state.popupsPaused) {
     state.intervalIds.popup = setInterval(spawnPopup, intervals.popup);
@@ -869,6 +839,7 @@ function stopIntervals() {
     clearInterval(state.intervalIds.morph);
     state.intervalIds.morph = null;
   }
+  stopColorChaos();
   document.documentElement.classList.add('paused');
 }
 
@@ -1426,22 +1397,23 @@ function setupControlButtons() {
    ============================================ */
 
 function randomizeColors() {
-  const weedColorVariants = [
-    { primary: '#4a8c3a', secondary: '#7b5e8b', highlight: '#8fbc8f' }, // default
-    { primary: '#3e7b2e', secondary: '#6b4d7b', highlight: '#7daf7d' }, // darker green
-    { primary: '#569946', secondary: '#8b6b9b', highlight: '#9bcf9b' }, // lighter green
-    { primary: '#2d5a2d', secondary: '#5e3a6e', highlight: '#6d8e6d' }, // forest
-    { primary: '#4d7a3d', secondary: '#7a5a8a', highlight: '#8aaa8a' }  // earthy
-  ];
+  const root = document.documentElement;
 
-  // 30% chance to use alternate colors
-  if (Math.random() < 0.3) {
-    const variant = weedColorVariants[Math.floor(Math.random() * weedColorVariants.length)];
-    const root = document.documentElement;
-    root.style.setProperty('--primary', variant.primary);
-    root.style.setProperty('--secondary', variant.secondary);
-    root.style.setProperty('--highlight', variant.highlight);
-  }
+  // generate a random base hue and produce other hues by offsets
+  const baseHue = Math.floor(Math.random() * 360);
+  const randPct = (min, max) => min + Math.random() * (max - min);
+  const primary = `hsl(${baseHue}, ${randPct(40,80)}%, ${randPct(30,60)}%)`;
+  const secondary = `hsl(${(baseHue + 60) % 360}, ${randPct(40,80)}%, ${randPct(30,60)}%)`;
+  const highlight = `hsl(${(baseHue + 120) % 360}, ${randPct(50,100)}%, ${randPct(60,90)}%)`;
+  const bgHue = (baseHue + 180 + Math.random() * 60 - 30) % 360;
+  const bg = `hsl(${bgHue}, ${randPct(20,40)}%, ${randPct(5,30)}%)`;
+  const text = `hsl(${(bgHue + 180) % 360}, ${randPct(20,80)}%, ${randPct(70,95)}%)`;
+
+  root.style.setProperty('--primary', primary);
+  root.style.setProperty('--secondary', secondary);
+  root.style.setProperty('--highlight', highlight);
+  root.style.setProperty('--bg', bg);
+  root.style.setProperty('--text', text);
 }
 
 /* ============================================
@@ -1482,6 +1454,63 @@ function loadUserPreferences() {
   updateChillButtonVisibility();
 }
 
+/**
+ * Random/chaotic movement for all control buttons (header & bottom)
+ */
+let controlChaosInterval = null;
+function startControlButtonChaos() {
+  if (controlChaosInterval) clearInterval(controlChaosInterval);
+  const CHAOS_INTERVAL = 420; // ms, can randomize per button for more chaos
+  function randomTransform() {
+    if (state.chillMode) {
+      // Reset transforms if chill mode is on
+      document.querySelectorAll('#header-controls .ctrl-btn, #bottom-controls-left .ctrl-btn, #bottom-controls-right .ctrl-btn').forEach(btn => {
+        btn.style.transform = '';
+      });
+      return;
+    }
+    document.querySelectorAll('#header-controls .ctrl-btn, #bottom-controls-left .ctrl-btn, #bottom-controls-right .ctrl-btn').forEach(btn => {
+      // Random translate (-6px to 6px), rotate (-8deg to 8deg), scale (0.96 to 1.08)
+      const tx = (Math.random() - 0.5) * 12;
+      const ty = (Math.random() - 0.5) * 12;
+      const rot = (Math.random() - 0.5) * 16;
+      const scale = 0.96 + Math.random() * 0.12;
+      btn.style.transition = 'transform 0.33s cubic-bezier(.7,-0.3,.7,1.7)';
+      btn.style.transform = `translate(${tx}px,${ty}px) rotate(${rot}deg) scale(${scale})`;
+    });
+  }
+  controlChaosInterval = setInterval(randomTransform, CHAOS_INTERVAL);
+  // Also run once immediately
+  randomTransform();
+}
+
+// --- color chaos --------------------------------------------------
+let colorChaosInterval = null;
+function startColorChaos() {
+  if (colorChaosInterval) clearInterval(colorChaosInterval);
+  const INTERVAL = 1200; // base interval between changes
+  colorChaosInterval = setInterval(() => {
+    if (!state.chillMode) randomizeColors();
+  }, INTERVAL + Math.random() * 1800); // jitter for unpredictability
+}
+function stopColorChaos() {
+  if (colorChaosInterval) {
+    clearInterval(colorChaosInterval);
+    colorChaosInterval = null;
+  }
+}
+
+// Reset transforms when chill mode is toggled on
+const origToggleChillMode = typeof toggleChillMode === 'function' ? toggleChillMode : null;
+toggleChillMode = function() {
+  if (origToggleChillMode) origToggleChillMode.apply(this, arguments);
+  if (state.chillMode) {
+    document.querySelectorAll('#header-controls .ctrl-btn, #bottom-controls-left .ctrl-btn, #bottom-controls-right .ctrl-btn').forEach(btn => {
+      btn.style.transform = '';
+    });
+  }
+};
+
 /* ============================================
    INITIALIZATION
    ============================================ */
@@ -1499,6 +1528,9 @@ function init() {
   // Setup control buttons
   setupControlButtons();
 
+  // Start chaotic header button movement
+  startControlButtonChaos();
+
   // Setup event handlers
   setupEventHandlers();
 
@@ -1513,6 +1545,8 @@ function init() {
 
   // Randomize colors on load
   randomizeColors();
+  // Kick off continuous color changes
+  startColorChaos();
 
   // Start intervals if page is visible
   if (!document.hidden) startIntervals();

@@ -32,6 +32,17 @@ const CONFIG = {
   MORPH_INTERVAL_CHILL: 5000,
   MORPH_INTERVAL_REDUCED: 10000,
   
+  // Morph burst configuration (used instead of a constant interval)
+  MORPH_BURST_INTERVAL_DEFAULT: 30000, // time between bursts
+  MORPH_BURST_INTERVAL_CHILL: 60000,
+  MORPH_BURST_INTERVAL_REDUCED: 90000,
+  MORPH_BURST_DURATION_DEFAULT: 5000,  // how long a burst lasts
+  MORPH_BURST_DURATION_CHILL: 10000,
+  MORPH_BURST_DURATION_REDUCED: 15000,
+  MORPH_BURST_STEP_DEFAULT: 500,      // delay between morph steps inside a burst
+  MORPH_BURST_STEP_CHILL: 1000,
+  MORPH_BURST_STEP_REDUCED: 1500,
+  
   // Timing durations (ms)
   OVERLAY_FADE_DURATION: 190,
   GLITCH_WORD_MIN_DURATION: 12000,
@@ -69,6 +80,13 @@ const state = {
     glitch: null,
     morph: null
   },
+
+  // burst control IDs for rapid sentence morphing
+  burstIntervalId: null,   // schedules when bursts start
+  morphStepId: null,       // timer between individual morphs during a burst
+  burstTimeoutId: null,    // cancels the burst after its duration
+  burstActive: false,
+
   activePopups: [],
   currentSentence: '',
   videoWindowLoaded: false
@@ -175,6 +193,29 @@ function getIntervals() {
     popup: CONFIG.POPUP_INTERVAL_MS,
     glitch: CONFIG.GLITCH_INTERVAL_DEFAULT,
     morph: CONFIG.MORPH_INTERVAL_DEFAULT
+  };
+}
+
+// BURST TIMING HELPERS
+function getBurstSettings() {
+  if (state.reducedMotion) {
+    return {
+      interval: CONFIG.MORPH_BURST_INTERVAL_REDUCED,
+      duration: CONFIG.MORPH_BURST_DURATION_REDUCED,
+      step: CONFIG.MORPH_BURST_STEP_REDUCED
+    };
+  }
+  if (state.chillMode) {
+    return {
+      interval: CONFIG.MORPH_BURST_INTERVAL_CHILL,
+      duration: CONFIG.MORPH_BURST_DURATION_CHILL,
+      step: CONFIG.MORPH_BURST_STEP_CHILL
+    };
+  }
+  return {
+    interval: CONFIG.MORPH_BURST_INTERVAL_DEFAULT,
+    duration: CONFIG.MORPH_BURST_DURATION_DEFAULT,
+    step: CONFIG.MORPH_BURST_STEP_DEFAULT
   };
 }
 
@@ -291,6 +332,43 @@ function morphToRandomSentence() {
     setTimeout(changeNextWord, 150);
   }
   changeNextWord();
+}
+
+// ======== burst control ========
+
+/**
+ * Begin a rapid series of morphs for a short duration.
+ * Subsequent calls while a burst is active are ignored.
+ */
+function startMorphBurst() {
+  if (state.burstActive) return;
+  const {duration, step} = getBurstSettings();
+  if (duration <= 0 || step <= 0) return;
+  state.burstActive = true;
+  // kick off first morph immediately
+  doBurstStep(step);
+  state.burstTimeoutId = setTimeout(endMorphBurst, duration);
+}
+
+/**
+ * Perform one morph and schedule the next if burst still active.
+ */
+function doBurstStep(step) {
+  if (!state.burstActive) return;
+  morphToRandomSentence();
+  state.morphStepId = setTimeout(() => doBurstStep(step), step);
+}
+
+/**
+ * End the current morph burst, clearing timers.
+ */
+function endMorphBurst() {
+  if (state.morphStepId) {
+    clearTimeout(state.morphStepId);
+    state.morphStepId = null;
+  }
+  state.burstActive = false;
+  state.burstTimeoutId = null;
 }
 
 /* ============================================
@@ -819,8 +897,14 @@ function startIntervals() {
     state.intervalIds.glitch = setInterval(glitchRandomWord, intervals.glitch);
   }
 
-  if (!state.intervalIds.morph && intervals.morph > 0) {
-    state.intervalIds.morph = setInterval(morphToRandomSentence, intervals.morph);
+  // morphs now occur in bursts rather than a constant interval
+  if (!state.burstIntervalId) {
+    const burst = getBurstSettings();
+    if (burst.interval > 0) {
+      state.burstIntervalId = setInterval(startMorphBurst, burst.interval);
+      // start one immediately so page isn't blank-long
+      startMorphBurst();
+    }
   }
 
   document.documentElement.classList.remove('paused');
@@ -839,6 +923,21 @@ function stopIntervals() {
     clearInterval(state.intervalIds.morph);
     state.intervalIds.morph = null;
   }
+  // also clear any burst-related timers
+  if (state.burstIntervalId) {
+    clearInterval(state.burstIntervalId);
+    state.burstIntervalId = null;
+  }
+  if (state.morphStepId) {
+    clearTimeout(state.morphStepId);
+    state.morphStepId = null;
+  }
+  if (state.burstTimeoutId) {
+    clearTimeout(state.burstTimeoutId);
+    state.burstTimeoutId = null;
+  }
+  state.burstActive = false;
+
   stopColorChaos();
   document.documentElement.classList.add('paused');
 }
@@ -1359,10 +1458,14 @@ function setupControlButtons() {
   const issueBtn = document.getElementById('issue-report');
   if (issueBtn) {
     issueBtn.addEventListener('click', e => { e.stopPropagation(); openIssues(); });
-    issueBtn.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openIssues(); }
-    });
   }
+
+  // Add hover chaos handlers to every control button. motion will start
+  // on mouseenter and stop/reset on mouseleave.
+  document.querySelectorAll('#header-controls .ctrl-btn, #bottom-controls-left .ctrl-btn, #bottom-controls-right .ctrl-btn').forEach(btn => {
+    btn.addEventListener('mouseenter', () => startButtonChaos(btn));
+    btn.addEventListener('mouseleave', () => stopButtonChaos(btn));
+  });
 
   // Chill mode button
   const chillBtn = document.getElementById('chill-control');
@@ -1456,9 +1559,18 @@ function loadUserPreferences() {
 
 /**
  * Random/chaotic movement for all control buttons (header & bottom)
+ *
+ * This behavior is optional and normally disabled. The buttons remain
+ * static until hovered, relying solely on the CSS :hover transform.
+ * The initialization call is commented out above. Keeping the function
+ * around makes it easy to re-enable in future if desired.
  */
 let controlChaosInterval = null;
 function startControlButtonChaos() {
+  // Legacy function - randomized transforms on every control button.
+  // No longer called automatically; the new hover‑based functions below
+  // handle per-button motion. Keeping this around in case the global
+  // behaviour is ever desired again.
   if (controlChaosInterval) clearInterval(controlChaosInterval);
   const CHAOS_INTERVAL = 420; // ms, can randomize per button for more chaos
   function randomTransform() {
@@ -1500,13 +1612,47 @@ function stopColorChaos() {
   }
 }
 
-// Reset transforms when chill mode is toggled on
+// Map to keep track of individual button chaos intervals
+const chaosIntervals = new WeakMap();
+
+/**
+ * Start random motion on a single control button. The interval will be
+ * stored in `chaosIntervals` so it can be cleared later.
+ */
+function startButtonChaos(btn) {
+  if (state.chillMode || chaosIntervals.has(btn)) return;
+  const CHAOS_INTERVAL = 420;
+  function randomTransform() {
+    // motion only while hovered; chill mode checked before starting
+    const tx = (Math.random() - 0.5) * 12;
+    const ty = (Math.random() - 0.5) * 12;
+    const rot = (Math.random() - 0.5) * 16;
+    const scale = 0.96 + Math.random() * 0.12;
+    btn.style.transition = 'transform 0.33s cubic-bezier(.7,-0.3,.7,1.7)';
+    btn.style.transform = `translate(${tx}px,${ty}px) rotate(${rot}deg) scale(${scale})`;
+  }
+  const interval = setInterval(randomTransform, CHAOS_INTERVAL);
+  chaosIntervals.set(btn, interval);
+  randomTransform();
+}
+
+function stopButtonChaos(btn) {
+  const interval = chaosIntervals.get(btn);
+  if (interval) {
+    clearInterval(interval);
+    chaosIntervals.delete(btn);
+  }
+  btn.style.transform = '';
+}
+
+// Reset transforms when chill mode is toggled on, and clear any running
+// per-button chaos intervals so they don't restart while chilled.
 const origToggleChillMode = typeof toggleChillMode === 'function' ? toggleChillMode : null;
 toggleChillMode = function() {
   if (origToggleChillMode) origToggleChillMode.apply(this, arguments);
   if (state.chillMode) {
     document.querySelectorAll('#header-controls .ctrl-btn, #bottom-controls-left .ctrl-btn, #bottom-controls-right .ctrl-btn').forEach(btn => {
-      btn.style.transform = '';
+      stopButtonChaos(btn);
     });
   }
 };
@@ -1529,7 +1675,8 @@ function init() {
   setupControlButtons();
 
   // Start chaotic header button movement
-  startControlButtonChaos();
+  // Note: chaotic motion has been disabled so buttons stay static
+  // startControlButtonChaos();  // commented out per request, hover still works
 
   // Setup event handlers
   setupEventHandlers();

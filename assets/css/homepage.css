@@ -45,8 +45,9 @@ html, body {
   width: 100vw;
   max-width: 100vw;
   text-align: justify;
-  text-align-last: justify;
-  -webkit-text-align-last: justify;
+  text-justify: inter-word; /* Improves spacing between words */
+  hyphens: auto;           /* Allows browser to hyphenate words */
+  -webkit-hyphens: auto;
   line-height: 1.5;
   letter-spacing: 0.5px;
   background: none;

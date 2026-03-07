@@ -1,43 +1,70 @@
-# Cartoons @ 420360
+# Autonomy Flux
 
-Pen and ink cartoon gallery at [420360.xyz/cartoons](https://420360.xyz/cartoons)
+Autonomy Flux is a static generative art website built with plain HTML/CSS/JS and p5.js.
+It is designed for GitHub Pages and explores a post-postmodern visual language where
+collective motion can produce turbulence, but the system gradually returns to coherence.
 
-## Adding New Cartoons
+## Features
 
-1. Upload your pen/ink drawing to Google Photos
-2. Get the shareable link (right-click image → Copy image address)
-3. Edit `cartoons.json` directly on GitHub or locally
-4. Add new entry at the **top** of the array:
-   ```json
-   {
-     "url": "https://lh3.googleusercontent.com/...",
-     "title": "Optional Title"
-   }
-   ```
-5. Commit and push - site auto-updates!
+- Continuous generative simulation with live mouse and touch influence
+- Deterministic seed system via URL query (`?seed=123456`)
+- Controls for seed navigation, pause/resume, reset, and PNG export
+- Reduced-motion toggle for lower animation intensity and gentler visuals
+- Short manifesto panel that frames the post-postmodern anti-escalation intent
+- Responsive layout for desktop and mobile
+- Zero build tooling, static deployment ready
 
-## Google Photos URL Tips
+## Run locally
 
-- Full size: URL should end with `=w2400` or `=s0`
-- Thumbnail: Change to `=w800` for faster loading
-- Direct image URL format: `https://lh3.googleusercontent.com/[ID]=w2400`
-
-## Tech Stack
-
-- Pure HTML/CSS/JS (no build tools)
-- CSS Masonry layout (3 cols desktop, 2 tablet, 1 mobile)
-- Retro 90s aesthetic matching main 420360.xyz site
-- Lightbox with keyboard navigation (← → arrows, ESC)
-- Progressive image loading
-
-## Local Development
+1. Open this folder in VS Code.
+2. Start any static server from the repository root.
+3. Example commands:
 
 ```bash
-cd cartoons
 python -m http.server 8000
-# Open http://localhost:8000
+# or
+npx serve .
 ```
 
----
+4. Visit `http://localhost:8000`.
 
-Part of the [420360](https://420360.xyz) universe 🧀
+## Seed reproducibility
+
+- Seed is read from `?seed=<value>`.
+- Seed controls update the URL automatically.
+- The same seed recreates the same baseline field and particle initialization.
+- Interactive pointer movement changes the evolving state in real time by design.
+
+## Deploy to GitHub Pages
+
+### Option A: Branch-based Pages (simple)
+
+1. Push this repository to GitHub.
+2. In repository settings, open `Pages`.
+3. Set source to `Deploy from a branch`.
+4. Choose branch `main` and folder `/ (root)`.
+5. Save and wait for deployment.
+
+### Option B: Actions-based Pages
+
+A workflow is included at `.github/workflows/pages.yml`.
+
+1. In repository settings, open `Pages`.
+2. Set source to `GitHub Actions`.
+3. Push to `main`; the workflow deploys automatically.
+
+## Customization
+
+- Edit palette and typography in `style.css`.
+- Tune interaction and flow constants in `script.js`:
+  - `PARTICLE_COUNT`
+  - flow coefficients in `getFlowVector`
+  - damping and slider ranges
+- Modify statement copy in `index.html`.
+
+## File overview
+
+- `index.html`: layout, narrative text, controls, script includes
+- `style.css`: visual direction and responsive behavior
+- `script.js`: p5 sketch, seed system, interaction logic
+- `.github/workflows/pages.yml`: optional automated Pages deploy

@@ -1,206 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cartoons @ 420360</title>
-  
-  <!-- SEO Metadata -->
-  <meta name="description" content="Pen and ink cartoon gallery by woodmurderedhat. Hand-drawn sketches and illustrations in retro web style.">
-  <meta name="keywords" content="cartoons, pen and ink, drawings, sketches, illustrations, art, 420360, woodmurderedhat">
-  <meta name="author" content="woodmurderedhat">
-  <meta name="theme-color" content="#4a8c3a">
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:title" content="Cartoons @ 420360">
-  <meta property="og:description" content="Pen and ink cartoon gallery by woodmurderedhat">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://420360.xyz/cartoons/">
-  <meta property="og:site_name" content="420360 Cartoons">
-  
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:creator" content="@woodenhat">
-  <meta name="twitter:title" content="Cartoons @ 420360">
-  <meta name="twitter:description" content="Pen and ink cartoon gallery by woodmurderedhat">
-  
-  <!-- Canonical URL -->
-  <link rel="canonical" href="https://420360.xyz/cartoons/">
-  
-  <!-- Pixel font -->
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
-  
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  
-  <!-- Header -->
-  <header>
-    <div class="header-content">
-      <h1>🧀 CARTOONS @ 420360</h1>
-      <p class="subtitle">Pen & Ink Drawings</p>
-      <a href="../" class="back-link">← Back to 420360</a>
-    </div>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Autonomy Flux</title>
+    <meta
+      name="description"
+      content="A generative artwork about distributed autonomy, civic agency, and a collective refusal of escalation."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f6f0e3'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%230f6e74'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%23c65f32'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Fraunces:opsz,wght,SOFT@9..144,400..700,75&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <main class="layout">
+      <header class="hero reveal-1">
+        <p class="kicker">Post-Postmodern Generative Study</p>
+        <h1>Autonomy Flux</h1>
+        <p class="statement">
+          The field remembers pressure, then slowly returns to civic rhythm. Motion is a vote for
+          agency. Turbulence appears, but it does not become doctrine.
+        </p>
+      </header>
 
-  <!-- Gallery Grid -->
-  <main>
-    <div id="gallery" class="masonry-grid">
-      <!-- Images loaded dynamically from cartoons.json -->
-    </div>
-    
-    <!-- Loading indicator -->
-    <div id="loading" class="loading-text">Loading cartoons...</div>
-    
-    <!-- Empty state -->
-    <div id="empty-state" class="empty-state" style="display: none;">
-      <p>No cartoons yet. Check back soon! 🧀</p>
-    </div>
-  </main>
+      <section class="manifesto reveal-2" aria-label="Artist statement">
+        <p>
+          This work treats autonomy as a distributed condition, not a heroic center. Each gesture
+          perturbs the commons, but the system is tuned toward de-escalation rather than permanent
+          crisis. It is a small refusal of inevitability.
+        </p>
+      </section>
 
-  <!-- Lightbox Modal -->
-  <div id="lightbox" class="lightbox" style="display: none;">
-    <div class="lightbox-overlay"></div>
-    <div class="lightbox-content">
-      <button class="lightbox-close" aria-label="Close lightbox">✕</button>
-      <button class="lightbox-prev" aria-label="Previous image">‹</button>
-      <button class="lightbox-next" aria-label="Next image">›</button>
-      <img id="lightbox-img" src="" alt="">
-      <div id="lightbox-title" class="lightbox-title"></div>
-      <div class="lightbox-counter">
-        <span id="lightbox-current">1</span> / <span id="lightbox-total">1</span>
-      </div>
-    </div>
-  </div>
+      <section class="canvas-shell reveal-2" aria-label="Interactive art canvas">
+        <div id="sketch-holder"></div>
+      </section>
 
-  <!-- Footer -->
-  <footer>
-    <p>Part of the <a href="../" rel="noopener">420360</a> universe</p>
-    <p>By <a href="https://github.com/woodmurderedhat" target="_blank" rel="noopener">woodmurderedhat</a></p>
-  </footer>
+      <aside class="controls reveal-3" aria-label="Artwork controls">
+        <div class="control-group">
+          <p class="label">Seed</p>
+          <p id="seed-display" class="seed-value">0</p>
+          <div class="row">
+            <button id="prev-seed" type="button">Previous</button>
+            <button id="next-seed" type="button">Next</button>
+          </div>
+          <div class="row">
+            <button id="random-seed" type="button">Random</button>
+            <button id="copy-link" type="button">Copy Link</button>
+          </div>
+        </div>
 
-  <!-- Gallery Script -->
-  <script>
-    // Gallery state
-    let cartoons = [];
-    let currentIndex = 0;
+        <div class="control-group">
+          <p class="label">Simulation</p>
+          <div class="row">
+            <button id="toggle-pause" type="button">Pause</button>
+            <button id="reset-scene" type="button">Reset</button>
+          </div>
+          <div class="row">
+            <button id="save-frame" type="button">Save PNG</button>
+            <button id="toggle-motion" type="button">Reduced Motion: Off</button>
+          </div>
+        </div>
 
-    // Load cartoons from JSON
-    async function loadCartoons() {
-      try {
-        const response = await fetch('cartoons.json');
-        cartoons = await response.json();
-        
-        if (cartoons.length === 0) {
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('empty-state').style.display = 'block';
-          return;
-        }
-        
-        renderGallery();
-        document.getElementById('loading').style.display = 'none';
-      } catch (error) {
-        console.error('Error loading cartoons:', error);
-        document.getElementById('loading').textContent = 'Error loading cartoons 😢';
-      }
-    }
+        <div class="control-group">
+          <p class="label">Intensity</p>
+          <label for="cohesion-slider">Cohesion</label>
+          <input id="cohesion-slider" type="range" min="0.2" max="1.8" step="0.05" value="0.95" />
+          <label for="drift-slider">Drift</label>
+          <input id="drift-slider" type="range" min="0.2" max="2" step="0.05" value="1" />
+          <label for="memory-slider">Memory</label>
+          <input id="memory-slider" type="range" min="0.85" max="0.995" step="0.001" value="0.965" />
+        </div>
+      </aside>
+    </main>
 
-    // Render gallery grid
-    function renderGallery() {
-      const gallery = document.getElementById('gallery');
-      gallery.innerHTML = '';
-      
-      cartoons.forEach((cartoon, index) => {
-        const item = document.createElement('div');
-        item.className = 'gallery-item';
-        
-        const img = document.createElement('img');
-        img.src = getThumbnailUrl(cartoon.url);
-        img.alt = cartoon.title || `Cartoon ${index + 1}`;
-        img.loading = 'lazy';
-        img.addEventListener('click', () => openLightbox(index));
-        
-        item.appendChild(img);
-        
-        if (cartoon.title) {
-          const title = document.createElement('div');
-          title.className = 'gallery-item-title';
-          title.textContent = cartoon.title;
-          item.appendChild(title);
-        }
-        
-        gallery.appendChild(item);
-      });
-    }
-
-    // Convert Google Photos URL to thumbnail size
-    function getThumbnailUrl(url) {
-      // Replace resolution parameter for thumbnail
-      return url.replace(/=w\d+/, '=w800').replace(/=s\d+/, '=w800');
-    }
-
-    // Get full-size URL
-    function getFullSizeUrl(url) {
-      // Use high resolution for lightbox
-      return url.replace(/=w\d+/, '=w2400').replace(/=s\d+/, '=s0');
-    }
-
-    // Open lightbox
-    function openLightbox(index) {
-      currentIndex = index;
-      const lightbox = document.getElementById('lightbox');
-      const img = document.getElementById('lightbox-img');
-      const title = document.getElementById('lightbox-title');
-      const current = document.getElementById('lightbox-current');
-      const total = document.getElementById('lightbox-total');
-      
-      img.src = getFullSizeUrl(cartoons[index].url);
-      img.alt = cartoons[index].title || `Cartoon ${index + 1}`;
-      title.textContent = cartoons[index].title || '';
-      current.textContent = index + 1;
-      total.textContent = cartoons.length;
-      
-      lightbox.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-
-    // Close lightbox
-    function closeLightbox() {
-      document.getElementById('lightbox').style.display = 'none';
-      document.body.style.overflow = 'auto';
-    }
-
-    // Navigate lightbox
-    function navigateLightbox(direction) {
-      currentIndex += direction;
-      if (currentIndex < 0) currentIndex = cartoons.length - 1;
-      if (currentIndex >= cartoons.length) currentIndex = 0;
-      openLightbox(currentIndex);
-    }
-
-    // Event listeners
-    document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
-    document.querySelector('.lightbox-prev').addEventListener('click', () => navigateLightbox(-1));
-    document.querySelector('.lightbox-next').addEventListener('click', () => navigateLightbox(1));
-    document.querySelector('.lightbox-overlay').addEventListener('click', closeLightbox);
-
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      const lightbox = document.getElementById('lightbox');
-      if (lightbox.style.display === 'flex') {
-        if (e.key === 'Escape') closeLightbox();
-        if (e.key === 'ArrowLeft') navigateLightbox(-1);
-        if (e.key === 'ArrowRight') navigateLightbox(1);
-      }
-    });
-
-    // Initialize
-    loadCartoons();
-  </script>
-
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.3/lib/p5.min.js"></script>
+    <script src="./script.js"></script>
+  </body>
 </html>

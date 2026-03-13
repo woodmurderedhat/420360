@@ -897,15 +897,8 @@ function startIntervals() {
     state.intervalIds.glitch = setInterval(glitchRandomWord, intervals.glitch);
   }
 
-  // morphs now occur in bursts rather than a constant interval
-  if (!state.burstIntervalId) {
-    const burst = getBurstSettings();
-    if (burst.interval > 0) {
-      state.burstIntervalId = setInterval(startMorphBurst, burst.interval);
-      // start one immediately so page isn't blank-long
-      startMorphBurst();
-    }
-  }
+  // morphs are now triggered by mouse movement (see setupEventHandlers)
+  // no timer-based burst interval is started here
 
   document.documentElement.classList.remove('paused');
 }
@@ -1325,6 +1318,23 @@ function setupEventHandlers() {
   window.addEventListener('pagehide', () => stopIntervals());
   window.addEventListener('pageshow', () => {
     if (!document.hidden) startIntervals();
+  });
+
+  // Sentence morph on mouse movement (throttled by distance + time)
+  let lastMorphX = null, lastMorphY = null, lastMorphTime = 0;
+  document.addEventListener('mousemove', (e) => {
+    if (state.reducedMotion) return;
+    const now = Date.now();
+    if (now - lastMorphTime < 800) return;
+    if (lastMorphX !== null) {
+      const dx = e.clientX - lastMorphX;
+      const dy = e.clientY - lastMorphY;
+      if (Math.sqrt(dx * dx + dy * dy) < 120) return;
+    }
+    morphToRandomSentence();
+    lastMorphX = e.clientX;
+    lastMorphY = e.clientY;
+    lastMorphTime = now;
   });
 
   // Click to spawn popup

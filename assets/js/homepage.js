@@ -50,6 +50,9 @@ const CONFIG = {
   MUSIC_FADE_DURATION: 1800,
   SFX_MIN_INTERVAL: 90,
   
+  // Mouse idle timeout (ms) before animations pause
+  MOUSE_IDLE_TIMEOUT: 1500,
+
   // Audio settings
   MUSIC_TARGET_VOLUME: 0.65,
   SFX_BASE_VOLUME: 0.55,
@@ -75,6 +78,8 @@ const state = {
   
   // Runtime state
   reducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false,
+  mouseActive: false,
+  mouseIdleTimeoutId: null,
   intervalIds: {
     popup: null,
     glitch: null,
@@ -946,9 +951,12 @@ function pauseBackground() {
   stopIntervals();
 }
 
+function hasOpenOverlay() {
+  return document.querySelectorAll('.integrated-overlay:not(.hidden)').length > 0;
+}
+
 function resumeBackgroundIfNone() {
-  const anyOpen = document.querySelectorAll('.integrated-overlay:not(.hidden)').length > 0;
-  if (!anyOpen && !document.hidden) startIntervals();
+  if (!hasOpenOverlay() && !document.hidden && state.mouseActive) startIntervals();
 }
 
 /* ============================================
@@ -976,9 +984,9 @@ const MusicSystem = {
     this.normalizeAudioSource();
     this.updateUI();
 
-    // Periodic glitch effect on button
+    // Periodic glitch effect on button (only while mouse is active)
     setInterval(() => {
-      if (Math.random() < 0.33) this.glitchButton();
+      if (Math.random() < 0.33 && state.mouseActive) this.glitchButton();
     }, 2400);
   },
 
@@ -1312,18 +1320,36 @@ function setupEventHandlers() {
   // Visibility change
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopIntervals();
-    else startIntervals();
+    else if (state.mouseActive) startIntervals();
   });
 
   window.addEventListener('pagehide', () => stopIntervals());
   window.addEventListener('pageshow', () => {
-    if (!document.hidden) startIntervals();
+    if (!document.hidden && state.mouseActive) startIntervals();
   });
 
-  // Sentence morph on mouse movement (throttled by distance + time)
+  // Start/stop animations based on mouse activity
   let lastMorphX = null, lastMorphY = null, lastMorphTime = 0;
   document.addEventListener('mousemove', (e) => {
     if (state.reducedMotion) return;
+
+    // Activate animations on mouse movement
+    if (!state.mouseActive) {
+      state.mouseActive = true;
+      if (!document.hidden && !hasOpenOverlay()) {
+        startIntervals();
+      }
+    }
+
+    // Reset idle timer — stop animations when mouse goes still
+    if (state.mouseIdleTimeoutId) clearTimeout(state.mouseIdleTimeoutId);
+    state.mouseIdleTimeoutId = setTimeout(() => {
+      state.mouseActive = false;
+      state.mouseIdleTimeoutId = null;
+      stopIntervals();
+    }, CONFIG.MOUSE_IDLE_TIMEOUT);
+
+    // Sentence morph on mouse movement (throttled by distance + time)
     const now = Date.now();
     if (now - lastMorphTime < 800) return;
     if (lastMorphX !== null) {
@@ -1700,13 +1726,10 @@ function init() {
   // Create floating video window (lazy - won't load content until shown)
   createFloatingWindow('videoThreadWindow', 'VIDEOS • SCHWEPE', 'https://schwepe.247420.xyz/videos-thread.html', false);
 
-  // Randomize colors on load
+  // Randomize colors on load once
   randomizeColors();
-  // Kick off continuous color changes
-  startColorChaos();
-
-  // Start intervals if page is visible
-  if (!document.hidden) startIntervals();
+  // All other animations start only when the mouse moves
+  stopIntervals();
 
   // Setup random popup glitch-out effect
   setInterval(() => {

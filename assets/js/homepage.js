@@ -68,10 +68,10 @@ const CONFIG = {
    ============================================ */
 const state = {
   // User preferences (loaded from localStorage)
-  musicEnabled: false,
-  sfxEnabled: false,
+  musicEnabled: true,
+  sfxEnabled: true,
   chillMode: false,
-  popupsPaused: true,  // Popups off by default
+  popupsPaused: false,  // Popups on by default
   
   // Runtime state
   reducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false,

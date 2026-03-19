@@ -47,16 +47,21 @@
 
     let bodies = [];
 
-    function randomBody() {
+    function randomColor() {
       const hue = Math.floor(Math.random() * 360);
+      return `hsl(${hue}, 100%, 60%)`;
+    }
 
+    function randomBody() {
       return {
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
+        prevX: 0,
+        prevY: 0,
         vx: (Math.random() - 0.5) * 3,
         vy: (Math.random() - 0.5) * 3,
         m: Math.random() * 5 + 5,
-        color: `hsl(${hue}, 100%, 60%)`
+        color: randomColor()
       };
     }
 
@@ -98,8 +103,15 @@
       const centerY = canvas.height / 2;
       const pull = 0.0005;
 
-      for (let b of bodies) {
-        // pull toward center
+      // collision + movement
+      for (let i = 0; i < bodies.length; i++) {
+        let b = bodies[i];
+
+        // store previous position
+        b.prevX = b.x;
+        b.prevY = b.y;
+
+        // center pull
         let dx = centerX - b.x;
         let dy = centerY - b.y;
 
@@ -114,16 +126,33 @@
         b.x += b.vx * dt;
         b.y += b.vy * dt;
 
-        // wrap around screen
+        // wrap
         if (b.x < 0) b.x += canvas.width;
         if (b.x > canvas.width) b.x -= canvas.width;
         if (b.y < 0) b.y += canvas.height;
         if (b.y > canvas.height) b.y -= canvas.height;
 
-        // clamp velocity
+        // clamp
         const maxSpeed = 10;
         b.vx = Math.max(Math.min(b.vx, maxSpeed), -maxSpeed);
         b.vy = Math.max(Math.min(b.vy, maxSpeed), -maxSpeed);
+      }
+
+      // detect collisions
+      for (let i = 0; i < bodies.length; i++) {
+        for (let j = i + 1; j < bodies.length; j++) {
+          let bi = bodies[i];
+          let bj = bodies[j];
+
+          let dx = bj.x - bi.x;
+          let dy = bj.y - bi.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 5) {
+            bi.color = randomColor();
+            bj.color = randomColor();
+          }
+        }
       }
     }
 
@@ -133,9 +162,11 @@
 
       for (let b of bodies) {
         ctx.beginPath();
-        ctx.arc(b.x, b.y, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = b.color;
-        ctx.fill();
+        ctx.moveTo(b.prevX, b.prevY);
+        ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = b.color;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
       }
     }
 

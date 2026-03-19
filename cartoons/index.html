@@ -41,8 +41,9 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const G = 1.2;
-    const dt = 1.0;
+    const G = 0.8;
+    const dt = 0.6;
+    const drag = 0.999;
 
     let bodies = [];
 
@@ -93,11 +94,33 @@
         }
       }
 
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const pull = 0.0005;
+
       for (let b of bodies) {
+        // pull toward center
+        let dx = centerX - b.x;
+        let dy = centerY - b.y;
+
+        b.vx += dx * pull;
+        b.vy += dy * pull;
+
+        // drag
+        b.vx *= drag;
+        b.vy *= drag;
+
+        // move
         b.x += b.vx * dt;
         b.y += b.vy * dt;
 
-        // optional velocity clamp to stop total escape
+        // wrap around screen
+        if (b.x < 0) b.x += canvas.width;
+        if (b.x > canvas.width) b.x -= canvas.width;
+        if (b.y < 0) b.y += canvas.height;
+        if (b.y > canvas.height) b.y -= canvas.height;
+
+        // clamp velocity
         const maxSpeed = 10;
         b.vx = Math.max(Math.min(b.vx, maxSpeed), -maxSpeed);
         b.vy = Math.max(Math.min(b.vy, maxSpeed), -maxSpeed);

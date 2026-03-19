@@ -41,18 +41,21 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const G = 0.2; // gravitational constant (tweak this)
-    const dt = 0.5;
+    const G = 1.2;
+    const dt = 1.0;
 
     let bodies = [];
 
     function randomBody() {
+      const hue = Math.floor(Math.random() * 360);
+
       return {
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2,
-        m: Math.random() * 5 + 5
+        vx: (Math.random() - 0.5) * 3,
+        vy: (Math.random() - 0.5) * 3,
+        m: Math.random() * 5 + 5,
+        color: `hsl(${hue}, 100%, 60%)`
       };
     }
 
@@ -90,22 +93,25 @@
         }
       }
 
-      // update positions
       for (let b of bodies) {
         b.x += b.vx * dt;
         b.y += b.vy * dt;
+
+        // optional velocity clamp to stop total escape
+        const maxSpeed = 10;
+        b.vx = Math.max(Math.min(b.vx, maxSpeed), -maxSpeed);
+        b.vy = Math.max(Math.min(b.vy, maxSpeed), -maxSpeed);
       }
     }
 
     function draw() {
-      // semi-transparent fade instead of full clear
-      ctx.fillStyle = "rgba(0,0,0,0.05)";
+      ctx.fillStyle = "rgba(0,0,0,0.01)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       for (let b of bodies) {
         ctx.beginPath();
         ctx.arc(b.x, b.y, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = "white";
+        ctx.fillStyle = b.color;
         ctx.fill();
       }
     }
@@ -119,7 +125,6 @@
     reset();
     loop();
 
-    // resize handling
     window.addEventListener("resize", () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;

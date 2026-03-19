@@ -46,6 +46,7 @@
     const drag = 0.999;
 
     let bodies = [];
+    let particles = [];
 
     function randomColor() {
       const hue = Math.floor(Math.random() * 360);
@@ -65,12 +66,32 @@
       };
     }
 
+    function spawnFragments(x, y, baseColor) {
+      for (let i = 0; i < 15; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 4;
+
+        particles.push({
+          x,
+          y,
+          prevX: x,
+          prevY: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 60 + Math.random() * 40,
+          color: baseColor
+        });
+      }
+    }
+
     function reset() {
       bodies = [randomBody(), randomBody(), randomBody()];
+      particles = [];
       clearCanvas();
     }
 
     function clearCanvas() {
+      ctx.globalCompositeOperation = "source-over";
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
@@ -103,42 +124,32 @@
       const centerY = canvas.height / 2;
       const pull = 0.0005;
 
-      // collision + movement
-      for (let i = 0; i < bodies.length; i++) {
-        let b = bodies[i];
-
-        // store previous position
+      for (let b of bodies) {
         b.prevX = b.x;
         b.prevY = b.y;
 
-        // center pull
         let dx = centerX - b.x;
         let dy = centerY - b.y;
 
         b.vx += dx * pull;
         b.vy += dy * pull;
 
-        // drag
         b.vx *= drag;
         b.vy *= drag;
 
-        // move
         b.x += b.vx * dt;
         b.y += b.vy * dt;
 
-        // wrap
         if (b.x < 0) b.x += canvas.width;
         if (b.x > canvas.width) b.x -= canvas.width;
         if (b.y < 0) b.y += canvas.height;
         if (b.y > canvas.height) b.y -= canvas.height;
 
-        // clamp
         const maxSpeed = 10;
         b.vx = Math.max(Math.min(b.vx, maxSpeed), -maxSpeed);
         b.vy = Math.max(Math.min(b.vy, maxSpeed), -maxSpeed);
       }
 
-      // detect collisions
       for (let i = 0; i < bodies.length; i++) {
         for (let j = i + 1; j < bodies.length; j++) {
           let bi = bodies[i];
@@ -149,17 +160,41 @@
           let dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < 5) {
+            spawnFragments(bi.x, bi.y, bi.color);
+            spawnFragments(bj.x, bj.y, bj.color);
+
             bi.color = randomColor();
             bj.color = randomColor();
           }
         }
       }
+
+      for (let p of particles) {
+        p.prevX = p.x;
+        p.prevY = p.y;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+
+        p.life--;
+      }
+
+      particles = particles.filter(p => p.life > 0);
     }
 
     function draw() {
-      ctx.fillStyle = "rgba(0,0,0,0.01)";
+      // normal mode for fading background
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = "rgba(10, 0, 20, 0.05)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // switch to additive blending
+      ctx.globalCompositeOperation = "lighter";
+
+      // body trails
       for (let b of bodies) {
         ctx.beginPath();
         ctx.moveTo(b.prevX, b.prevY);
@@ -168,6 +203,21 @@
         ctx.lineWidth = 1.5;
         ctx.stroke();
       }
+
+      // particles
+      for (let p of particles) {
+        ctx.beginPath();
+        ctx.moveTo(p.prevX, p.prevY);
+        ctx.lineTo(p.x, p.y);
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = p.life / 100;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
+      // restore default
+      ctx.globalCompositeOperation = "source-over";
     }
 
     function loop() {

@@ -567,17 +567,14 @@ html, body {
 #socials-emoticons {
   position: fixed;
   bottom: 78px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(96vw, 900px);
-  text-align: center;
+  right: 16px;
   z-index: 4600;
 }
 
 .social-links-row {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 8px;
 }
 
@@ -725,7 +722,7 @@ html, body {
 
   #socials-emoticons {
     bottom: 120px;
-    width: 96vw;
+    right: 8px;
   }
 
   #socials-emoticons a {

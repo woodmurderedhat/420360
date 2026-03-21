@@ -59,6 +59,7 @@ const CONFIG = {
   
   // LocalStorage keys
   STORAGE_KEYS: {
+    AGE_GATE_PROFILE: 'ageGateProfile',
     MUSIC_ENABLED: 'musicEnabled',
     SFX_ENABLED: 'sfxEnabled',
     CHILL_MODE: 'chillMode',
@@ -91,11 +92,60 @@ const state = {
   morphStepId: null,       // timer between individual morphs during a burst
   burstTimeoutId: null,    // cancels the burst after its duration
   burstActive: false,
+  initialized: false,
+  sentences: [],
 
   activePopups: [],
   currentSentence: '',
   videoWindowLoaded: false
 };
+
+function getThemeSentences() {
+  return [
+    `420360 is now a cannabis-first arcade dreamspace. Neon smoke drifts through popup windows, cartridges hum in the background, and each click opens a new chill loop between play, art, and curiosity.`,
+    `Roll into the glitch: this is where marijuana culture meets 90s browser chaos. Spark up your focus, surf retro controls, and let pixel storms turn into late-night stoner mythology.`,
+    `No gatekeeping, no hard sell, just a mellow digital hangout for adults. Browse weird experiments, launch arcade runs, and settle into a paced, low-pressure cannabis vibe.`,
+    `Chill mode is a ritual here: breathe, play, and drift. 420360 treats the web like a smoke circle made of code, memory, and bright analog nostalgia.`
+  ];
+}
+
+function getRegionMinimumAge(region) {
+  if (region === 'us-ca') return 21;
+  if (region === 'eu' || region === 'other') return 18;
+  return 21;
+}
+
+function loadAgeGateProfile() {
+  try {
+    const raw = localStorage.getItem(CONFIG.STORAGE_KEYS.AGE_GATE_PROFILE);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    if (!parsed.region || typeof parsed.age !== 'number') return null;
+    return parsed;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveAgeGateProfile(region, age) {
+  try {
+    const payload = {
+      region,
+      age,
+      verifiedAt: new Date().toISOString()
+    };
+    localStorage.setItem(CONFIG.STORAGE_KEYS.AGE_GATE_PROFILE, JSON.stringify(payload));
+  } catch (e) {
+    console.warn('Failed to save age gate profile');
+  }
+}
+
+function isAgeGateValid(profile) {
+  if (!profile) return false;
+  if (!profile.region || typeof profile.age !== 'number') return false;
+  return profile.age >= getRegionMinimumAge(profile.region);
+}
 
 /* ============================================
   SENTENCES FOR BLURB (global, loaded via script)
@@ -295,7 +345,8 @@ function morphToRandomSentence() {
   if (!blurbEl) return;
 
   const currentTrimmed = state.currentSentence.trim();
-  const uniqueSentences = SENTENCES.filter(s => s.trim() !== currentTrimmed);
+  const sentencePool = state.sentences.length ? state.sentences : SENTENCES;
+  const uniqueSentences = sentencePool.filter(s => s.trim() !== currentTrimmed);
   if (uniqueSentences.length === 0) return;
 
   const nextSentence = uniqueSentences[Math.floor(Math.random() * uniqueSentences.length)];
@@ -1496,6 +1547,16 @@ function setupControlButtons() {
     issueBtn.addEventListener('click', e => { e.stopPropagation(); openIssues(); });
   }
 
+  const legalBtn = document.getElementById('legal-control');
+  if (legalBtn) {
+    legalBtn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        window.location.href = '/legal.html';
+      }
+    });
+  }
+
   // Add hover chaos handlers to every control button. motion will start
   // on mouseenter and stop/reset on mouseleave.
   document.querySelectorAll('#header-controls .ctrl-btn, #bottom-controls-left .ctrl-btn, #bottom-controls-right .ctrl-btn').forEach(btn => {
@@ -1698,8 +1759,59 @@ toggleChillMode = function() {
    ============================================ */
 
 function init() {
+  if (state.initialized) return;
+
+  const gate = document.getElementById('age-gate');
+  const enterBtn = document.getElementById('age-gate-enter');
+  const exitBtn = document.getElementById('age-gate-exit');
+  const regionSelect = document.getElementById('age-gate-region');
+  const ageInput = document.getElementById('age-gate-age');
+  const gateFeedback = document.getElementById('age-gate-feedback');
+  const ageProfile = loadAgeGateProfile();
+
+  if (!isAgeGateValid(ageProfile) && gate) {
+    gate.classList.add('active');
+    if (enterBtn) {
+      enterBtn.addEventListener('click', () => {
+        const region = regionSelect?.value || 'us-ca';
+        const age = Number(ageInput?.value || 0);
+        const minAge = getRegionMinimumAge(region);
+
+        if (!Number.isFinite(age) || age <= 0) {
+          if (gateFeedback) gateFeedback.textContent = 'Enter a valid age to continue.';
+          return;
+        }
+
+        if (age < minAge) {
+          if (gateFeedback) gateFeedback.textContent = `Access denied: this region requires ${minAge}+.`;
+          return;
+        }
+
+        saveAgeGateProfile(region, age);
+        if (gateFeedback) gateFeedback.textContent = '';
+        gate.classList.remove('active');
+        init();
+      });
+    }
+    if (exitBtn) {
+      exitBtn.addEventListener('click', () => {
+        window.location.href = 'https://www.google.com';
+      });
+    }
+
+    if (ageProfile && regionSelect && ageInput) {
+      regionSelect.value = ageProfile.region;
+      ageInput.value = String(ageProfile.age);
+    }
+
+    return;
+  }
+
+  state.initialized = true;
+
   // Initialize state
-  state.currentSentence = SENTENCES[0];
+  state.sentences = getThemeSentences();
+  state.currentSentence = state.sentences[0];
 
   // Set initial blurb text
   setBlurbText(state.currentSentence);

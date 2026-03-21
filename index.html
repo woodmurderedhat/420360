@@ -5,17 +5,17 @@
 <script src="assets/js/homepage.js"></script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>420360</title>
+<title>420360 - Marijuana Arcade and Cannabis Culture Hub</title>
 
 <!-- Social/SEO Metadata -->
-<meta name="description" content="420360: Experience 90s retro web popups, glitch art, and digital nostalgia. Play free browser-based arcade games, explore interactive narratives, and dive into generative art experiences." />
-<meta name="keywords" content="420360, retro games, 90s web, glitch art, arcade games, browser games, digital nostalgia, pixel art, interactive art, generative art, woodmurderedhat" />
+<meta name="description" content="420360: A marijuana-focused retro web arcade and cannabis culture hub. Explore stoner popups, weed-friendly browser games, and psychedelic digital art sessions." />
+<meta name="keywords" content="420360, marijuana arcade, cannabis culture, weed games, stoner games, retro web, psychedelic art, browser arcade, cannabis entertainment, woodmurderedhat" />
 <meta name="author" content="woodmurderedhat" />
 <meta name="theme-color" content="#4a8c3a" />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:title" content="420360 - Retro Web Arcade & Digital Nostalgia" />
-<meta property="og:description" content="Experience 90s retro web popups, glitch art, and digital nostalgia. Play free arcade games and explore interactive experiences." />
+<meta property="og:title" content="420360 - Marijuana Arcade and Cannabis Culture Hub" />
+<meta property="og:description" content="A marijuana-focused retro web arcade with stoner popups, weed-friendly games, and psychedelic interactive art." />
 <meta property="og:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -23,13 +23,15 @@
 <meta property="og:url" content="https://420360.xyz/" />
 <meta property="og:site_name" content="420360" />
 <meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="en_CA" />
+<meta property="og:locale:alternate" content="en_GB" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:site" content="@woodenhat" />
 <meta name="twitter:creator" content="@woodenhat" />
-<meta name="twitter:title" content="420360 - Retro Web Arcade & Digital Nostalgia" />
-<meta name="twitter:description" content="Experience 90s retro web popups, glitch art, and digital nostalgia. Play free arcade games and explore interactive experiences." />
+<meta name="twitter:title" content="420360 - Marijuana Arcade and Cannabis Culture Hub" />
+<meta name="twitter:description" content="A marijuana-focused retro web arcade with stoner popups, weed-friendly games, and psychedelic interactive art." />
 <meta name="twitter:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
 
 <!-- Social links for search engines -->
@@ -46,6 +48,10 @@
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://420360.xyz/" />
+<link rel="alternate" hreflang="en" href="https://420360.xyz/" />
+<link rel="alternate" hreflang="en-us" href="https://420360.xyz/" />
+<link rel="alternate" hreflang="en-ca" href="https://420360.xyz/" />
+<link rel="alternate" hreflang="x-default" href="https://420360.xyz/" />
 
 <!-- Humans.txt -->
 <link rel="author" href="/humans.txt" />
@@ -60,7 +66,7 @@
   "@type": "WebSite",
   "name": "420360",
   "url": "https://420360.xyz/",
-  "description": "90s retro web popups, glitch art, and digital nostalgia. A collection of retro arcade games and interactive experiences.",
+  "description": "A marijuana-focused retro arcade and cannabis culture hub with browser games, psychedelic visuals, and interactive chill experiences.",
   "author": {
     "@type": "Person",
     "name": "woodmurderedhat",
@@ -84,8 +90,8 @@
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": "420360 Games Collection",
-  "description": "Retro arcade games and interactive experiences",
+  "name": "420360 Cannabis Games Collection",
+  "description": "Weed-friendly arcade games and interactive psychedelic experiences",
   "itemListElement": [
     {
       "@type": "ListItem",
@@ -130,6 +136,29 @@
 </head>
 <body>
 
+<div id="age-gate" class="age-gate" role="dialog" aria-modal="true" aria-labelledby="age-gate-title" aria-describedby="age-gate-copy">
+  <div class="age-gate-card">
+    <h2 id="age-gate-title">420360 Cannabis Access</h2>
+    <p id="age-gate-copy">This experience is for adults in regions where cannabis content is legal. Choose your region and enter your age to continue.</p>
+    <div class="age-gate-fields">
+      <label for="age-gate-region">REGION</label>
+      <select id="age-gate-region" aria-label="Region for legal age verification">
+        <option value="us-ca">US / Canada (21+)</option>
+        <option value="eu">Europe (18+)</option>
+        <option value="other">Other legal region (18+)</option>
+      </select>
+      <label for="age-gate-age">YOUR AGE</label>
+      <input id="age-gate-age" type="number" min="0" max="120" inputmode="numeric" placeholder="Enter age" aria-label="Your age" />
+      <p id="age-gate-feedback" class="age-gate-feedback" aria-live="polite"></p>
+    </div>
+    <div class="age-gate-actions">
+      <button id="age-gate-enter" type="button">VERIFY AND ENTER</button>
+      <button id="age-gate-exit" type="button">EXIT SITE</button>
+    </div>
+    <p class="age-gate-legal-link"><a href="/legal.html" target="_blank" rel="noopener noreferrer">Read legal disclaimer</a></p>
+  </div>
+</div>
+
 <!-- Skip to main content for accessibility -->
 <a href="#blurb" class="skip-to-main">Skip to main content</a>
 
@@ -163,6 +192,10 @@
   <div id="issue-report" class="ctrl-btn" role="button" tabindex="0" title="Report an issue on GitHub (I)" aria-label="Report an issue on GitHub">
     <span class="ctrl-btn-label">ISSUES</span>
     <span class="ctrl-btn-icon">🐞</span>
+  </div>
+  <div id="legal-control" class="ctrl-btn" role="button" tabindex="0" title="Legal disclaimer" aria-label="Open legal disclaimer" onclick="window.location.href='/legal.html'">
+    <span class="ctrl-btn-label">LEGAL</span>
+    <span class="ctrl-btn-icon">⚖️</span>
   </div>
 </div>
 
@@ -200,6 +233,7 @@
     <a href="https://github.com/woodmurderedhat" target="_blank" rel="noopener noreferrer" title="Social Links">🌲</a>
     <a href="https://blog.420360.xyz" target="_blank" rel="noopener noreferrer" title="Blog">📝</a>
     <a href="/cartoons/" title="Cartoons">🧀</a>
+    <a href="/legal.html" title="Legal">⚖️</a>
   </div>
 </div>
 

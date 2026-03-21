@@ -3,30 +3,38 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Games • 420360 - Retro Arcade Collection</title>
+<title>Games • 420360 Marijuana and Stoner Arcade Collection</title>
 
 <!-- SEO Meta Tags -->
-<meta name="description" content="Play retro arcade games including Tarot Tetromino, Noctis Reverie, Space Invaders, and more. Free browser-based games with 90s nostalgia and pixel art aesthetics." />
-<meta name="keywords" content="retro games, arcade games, browser games, pixel art games, 90s games, free online games, tetris, space invaders, breakout, snake" />
+<meta name="description" content="Play 420360's marijuana-focused browser games. A weed-friendly stoner arcade with retro mechanics, pixel art, and psychedelic experiments." />
+<meta name="keywords" content="420360 games, marijuana games, stoner arcade, weed games, cannabis games, retro browser games, pixel art games" />
+<meta name="robots" content="index,follow,max-image-preview:large" />
 <meta name="author" content="woodmurderedhat" />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://420360.xyz/games/" />
-<meta property="og:title" content="Games • 420360 - Retro Arcade Collection" />
-<meta property="og:description" content="Play retro arcade games including Tarot Tetromino, Noctis Reverie, Space Invaders, and more. Free browser-based games with 90s nostalgia." />
+<meta property="og:title" content="Games • 420360 Marijuana and Stoner Arcade Collection" />
+<meta property="og:description" content="A chill marijuana-focused arcade lineup with weed-friendly browser games and psychedelic interactive experiences." />
 <meta property="og:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
 <meta property="og:site_name" content="420360" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:locale:alternate" content="en_CA" />
+<meta property="og:locale:alternate" content="en_GB" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:url" content="https://420360.xyz/games/" />
-<meta name="twitter:title" content="Games • 420360 - Retro Arcade Collection" />
-<meta name="twitter:description" content="Play retro arcade games including Tarot Tetromino, Noctis Reverie, Space Invaders, and more. Free browser-based games with 90s nostalgia." />
+<meta name="twitter:title" content="Games • 420360 Marijuana and Stoner Arcade Collection" />
+<meta name="twitter:description" content="A chill marijuana-focused arcade lineup with weed-friendly browser games and psychedelic interactive experiences." />
 <meta name="twitter:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://420360.xyz/games/" />
+<link rel="alternate" hreflang="en" href="https://420360.xyz/games/" />
+<link rel="alternate" hreflang="en-us" href="https://420360.xyz/games/" />
+<link rel="alternate" hreflang="en-ca" href="https://420360.xyz/games/" />
+<link rel="alternate" hreflang="x-default" href="https://420360.xyz/games/" />
 
 <!-- Favicon -->
 <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico" />
@@ -59,7 +67,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 	:root{
-		--bg:#2d1b2d;--primary:#9370db;--secondary:#ba55d3;--highlight:#dda0dd;--text:#f8f8ff;
+		--bg:#152016;--primary:#3f8a44;--secondary:#e4a432;--highlight:#b9f2a5;--text:#f3ffe9;
 	}
 	html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Press Start 2P','Courier New',monospace;image-rendering:pixelated;}
 	body{padding:20px 10px 60px 10px;}
@@ -88,7 +96,7 @@
 </style>
 </head>
 <body>
-	<h1>ARCADE DIRECTORY</h1>
+	<h1>STONER ARCADE DIRECTORY</h1>
 	<div class="searchWrap"><input type="text" id="gameSearch" placeholder="TYPE TO FILTER" aria-label="Filter games" /></div>
 	<div class="filters" aria-label="Tag filters">
 		<button data-tag="all" class="active">ALL</button>
@@ -99,7 +107,7 @@
 		<button data-tag="experimental">EXPERIMENTAL</button>
 	</div>
 	<div class="grid" id="gamesGrid" aria-live="polite"></div>
-	<div class="empty" id="emptyMsg" style="display:none;">NO MATCHES</div>
+	<div class="empty" id="emptyMsg" style="display:none;">NO MATCHES • TRY A DIFFERENT STRAIN</div>
 	<footer>Press G again to close • ESC also works</footer>
 <script>
 // Data for games (manually curated tags & blurbs)
@@ -107,21 +115,21 @@
 // Available IDs reference: 3PLAXg1osLVVttjRTN, WveGOgFwcI6uTn2khE, eYDnuFt0MckAb3xdSH, DfqSbJVYLHmO8QFn1R,
 // 7Ti0iZdo5QCiWJfMvA, qxJ9pAQCBIJLxfelCv, HtCcDJ134eAICJZjLb, JeEjGpM2TVZGaM5BuE
 const GAMES = [
-	{ id:'tarot-tetromino', name:'TAROT TETROMINO', url:'tarot-tetromino/', tags:['puzzle','experimental','retro'], blurb:'Arcana-fused falling blocks.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif', scoreKey:'tetrisLeaderboard', scoreType:'leaderboard' },
+	{ id:'tarot-tetromino', name:'TAROT TETROMINO', url:'tarot-tetromino/', tags:['puzzle','experimental','retro'], blurb:'Arcana-fused blocks for smoke-break focus.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif', scoreKey:'tetrisLeaderboard', scoreType:'leaderboard' },
 	{ id:'glitch-maze', name:'GLITCH MAZE', url:'glitch-maze/', tags:['puzzle','experimental'], blurb:'Escape distortion.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif', scoreKey:'glitchMazeBestLevel', scoreType:'level' },
 	{ id:'neon-simon', name:'NEON SIMON', url:'neon-simon/', tags:['memory','retro'], blurb:'Sequence recall glow.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif', scoreKey:'neonSimonBest', scoreType:'score' },
-	{ id:'pixel-rain', name:'PIXEL RAIN', url:'pixel-rain/', tags:['experimental','retro'], blurb:'Falling pixel ambience.', gif:'https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif', scoreKey:'pixelRainBest', scoreType:'score' },
-	{ id:'pong', name:'PONG CLASSIC', url:'pong/', tags:['arcade','retro'], blurb:'OG duel of reflex.', gif:'https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif', scoreKey:'pongBestWins', scoreType:'wins' },
+	{ id:'pixel-rain', name:'PIXEL RAIN', url:'pixel-rain/', tags:['experimental','retro'], blurb:'Cannabis lounge ambience in falling pixels.', gif:'https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif', scoreKey:'pixelRainBest', scoreType:'score' },
+	{ id:'pong', name:'PONG CLASSIC', url:'pong/', tags:['arcade','retro'], blurb:'OG duel of reflex, now with stoner tempo.', gif:'https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif', scoreKey:'pongBestWins', scoreType:'wins' },
 	{ id:'snake', name:'SNAKE', url:'snake/', tags:['arcade','retro'], blurb:'Devour & grow.', gif:'https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif', scoreKey:'snakeHighScore', scoreType:'score' },
 	{ id:'memory', name:'MEMORY CARDS', url:'memory/', tags:['memory','puzzle'], blurb:'Flip & match pairs.', gif:'https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif', scoreKey:'memoryBestScore', scoreType:'score' },
-	{ id:'breakout', name:'BREAKOUT', url:'breakout/', tags:['arcade','retro'], blurb:'Brick smashing zen.', gif:'https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif', scoreKey:'breakoutHighScore', scoreType:'score' },
+	{ id:'breakout', name:'BREAKOUT', url:'breakout/', tags:['arcade','retro'], blurb:'Brick-smashing weed-lounge zen.', gif:'https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif', scoreKey:'breakoutHighScore', scoreType:'score' },
 	{ id:'flappy-bird', name:'FLAPPY BIRD', url:'flappy-bird/', tags:['arcade','retro'], blurb:'Navigate through pipes.', gif:'https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif', scoreKey:'flappyBirdHighScore', scoreType:'score' },
 	{ id:'space-invaders', name:'SPACE INVADERS', url:'space-invaders/', tags:['arcade','retro'], blurb:'Defend against aliens.', gif:'https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif', scoreKey:'spaceInvadersHighScore', scoreType:'score' },
 	{ id:'asteroids', name:'ASTEROIDS', url:'asteroids/', tags:['arcade','retro'], blurb:'Navigate & destroy rocks.', gif:'https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif', scoreKey:'asteroidsHighScore', scoreType:'score' },
 	{ id:'infinite-jumper', name:'INFINITE JUMPER', url:'infinite-jumper/', tags:['arcade','retro'], blurb:'Jump to infinite heights.', gif:'https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif', scoreKey:'infiniteJumperHighScore', scoreType:'score' },
-	{ id:'generative-art', name:'GENERATIVE ART', url:'generative-art/', tags:['experimental'], blurb:'Procedural visuals.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif' },
+	{ id:'generative-art', name:'GENERATIVE ART', url:'generative-art/', tags:['experimental'], blurb:'Procedural visuals for high-minded sessions.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif' },
 	{ id:'tim-the-dialogue-oracle', name:'TIM • ORACLE', url:'../tim-the-dialogue-oracle/', tags:['experimental'], blurb:'Conversational mystic.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif' },
-	{ id:'noctis-reverie', name:'NOCTIS REVERIE', url:'noctis-reverie/', tags:['experimental'], blurb:'Dreamlike voyage.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif' },
+	{ id:'noctis-reverie', name:'NOCTIS REVERIE', url:'noctis-reverie/', tags:['experimental'], blurb:'Dreamlike voyage through cannabis-night aesthetics.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif' },
 	{ id:'pixel-crush', name:'PIXEL CRUSH', url:'pixel-crush/', tags:['puzzle','experimental'], blurb:'Match-3 pixel mayhem.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif', scoreKey:'pixelCrushProgress', scoreType:'total' }
 ];
 

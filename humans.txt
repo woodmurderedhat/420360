@@ -6,7 +6,7 @@ Location: Digital Realm
 
 /* THANKS */
 
-Inspiration: 90s web culture, glitch art, retro gaming
+Inspiration: cannabis culture, 90s web culture, glitch art, retro gaming
 Community: 247420 Discord
 Platforms: YouTube (@woodenhat), Lens Protocol (hey.xyz/u/wooden)
 
@@ -17,13 +17,13 @@ Language: English
 Doctype: HTML5
 IDE: Various
 Standards: HTML5, CSS3, Vanilla JavaScript
-Components: Retro arcade games, interactive narratives, generative art
-Software: Hand-coded with love and nostalgia
+Components: Cannabis-themed arcade games, interactive narratives, generative art
+Software: Hand-coded with love, nostalgia, and chill intent
 
 /* PHILOSOPHY */
 
-Mission: Curate playful, low-friction experiments rekindling curiosity + contemplative drift
-Aesthetic: 90s retro web popups, glitch art, digital nostalgia
+Mission: Curate playful, low-friction cannabis-themed experiments rekindling curiosity + contemplative drift
+Aesthetic: 90s retro web popups, stoner surrealism, glitch art, digital nostalgia
 Ethos: Output > Hype. Pixels were our stars in the night sky.
 
 /* SPECIAL PROJECTS */
@@ -58,5 +58,5 @@ Shop: https://www.redbubble.com/shop/ap/174665816
                            /'\_   _/`\
                            \___)=(___/
 
-            Welcome to 420360 - Where pixels meet nostalgia
+            Welcome to 420360 - Where pixels meet cannabis culture
 

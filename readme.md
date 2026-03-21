@@ -1,8 +1,8 @@
-# 420360 — Retro Web Arcade
+# 420360 — Marijuana Retro Web Arcade
 
 ![420360 banner](assets/images/420360arcadebanner.png)
 
-420360 is a lightweight, 90s-inspired web arcade: a collection of small games, glitch art, and experiments you can open in the browser. The landing page features glitchy popups, integrated overlays (About, Games index, Oracle), and a curated directory of games.
+420360 is a lightweight, marijuana-focused 90s web arcade: a collection of small games, glitch art, and cannabis-culture experiments you can open in the browser. The landing page features stoner popups, integrated overlays (About, Games index, Oracle), and a curated directory of games.
 
 Live site: https://420360.xyz/
 
@@ -15,6 +15,7 @@ Live site: https://420360.xyz/
 - Integrated overlays from the landing page for a seamless “windowed” feel (About, Games, Oracle)
 - Local scores/progress via `localStorage` surfaced in the Games index
 - Toggleable music and SFX with a tiny glitch animation
+- Region-based age gate for cannabis-themed content access (21+ US/Canada, 18+ selected legal regions)
 - Zero build tooling — vanilla HTML/CSS/JS
 
 Keyboard shortcuts on the landing page:

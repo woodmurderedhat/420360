@@ -565,19 +565,50 @@ html, body {
 
 /* === SOCIALS SECTION === */
 #socials-emoticons {
-  margin: 18px 0 10px 0;
+  position: fixed;
+  bottom: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(96vw, 900px);
   text-align: center;
-  z-index: 10;
+  z-index: 4600;
+}
+
+.social-links-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 #socials-emoticons a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   text-decoration: none;
-  transition: transform 0.2s ease;
-  display: inline-block;
+  padding: 7px 8px;
+  border: 2px solid var(--secondary);
+  background: rgba(12, 18, 14, 0.92);
+  color: var(--highlight);
+  font-size: 8px;
+  line-height: 1;
+  box-shadow: 0 0 0 2px var(--primary), 2px 2px 0 #000;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 #socials-emoticons a:hover {
-  transform: scale(1.2);
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+
+.social-icon {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 12px;
+}
+
+.social-label {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  letter-spacing: 0.6px;
 }
 
 /* === ACCESSIBILITY IMPROVEMENTS === */
@@ -690,6 +721,20 @@ html, body {
 
   #bottom-controls-right {
     bottom: 10px;
+  }
+
+  #socials-emoticons {
+    bottom: 120px;
+    width: 96vw;
+  }
+
+  #socials-emoticons a {
+    font-size: 7px;
+    padding: 6px 6px;
+  }
+
+  .social-icon {
+    font-size: 10px;
   }
 
   .ctrl-btn {

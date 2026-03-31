@@ -793,6 +793,11 @@ function openEsotericHub() {
   showOverlay('esotericHubOverlay');
 }
 
+function openMovieReviews() {
+  createOverlay('movieReviewsOverlay', 'MOVIE REVIEWS • 420360', 'movie-reviews/index.html');
+  showOverlay('movieReviewsOverlay');
+}
+
 function openDaughtersIndex() {
   openEsotericHub();
 }
@@ -1436,6 +1441,7 @@ function setupEventHandlers() {
       case 'g': openGamesIndex(); break;
       case 'b': openBoardIndex(); break;
       case 'e': openEsotericHub(); break;
+      case 'r': openMovieReviews(); break;
       case 'd': openDaughtersIndex(); break;
       case 'o': openOracle(); break;
       case 'i': openIssues(); break;
@@ -1538,6 +1544,15 @@ function setupControlButtons() {
     esotericBtn.addEventListener('click', e => { e.stopPropagation(); openEsotericHub(); });
     esotericBtn.addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEsotericHub(); }
+    });
+  }
+
+  // Reviews button
+  const reviewsBtn = document.getElementById('reviews-control');
+  if (reviewsBtn) {
+    reviewsBtn.addEventListener('click', e => { e.stopPropagation(); openMovieReviews(); });
+    reviewsBtn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMovieReviews(); }
     });
   }
 

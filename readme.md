@@ -13,6 +13,7 @@ Live site: https://420360.xyz/
 	- Puzzle/memory: Neon Simon, Memory Cards, Pixel Crush
 	- Experimental: Tarot Tetromino (arcana-fused falling blocks), Glitch Maze, Generative Art, TIM • The Dialogue Oracle, Noctis Reverie
 - Integrated overlays from the landing page for a seamless “windowed” feel (About, Games, Oracle)
+- Movie Reviews overlay powered by a daily Letterboxd RSS sync
 - Local scores/progress via `localStorage` surfaced in the Games index
 - Toggleable music and SFX with a tiny glitch animation
 - Region-based age gate for cannabis-themed content access (21+ US/Canada, 18+ selected legal regions)
@@ -20,7 +21,22 @@ Live site: https://420360.xyz/
 
 Keyboard shortcuts on the landing page:
 - `A` About • `G` Games index • `O` Oracle • `B` Board (if present) • `Esc` close overlays
+- `R` Movie Reviews
 - `M` toggle music • `S` toggle SFX • `I` open Issues link
+
+## Movie reviews feed
+
+The Movie Reviews page lives at `movie-reviews/index.html` and reads from `assets/data/movie-reviews.json`.
+
+- Source feed: `https://letterboxd.com/woodmurderedhat/rss/`
+- Sync workflow: `.github/workflows/letterboxd-sync.yml`
+- Sync cadence: daily (and on manual workflow dispatch)
+
+To refresh data locally:
+
+```bash
+node tools/fetch-letterboxd-reviews.mjs
+```
 
 ## Repository structure (high level)
 

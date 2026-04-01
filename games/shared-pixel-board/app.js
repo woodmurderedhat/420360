@@ -13,7 +13,7 @@ import {
   remove
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-const BOARD_SIZE = 100;
+const BOARD_SIZE = 256;
 const PIXEL_SIZE = 8;
 const DEFAULT_COLOR = "#111827";
 const COLOR_PATTERN = /^#[0-9A-F]{6}$/;

@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "pixels": {
+      ".read": true,
+      "$pixel": {
+        ".write": "newData.isString()",
+        ".validate": "$pixel.matches(/^[0-9]{1,2}_[0-9]{1,2}$/) && newData.val().matches(/^#[0-9A-F]{6}$/)"
+      }
+    },
+    "meta": {
+      ".read": true,
+      "lastUpdated": {
+        ".write": true,
+        ".validate": "newData.isNumber() || newData.val() == now"
+      },
+      "lastEditor": {
+        ".write": true,
+        ".validate": "newData.isString() && newData.val().length <= 64"
+      }
+    },
+    "presence": {
+      ".read": true,
+      "$uid": {
+        ".write": true,
+        ".validate": "$uid.matches(/^anon_[a-z0-9]+_[a-z0-9]+$/) && newData.hasChildren(['at']) && newData.child('at').val() == now"
+      }
+    },
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

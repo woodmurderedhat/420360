@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shared Pixel Board | 420360</title>
+  <meta name="description" content="Realtime collaborative pixel board powered by Firebase Realtime Database. Place pixels, overwrite strangers, watch it mutate live." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://420360.xyz/games/shared-pixel-board/index.html" />
+  <link rel="icon" type="image/x-icon" href="../../assets/images/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <p class="kicker">Realtime Experiment</p>
+        <h1>Shared Pixel Board</h1>
+        <p class="subtitle">A public surface that expects sabotage.</p>
+      </div>
+      <a class="back-link" href="../index.html">Back to Games</a>
+    </header>
+
+    <section class="control-panel" aria-label="Pixel controls">
+      <label class="field">
+        <span>Color</span>
+        <input id="colorPicker" type="color" value="#ff4d4d" aria-label="Pick pixel color" />
+      </label>
+
+      <div class="field">
+        <span>Current</span>
+        <div id="currentColorSwatch" class="swatch" aria-live="polite">#FF4D4D</div>
+      </div>
+
+      <label class="field">
+        <span>Cooldown</span>
+        <select id="cooldownSelect" aria-label="Set cooldown seconds">
+          <option value="1000">1s</option>
+          <option value="3000" selected>3s</option>
+          <option value="5000">5s</option>
+        </select>
+      </label>
+
+      <label class="field checkbox-field">
+        <input id="gridToggle" type="checkbox" checked />
+        <span>Grid</span>
+      </label>
+    </section>
+
+    <section class="status-row" aria-live="polite">
+      <p id="connectionStatus" class="status-pill offline">offline</p>
+      <p id="cooldownStatus" class="status-pill">ready</p>
+      <p id="userCount" class="status-pill">users: 0</p>
+      <p id="boardStamp" class="status-pill">last update: -</p>
+    </section>
+
+    <section class="canvas-wrap" aria-label="Collaborative board">
+      <canvas id="pixelCanvas" width="800" height="800" aria-label="100 by 100 shared pixel board"></canvas>
+    </section>
+
+    <section class="notice" id="noticeBox">
+      Configure Firebase in app.js before deployment.
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

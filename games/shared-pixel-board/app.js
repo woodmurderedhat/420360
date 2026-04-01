@@ -39,7 +39,11 @@ const connectionStatus = document.getElementById("connectionStatus");
 const cooldownStatus = document.getElementById("cooldownStatus");
 const userCount = document.getElementById("userCount");
 const boardStamp = document.getElementById("boardStamp");
+const hoverStatus = document.getElementById("hoverStatus");
+const sessionStats = document.getElementById("sessionStats");
+const reconnectBanner = document.getElementById("reconnectBanner");
 const noticeBox = document.getElementById("noticeBox");
+const canvasWrap = document.querySelector(".canvas-wrap");
 
 const pixelCache = new Map();
 const sessionId = `anon_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
@@ -48,9 +52,68 @@ let cooldownMs = Number(cooldownSelect.value);
 let lastPlacementAt = Number(localStorage.getItem("sharedPixelLastPlacementAt") || 0);
 let db = null;
 let writeInFlight = false;
+let zoomLevel = 1;
+let dragPanActive = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragStartScrollLeft = 0;
+let dragStartScrollTop = 0;
+const activePointers = new Map();
+let pinchDistanceStart = 0;
+let pinchZoomStart = 1;
+let pinchMidpointLast = null;
+
+const stats = {
+  placements: 0,
+  blockedCooldown: 0,
+  blockedNoop: 0
+};
 
 canvas.width = BOARD_SIZE * PIXEL_SIZE;
 canvas.height = BOARD_SIZE * PIXEL_SIZE;
+
+function renderSessionStats() {
+  sessionStats.textContent = `session: ok ${stats.placements} | cd ${stats.blockedCooldown} | noop ${stats.blockedNoop}`;
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function clampScrollBounds() {
+  canvasWrap.scrollLeft = clamp(canvasWrap.scrollLeft, 0, Math.max(0, canvasWrap.scrollWidth - canvasWrap.clientWidth));
+  canvasWrap.scrollTop = clamp(canvasWrap.scrollTop, 0, Math.max(0, canvasWrap.scrollHeight - canvasWrap.clientHeight));
+}
+
+function applyZoom(newZoom, originClientX, originClientY) {
+  const clampedZoom = clamp(newZoom, 0.5, 4);
+  const rect = canvasWrap.getBoundingClientRect();
+  const originX = originClientX - rect.left + canvasWrap.scrollLeft;
+  const originY = originClientY - rect.top + canvasWrap.scrollTop;
+  const worldX = originX / zoomLevel;
+  const worldY = originY / zoomLevel;
+
+  zoomLevel = clampedZoom;
+  canvas.style.width = `${canvas.width * zoomLevel}px`;
+  canvas.style.height = `${canvas.height * zoomLevel}px`;
+
+  canvasWrap.scrollLeft = worldX * zoomLevel - (originClientX - rect.left);
+  canvasWrap.scrollTop = worldY * zoomLevel - (originClientY - rect.top);
+  clampScrollBounds();
+}
+
+function getPointerDistance(pointerA, pointerB) {
+  const dx = pointerA.x - pointerB.x;
+  const dy = pointerA.y - pointerB.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function getPointerMidpoint(pointerA, pointerB) {
+  return {
+    x: (pointerA.x + pointerB.x) / 2,
+    y: (pointerA.y + pointerB.y) / 2
+  };
+}
 
 function drawBaseBoard() {
   ctx.fillStyle = DEFAULT_COLOR;
@@ -120,8 +183,14 @@ function canvasToBoardCoordinates(event) {
   const rect = canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
-  const x = Math.floor((event.clientX - rect.left) * scaleX / PIXEL_SIZE);
-  const y = Math.floor((event.clientY - rect.top) * scaleY / PIXEL_SIZE);
+  const eventX = event.clientX ?? (event.touches && event.touches[0] ? event.touches[0].clientX : null);
+  const eventY = event.clientY ?? (event.touches && event.touches[0] ? event.touches[0].clientY : null);
+  if (eventX === null || eventY === null) {
+    return { x: -1, y: -1 };
+  }
+
+  const x = Math.floor((eventX - rect.left) * scaleX / PIXEL_SIZE);
+  const y = Math.floor((eventY - rect.top) * scaleY / PIXEL_SIZE);
   return { x, y };
 }
 
@@ -151,12 +220,16 @@ async function placePixel(x, y) {
 
   const key = `${x}_${y}`;
   if (pixelCache.get(key) === selectedColor) {
+    stats.blockedNoop += 1;
+    renderSessionStats();
     setNotice("No-op blocked: pixel already that color.");
     return;
   }
 
   const now = Date.now();
   if (now - lastPlacementAt < cooldownMs) {
+    stats.blockedCooldown += 1;
+    renderSessionStats();
     setNotice("Cooldown active.");
     updateCooldownBadge();
     return;
@@ -175,6 +248,8 @@ async function placePixel(x, y) {
     };
 
     await update(ref(db), updates);
+    stats.placements += 1;
+    renderSessionStats();
     setNotice("Placement accepted.", true);
   } catch (error) {
     setNotice(`Write failed: ${error.message}`);
@@ -195,9 +270,116 @@ function bindUI() {
 
   gridToggle.addEventListener("change", redrawFromCache);
 
-  canvas.addEventListener("click", (event) => {
+  canvasWrap.addEventListener("wheel", (event) => {
+    event.preventDefault();
+    const zoomDelta = event.deltaY < 0 ? 1.12 : 0.89;
+    applyZoom(zoomLevel * zoomDelta, event.clientX, event.clientY);
+  }, { passive: false });
+
+  canvas.addEventListener("pointerdown", (event) => {
+    activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (event.pointerType === "touch") {
+      return;
+    }
+
+    if (event.button === 1 || event.shiftKey) {
+      dragPanActive = true;
+      dragStartX = event.clientX;
+      dragStartY = event.clientY;
+      dragStartScrollLeft = canvasWrap.scrollLeft;
+      dragStartScrollTop = canvasWrap.scrollTop;
+      canvasWrap.classList.add("panning");
+      return;
+    }
+
+    if (event.button === 0) {
+      const { x, y } = canvasToBoardCoordinates(event);
+      placePixel(x, y);
+    }
+  });
+
+  canvas.addEventListener("pointermove", (event) => {
+    if (activePointers.has(event.pointerId)) {
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    }
+
+    if (activePointers.size === 2) {
+      const pointers = Array.from(activePointers.values());
+      const distance = getPointerDistance(pointers[0], pointers[1]);
+      const midpoint = getPointerMidpoint(pointers[0], pointers[1]);
+
+      if (pinchDistanceStart === 0) {
+        pinchDistanceStart = distance;
+        pinchZoomStart = zoomLevel;
+        pinchMidpointLast = midpoint;
+      } else {
+        const nextZoom = pinchZoomStart * (distance / pinchDistanceStart);
+        applyZoom(nextZoom, midpoint.x, midpoint.y);
+        canvasWrap.scrollLeft -= midpoint.x - pinchMidpointLast.x;
+        canvasWrap.scrollTop -= midpoint.y - pinchMidpointLast.y;
+        clampScrollBounds();
+        pinchMidpointLast = midpoint;
+      }
+    }
+
+    if (dragPanActive) {
+      canvasWrap.scrollLeft = dragStartScrollLeft - (event.clientX - dragStartX);
+      canvasWrap.scrollTop = dragStartScrollTop - (event.clientY - dragStartY);
+      clampScrollBounds();
+      return;
+    }
+
+    if (activePointers.size > 1) {
+      hoverStatus.textContent = "hover: -";
+      return;
+    }
+
     const { x, y } = canvasToBoardCoordinates(event);
-    placePixel(x, y);
+    if (!validCoordinates(x, y)) {
+      hoverStatus.textContent = "hover: -";
+      return;
+    }
+
+    const key = `${x}_${y}`;
+    const existingColor = pixelCache.get(key) || DEFAULT_COLOR;
+    hoverStatus.textContent = `hover: ${x},${y} ${existingColor}`;
+  });
+
+  canvas.addEventListener("pointerleave", () => {
+    hoverStatus.textContent = "hover: -";
+  });
+
+  canvas.addEventListener("pointerup", (event) => {
+    activePointers.delete(event.pointerId);
+
+    if (event.pointerType === "touch" && activePointers.size === 0 && pinchDistanceStart === 0) {
+      const { x, y } = canvasToBoardCoordinates(event);
+      placePixel(x, y);
+    }
+
+    if (activePointers.size < 2) {
+      pinchDistanceStart = 0;
+      pinchMidpointLast = null;
+    }
+
+    if (dragPanActive) {
+      dragPanActive = false;
+      canvasWrap.classList.remove("panning");
+    }
+  });
+
+  canvas.addEventListener("pointercancel", (event) => {
+    activePointers.delete(event.pointerId);
+    if (activePointers.size < 2) {
+      pinchDistanceStart = 0;
+      pinchMidpointLast = null;
+    }
+
+    if (dragPanActive) {
+      dragPanActive = false;
+      canvasWrap.classList.remove("panning");
+    }
   });
 
   setInterval(updateCooldownBadge, 120);
@@ -247,6 +429,7 @@ function wireDatabaseListeners() {
     connectionStatus.textContent = connected ? "online" : "offline";
     connectionStatus.classList.toggle("online", connected);
     connectionStatus.classList.toggle("offline", !connected);
+    reconnectBanner.classList.toggle("active", !connected);
   });
 
   onValue(ref(db, "presence"), (snap) => {
@@ -285,6 +468,7 @@ function firebaseConfigured() {
 }
 
 async function boot() {
+  renderSessionStats();
   drawBaseBoard();
   syncCurrentColor(colorPicker.value);
   bindUI();

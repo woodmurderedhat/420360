@@ -55,10 +55,16 @@
       <p id="cooldownStatus" class="status-pill">ready</p>
       <p id="userCount" class="status-pill">users: 0</p>
       <p id="boardStamp" class="status-pill">last update: -</p>
+      <p id="hoverStatus" class="status-pill">hover: -</p>
+      <p id="sessionStats" class="status-pill">session: ok 0 | cd 0 | noop 0</p>
     </section>
 
     <section class="canvas-wrap" aria-label="Collaborative board">
       <canvas id="pixelCanvas" width="800" height="800" aria-label="100 by 100 shared pixel board"></canvas>
+    </section>
+
+    <section id="reconnectBanner" class="reconnect-banner" aria-live="polite">
+      Connection lost. Reconnecting...
     </section>
 
     <section class="notice" id="noticeBox">

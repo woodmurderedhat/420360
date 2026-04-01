@@ -148,18 +148,54 @@ select {
   border-radius: 14px;
   padding: 0.6rem;
   background: rgba(6, 10, 17, 0.8);
+  width: min(92vw, 820px);
+  height: min(92vw, 820px);
+  margin-left: auto;
+  margin-right: auto;
   overflow: auto;
+  touch-action: none;
 }
 
 #pixelCanvas {
   display: block;
-  width: min(92vw, 800px);
-  height: min(92vw, 800px);
-  margin: 0 auto;
+  width: 800px;
+  height: 800px;
+  margin: 0;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   cursor: crosshair;
+  touch-action: none;
   background: #0a111a;
+}
+
+.canvas-wrap.panning #pixelCanvas {
+  cursor: grabbing;
+}
+
+.reconnect-banner {
+  margin-top: 0.75rem;
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.82rem;
+  color: #ffd2dd;
+  background: rgba(255, 53, 94, 0.12);
+  display: none;
+}
+
+.reconnect-banner.active {
+  display: block;
+  animation: pulseReconnect 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes pulseReconnect {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .notice {

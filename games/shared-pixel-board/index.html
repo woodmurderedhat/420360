@@ -71,6 +71,21 @@
       </label>
 
       <div class="field">
+        <span>Palette (1-9)</span>
+        <div id="paletteGrid" class="palette-grid" aria-label="Color palette shortcuts">
+          <button class="palette-btn active" type="button" data-palette-slot="1" data-palette-color="#FF4D4D" aria-label="Palette color 1 #FF4D4D">1</button>
+          <button class="palette-btn" type="button" data-palette-slot="2" data-palette-color="#4DFF88" aria-label="Palette color 2 #4DFF88">2</button>
+          <button class="palette-btn" type="button" data-palette-slot="3" data-palette-color="#4DB8FF" aria-label="Palette color 3 #4DB8FF">3</button>
+          <button class="palette-btn" type="button" data-palette-slot="4" data-palette-color="#FFE14D" aria-label="Palette color 4 #FFE14D">4</button>
+          <button class="palette-btn" type="button" data-palette-slot="5" data-palette-color="#C24DFF" aria-label="Palette color 5 #C24DFF">5</button>
+          <button class="palette-btn" type="button" data-palette-slot="6" data-palette-color="#FF8C4D" aria-label="Palette color 6 #FF8C4D">6</button>
+          <button class="palette-btn" type="button" data-palette-slot="7" data-palette-color="#00D4AA" aria-label="Palette color 7 #00D4AA">7</button>
+          <button class="palette-btn" type="button" data-palette-slot="8" data-palette-color="#F5F5F5" aria-label="Palette color 8 #F5F5F5">8</button>
+          <button class="palette-btn" type="button" data-palette-slot="9" data-palette-color="#111827" aria-label="Palette color 9 #111827">9</button>
+        </div>
+      </div>
+
+      <div class="field">
         <span>Current</span>
         <div id="currentColorSwatch" class="swatch" aria-live="polite">#FF4D4D</div>
       </div>
@@ -80,23 +95,69 @@
         <div id="cooldownFixed" class="fixed-value" aria-label="Cooldown is locked">30s (locked)</div>
       </label>
 
+      <label class="field">
+        <span>Tool (P/B/L/F)</span>
+        <select id="toolSelect" aria-label="Drawing tool">
+          <option value="pixel">Pixel</option>
+          <option value="brush">Brush</option>
+          <option value="line">Line</option>
+          <option value="fill">Fill</option>
+        </select>
+      </label>
+
+      <label class="field" id="brushSizeField">
+        <span>Brush Size ([ / ])</span>
+        <select id="brushSize" aria-label="Brush size">
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Fill Cap</span>
+        <div id="fillCapValue" class="fixed-value" aria-label="Fill cap is locked">480 px (locked)</div>
+      </label>
+
       <label class="field checkbox-field">
         <input id="gridToggle" type="checkbox" checked />
         <span>Grid</span>
       </label>
+
+      <div class="field">
+        <span>Actions</span>
+        <button id="exportPng" class="action-btn" type="button">Export PNG (E)</button>
+        <button id="copySpectatorLink" class="action-btn secondary" type="button">Copy Spectator Link</button>
+        <button id="toggleHelp" class="action-btn secondary" type="button">Help / Shortcuts (?)</button>
+        <div class="history-actions">
+          <button id="undoAction" class="action-btn secondary" type="button">Undo</button>
+          <button id="redoAction" class="action-btn secondary" type="button">Redo</button>
+        </div>
+        <small class="hotkey-note">Tools: P/B/L/F, Brush: [ ], Undo/Redo: U/R or Ctrl+Z/Y, Share: S, Help: ?, Zoom: +/-/0, Pan: arrows, Grid: G</small>
+      </div>
     </section>
 
     <section class="status-row" aria-live="polite">
       <p id="connectionStatus" class="status-pill offline">offline</p>
+      <p id="modeStatus" class="status-pill">mode: paint</p>
+      <p id="toolStatus" class="status-pill">tool: pixel</p>
+      <p id="syncStatus" class="status-pill">sync: idle</p>
+      <p id="zoomStatus" class="status-pill">zoom: 100%</p>
       <p id="cooldownStatus" class="status-pill">ready</p>
       <p id="userCount" class="status-pill">users: 0</p>
       <p id="boardStamp" class="status-pill">last update: -</p>
       <p id="hoverStatus" class="status-pill">hover: -</p>
       <p id="sessionStats" class="status-pill">session: ok 0 | cd 0 | noop 0</p>
+      <p id="historyStatus" class="status-pill">history: 0 | redo: 0</p>
     </section>
 
     <section class="canvas-wrap" aria-label="Collaborative board">
-      <canvas id="pixelCanvas" width="800" height="800" aria-label="100 by 100 shared pixel board"></canvas>
+      <div class="canvas-stage">
+        <canvas id="pixelCanvas" width="800" height="800" aria-label="100 by 100 shared pixel board"></canvas>
+        <canvas id="overlayCanvas" width="800" height="800" aria-hidden="true"></canvas>
+      </div>
     </section>
 
     <section id="reconnectBanner" class="reconnect-banner" aria-live="polite">
@@ -105,6 +166,29 @@
 
     <section class="notice" id="noticeBox">
       Configure Firebase in app.js before deployment.
+    </section>
+
+    <section class="mobile-toolbar" aria-label="Mobile quick actions">
+      <button type="button" id="mobilePixel" class="action-btn secondary">P</button>
+      <button type="button" id="mobileBrush" class="action-btn secondary">B</button>
+      <button type="button" id="mobileLine" class="action-btn secondary">L</button>
+      <button type="button" id="mobileFill" class="action-btn secondary">F</button>
+      <button type="button" id="mobilePan" class="action-btn secondary" aria-pressed="false">Pan</button>
+      <button type="button" id="mobileUndo" class="action-btn secondary">Undo</button>
+      <button type="button" id="mobileHelp" class="action-btn secondary">Help</button>
+    </section>
+
+    <section id="helpPanel" class="help-panel" hidden aria-label="Shortcuts and controls">
+      <div class="help-card">
+        <h2>Controls</h2>
+        <p><strong>Tools:</strong> P pixel, B brush, L line, F fill</p>
+        <p><strong>Brush size:</strong> [ smaller, ] larger</p>
+        <p><strong>View:</strong> + zoom in, - zoom out, 0 reset, arrows pan, G grid</p>
+        <p><strong>History:</strong> U undo, R redo, Ctrl/Cmd+Z undo, Ctrl/Cmd+Y redo</p>
+        <p><strong>Actions:</strong> E export PNG, S copy spectator link, Esc cancel gesture</p>
+        <p><strong>Eyedropper:</strong> Right-click (or Ctrl+click) any pixel to pick its color</p>
+        <button id="closeHelp" class="action-btn" type="button">Close</button>
+      </div>
     </section>
   </main>
 

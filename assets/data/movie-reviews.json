@@ -2,10 +2,37 @@
   "meta": {
     "source": "https://letterboxd.com/woodmurderedhat/rss/",
     "profile": "https://letterboxd.com/woodmurderedhat/",
-    "lastSynced": "2026-03-31T16:27:23.157Z",
-    "total": 3
+    "lastSynced": "2026-04-01T06:56:47.400Z",
+    "total": 6
   },
   "items": [
+    {
+      "title": "Good Luck, Have Fun, Don&#039;t Die, 2025 - ★★★★",
+      "link": "https://letterboxd.com/woodmurderedhat/film/good-luck-have-fun-dont-die/",
+      "rating": 4,
+      "watchedDate": "2026-03-31T00:00:00.000Z",
+      "publishedAt": "2026-03-31T22:23:16.000Z",
+      "summary": "Quite a cool time travel movie with a twist. Has some funny and outrageous scenes. Quite entertaining. Worth the watch.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/0/0/9/2/3/7/1009237-good-luck-have-fun-dont-die-0-600-0-900-crop.jpg?v=be79007f48"
+    },
+    {
+      "title": "Wuthering Heights, 2026 - ★★½",
+      "link": "https://letterboxd.com/woodmurderedhat/film/wuthering-heights-2026/",
+      "rating": 2.5,
+      "watchedDate": "2026-03-31T00:00:00.000Z",
+      "publishedAt": "2026-03-31T22:19:04.000Z",
+      "summary": "Love story for narcissists. Probably won't get laid with this one, unless you have the dog in you.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/1/9/6/9/1/1/1196911-wuthering-heights-2026-0-600-0-900-crop.jpg?v=7d02cf3bdc"
+    },
+    {
+      "title": "Hoppers, 2026 - ★★½",
+      "link": "https://letterboxd.com/woodmurderedhat/film/hoppers/",
+      "rating": 2.5,
+      "watchedDate": "2026-03-31T00:00:00.000Z",
+      "publishedAt": "2026-03-31T22:16:23.000Z",
+      "summary": "It was a pretty mid animated movie about saving the animals.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/2/0/7/5/5/7/1207557-hoppers-0-600-0-900-crop.jpg?v=7711e7b5a7"
+    },
     {
       "title": "The Wrong Bitch, 2025 - ★",
       "link": "https://letterboxd.com/woodmurderedhat/film/the-wrong-bitch/",

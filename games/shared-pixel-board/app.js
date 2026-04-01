@@ -1112,6 +1112,10 @@ function bindUI() {
   copySpectatorLink.addEventListener("click", copySpectatorUrl);
   toggleHelp.addEventListener("click", () => setHelpVisible(true));
   closeHelp.addEventListener("click", () => setHelpVisible(false));
+  closeHelp.addEventListener("pointerup", (event) => {
+    event.preventDefault();
+    setHelpVisible(false);
+  });
   helpPanel.addEventListener("click", (event) => {
     if (event.target === helpPanel) {
       setHelpVisible(false);
@@ -1172,10 +1176,6 @@ function bindUI() {
       return;
     }
 
-    if (event.pointerType !== "touch" && event.button !== 0) {
-      return;
-    }
-
     if (event.pointerType !== "touch" && event.button === 2) {
       if (!SPECTATOR_MODE) {
         const { x: ex, y: ey } = canvasToBoardCoordinates(event);
@@ -1185,6 +1185,10 @@ function bindUI() {
           setNotice(`Color picked: ${picked}.`, true);
         }
       }
+      return;
+    }
+
+    if (event.pointerType !== "touch" && event.button !== 0) {
       return;
     }
 
@@ -1412,6 +1416,7 @@ function firebaseConfigured() {
 }
 
 async function boot() {
+  setHelpVisible(false);
   applySavedPreferences();
   renderSessionStats();
   renderHistoryStatus();

@@ -359,6 +359,11 @@ button {
   place-items: center;
   z-index: 40;
   padding: 1rem;
+  pointer-events: auto;
+}
+
+.help-panel[hidden] {
+  display: none !important;
 }
 
 .help-card {
@@ -368,6 +373,7 @@ button {
   padding: 1rem;
   background: linear-gradient(160deg, rgba(27, 16, 10, 0.96), rgba(13, 8, 5, 0.98));
   box-shadow: 0 20px 42px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
 }
 
 .help-card h2 {

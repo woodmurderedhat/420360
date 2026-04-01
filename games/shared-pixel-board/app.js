@@ -33,7 +33,6 @@ const canvas = document.getElementById("pixelCanvas");
 const ctx = canvas.getContext("2d", { alpha: false });
 const colorPicker = document.getElementById("colorPicker");
 const currentColorSwatch = document.getElementById("currentColorSwatch");
-const cooldownSelect = document.getElementById("cooldownSelect");
 const gridToggle = document.getElementById("gridToggle");
 const connectionStatus = document.getElementById("connectionStatus");
 const cooldownStatus = document.getElementById("cooldownStatus");
@@ -48,7 +47,7 @@ const canvasWrap = document.querySelector(".canvas-wrap");
 const pixelCache = new Map();
 const sessionId = `anon_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
 let selectedColor = "#FF4D4D";
-let cooldownMs = Number(cooldownSelect.value);
+const cooldownMs = 30000;
 let lastPlacementAt = Number(localStorage.getItem("sharedPixelLastPlacementAt") || 0);
 let db = null;
 let writeInFlight = false;
@@ -261,11 +260,6 @@ async function placePixel(x, y) {
 function bindUI() {
   colorPicker.addEventListener("input", (event) => {
     syncCurrentColor(event.target.value);
-  });
-
-  cooldownSelect.addEventListener("change", (event) => {
-    cooldownMs = Number(event.target.value);
-    updateCooldownBadge();
   });
 
   gridToggle.addEventListener("change", redrawFromCache);

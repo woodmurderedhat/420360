@@ -99,6 +99,18 @@ select {
   font-family: "JetBrains Mono", monospace;
 }
 
+.fixed-value {
+  border: 1px solid var(--line);
+  background: #0a1019;
+  color: var(--ink);
+  border-radius: 8px;
+  min-height: 2.2rem;
+  font-family: "JetBrains Mono", monospace;
+  display: flex;
+  align-items: center;
+  padding: 0 0.65rem;
+}
+
 .checkbox-field {
   flex-direction: row;
   align-items: center;

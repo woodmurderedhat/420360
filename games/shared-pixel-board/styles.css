@@ -262,8 +262,8 @@ button {
   background:
     linear-gradient(180deg, rgba(25, 15, 10, 0.95), rgba(11, 7, 5, 0.95)),
     repeating-linear-gradient(45deg, rgba(255, 187, 88, 0.03), rgba(255, 187, 88, 0.03) 8px, transparent 8px, transparent 16px);
-  width: min(92vw, 820px);
-  height: min(92vw, 820px);
+  width: min(92vw, 960px);
+  height: min(92vw, 960px);
   margin-left: auto;
   margin-right: auto;
   overflow: auto;
@@ -273,8 +273,8 @@ button {
 
 #pixelCanvas {
   display: block;
-  width: 800px;
-  height: 800px;
+  width: 2048px;
+  height: 2048px;
   margin: 0;
   image-rendering: pixelated;
   image-rendering: crisp-edges;

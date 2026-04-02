@@ -137,6 +137,8 @@ const stats = {
 
 canvas.width = BOARD_SIZE * PIXEL_SIZE;
 canvas.height = BOARD_SIZE * PIXEL_SIZE;
+overlayCanvas.width = BOARD_SIZE * PIXEL_SIZE;
+overlayCanvas.height = BOARD_SIZE * PIXEL_SIZE;
 
 function renderSessionStats() {
   sessionStats.textContent = `session: ok ${stats.placements} | cd ${stats.blockedCooldown} | noop ${stats.blockedNoop}`;

@@ -157,7 +157,11 @@ html, body {
 .blurb span { 
   display: inline-block; 
   margin-right: 6px; 
-  transition: color 0.2s, background 0.2s; 
+  transition: color 0.2s, background 0.2s, opacity 0.22s ease;
+}
+
+.blurb span.is-hidden-word {
+  opacity: 0;
 }
 
 .blurb .glitch {

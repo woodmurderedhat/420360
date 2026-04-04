@@ -53,6 +53,12 @@ const CONFIG = {
   // Mouse idle timeout (ms) before animations pause
   MOUSE_IDLE_TIMEOUT: 1500,
 
+  // Progressive blurb reveal configuration
+  PROGRESSIVE_REVEAL_SENTENCE: 'Welcome to 420360 where each move reveals another layer of the experience.',
+  POINTER_REVEAL_MIN_INTERVAL: 140,
+  POINTER_REVEAL_MIN_DISTANCE: 36,
+  SCROLL_REVEAL_MIN_INTERVAL: 180,
+
   // Audio settings
   MUSIC_TARGET_VOLUME: 0.65,
   SFX_BASE_VOLUME: 0.55,
@@ -97,7 +103,14 @@ const state = {
 
   activePopups: [],
   currentSentence: '',
-  videoWindowLoaded: false
+  videoWindowLoaded: false,
+
+  progressiveReveal: {
+    enabled: true,
+    words: [],
+    revealedCount: 1,
+    lastRevealAt: 0
+  }
 };
 
 function getThemeSentences() {
@@ -297,6 +310,47 @@ function setBlurbText(sentence) {
   cursor.textContent = '_';
   cursor.setAttribute('aria-hidden', 'true');
   blurbEl.appendChild(cursor);
+
+  if (state.progressiveReveal.enabled) {
+    applyProgressiveReveal();
+  }
+}
+
+function initializeProgressiveSentence() {
+  const sentence = (CONFIG.PROGRESSIVE_REVEAL_SENTENCE || '').trim();
+  if (!sentence) return;
+  state.currentSentence = sentence;
+  state.progressiveReveal.words = sentence.split(/\s+/).filter(Boolean);
+  state.progressiveReveal.revealedCount = Math.min(1, state.progressiveReveal.words.length);
+  state.progressiveReveal.lastRevealAt = 0;
+}
+
+function applyProgressiveReveal() {
+  const blurbEl = document.getElementById('blurb');
+  if (!blurbEl) return;
+
+  const spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  const maxWords = spans.length;
+  const revealCount = Math.max(1, Math.min(state.progressiveReveal.revealedCount, maxWords));
+
+  spans.forEach((span, index) => {
+    if (index < revealCount) span.classList.remove('is-hidden-word');
+    else span.classList.add('is-hidden-word');
+  });
+}
+
+function revealNextProgressiveWord() {
+  if (!state.progressiveReveal.enabled) return;
+
+  const wordsTotal = state.progressiveReveal.words.length;
+  if (!wordsTotal || state.progressiveReveal.revealedCount >= wordsTotal) return;
+
+  const now = Date.now();
+  if (now - state.progressiveReveal.lastRevealAt < CONFIG.POINTER_REVEAL_MIN_INTERVAL) return;
+
+  state.progressiveReveal.revealedCount += 1;
+  state.progressiveReveal.lastRevealAt = now;
+  applyProgressiveReveal();
 }
 
 /**
@@ -306,7 +360,7 @@ function glitchRandomWord() {
   const blurbEl = document.getElementById('blurb');
   if (!blurbEl) return;
 
-  const spans = blurbEl.querySelectorAll('span:not(.cursor)');
+  const spans = blurbEl.querySelectorAll('span:not(.cursor):not(.is-hidden-word)');
   if (!spans.length) return;
 
   // Rare chance for whole-blurb glitch
@@ -341,6 +395,8 @@ function fullGlitch() {
  * Morph to a random sentence
  */
 function morphToRandomSentence() {
+  if (state.progressiveReveal.enabled) return;
+
   const blurbEl = document.getElementById('blurb');
   if (!blurbEl) return;
 
@@ -1384,13 +1440,14 @@ function setupEventHandlers() {
     if (!document.hidden && state.mouseActive) startIntervals();
   });
 
-  // Start/stop animations based on mouse activity
+  // Start/stop animations and reveal words based on movement
   let lastMorphX = null, lastMorphY = null, lastMorphTime = 0;
-  document.addEventListener('mousemove', (e) => {
-    if (state.reducedMotion) return;
+  let lastScrollRevealTime = 0;
+  document.addEventListener('pointermove', (e) => {
+    const animationsAllowed = !state.reducedMotion;
 
     // Activate animations on mouse movement
-    if (!state.mouseActive) {
+    if (animationsAllowed && !state.mouseActive) {
       state.mouseActive = true;
       if (!document.hidden && !hasOpenOverlay()) {
         startIntervals();
@@ -1398,26 +1455,36 @@ function setupEventHandlers() {
     }
 
     // Reset idle timer — stop animations when mouse goes still
-    if (state.mouseIdleTimeoutId) clearTimeout(state.mouseIdleTimeoutId);
-    state.mouseIdleTimeoutId = setTimeout(() => {
-      state.mouseActive = false;
-      state.mouseIdleTimeoutId = null;
-      stopIntervals();
-    }, CONFIG.MOUSE_IDLE_TIMEOUT);
+    if (animationsAllowed) {
+      if (state.mouseIdleTimeoutId) clearTimeout(state.mouseIdleTimeoutId);
+      state.mouseIdleTimeoutId = setTimeout(() => {
+        state.mouseActive = false;
+        state.mouseIdleTimeoutId = null;
+        stopIntervals();
+      }, CONFIG.MOUSE_IDLE_TIMEOUT);
+    }
 
-    // Sentence morph on mouse movement (throttled by distance + time)
+    // Progressive reveal on pointer movement (throttled by distance + time)
     const now = Date.now();
-    if (now - lastMorphTime < 800) return;
+    if (now - lastMorphTime < CONFIG.POINTER_REVEAL_MIN_INTERVAL) return;
     if (lastMorphX !== null) {
       const dx = e.clientX - lastMorphX;
       const dy = e.clientY - lastMorphY;
-      if (Math.sqrt(dx * dx + dy * dy) < 120) return;
+      if (Math.sqrt(dx * dx + dy * dy) < CONFIG.POINTER_REVEAL_MIN_DISTANCE) return;
     }
-    morphToRandomSentence();
+    revealNextProgressiveWord();
     lastMorphX = e.clientX;
     lastMorphY = e.clientY;
     lastMorphTime = now;
   });
+
+  // Reveal words on scroll as well
+  window.addEventListener('scroll', () => {
+    const now = Date.now();
+    if (now - lastScrollRevealTime < CONFIG.SCROLL_REVEAL_MIN_INTERVAL) return;
+    revealNextProgressiveWord();
+    lastScrollRevealTime = now;
+  }, { passive: true });
 
   // Click to spawn popup
   let lastClick = 0;
@@ -1826,7 +1893,10 @@ function init() {
 
   // Initialize state
   state.sentences = getThemeSentences();
-  state.currentSentence = state.sentences[0];
+  initializeProgressiveSentence();
+  if (!state.currentSentence) {
+    state.currentSentence = state.sentences[0];
+  }
 
   // Set initial blurb text
   setBlurbText(state.currentSentence);

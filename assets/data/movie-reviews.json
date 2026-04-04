@@ -2,10 +2,37 @@
   "meta": {
     "source": "https://letterboxd.com/woodmurderedhat/rss/",
     "profile": "https://letterboxd.com/woodmurderedhat/",
-    "lastSynced": "2026-04-03T06:49:33.811Z",
-    "total": 6
+    "lastSynced": "2026-04-04T06:42:38.098Z",
+    "total": 9
   },
   "items": [
+    {
+      "title": "Crime 101, 2026 - ★★½",
+      "link": "https://letterboxd.com/woodmurderedhat/film/crime-101/",
+      "rating": 2.5,
+      "watchedDate": "2026-04-03T00:00:00.000Z",
+      "publishedAt": "2026-04-03T15:16:54.000Z",
+      "summary": "It was alright.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/0/5/8/1/3/2/1058132-crime-101-0-600-0-900-crop.jpg?v=eaba4b3224"
+    },
+    {
+      "title": "Wardriver, 2026 - ★★★",
+      "link": "https://letterboxd.com/woodmurderedhat/film/wardriver/",
+      "rating": 3,
+      "watchedDate": "2026-04-03T00:00:00.000Z",
+      "publishedAt": "2026-04-03T15:14:11.000Z",
+      "summary": "A solid hacker/heist movie.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/8/4/3/1/7/4/843174-wardriver-0-600-0-900-crop.jpg?v=1332620b67"
+    },
+    {
+      "title": "Mike & Nick & Nick & Alice, 2026 - ★★★½",
+      "link": "https://letterboxd.com/woodmurderedhat/film/mike-nick-nick-alice/",
+      "rating": 3.5,
+      "watchedDate": "2026-04-03T00:00:00.000Z",
+      "publishedAt": "2026-04-03T15:13:15.000Z",
+      "summary": "A cool crime story with some time travel thrown in there. Was pretty fun to watch.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/0/0/5/6/8/5/1005685-mike-nick-nick-alice-0-600-0-900-crop.jpg?v=731264397d"
+    },
     {
       "title": "Good Luck, Have Fun, Don&#039;t Die, 2025 - ★★★★",
       "link": "https://letterboxd.com/woodmurderedhat/film/good-luck-have-fun-dont-die/",

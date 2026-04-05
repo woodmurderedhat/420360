@@ -54,7 +54,6 @@ const CONFIG = {
   MOUSE_IDLE_TIMEOUT: 1500,
 
   // Progressive blurb reveal configuration
-  PROGRESSIVE_REVEAL_SENTENCE: 'Welcome to 420360 where each move reveals another layer of the experience.',
   POINTER_REVEAL_MIN_INTERVAL: 140,
   POINTER_REVEAL_MIN_DISTANCE: 36,
   SCROLL_REVEAL_MIN_INTERVAL: 180,
@@ -317,7 +316,11 @@ function setBlurbText(sentence) {
 }
 
 function initializeProgressiveSentence() {
-  const sentence = (CONFIG.PROGRESSIVE_REVEAL_SENTENCE || '').trim();
+  const sentencePool = state.sentences.length ? state.sentences : (typeof window !== 'undefined' && Array.isArray(window.SENTENCES) ? window.SENTENCES : []);
+  const randomSentence = sentencePool.length
+    ? sentencePool[Math.floor(Math.random() * sentencePool.length)]
+    : '';
+  const sentence = String(randomSentence || '').trim();
   if (!sentence) return;
   state.currentSentence = sentence;
   state.progressiveReveal.words = sentence.split(/\s+/).filter(Boolean);
@@ -1892,7 +1895,9 @@ function init() {
   state.initialized = true;
 
   // Initialize state
-  state.sentences = getThemeSentences();
+  state.sentences = (typeof window !== 'undefined' && Array.isArray(window.SENTENCES) && window.SENTENCES.length)
+    ? window.SENTENCES.filter(s => typeof s === 'string' && s.trim())
+    : getThemeSentences();
   initializeProgressiveSentence();
   if (!state.currentSentence) {
     state.currentSentence = state.sentences[0];

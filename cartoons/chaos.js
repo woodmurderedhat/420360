@@ -16,6 +16,7 @@ const DEFAULT_SEED = 20260405;
 const PENDULUM_TRAIL_MAX = 400;
 const EPICYCLE_TRAIL_MAX = 600;
 const TRAIL_BUCKETS = 20;
+const PARTICLE_MAX = 1200;
 
 // Pendulum
 const PL1 = 120, PL2 = 90, PM1 = 10, PM2 = 8, PG = 1.2, PDT = 0.3;
@@ -27,6 +28,7 @@ const EP_SPEEDS = [0.008, 0.024, 0.056, 0.104, 0.184];
 // ── Mutable state ─────────────────────────────────────────────────────────────
 let G = 0.8;
 let trailFade = 0.05;
+let couplingStrength = 1.35;
 let currentSeed = DEFAULT_SEED;
 let rng = mulberry32(DEFAULT_SEED);
 let paused = false;
@@ -38,6 +40,13 @@ let bodies = [];
 let particles = [];
 let anchorX = 0;
 let anchorY = 0;
+let anchorVX = 0;
+let anchorVY = 0;
+let bodyEnergy = 0;
+let couplingSignal = 0;
+let clickInfluence = 0;
+let clickAnchorX = 0;
+let clickAnchorY = 0;
 
 let pθ1 = 0, pθ2 = 0, pω1 = 0, pω2 = 0;
 let pendulumTrail = [];
@@ -76,6 +85,10 @@ function applySeed(newSeed) {
 }
 
 // ── Canvas helpers ────────────────────────────────────────────────────────────
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 function resizeCanvas() {
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
@@ -117,6 +130,13 @@ function resetSimulation() {
   resizeCanvas();
   anchorX = canvas.width / 2;
   anchorY = canvas.height / 2;
+  anchorVX = 0;
+  anchorVY = 0;
+  bodyEnergy = 0;
+  couplingSignal = 0;
+  clickInfluence = 0;
+  clickAnchorX = anchorX;
+  clickAnchorY = anchorY;
   bodies = [randomBody(), randomBody(), randomBody()];
   particles = [];
   epAngles = [0, 0, 0, 0, 0];
@@ -127,7 +147,8 @@ function resetSimulation() {
 
 // ── Update ────────────────────────────────────────────────────────────────────
 function spawnFragments(x, y, baseColor) {
-  for (let i = 0; i < 15; i++) {
+  const fragmentCount = 15 + Math.floor(couplingStrength * 8);
+  for (let i = 0; i < fragmentCount; i++) {
     const angle = rng() * Math.PI * 2;
     const speed = rng() * 4;
     particles.push({
@@ -147,6 +168,10 @@ function updateBodies() {
   const centerY = canvas.height / 2;
   const pull = 0.0005;
   const maxSpeed = 10;
+  let totalMass = 0;
+  let comX = 0;
+  let comY = 0;
+  let energySum = 0;
 
   for (let i = 0; i < bodies.length; i++) {
     const bi = bodies[i];
@@ -178,7 +203,40 @@ function updateBodies() {
     if (b.y > canvas.height) b.y -= canvas.height;
     b.vx = Math.max(Math.min(b.vx, maxSpeed), -maxSpeed);
     b.vy = Math.max(Math.min(b.vy, maxSpeed), -maxSpeed);
+
+    totalMass += b.m;
+    comX += b.x * b.m;
+    comY += b.y * b.m;
+    energySum += b.vx * b.vx + b.vy * b.vy;
   }
+
+  if (totalMass > 0) {
+    const bodyAnchorX = comX / totalMass;
+    const bodyAnchorY = comY / totalMass;
+    const targetAnchorX = bodyAnchorX * (1 - clickInfluence) + clickAnchorX * clickInfluence;
+    const targetAnchorY = bodyAnchorY * (1 - clickInfluence) + clickAnchorY * clickInfluence;
+    const spring = 0.045 + couplingStrength * 0.028;
+    const damping = clamp(0.84 - couplingStrength * 0.05, 0.7, 0.9);
+
+    anchorVX = anchorVX * damping + (targetAnchorX - anchorX) * spring;
+    anchorVY = anchorVY * damping + (targetAnchorY - anchorY) * spring;
+
+    const maxAnchorSpeed = 12 + couplingStrength * 9;
+    anchorVX = clamp(anchorVX, -maxAnchorSpeed, maxAnchorSpeed);
+    anchorVY = clamp(anchorVY, -maxAnchorSpeed, maxAnchorSpeed);
+
+    anchorX = clamp(anchorX + anchorVX, 0, canvas.width);
+    anchorY = clamp(anchorY + anchorVY, 0, canvas.height);
+  }
+
+  clickInfluence *= clamp(0.968 - (couplingStrength - 1) * 0.012, 0.93, 0.975);
+  if (clickInfluence < 0.001) clickInfluence = 0;
+
+  bodyEnergy = energySum / Math.max(1, bodies.length);
+  const energyNorm = clamp(Math.sqrt(bodyEnergy) / 3.6, 0, 1);
+  const anchorMotionNorm = clamp(Math.hypot(anchorVX, anchorVY) / 14, 0, 1);
+  const targetSignal = clamp((energyNorm * 0.72 + anchorMotionNorm * 0.28) * couplingStrength, 0, 1.8);
+  couplingSignal += (targetSignal - couplingSignal) * 0.13;
 
   for (let i = 0; i < bodies.length; i++) {
     for (let j = i + 1; j < bodies.length; j++) {
@@ -205,6 +263,9 @@ function updateParticles() {
     p.life--;
   }
   particles = particles.filter(p => p.life > 0);
+  if (particles.length > PARTICLE_MAX) {
+    particles.splice(0, particles.length - PARTICLE_MAX);
+  }
 }
 
 function updatePendulum() {
@@ -226,6 +287,20 @@ function updatePendulum() {
   ) / (PL2 * denom1);
   pω1 += α1 * PDT;
   pω2 += α2 * PDT;
+
+  const anchorCoupling = (anchorVX * Math.cos(pθ1) + anchorVY * Math.sin(pθ1)) * 0.00105 * (0.75 + couplingSignal);
+  const energyCoupling = clamp(bodyEnergy, 0, 40) * 0.00032 * (0.65 + couplingSignal) * Math.sin(pθ2 - pθ1);
+  pω1 += anchorCoupling + energyCoupling;
+  pω2 += anchorCoupling * 0.6 - energyCoupling * 0.5;
+
+  pω1 = clamp(pω1, -12, 12);
+  pω2 = clamp(pω2, -12, 12);
+
+  if (!Number.isFinite(pω1) || !Number.isFinite(pω2) || !Number.isFinite(pθ1) || !Number.isFinite(pθ2)) {
+    initPendulum();
+    return;
+  }
+
   pθ1 += pω1 * PDT;
   pθ2 += pω2 * PDT;
 
@@ -238,7 +313,18 @@ function updatePendulum() {
 }
 
 function updateEpicycles() {
-  for (let i = 0; i < 5; i++) epAngles[i] += EP_SPEEDS[i];
+  const pendulumEnergy = clamp(Math.abs(pω1) + Math.abs(pω2), 0, 25);
+  const pendulumNorm = pendulumEnergy / 25;
+  const anchorMotion = clamp(Math.hypot(anchorVX, anchorVY), 0, 20);
+  const anchorNorm = anchorMotion / 20;
+  const speedMod = clamp(
+    1 + couplingSignal * 0.68 + pendulumNorm * 0.62 + anchorNorm * 0.42,
+    0.55,
+    2.4
+  );
+  for (let i = 0; i < 5; i++) {
+    epAngles[i] += EP_SPEEDS[i] * speedMod;
+  }
   let x = anchorX, y = anchorY;
   for (let i = 0; i < 5; i++) {
     x += EP_RADII[i] * Math.cos(epAngles[i]);
@@ -428,6 +514,15 @@ function wireControls() {
     gValue.textContent = G.toFixed(2);
   });
 
+  const couplingSlider = document.getElementById("coupling-slider");
+  const couplingValue = document.getElementById("coupling-value");
+  couplingSlider.value = couplingStrength.toFixed(2);
+  couplingValue.textContent = couplingStrength.toFixed(2);
+  couplingSlider.addEventListener("input", () => {
+    couplingStrength = parseFloat(couplingSlider.value);
+    couplingValue.textContent = couplingStrength.toFixed(2);
+  });
+
   const fadeSlider = document.getElementById("fade-slider");
   const fadeValue = document.getElementById("fade-value");
   fadeSlider.addEventListener("input", () => {
@@ -446,15 +541,28 @@ window.addEventListener("DOMContentLoaded", () => {
 
   canvas.addEventListener("click", (e) => {
     const rect = canvas.getBoundingClientRect();
-    anchorX = e.clientX - rect.left;
-    anchorY = e.clientY - rect.top;
-    initPendulum();
+    const x = clamp(e.clientX - rect.left, 0, canvas.width);
+    const y = clamp(e.clientY - rect.top, 0, canvas.height);
+    clickAnchorX = x;
+    clickAnchorY = y;
+    clickInfluence = clamp(0.9 - (couplingStrength - 1) * 0.05, 0.78, 0.94);
+    anchorX = x;
+    anchorY = y;
+    anchorVX *= 0.35;
+    anchorVY *= 0.35;
+    pω1 *= 0.7;
+    pω2 *= 0.7;
   });
 
   window.addEventListener("resize", () => {
     resizeCanvas();
     anchorX = canvas.width / 2;
     anchorY = canvas.height / 2;
+    clickAnchorX = anchorX;
+    clickAnchorY = anchorY;
+    clickInfluence = 0;
+    anchorVX = 0;
+    anchorVY = 0;
     clearCanvas();
   });
 

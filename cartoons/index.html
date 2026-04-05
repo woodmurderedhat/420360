@@ -16,7 +16,7 @@
     <header class="hero reveal-1">
       <p class="kicker">Generative Art</p>
       <h1>3 Body Chaos</h1>
-      <p class="statement">Three gravitating bodies drive a double pendulum that steers five nested epicycles — three chaotic systems layered into one canvas. Click to move the anchor.</p>
+      <p class="statement">Three gravitating bodies drive a double pendulum that steers five nested epicycles — three chaotic systems layered into one canvas. Click to temporarily pull the anchor, then tune how strongly everything couples with the Coupling control.</p>
     </header>
 
     <section class="manifesto reveal-2">
@@ -67,6 +67,8 @@
         <p class="label">Physics</p>
         <label>Gravity (G): <span id="g-value">0.80</span></label>
         <input type="range" id="g-slider" min="0.1" max="3" step="0.05" value="0.8" />
+        <label>Coupling: <span id="coupling-value">1.35</span></label>
+        <input type="range" id="coupling-slider" min="0.3" max="2.6" step="0.05" value="1.35" />
         <label>Trail Fade: <span id="fade-value">0.05</span></label>
         <input type="range" id="fade-slider" min="0.01" max="0.30" step="0.01" value="0.05" />
       </div>

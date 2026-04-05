@@ -54,8 +54,171 @@ let pendulumTrail = [];
 let epAngles = [0, 0, 0, 0, 0];
 let epicycleTrail = [];
 
+const DEFAULT_CLIP_DURATION_SECONDS = 5;
+const CLIP_DURATION_OPTIONS = [3, 5, 8];
+const CLIP_FRAME_RATE = 60;
+let clipRecorder = null;
+let clipStream = null;
+let clipChunks = [];
+let clipStopTimeoutId = null;
+let clipRecording = false;
+
 // Canvas (assigned in DOMContentLoaded)
 let canvas, ctx;
+
+function setExportStatus(message, isError = false) {
+  const status = document.getElementById("export-status");
+  if (!status) return;
+  status.textContent = message;
+  status.classList.toggle("error", isError);
+}
+
+function getSupportedClipMimeType() {
+  if (typeof MediaRecorder === "undefined") {
+    return null;
+  }
+
+  const preferredTypes = [
+    "video/webm;codecs=vp9",
+    "video/webm;codecs=vp8",
+    "video/webm"
+  ];
+
+  for (const type of preferredTypes) {
+    if (MediaRecorder.isTypeSupported(type)) {
+      return type;
+    }
+  }
+
+  return "";
+}
+
+function supportsClipExport() {
+  return Boolean(canvas && canvas.captureStream && typeof MediaRecorder !== "undefined");
+}
+
+function getSelectedClipDurationSeconds() {
+  const selector = document.getElementById("clip-duration");
+  if (!selector) {
+    return DEFAULT_CLIP_DURATION_SECONDS;
+  }
+
+  const duration = Number.parseInt(selector.value, 10);
+  if (!CLIP_DURATION_OPTIONS.includes(duration)) {
+    return DEFAULT_CLIP_DURATION_SECONDS;
+  }
+
+  return duration;
+}
+
+function updateExportButtonLabel(button) {
+  if (clipRecording) {
+    return;
+  }
+
+  const seconds = getSelectedClipDurationSeconds();
+  button.textContent = `Export ${seconds}s Clip`;
+}
+
+function finishClipExport(button) {
+  if (clipStopTimeoutId) {
+    clearTimeout(clipStopTimeoutId);
+    clipStopTimeoutId = null;
+  }
+
+  if (clipStream) {
+    for (const track of clipStream.getTracks()) {
+      track.stop();
+    }
+  }
+
+  clipRecorder = null;
+  clipStream = null;
+  clipChunks = [];
+  clipRecording = false;
+  button.disabled = false;
+  updateExportButtonLabel(button);
+}
+
+function downloadRecordedClip(mimeType, durationSeconds) {
+  if (!clipChunks.length) {
+    setExportStatus("Clip export failed: no frames were captured.", true);
+    return;
+  }
+
+  const blobType = mimeType || "video/webm";
+  const blob = new Blob(clipChunks, { type: blobType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `3body-chaos-${currentSeed}-${durationSeconds}s-${Date.now()}.webm`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setExportStatus("Clip exported as WebM.");
+}
+
+function exportShortClip(button) {
+  if (clipRecording) {
+    return;
+  }
+
+  if (!supportsClipExport()) {
+    setExportStatus("Clip export is not supported in this browser.", true);
+    return;
+  }
+
+  const mimeType = getSupportedClipMimeType();
+  if (mimeType === null) {
+    setExportStatus("Clip export is not supported in this browser.", true);
+    return;
+  }
+
+  const durationSeconds = getSelectedClipDurationSeconds();
+  const durationMs = durationSeconds * 1000;
+
+  if (paused) {
+    paused = false;
+    const pauseBtn = document.getElementById("toggle-pause");
+    if (pauseBtn) pauseBtn.textContent = "Pause";
+  }
+
+  try {
+    clipChunks = [];
+    clipStream = canvas.captureStream(CLIP_FRAME_RATE);
+    clipRecorder = mimeType ? new MediaRecorder(clipStream, { mimeType }) : new MediaRecorder(clipStream);
+
+    clipRecorder.ondataavailable = (event) => {
+      if (event.data && event.data.size > 0) {
+        clipChunks.push(event.data);
+      }
+    };
+
+    clipRecorder.onerror = () => {
+      setExportStatus("Clip export failed during recording.", true);
+      finishClipExport(button);
+    };
+
+    clipRecorder.onstop = () => {
+      downloadRecordedClip(clipRecorder ? clipRecorder.mimeType : mimeType, durationSeconds);
+      finishClipExport(button);
+    };
+
+    clipRecorder.start();
+    clipRecording = true;
+    button.disabled = true;
+    button.textContent = "Recording...";
+    setExportStatus(`Recording ${durationSeconds}s clip...`);
+
+    clipStopTimeoutId = setTimeout(() => {
+      if (clipRecorder && clipRecorder.state !== "inactive") {
+        clipRecorder.stop();
+      }
+    }, durationMs);
+  } catch (error) {
+    setExportStatus("Clip export failed to start.", true);
+    finishClipExport(button);
+  }
+}
 
 // ── Seed system ───────────────────────────────────────────────────────────────
 function sanitizeSeed(seed) {
@@ -490,6 +653,25 @@ function wireControls() {
     a.download = `3body-chaos-${currentSeed}.png`;
     a.href = canvas.toDataURL("image/png");
     a.click();
+  });
+
+  const exportClipBtn = document.getElementById("export-clip-btn");
+  const clipDurationSelect = document.getElementById("clip-duration");
+  if (!supportsClipExport()) {
+    exportClipBtn.disabled = true;
+    clipDurationSelect.disabled = true;
+    setExportStatus("Clip export unavailable in this browser.", true);
+  } else {
+    updateExportButtonLabel(exportClipBtn);
+    setExportStatus("Exports a short WebM clip.");
+  }
+
+  clipDurationSelect.addEventListener("change", () => {
+    updateExportButtonLabel(exportClipBtn);
+  });
+
+  exportClipBtn.addEventListener("click", () => {
+    exportShortClip(exportClipBtn);
   });
 
   document.getElementById("toggle-bodies").addEventListener("click", (e) => {

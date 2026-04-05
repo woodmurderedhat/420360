@@ -10,6 +10,7 @@ systems layered into one canvas. Designed for GitHub Pages.
 - Deterministic seed system via URL query (`?seed=123456`) using mulberry32 PRNG
 - Seed navigation: prev / next / random + copy-link for exact reproduction
 - Pause / resume, reset to seed, PNG export
+- Short video export (3s, 5s, or 8s WebM clip)
 - Layer toggles: show/hide bodies, pendulum, and epicycles independently
 - Physics sliders: gravity (G) and trail fade
 - Responsive layout for desktop and mobile (Autonomy Flux shell)

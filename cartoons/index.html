@@ -50,6 +50,18 @@
           <button id="reset-btn">Reset</button>
           <button id="save-btn">Save PNG</button>
         </div>
+        <div class="row">
+          <button id="export-clip-btn">Export Clip</button>
+        </div>
+        <div class="row">
+          <label class="compact-label" for="clip-duration">Clip Length</label>
+          <select id="clip-duration" aria-label="Clip Length">
+            <option value="3">3s</option>
+            <option value="5" selected>5s</option>
+            <option value="8">8s</option>
+          </select>
+        </div>
+        <p id="export-status" class="export-status" aria-live="polite"></p>
       </div>
 
       <div class="control-group">

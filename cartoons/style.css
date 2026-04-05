@@ -161,16 +161,55 @@ button:hover {
   transform: translateY(-1px);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
 label {
   display: block;
   font-size: 0.82rem;
   margin: 0.2rem 0;
 }
 
+.compact-label {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  min-width: 84px;
+}
+
+select {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: #f8f4e9;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.45rem;
+}
+
+select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 input[type="range"] {
   width: 100%;
   accent-color: var(--sea);
   margin-bottom: 0.4rem;
+}
+
+.export-status {
+  min-height: 1.2em;
+  margin: 0;
+  font-size: 0.78rem;
+  color: #24423d;
+}
+
+.export-status.error {
+  color: #7f3021;
 }
 
 .reveal-1,

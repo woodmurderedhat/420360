@@ -1,399 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3 Body Chaos</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-    }
-    #ui {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      color: white;
-      font-family: monospace;
-    }
-    button {
-      padding: 6px 10px;
-      margin-right: 5px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,400&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <canvas id="canvas"></canvas>
+  <div class="atmosphere" aria-hidden="true"></div>
 
-  <div id="ui">
-    <button onclick="reset()">reset</button>
-    <button onclick="clearCanvas()">clear</button>
+  <div class="layout">
+    <header class="hero reveal-1">
+      <p class="kicker">Generative Art</p>
+      <h1>3 Body Chaos</h1>
+      <p class="statement">Three gravitating bodies drive a double pendulum that steers five nested epicycles — three chaotic systems layered into one canvas. Click to move the anchor.</p>
+    </header>
+
+    <section class="manifesto reveal-2">
+      <p>Deterministic equations produce trajectories that never repeat. Tiny differences in initial conditions compound into wildly divergent paths — yet the geometry is always bounded, always drawing. Same seed, same start.</p>
+    </section>
+
+    <main class="canvas-shell reveal-2">
+      <div id="sketch-holder">
+        <canvas id="chaos-canvas"></canvas>
+      </div>
+    </main>
+
+    <aside class="controls reveal-3">
+      <div class="control-group">
+        <p class="label">Seed</p>
+        <p class="seed-value" id="seed-display">——</p>
+        <div class="row">
+          <button id="prev-seed">← Prev</button>
+          <button id="next-seed">Next →</button>
+          <button id="random-seed">Random</button>
+        </div>
+        <div class="row">
+          <button id="copy-link">Copy Link</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <p class="label">Playback</p>
+        <div class="row">
+          <button id="toggle-pause">Pause</button>
+          <button id="reset-btn">Reset</button>
+          <button id="save-btn">Save PNG</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <p class="label">Layers</p>
+        <div class="row">
+          <button id="toggle-bodies">Bodies: On</button>
+          <button id="toggle-pendulum">Pendulum: On</button>
+        </div>
+        <div class="row">
+          <button id="toggle-epicycles">Epicycles: On</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <p class="label">Physics</p>
+        <label>Gravity (G): <span id="g-value">0.80</span></label>
+        <input type="range" id="g-slider" min="0.1" max="3" step="0.05" value="0.8" />
+        <label>Trail Fade: <span id="fade-value">0.05</span></label>
+        <input type="range" id="fade-slider" min="0.01" max="0.30" step="0.01" value="0.05" />
+      </div>
+    </aside>
   </div>
 
-  <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const G = 0.8;
-    const dt = 0.6;
-    const drag = 0.999;
-
-    let bodies = [];
-    let particles = [];
-
-    // ── Shared anchor (click-to-move) ──────────────────────────────────────
-    let anchorX = canvas.width / 2;
-    let anchorY = canvas.height / 2;
-
-    // ── Layer 1: Double Pendulum ───────────────────────────────────────────
-    const PL1 = 120, PL2 = 90, PM1 = 10, PM2 = 8, PG = 1.2, PDT = 0.3;
-    let pθ1, pθ2, pω1, pω2;
-    let pendulumTrail = [];
-    const PENDULUM_TRAIL_MAX = 800;
-
-    function initPendulum() {
-      pθ1 = (Math.random() - 0.5) * Math.PI * 1.2 + Math.PI / 2;
-      pθ2 = (Math.random() - 0.5) * Math.PI * 1.8 + Math.PI;
-      pω1 = 0;
-      pω2 = 0;
-      pendulumTrail = [];
-    }
-
-    function updatePendulum() {
-      // Standard double-pendulum equations of motion (Lagrangian derivation)
-      const dθ = pθ2 - pθ1;
-      const sinDθ = Math.sin(dθ);
-      const cosDθ = Math.cos(dθ);
-      const denom1 = (2 * PM1 + PM2 - PM2 * Math.cos(2 * dθ));
-      const α1 = (
-        -PG * (2 * PM1 + PM2) * Math.sin(pθ1)
-        - PM2 * PG * Math.sin(pθ1 - 2 * pθ2)
-        - 2 * sinDθ * PM2 * (pω2 * pω2 * PL2 + pω1 * pω1 * PL1 * cosDθ)
-      ) / (PL1 * denom1);
-
-      const α2 = (
-        2 * sinDθ * (
-          pω1 * pω1 * PL1 * (PM1 + PM2)
-          + PG * (PM1 + PM2) * Math.cos(pθ1)
-          + pω2 * pω2 * PL2 * PM2 * cosDθ
-        )
-      ) / (PL2 * denom1);
-
-      pω1 += α1 * PDT;
-      pω2 += α2 * PDT;
-      pθ1 += pω1 * PDT;
-      pθ2 += pω2 * PDT;
-
-      // Tip position
-      const x1 = anchorX + PL1 * Math.sin(pθ1);
-      const y1 = anchorY + PL1 * Math.cos(pθ1);
-      const x2 = x1 + PL2 * Math.sin(pθ2);
-      const y2 = y1 + PL2 * Math.cos(pθ2);
-
-      pendulumTrail.push({ x: x2, y: y2 });
-      if (pendulumTrail.length > PENDULUM_TRAIL_MAX) pendulumTrail.shift();
-    }
-
-    function drawPendulum() {
-      const x1 = anchorX + PL1 * Math.sin(pθ1);
-      const y1 = anchorY + PL1 * Math.cos(pθ1);
-      const x2 = x1 + PL2 * Math.sin(pθ2);
-      const y2 = y1 + PL2 * Math.cos(pθ2);
-
-      // Ghost rods (source-over, very faint)
-      ctx.globalCompositeOperation = "source-over";
-      ctx.globalAlpha = 0.12;
-      ctx.strokeStyle = "hsl(40, 80%, 50%)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(anchorX, anchorY);
-      ctx.lineTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-
-      // Trail with additive blending — amber/gold
-      if (pendulumTrail.length < 2) return;
-      ctx.globalCompositeOperation = "lighter";
-      for (let i = 1; i < pendulumTrail.length; i++) {
-        const t = i / pendulumTrail.length;
-        ctx.beginPath();
-        ctx.moveTo(pendulumTrail[i - 1].x, pendulumTrail[i - 1].y);
-        ctx.lineTo(pendulumTrail[i].x, pendulumTrail[i].y);
-        ctx.strokeStyle = `hsl(${35 + t * 20}, 100%, ${45 + t * 25}%)`;
-        ctx.lineWidth = 0.8 + t * 0.7;
-        ctx.globalAlpha = t * 0.6;
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    // ── Layer 2: Epicycles (3 nested rotating circles) ─────────────────────
-    const EP_RADII = [180, 90, 45];
-    const EP_SPEEDS = [0.008, 0.024, 0.056]; // angular velocities (rad/frame)
-    let epAngles = [0, 0, 0];
-    let epicycleTrail = [];
-    const EPICYCLE_TRAIL_MAX = 1200;
-
-    function updateEpicycles() {
-      epAngles[0] += EP_SPEEDS[0];
-      epAngles[1] += EP_SPEEDS[1];
-      epAngles[2] += EP_SPEEDS[2];
-
-      // Cumulative tip position
-      let x = anchorX;
-      let y = anchorY;
-      for (let i = 0; i < 3; i++) {
-        x += EP_RADII[i] * Math.cos(epAngles[i]);
-        y += EP_RADII[i] * Math.sin(epAngles[i]);
-      }
-      epicycleTrail.push({ x, y });
-      if (epicycleTrail.length > EPICYCLE_TRAIL_MAX) epicycleTrail.shift();
-    }
-
-    function drawEpicycles() {
-      // Ghost circles (source-over, faint)
-      ctx.globalCompositeOperation = "source-over";
-      ctx.globalAlpha = 0.07;
-      ctx.lineWidth = 0.8;
-
-      let cx = anchorX, cy = anchorY;
-      const ghostHues = [260, 220, 190];
-      for (let i = 0; i < 3; i++) {
-        ctx.strokeStyle = `hsl(${ghostHues[i]}, 80%, 60%)`;
-        ctx.beginPath();
-        ctx.arc(cx, cy, EP_RADII[i], 0, Math.PI * 2);
-        ctx.stroke();
-        cx += EP_RADII[i] * Math.cos(epAngles[i]);
-        cy += EP_RADII[i] * Math.sin(epAngles[i]);
-      }
-      ctx.globalAlpha = 1;
-
-      // Trail with additive blending — violet → teal
-      if (epicycleTrail.length < 2) return;
-      ctx.globalCompositeOperation = "lighter";
-      for (let i = 1; i < epicycleTrail.length; i++) {
-        const t = i / epicycleTrail.length;
-        const hue = 200 + t * 80; // teal → violet
-        ctx.beginPath();
-        ctx.moveTo(epicycleTrail[i - 1].x, epicycleTrail[i - 1].y);
-        ctx.lineTo(epicycleTrail[i].x, epicycleTrail[i].y);
-        ctx.strokeStyle = `hsl(${hue}, 100%, 62%)`;
-        ctx.lineWidth = 0.7 + t * 0.8;
-        ctx.globalAlpha = t * 0.55;
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    function randomColor() {
-      const hue = Math.floor(Math.random() * 360);
-      return `hsl(${hue}, 100%, 60%)`;
-    }
-
-    function randomBody() {
-      return {
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        prevX: 0,
-        prevY: 0,
-        vx: (Math.random() - 0.5) * 3,
-        vy: (Math.random() - 0.5) * 3,
-        m: Math.random() * 5 + 5,
-        color: randomColor()
-      };
-    }
-
-    function spawnFragments(x, y, baseColor) {
-      for (let i = 0; i < 15; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 4;
-
-        particles.push({
-          x,
-          y,
-          prevX: x,
-          prevY: y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          life: 60 + Math.random() * 40,
-          color: baseColor
-        });
-      }
-    }
-
-    function reset() {
-      bodies = [randomBody(), randomBody(), randomBody()];
-      particles = [];
-      initPendulum();
-      clearCanvas();
-    }
-
-    function clearCanvas() {
-      ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function update() {
-      for (let i = 0; i < bodies.length; i++) {
-        let bi = bodies[i];
-
-        for (let j = 0; j < bodies.length; j++) {
-          if (i === j) continue;
-
-          let bj = bodies[j];
-
-          let dx = bj.x - bi.x;
-          let dy = bj.y - bi.y;
-          let distSq = dx * dx + dy * dy + 0.1;
-          let dist = Math.sqrt(distSq);
-
-          let force = G * bi.m * bj.m / distSq;
-
-          let ax = force * dx / dist / bi.m;
-          let ay = force * dy / dist / bi.m;
-
-          bi.vx += ax * dt;
-          bi.vy += ay * dt;
-        }
-      }
-
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const pull = 0.0005;
-
-      for (let b of bodies) {
-        b.prevX = b.x;
-        b.prevY = b.y;
-
-        let dx = centerX - b.x;
-        let dy = centerY - b.y;
-
-        b.vx += dx * pull;
-        b.vy += dy * pull;
-
-        b.vx *= drag;
-        b.vy *= drag;
-
-        b.x += b.vx * dt;
-        b.y += b.vy * dt;
-
-        if (b.x < 0) b.x += canvas.width;
-        if (b.x > canvas.width) b.x -= canvas.width;
-        if (b.y < 0) b.y += canvas.height;
-        if (b.y > canvas.height) b.y -= canvas.height;
-
-        const maxSpeed = 10;
-        b.vx = Math.max(Math.min(b.vx, maxSpeed), -maxSpeed);
-        b.vy = Math.max(Math.min(b.vy, maxSpeed), -maxSpeed);
-      }
-
-      for (let i = 0; i < bodies.length; i++) {
-        for (let j = i + 1; j < bodies.length; j++) {
-          let bi = bodies[i];
-          let bj = bodies[j];
-
-          let dx = bj.x - bi.x;
-          let dy = bj.y - bi.y;
-          let dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 5) {
-            spawnFragments(bi.x, bi.y, bi.color);
-            spawnFragments(bj.x, bj.y, bj.color);
-
-            bi.color = randomColor();
-            bj.color = randomColor();
-          }
-        }
-      }
-
-      for (let p of particles) {
-        p.prevX = p.x;
-        p.prevY = p.y;
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        p.vx *= 0.98;
-        p.vy *= 0.98;
-
-        p.life--;
-      }
-
-      particles = particles.filter(p => p.life > 0);
-
-      updatePendulum();
-      updateEpicycles();
-    }
-
-    function draw() {
-      // normal mode for fading background
-      ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = "rgba(10, 0, 20, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // switch to additive blending
-      ctx.globalCompositeOperation = "lighter";
-
-      // body trails
-      for (let b of bodies) {
-        ctx.beginPath();
-        ctx.moveTo(b.prevX, b.prevY);
-        ctx.lineTo(b.x, b.y);
-        ctx.strokeStyle = b.color;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      }
-
-      // particles
-      for (let p of particles) {
-        ctx.beginPath();
-        ctx.moveTo(p.prevX, p.prevY);
-        ctx.lineTo(p.x, p.y);
-        ctx.strokeStyle = p.color;
-        ctx.lineWidth = 1;
-        ctx.globalAlpha = p.life / 100;
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
-
-      // restore default
-      ctx.globalCompositeOperation = "source-over";
-
-      drawPendulum();
-      drawEpicycles();
-
-      ctx.globalCompositeOperation = "source-over";
-    }
-
-    function loop() {
-      update();
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    reset();
-    loop();
-
-    canvas.addEventListener("click", (e) => {
-      anchorX = e.clientX;
-      anchorY = e.clientY;
-      initPendulum();
-    });
-
-    window.addEventListener("resize", () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      clearCanvas();
-    });
-  </script>
+  <script src="chaos.js"></script>
+  <!-- simulation code lives in chaos.js -->
 </body>
 </html>

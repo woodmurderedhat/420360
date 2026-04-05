@@ -2,7 +2,7 @@
 // Contains large text chunks for homepage blurb system
 
 window.SENTENCES = [
-  `Welcome to the future of the internet. Once, the world was a patchwork of static pages, blinking cursors, and the gentle hum of dial-up. We surfed the chaos, byte by byte, our hearts beating in ASCII code, our dreams animated in GIFs. The homepage was where the heart was, and every guestbook signature was a digital footprint in the sand.
+  `Hello. Get Fucked. Welcome to the future of the internet. Once, the world was a patchwork of static pages, blinking cursors, and the gentle hum of dial-up. We surfed the chaos, byte by byte, our hearts beating in ASCII code, our dreams animated in GIFs. The homepage was where the heart was, and every guestbook signature was a digital footprint in the sand.
 
 But the web was wild, untamed, infinite. Neon hyperlinks lit the way home, chatrooms echoed with forgotten voices, and pop-ups were portals to the unknown. The night glowed with CRT static, and reality pixelated in low-res confusion.
 

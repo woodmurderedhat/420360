@@ -48,6 +48,151 @@
     let bodies = [];
     let particles = [];
 
+    // ── Shared anchor (click-to-move) ──────────────────────────────────────
+    let anchorX = canvas.width / 2;
+    let anchorY = canvas.height / 2;
+
+    // ── Layer 1: Double Pendulum ───────────────────────────────────────────
+    const PL1 = 120, PL2 = 90, PM1 = 10, PM2 = 8, PG = 1.2, PDT = 0.3;
+    let pθ1, pθ2, pω1, pω2;
+    let pendulumTrail = [];
+    const PENDULUM_TRAIL_MAX = 800;
+
+    function initPendulum() {
+      pθ1 = (Math.random() - 0.5) * Math.PI * 1.2 + Math.PI / 2;
+      pθ2 = (Math.random() - 0.5) * Math.PI * 1.8 + Math.PI;
+      pω1 = 0;
+      pω2 = 0;
+      pendulumTrail = [];
+    }
+
+    function updatePendulum() {
+      // Standard double-pendulum equations of motion (Lagrangian derivation)
+      const dθ = pθ2 - pθ1;
+      const sinDθ = Math.sin(dθ);
+      const cosDθ = Math.cos(dθ);
+      const denom1 = (2 * PM1 + PM2 - PM2 * Math.cos(2 * dθ));
+      const α1 = (
+        -PG * (2 * PM1 + PM2) * Math.sin(pθ1)
+        - PM2 * PG * Math.sin(pθ1 - 2 * pθ2)
+        - 2 * sinDθ * PM2 * (pω2 * pω2 * PL2 + pω1 * pω1 * PL1 * cosDθ)
+      ) / (PL1 * denom1);
+
+      const α2 = (
+        2 * sinDθ * (
+          pω1 * pω1 * PL1 * (PM1 + PM2)
+          + PG * (PM1 + PM2) * Math.cos(pθ1)
+          + pω2 * pω2 * PL2 * PM2 * cosDθ
+        )
+      ) / (PL2 * denom1);
+
+      pω1 += α1 * PDT;
+      pω2 += α2 * PDT;
+      pθ1 += pω1 * PDT;
+      pθ2 += pω2 * PDT;
+
+      // Tip position
+      const x1 = anchorX + PL1 * Math.sin(pθ1);
+      const y1 = anchorY + PL1 * Math.cos(pθ1);
+      const x2 = x1 + PL2 * Math.sin(pθ2);
+      const y2 = y1 + PL2 * Math.cos(pθ2);
+
+      pendulumTrail.push({ x: x2, y: y2 });
+      if (pendulumTrail.length > PENDULUM_TRAIL_MAX) pendulumTrail.shift();
+    }
+
+    function drawPendulum() {
+      const x1 = anchorX + PL1 * Math.sin(pθ1);
+      const y1 = anchorY + PL1 * Math.cos(pθ1);
+      const x2 = x1 + PL2 * Math.sin(pθ2);
+      const y2 = y1 + PL2 * Math.cos(pθ2);
+
+      // Ghost rods (source-over, very faint)
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 0.12;
+      ctx.strokeStyle = "hsl(40, 80%, 50%)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(anchorX, anchorY);
+      ctx.lineTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Trail with additive blending — amber/gold
+      if (pendulumTrail.length < 2) return;
+      ctx.globalCompositeOperation = "lighter";
+      for (let i = 1; i < pendulumTrail.length; i++) {
+        const t = i / pendulumTrail.length;
+        ctx.beginPath();
+        ctx.moveTo(pendulumTrail[i - 1].x, pendulumTrail[i - 1].y);
+        ctx.lineTo(pendulumTrail[i].x, pendulumTrail[i].y);
+        ctx.strokeStyle = `hsl(${35 + t * 20}, 100%, ${45 + t * 25}%)`;
+        ctx.lineWidth = 0.8 + t * 0.7;
+        ctx.globalAlpha = t * 0.6;
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // ── Layer 2: Epicycles (3 nested rotating circles) ─────────────────────
+    const EP_RADII = [180, 90, 45];
+    const EP_SPEEDS = [0.008, 0.024, 0.056]; // angular velocities (rad/frame)
+    let epAngles = [0, 0, 0];
+    let epicycleTrail = [];
+    const EPICYCLE_TRAIL_MAX = 1200;
+
+    function updateEpicycles() {
+      epAngles[0] += EP_SPEEDS[0];
+      epAngles[1] += EP_SPEEDS[1];
+      epAngles[2] += EP_SPEEDS[2];
+
+      // Cumulative tip position
+      let x = anchorX;
+      let y = anchorY;
+      for (let i = 0; i < 3; i++) {
+        x += EP_RADII[i] * Math.cos(epAngles[i]);
+        y += EP_RADII[i] * Math.sin(epAngles[i]);
+      }
+      epicycleTrail.push({ x, y });
+      if (epicycleTrail.length > EPICYCLE_TRAIL_MAX) epicycleTrail.shift();
+    }
+
+    function drawEpicycles() {
+      // Ghost circles (source-over, faint)
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 0.07;
+      ctx.lineWidth = 0.8;
+
+      let cx = anchorX, cy = anchorY;
+      const ghostHues = [260, 220, 190];
+      for (let i = 0; i < 3; i++) {
+        ctx.strokeStyle = `hsl(${ghostHues[i]}, 80%, 60%)`;
+        ctx.beginPath();
+        ctx.arc(cx, cy, EP_RADII[i], 0, Math.PI * 2);
+        ctx.stroke();
+        cx += EP_RADII[i] * Math.cos(epAngles[i]);
+        cy += EP_RADII[i] * Math.sin(epAngles[i]);
+      }
+      ctx.globalAlpha = 1;
+
+      // Trail with additive blending — violet → teal
+      if (epicycleTrail.length < 2) return;
+      ctx.globalCompositeOperation = "lighter";
+      for (let i = 1; i < epicycleTrail.length; i++) {
+        const t = i / epicycleTrail.length;
+        const hue = 200 + t * 80; // teal → violet
+        ctx.beginPath();
+        ctx.moveTo(epicycleTrail[i - 1].x, epicycleTrail[i - 1].y);
+        ctx.lineTo(epicycleTrail[i].x, epicycleTrail[i].y);
+        ctx.strokeStyle = `hsl(${hue}, 100%, 62%)`;
+        ctx.lineWidth = 0.7 + t * 0.8;
+        ctx.globalAlpha = t * 0.55;
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
     function randomColor() {
       const hue = Math.floor(Math.random() * 360);
       return `hsl(${hue}, 100%, 60%)`;
@@ -87,6 +232,7 @@
     function reset() {
       bodies = [randomBody(), randomBody(), randomBody()];
       particles = [];
+      initPendulum();
       clearCanvas();
     }
 
@@ -183,6 +329,9 @@
       }
 
       particles = particles.filter(p => p.life > 0);
+
+      updatePendulum();
+      updateEpicycles();
     }
 
     function draw() {
@@ -218,6 +367,11 @@
 
       // restore default
       ctx.globalCompositeOperation = "source-over";
+
+      drawPendulum();
+      drawEpicycles();
+
+      ctx.globalCompositeOperation = "source-over";
     }
 
     function loop() {
@@ -228,6 +382,12 @@
 
     reset();
     loop();
+
+    canvas.addEventListener("click", (e) => {
+      anchorX = e.clientX;
+      anchorY = e.clientY;
+      initPendulum();
+    });
 
     window.addEventListener("resize", () => {
       canvas.width = window.innerWidth;

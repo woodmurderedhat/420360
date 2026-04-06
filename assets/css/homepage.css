@@ -173,6 +173,7 @@ main {
 }
 
 .hero-shell {
+  min-height: 110vh;
   backdrop-filter: blur(8px);
   background: linear-gradient(145deg, rgba(15, 43, 34, 0.8) 0%, rgba(9, 26, 21, 0.6) 100%);
   border: 1px solid rgba(154, 249, 199, 0.28);
@@ -258,7 +259,7 @@ main {
 }
 
 .blurb span.is-hidden-word {
-  opacity: 0;
+  display: none;
 }
 
 .blurb .glitch {

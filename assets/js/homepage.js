@@ -340,6 +340,10 @@ function applyProgressiveReveal() {
     if (index < revealCount) span.classList.remove('is-hidden-word');
     else span.classList.add('is-hidden-word');
   });
+
+  const cursor = blurbEl.querySelector('.cursor');
+  const lastRevealedSpan = spans[revealCount - 1];
+  if (cursor && lastRevealedSpan) lastRevealedSpan.after(cursor);
 }
 
 function revealNextProgressiveWord() {

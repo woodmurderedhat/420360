@@ -39,6 +39,13 @@ export function createInteractionSystem({
     let lastMorphY = null;
     let lastMorphTime = 0;
     let lastScrollRevealTime = 0;
+    const glitchPresets = ['cinematic', 'chaotic', 'subtle', 'mobileSafe'];
+    let glitchPresetIndex = 0;
+
+    const applyGlitchPreset = (nextIndex) => {
+      glitchPresetIndex = (nextIndex + glitchPresets.length) % glitchPresets.length;
+      window.glitchEngine?.setPreset?.(glitchPresets[glitchPresetIndex]);
+    };
 
     document.addEventListener('pointermove', (e) => {
       const animationsAllowed = !state.reducedMotion;
@@ -83,6 +90,12 @@ export function createInteractionSystem({
     window.addEventListener('wheel', (ev) => {
       const now = Date.now();
       if (now - lastWheelGlitchAt < 90) return;
+
+      if (ev.shiftKey) {
+        applyGlitchPreset(glitchPresetIndex + (ev.deltaY < 0 ? -1 : 1));
+        lastWheelGlitchAt = now;
+        return;
+      }
 
       if (ev.deltaY < 0) {
         window.glitchEngine?.triggerScrollUp?.();
@@ -130,6 +143,11 @@ export function createInteractionSystem({
         case 'c': toggleChillMode(); break;
         case 'p': togglePopupPause(); break;
         case 'x': triggerControlChaosPulse(); break;
+        case '[': applyGlitchPreset(glitchPresetIndex - 1); break;
+        case ']': applyGlitchPreset(glitchPresetIndex + 1); break;
+        case '1': window.glitchEngine?.setQualityTier?.('low'); break;
+        case '2': window.glitchEngine?.setQualityTier?.('balanced'); break;
+        case '3': window.glitchEngine?.setQualityTier?.('high'); break;
         case 'escape':
           document.querySelectorAll('.integrated-overlay:not(.hidden)').forEach(el => closeOverlay(el.id));
           break;

@@ -7,6 +7,7 @@
  * Features:
  * - Full-screen canvas background
  * - Mouse-driven pixel corruption of real image pixels
+ * - Movement-reactive glitch profiles (drift, swipe, whip, jitter, surge, stall)
  * - Extreme glitch intensity (tears, displacement, channel shears)
  * - Persistent damage (no auto-restore)
  * - Responsive to viewport size
@@ -37,8 +38,26 @@ class PixelGlitchEngine {
     this.lastGlitchTime = 0;
     this.glitchThrottle = 80;
 
+    this.motionState = {
+      lastX: null,
+      lastY: null,
+      lastTime: 0,
+      lastSpeed: 0,
+      lastAngle: null,
+      turnBurst: 0,
+      jitterBurst: 0,
+      accelBurst: 0,
+      stopShock: 0
+    };
+
     this.effectCooldowns = {
       move: 80,
+      moveDrift: 110,
+      moveSwipe: 75,
+      moveWhip: 90,
+      moveJitter: 95,
+      moveSurge: 70,
+      moveStall: 115,
       click: 140,
       scrollUp: 130,
       scrollDown: 130,
@@ -46,6 +65,12 @@ class PixelGlitchEngine {
     };
     this.lastEffectAt = {
       move: 0,
+      moveDrift: 0,
+      moveSwipe: 0,
+      moveWhip: 0,
+      moveJitter: 0,
+      moveSurge: 0,
+      moveStall: 0,
       click: 0,
       scrollUp: 0,
       scrollDown: 0,
@@ -131,10 +156,12 @@ class PixelGlitchEngine {
     this.mouseX = event.clientX;
     this.mouseY = event.clientY;
 
+    const movementMeta = this.classifyMouseMotion(event);
+
     // Throttle glitch application
     const now = performance.now();
     if (now - this.lastGlitchTime >= this.glitchThrottle) {
-      this.triggerMove();
+      this.triggerMove(movementMeta);
       this.lastGlitchTime = now;
     }
   }
@@ -144,8 +171,9 @@ class PixelGlitchEngine {
     this.drawImage();
   }
 
-  triggerMove() {
-    this.queueEffect('move');
+  triggerMove(movementMeta = null) {
+    const profile = this.pickMoveProfile(movementMeta);
+    this.queueEffect(profile.type, profile.meta);
     if (Math.random() < 0.08) this.queueEffect('ambient');
   }
 
@@ -161,7 +189,7 @@ class PixelGlitchEngine {
     this.queueEffect('scrollDown');
   }
 
-  queueEffect(effectType) {
+  queueEffect(effectType, effectMeta = null) {
     if (!this.ctx || !this.isInitialized) return;
 
     const now = performance.now();
@@ -170,15 +198,15 @@ class PixelGlitchEngine {
     this.lastEffectAt[effectType] = now;
 
     if (this.isProcessing) {
-      this.pendingEffect = effectType;
+      this.pendingEffect = { type: effectType, meta: effectMeta };
       return;
     }
 
     this.isProcessing = true;
-    requestAnimationFrame(() => this.processEffect(effectType));
+    requestAnimationFrame(() => this.processEffect(effectType, effectMeta));
   }
 
-  processEffect(effectType) {
+  processEffect(effectType, effectMeta = null) {
     if (!this.ctx) {
       this.isProcessing = false;
       return;
@@ -193,6 +221,24 @@ class PixelGlitchEngine {
     switch (effectType) {
       case 'move':
         this.applyMoveProfile(data, source, width, height);
+        break;
+      case 'moveDrift':
+        this.applyMoveDriftProfile(data, source, width, height, effectMeta);
+        break;
+      case 'moveSwipe':
+        this.applyMoveSwipeProfile(data, source, width, height, effectMeta);
+        break;
+      case 'moveWhip':
+        this.applyMoveWhipProfile(data, source, width, height, effectMeta);
+        break;
+      case 'moveJitter':
+        this.applyMoveJitterProfile(data, source, width, height, effectMeta);
+        break;
+      case 'moveSurge':
+        this.applyMoveSurgeProfile(data, source, width, height, effectMeta);
+        break;
+      case 'moveStall':
+        this.applyMoveStallProfile(data, source, width, height, effectMeta);
         break;
       case 'click':
         this.applyClickProfile(data, source, width, height);
@@ -217,7 +263,7 @@ class PixelGlitchEngine {
     if (this.pendingEffect) {
       const queued = this.pendingEffect;
       this.pendingEffect = null;
-      this.queueEffect(queued);
+      this.queueEffect(queued.type, queued.meta);
     }
   }
 
@@ -231,6 +277,73 @@ class PixelGlitchEngine {
     if (Math.random() < 0.18) {
       this.glitchChromaBands(data, source, width, height, this.randInt(-2, 2), this.randInt(-1, 1), 2);
     }
+  }
+
+  applyMoveDriftProfile(data, source, width, height, effectMeta = null) {
+    const verticalBias = effectMeta?.axis === 'y' ? (effectMeta.direction || 1) : this.randInt(-1, 1) || 1;
+    this.glitchFrameSlip(data, source, width, height, verticalBias);
+    this.glitchScanlineShear(data, source, width, height, 1 + this.randInt(0, 1), 5);
+    if (Math.random() < 0.55) {
+      this.glitchChromaBands(data, source, width, height, this.randInt(-1, 1), verticalBias, 2);
+    }
+  }
+
+  applyMoveSwipeProfile(data, source, width, height, effectMeta = null) {
+    const axis = effectMeta?.axis || 'x';
+    const direction = effectMeta?.direction || 1;
+
+    this.glitchDisplacePixels(data, source, width, height, 0.14, 6);
+    this.glitchScanlineShear(data, source, width, height, 4 + this.randInt(0, 3), 20);
+    this.glitchFrameSlip(data, source, width, height, axis === 'y' ? direction : this.randInt(-1, 1) || 1);
+
+    if (axis === 'x') {
+      this.glitchChromaBands(data, source, width, height, direction * this.randInt(3, 6), this.randInt(-1, 1), 4);
+    } else {
+      this.glitchChromaBands(data, source, width, height, this.randInt(-2, 2), direction * this.randInt(2, 4), 3);
+    }
+  }
+
+  applyMoveWhipProfile(data, source, width, height, effectMeta = null) {
+    const direction = effectMeta?.direction || 1;
+    this.glitchBlockTears(data, source, width, height, 8 + this.randInt(0, 6));
+    this.glitchScanlineShear(data, source, width, height, 5 + this.randInt(0, 3), 24);
+    this.glitchChromaBands(data, source, width, height, direction * this.randInt(-6, 6), this.randInt(-3, 3), 5);
+    if (Math.random() < 0.45) {
+      this.glitchLumaDropout(data, width, height, 1 + this.randInt(0, 2), 16, 40);
+    }
+  }
+
+  applyMoveJitterProfile(data, source, width, height) {
+    this.glitchPixelateChunks(data, source, width, height, 14 + this.randInt(0, 10), 4, 14);
+    this.glitchDisplacePixels(data, source, width, height, 0.12, 5);
+    this.glitchVerticalScratches(data, width, height, 2 + this.randInt(0, 3));
+    if (Math.random() < 0.5) {
+      this.glitchChromaBands(data, source, width, height, this.randInt(-5, 5), this.randInt(-2, 2), 3);
+    }
+  }
+
+  applyMoveSurgeProfile(data, source, width, height, effectMeta = null) {
+    const axis = effectMeta?.axis || 'x';
+    const direction = effectMeta?.direction || 1;
+
+    this.glitchDigitalTearExpand(data, source, width, height);
+    this.glitchDisplacePixels(data, source, width, height, 0.2, 8);
+    this.glitchScanlineShear(data, source, width, height, 5 + this.randInt(0, 4), 26);
+
+    if (axis === 'x') {
+      this.glitchChromaBands(data, source, width, height, direction * this.randInt(4, 8), this.randInt(-2, 2), 5);
+    } else {
+      this.glitchChromaBands(data, source, width, height, this.randInt(-3, 3), direction * this.randInt(3, 7), 5);
+    }
+  }
+
+  applyMoveStallProfile(data, source, width, height, effectMeta = null) {
+    const direction = effectMeta?.direction || 1;
+
+    this.glitchLumaDropout(data, width, height, 2 + this.randInt(0, 2), 20, 56);
+    this.glitchFrameSlip(data, source, width, height, -direction);
+    this.glitchPixelateChunks(data, source, width, height, 9 + this.randInt(0, 7), 5, 18);
+    this.glitchVerticalScratches(data, width, height, 2 + this.randInt(0, 2));
   }
 
   applyClickProfile(data, source, width, height) {
@@ -278,6 +391,99 @@ class PixelGlitchEngine {
     }
     this.glitchChromaBands(data, source, width, height, this.randInt(-4, 4), this.randInt(-2, 2), 5);
     this.glitchVerticalScratches(data, width, height, 1 + this.randInt(0, 2));
+  }
+
+  classifyMouseMotion(event) {
+    const now = performance.now();
+    const state = this.motionState;
+
+    if (state.lastX === null || state.lastY === null || !state.lastTime) {
+      state.lastX = event.clientX;
+      state.lastY = event.clientY;
+      state.lastTime = now;
+      return null;
+    }
+
+    const dx = event.clientX - state.lastX;
+    const dy = event.clientY - state.lastY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const dt = Math.max(1, now - state.lastTime);
+    const speed = distance / dt;
+
+    const angle = distance > 0 ? Math.atan2(dy, dx) : state.lastAngle;
+    let angleDelta = 0;
+    if (angle !== null && state.lastAngle !== null) {
+      angleDelta = Math.abs(Math.atan2(Math.sin(angle - state.lastAngle), Math.cos(angle - state.lastAngle)));
+    }
+
+    const strongTurn = angleDelta > 1.05 && distance > 5;
+    const jitterTurn = angleDelta > 1.35 && distance < 34 && speed > 0.16;
+    const speedDelta = speed - state.lastSpeed;
+    const accel = speedDelta / dt;
+    const accelSpike = speed > 0.55 && accel > 0.012;
+    const suddenStop = state.lastSpeed > 0.9 && speed < 0.08 && dt < 90;
+
+    state.turnBurst = strongTurn ? Math.min(6, state.turnBurst + 1) : Math.max(0, state.turnBurst - 1);
+    state.jitterBurst = jitterTurn ? Math.min(6, state.jitterBurst + 1) : Math.max(0, state.jitterBurst - 1);
+    state.accelBurst = accelSpike ? Math.min(5, state.accelBurst + 1) : Math.max(0, state.accelBurst - 1);
+    state.stopShock = suddenStop ? Math.min(3, state.stopShock + 1) : Math.max(0, state.stopShock - 1);
+
+    const axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+    const direction = axis === 'x'
+      ? (dx === 0 ? 1 : Math.sign(dx))
+      : (dy === 0 ? 1 : Math.sign(dy));
+
+    state.lastX = event.clientX;
+    state.lastY = event.clientY;
+    state.lastTime = now;
+    state.lastSpeed = speed;
+    state.lastAngle = angle;
+
+    return {
+      speed,
+      distance,
+      dt,
+      accel,
+      angleDelta,
+      axis,
+      direction,
+      turnBurst: state.turnBurst,
+      jitterBurst: state.jitterBurst,
+      accelBurst: state.accelBurst,
+      stopShock: state.stopShock
+    };
+  }
+
+  pickMoveProfile(movementMeta) {
+    if (!movementMeta) {
+      return { type: 'move', meta: null };
+    }
+
+    if (movementMeta.stopShock >= 1) {
+      return { type: 'moveStall', meta: movementMeta };
+    }
+
+    if (movementMeta.accelBurst >= 2) {
+      return { type: 'moveSurge', meta: movementMeta };
+    }
+
+    if (movementMeta.jitterBurst >= 2) {
+      return { type: 'moveJitter', meta: movementMeta };
+    }
+
+    if (movementMeta.turnBurst >= 2 && movementMeta.speed > 0.3) {
+      return { type: 'moveWhip', meta: movementMeta };
+    }
+
+    if (movementMeta.speed > 0.95 || movementMeta.distance > 80) {
+      return { type: 'moveSwipe', meta: movementMeta };
+    }
+
+    if (movementMeta.speed < 0.13 || movementMeta.distance < 6) {
+      return { type: 'moveDrift', meta: movementMeta };
+    }
+
+    return { type: 'move', meta: movementMeta };
   }
 
   glitchDisplacePixels(data, source, width, height, intensity = this.glitchIntensity, maxDisplacement = this.maxDisplacement) {

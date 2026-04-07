@@ -45,8 +45,8 @@ const CONFIG = {
   
   // Timing durations (ms)
   OVERLAY_FADE_DURATION: 190,
-  GLITCH_WORD_MIN_DURATION: 12000,
-  GLITCH_WORD_MAX_DURATION: 42000,
+  GLITCH_WORD_MIN_DURATION: 220,
+  GLITCH_WORD_MAX_DURATION: 900,
   MUSIC_FADE_DURATION: 1800,
   SFX_MIN_INTERVAL: 90,
   
@@ -378,14 +378,23 @@ function glitchRandomWord() {
   if (!span || span.classList.contains('glitch')) return;
 
   const original = span.textContent;
+  const previousTimeoutId = Number(span.dataset.glitchTimeoutId || 0);
+  if (previousTimeoutId) clearTimeout(previousTimeoutId);
+
+  span.dataset.glitchOriginal = original;
   span.textContent = randomGlitchString(Math.max(1, original.length));
   span.classList.add('glitch');
 
   const duration = CONFIG.GLITCH_WORD_MIN_DURATION + Math.random() * (CONFIG.GLITCH_WORD_MAX_DURATION - CONFIG.GLITCH_WORD_MIN_DURATION);
-  setTimeout(() => {
-    span.textContent = original;
+  const timeoutId = setTimeout(() => {
+    const fallbackOriginal = span.dataset.glitchOriginal || original;
+    span.textContent = fallbackOriginal;
     span.classList.remove('glitch');
+    delete span.dataset.glitchOriginal;
+    delete span.dataset.glitchTimeoutId;
   }, duration);
+
+  span.dataset.glitchTimeoutId = String(timeoutId);
 }
 
 /**

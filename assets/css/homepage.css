@@ -20,6 +20,20 @@
   --popup-anim-duration: 0.25s;
   --glitch-duration: 0.12s;
   --overlay-fade-duration: 0.18s;
+
+  /* Blurb neon-glass tokens */
+  --blurb-bg-top: rgba(14, 22, 25, 0.92);
+  --blurb-bg-bottom: rgba(8, 12, 20, 0.9);
+  --blurb-border: rgba(184, 250, 224, 0.5);
+  --blurb-wash-a: rgba(86, 255, 162, 0.16);
+  --blurb-wash-b: rgba(255, 181, 64, 0.18);
+  --blurb-wash-c: rgba(64, 212, 255, 0.12);
+  --blurb-shadow-alpha: 0.52;
+  --blurb-glow-alpha: 0.24;
+  --blurb-text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55), 0 0 14px rgba(7, 22, 15, 0.42);
+  --blurb-glitch-bg: rgba(102, 255, 173, 0.3);
+  --blurb-glitch-ink: #ffe796;
+  --cursor-bg: rgba(8, 12, 14, 0.88);
 }
 
 .age-gate {
@@ -254,20 +268,59 @@ main {
   text-align: left;
   line-height: 1.55;
   letter-spacing: 0.01em;
-  border: 1px solid rgba(154, 249, 199, 0.16);
-  background: linear-gradient(180deg, rgba(8, 20, 16, 0.75), rgba(4, 12, 10, 0.7));
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--blurb-border);
+  background:
+    radial-gradient(circle at 8% 18%, var(--blurb-wash-a), transparent 46%),
+    radial-gradient(circle at 88% 22%, var(--blurb-wash-b), transparent 44%),
+    radial-gradient(circle at 48% 102%, var(--blurb-wash-c), transparent 54%),
+    linear-gradient(180deg, var(--blurb-bg-top), var(--blurb-bg-bottom));
   border-radius: 16px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 20px 42px rgba(5, 8, 14, var(--blurb-shadow-alpha)),
+    0 0 26px rgba(82, 246, 163, var(--blurb-glow-alpha)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -12px 20px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(8px) saturate(128%);
   padding: 18px 18px 20px;
   margin: 0;
   z-index: 2;
+  color: #f3fff8;
+  text-shadow: var(--blurb-text-shadow);
   user-select: none;
   min-height: 124px;
+}
+
+.blurb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, rgba(255, 255, 255, 0.12), transparent 34%, transparent 68%, rgba(255, 255, 255, 0.09));
+  opacity: 0.46;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.blurb::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.76), transparent);
+  opacity: 0.78;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .blurb span { 
   display: inline-block; 
   margin-right: 5px; 
+  position: relative;
+  z-index: 2;
   transition: color 0.2s, background 0.2s, opacity 0.22s ease;
 }
 
@@ -276,9 +329,11 @@ main {
 }
 
 .blurb .glitch {
-  color: var(--secondary);
-  background: rgba(47, 217, 130, 0.16);
-  text-shadow: 0 0 8px rgba(47, 217, 130, 0.35);
+  color: var(--blurb-glitch-ink);
+  background: var(--blurb-glitch-bg);
+  border-radius: 4px;
+  box-shadow: 0 0 14px rgba(112, 255, 181, 0.34);
+  text-shadow: 0 0 9px rgba(70, 255, 172, 0.68);
   animation: glitchy var(--glitch-duration) steps(2) infinite alternate;
 }
 
@@ -291,10 +346,11 @@ main {
   display: inline-block;
   width: 1ch;
   color: var(--primary);
-  background: #000;
+  background: var(--cursor-bg);
+  border-radius: 3px;
   font-weight: bold;
   animation: blink 0.8s steps(1) infinite;
-  text-shadow: 2px 2px 0 var(--secondary);
+  text-shadow: 0 0 10px rgba(122, 255, 202, 0.6), 1px 1px 0 var(--secondary);
   vertical-align: baseline;
 }
 
@@ -820,6 +876,11 @@ main {
 }
 
 @media (max-width: 768px) {
+  :root {
+    --blurb-glow-alpha: 0.2;
+    --blurb-shadow-alpha: 0.46;
+  }
+
   .floating-window {
     width: 90vw;
     height: 50vh;
@@ -842,6 +903,7 @@ main {
   .blurb {
     font-size: 15px;
     padding: 14px 12px;
+    border-radius: 14px;
   }
 
   main {
@@ -854,6 +916,11 @@ main {
 }
 
 @media (max-width: 600px) {
+  :root {
+    --blurb-glow-alpha: 0.16;
+    --blurb-shadow-alpha: 0.38;
+  }
+
   #bottom-controls-left,
   #bottom-controls-right {
     position: fixed;
@@ -894,6 +961,7 @@ main {
   .blurb {
     font-size: 14px;
     padding: 12px 10px;
+    border-radius: 12px;
   }
 
   .hero-title {
@@ -911,6 +979,11 @@ main {
 }
 
 @media (max-width: 400px) {
+  :root {
+    --blurb-glow-alpha: 0.12;
+    --blurb-shadow-alpha: 0.34;
+  }
+
   #header-controls {
     top: 5px;
     gap: 6px;
@@ -923,6 +996,7 @@ main {
 
   .blurb {
     font-size: 13px;
+    border-radius: 10px;
   }
 
   .hero-kicker {

@@ -10,107 +10,20 @@
  * - Accessibility improvements
  */
 
-/* ============================================
-   CONFIGURATION
-   Named constants replacing magic numbers
-   ============================================ */
-const CONFIG = {
-  // Popup settings
-  POPUP_INTERVAL_MS: 1000,
-  POPUP_INTERVAL_CHILL: 4000,
-  POPUP_INTERVAL_REDUCED: 8000,
-  POPUP_LIFETIME_MS: 9500,
-  MAX_POPUPS: 200,
-  NON_OVERLAP_ATTEMPTS: 30,
-  
-  // Animation intervals
-  GLITCH_INTERVAL_DEFAULT: 300,
-  GLITCH_INTERVAL_CHILL: 700,
-  GLITCH_INTERVAL_REDUCED: 1600,
-
-  MORPH_INTERVAL_DEFAULT: 2500,
-  MORPH_INTERVAL_CHILL: 5000,
-  MORPH_INTERVAL_REDUCED: 10000,
-  
-  // Morph burst configuration (used instead of a constant interval)
-  MORPH_BURST_INTERVAL_DEFAULT: 30000, // time between bursts
-  MORPH_BURST_INTERVAL_CHILL: 60000,
-  MORPH_BURST_INTERVAL_REDUCED: 90000,
-  MORPH_BURST_DURATION_DEFAULT: 5000,  // how long a burst lasts
-  MORPH_BURST_DURATION_CHILL: 10000,
-  MORPH_BURST_DURATION_REDUCED: 15000,
-  MORPH_BURST_STEP_DEFAULT: 500,      // delay between morph steps inside a burst
-  MORPH_BURST_STEP_CHILL: 1000,
-  MORPH_BURST_STEP_REDUCED: 1500,
-  
-  // Timing durations (ms)
-  OVERLAY_FADE_DURATION: 190,
-  GLITCH_WORD_MIN_DURATION: 220,
-  GLITCH_WORD_MAX_DURATION: 900,
-  MUSIC_FADE_DURATION: 1800,
-  SFX_MIN_INTERVAL: 90,
-  
-  // Mouse idle timeout (ms) before animations pause
-  MOUSE_IDLE_TIMEOUT: 1500,
-
-  // Progressive blurb reveal configuration
-  POINTER_REVEAL_MIN_INTERVAL: 140,
-  POINTER_REVEAL_MIN_DISTANCE: 36,
-  SCROLL_REVEAL_MIN_INTERVAL: 180,
-
-  // Audio settings
-  MUSIC_TARGET_VOLUME: 0.65,
-  SFX_BASE_VOLUME: 0.55,
-  
-  // LocalStorage keys
-  STORAGE_KEYS: {
-    AGE_GATE_PROFILE: 'ageGateProfile',
-    MUSIC_ENABLED: 'musicEnabled',
-    SFX_ENABLED: 'sfxEnabled',
-    CHILL_MODE: 'chillMode',
-    POPUPS_PAUSED: 'popupsPaused'
-  }
-};
-
-/* ============================================
-   STATE MANAGEMENT
-   ============================================ */
-const state = {
-  // User preferences (loaded from localStorage)
-  musicEnabled: true,
-  sfxEnabled: true,
-  chillMode: false,
-  popupsPaused: false,  // Popups on by default
-  
-  // Runtime state
-  reducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false,
-  mouseActive: false,
-  mouseIdleTimeoutId: null,
-  intervalIds: {
-    popup: null,
-    glitch: null,
-    morph: null
-  },
-
-  // burst control IDs for rapid sentence morphing
-  burstIntervalId: null,   // schedules when bursts start
-  morphStepId: null,       // timer between individual morphs during a burst
-  burstTimeoutId: null,    // cancels the burst after its duration
-  burstActive: false,
-  initialized: false,
-  sentences: [],
-
-  activePopups: [],
-  currentSentence: '',
-  videoWindowLoaded: false,
-
-  progressiveReveal: {
-    enabled: true,
-    words: [],
-    revealedCount: 1,
-    lastRevealAt: 0
-  }
-};
+import { CONFIG, ICON_DATA, ADS, POPUP_COLOR_SCHEMES } from './homepage/config.js';
+import { state } from './homepage/state.js';
+import { loadPreference, savePreference } from './homepage/storage.js';
+import {
+  getRegionMinimumAge,
+  loadAgeGateProfile,
+  saveAgeGateProfile,
+  isAgeGateValid
+} from './homepage/age-gate.js';
+import { createIntervalManager } from './homepage/interval-manager.js';
+import { createMusicSystem, createSfxSystem } from './homepage/audio-system.js';
+import { ensureAgeGateAccess } from './homepage/init-flow.js';
+import { createPopupSystem } from './homepage/popup-system.js';
+import { createTextSystem } from './homepage/text-system.js';
 
 function getThemeSentences() {
   return [
@@ -121,43 +34,6 @@ function getThemeSentences() {
   ];
 }
 
-function getRegionMinimumAge(region) {
-  if (region === 'us-ca') return 21;
-  if (region === 'eu' || region === 'other') return 18;
-  return 21;
-}
-
-function loadAgeGateProfile() {
-  try {
-    const raw = localStorage.getItem(CONFIG.STORAGE_KEYS.AGE_GATE_PROFILE);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') return null;
-    if (!parsed.region || typeof parsed.age !== 'number') return null;
-    return parsed;
-  } catch (e) {
-    return null;
-  }
-}
-
-function saveAgeGateProfile(region, age) {
-  try {
-    const payload = {
-      region,
-      age,
-      verifiedAt: new Date().toISOString()
-    };
-    localStorage.setItem(CONFIG.STORAGE_KEYS.AGE_GATE_PROFILE, JSON.stringify(payload));
-  } catch (e) {
-    console.warn('Failed to save age gate profile');
-  }
-}
-
-function isAgeGateValid(profile) {
-  if (!profile) return false;
-  if (!profile.region || typeof profile.age !== 'number') return false;
-  return profile.age >= getRegionMinimumAge(profile.region);
-}
 
 /* ============================================
   SENTENCES FOR BLURB (global, loaded via script)
@@ -167,28 +43,6 @@ function isAgeGateValid(profile) {
 /* ============================================
    AD/POPUP DATA
    ============================================ */
-const ICON_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAALklEQVQoka3OMQ0AAAzDsPnfpM1Yip5JRGCBqgMFBQUFBQUFBQUFBQUFBSUlG8mG6tD3oxAAAAAElFTkSuQmCC";
-
-const ADS = [
-  { label: "SHOP • REDBUBBLE", href: "https://www.redbubble.com/shop/ap/174665816?asc=u", gif: "https://media.giphy.com/media/R7roNpEGCKqzjs1kkO/giphy.gif" },
-  { label: "NOCTIS REVERIE", href: "https://420360.xyz/games/noctis-reverie/index.html", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif" },
-  { label: "247420", href: "https://discord.gg/an-entrypoint-367741339393327104", gif: "https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif" },
-  { label: "GIPHY", href: "https://giphy.com/woodmurderedhat", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" },
-  { label: "WOODMURDEREDHAT", href: "https://github.com/woodmurderedhat", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" },
-  { label: "YOUTUBE", href: "https://www.youtube.com/@woodenhat", gif: "https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif" },
-  { label: "FRIDAY", href: "#", gif: "https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif" },
-  { label: "SATURDAY", href: "#", gif: "https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif" },
-  { label: "PEARL WHAT?", href: "https://www.youtube.com/watch?v=DXS6NbEAkLM", gif: "https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif" },
-  { label: "ZEF SHELLED#", href: "#", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif" },
-  { label: "MOAN-AH", href: "https://www.youtube.com/watch?v=wo5QBEux8nk", gif: "https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif" },
-  { label: "WEDNESDAY", href: "#", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" },
-  { label: "WAR ART", href: "#", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" },
-  { label: "ZEF DEMONS", href: "#", gif: "https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif" },
-  { label: "SCHIZODIO", href: "https://schizodio.xyz/brobaker", gif: "https://media.giphy.com/media/8Javw7WzqetpyiT3ls/giphy.gif" },
-  { label: "SHADOW PROTOCOL", href: "https://420360.xyz/null-vesper/shadow-protocol/", gif: "https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif" },
-  { label: "TIM ORACLE", href: "__INTERNAL_ORACLE__", gif: "https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif" },
-  { label: "DAUGHTERS OF ZION", href: "https://420360.xyz/esoteric/daughters-of-zion/index.html", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" }
-];
 
 /* ============================================
    UTILITY FUNCTIONS
@@ -203,475 +57,88 @@ function escapeHtml(s) {
   return s.replace(/[&<>"']/g, m => escapeMap[m]);
 }
 
-/**
- * Load preference from localStorage with fallback
- */
-function loadPreference(key, defaultValue = false) {
-  try {
-    const value = localStorage.getItem(key);
-    if (value === null) return defaultValue;
-    return value === 'true';
-  } catch (e) {
-    return defaultValue;
-  }
-}
 
-/**
- * Save preference to localStorage
- */
-function savePreference(key, value) {
-  try {
-    localStorage.setItem(key, String(value));
-  } catch (e) {
-    console.warn('Failed to save preference:', key);
-  }
-}
+const textSystem = createTextSystem({
+  state,
+  config: CONFIG,
+  getSentencesFallback: () => (
+    typeof window !== 'undefined' && Array.isArray(window.SENTENCES)
+      ? window.SENTENCES
+      : []
+  )
+});
 
-/**
- * Generate random glitch string
- */
 function randomGlitchString(len) {
-  const chars = "!@#$%^&*()_+=-[]{};:<>,.?/|~420360";
-  return Array.from({ length: len }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+  return textSystem.randomGlitchString(len);
 }
 
-/**
- * Get current interval values based on mode
- */
-function getIntervals() {
-  if (state.reducedMotion) {
-    return {
-      popup: CONFIG.POPUP_INTERVAL_REDUCED,
-      glitch: CONFIG.GLITCH_INTERVAL_REDUCED,
-      morph: CONFIG.MORPH_INTERVAL_REDUCED
-    };
-  }
-  if (state.chillMode) {
-    return {
-      popup: CONFIG.POPUP_INTERVAL_CHILL,
-      glitch: CONFIG.GLITCH_INTERVAL_CHILL,
-      morph: CONFIG.MORPH_INTERVAL_CHILL
-    };
-  }
-  return {
-    popup: CONFIG.POPUP_INTERVAL_MS,
-    glitch: CONFIG.GLITCH_INTERVAL_DEFAULT,
-    morph: CONFIG.MORPH_INTERVAL_DEFAULT
-  };
-}
-
-// BURST TIMING HELPERS
-function getBurstSettings() {
-  if (state.reducedMotion) {
-    return {
-      interval: CONFIG.MORPH_BURST_INTERVAL_REDUCED,
-      duration: CONFIG.MORPH_BURST_DURATION_REDUCED,
-      step: CONFIG.MORPH_BURST_STEP_REDUCED
-    };
-  }
-  if (state.chillMode) {
-    return {
-      interval: CONFIG.MORPH_BURST_INTERVAL_CHILL,
-      duration: CONFIG.MORPH_BURST_DURATION_CHILL,
-      step: CONFIG.MORPH_BURST_STEP_CHILL
-    };
-  }
-  return {
-    interval: CONFIG.MORPH_BURST_INTERVAL_DEFAULT,
-    duration: CONFIG.MORPH_BURST_DURATION_DEFAULT,
-    step: CONFIG.MORPH_BURST_STEP_DEFAULT
-  };
-}
-
-/* ============================================
-   BLURB / TEXT SYSTEM
-   ============================================ */
-
-/**
- * Set the blurb text with word spans
- */
 function setBlurbText(sentence) {
-  const blurbEl = document.getElementById('blurb');
-  if (!blurbEl) return;
-
-  blurbEl.innerHTML = "";
-  const words = sentence.trim().split(" ").filter(Boolean);
-  words.forEach(w => {
-    const s = document.createElement('span');
-    s.textContent = w;
-    blurbEl.appendChild(s);
-  });
-  const cursor = document.createElement('span');
-  cursor.className = 'cursor';
-  cursor.textContent = '_';
-  cursor.setAttribute('aria-hidden', 'true');
-  blurbEl.appendChild(cursor);
-
-  if (state.progressiveReveal.enabled) {
-    applyProgressiveReveal();
-  }
+  return textSystem.setBlurbText(sentence);
 }
 
 function initializeProgressiveSentence() {
-  const sentencePool = state.sentences.length ? state.sentences : (typeof window !== 'undefined' && Array.isArray(window.SENTENCES) ? window.SENTENCES : []);
-  const randomSentence = sentencePool.length
-    ? sentencePool[Math.floor(Math.random() * sentencePool.length)]
-    : '';
-  const sentence = String(randomSentence || '').trim();
-  if (!sentence) return;
-  state.currentSentence = sentence;
-  state.progressiveReveal.words = sentence.split(/\s+/).filter(Boolean);
-  state.progressiveReveal.revealedCount = Math.min(1, state.progressiveReveal.words.length);
-  state.progressiveReveal.lastRevealAt = 0;
+  return textSystem.initializeProgressiveSentence();
 }
 
 function applyProgressiveReveal() {
-  const blurbEl = document.getElementById('blurb');
-  if (!blurbEl) return;
-
-  const spans = blurbEl.querySelectorAll('span:not(.cursor)');
-  const maxWords = spans.length;
-  const revealCount = Math.max(1, Math.min(state.progressiveReveal.revealedCount, maxWords));
-
-  spans.forEach((span, index) => {
-    if (index < revealCount) span.classList.remove('is-hidden-word');
-    else span.classList.add('is-hidden-word');
-  });
-
-  const cursor = blurbEl.querySelector('.cursor');
-  const lastRevealedSpan = spans[revealCount - 1];
-  if (cursor && lastRevealedSpan) lastRevealedSpan.after(cursor);
+  return textSystem.applyProgressiveReveal();
 }
 
 function revealNextProgressiveWord() {
-  if (!state.progressiveReveal.enabled) return;
-
-  const wordsTotal = state.progressiveReveal.words.length;
-  if (!wordsTotal || state.progressiveReveal.revealedCount >= wordsTotal) return;
-
-  const now = Date.now();
-  if (now - state.progressiveReveal.lastRevealAt < CONFIG.POINTER_REVEAL_MIN_INTERVAL) return;
-
-  state.progressiveReveal.revealedCount += 1;
-  state.progressiveReveal.lastRevealAt = now;
-  applyProgressiveReveal();
+  return textSystem.revealNextProgressiveWord();
 }
 
-/**
- * Glitch a random word in the blurb
- */
 function glitchRandomWord() {
-  const blurbEl = document.getElementById('blurb');
-  if (!blurbEl) return;
-
-  const spans = blurbEl.querySelectorAll('span:not(.cursor):not(.is-hidden-word)');
-  if (!spans.length) return;
-
-  // Rare chance for whole-blurb glitch
-  if (Math.random() < 0.02) fullGlitch();
-
-  const idx = Math.floor(Math.random() * spans.length);
-  const span = spans[idx];
-  if (!span || span.classList.contains('glitch')) return;
-
-  const original = span.textContent;
-  const previousTimeoutId = Number(span.dataset.glitchTimeoutId || 0);
-  if (previousTimeoutId) clearTimeout(previousTimeoutId);
-
-  span.dataset.glitchOriginal = original;
-  span.textContent = randomGlitchString(Math.max(1, original.length));
-  span.classList.add('glitch');
-
-  const duration = CONFIG.GLITCH_WORD_MIN_DURATION + Math.random() * (CONFIG.GLITCH_WORD_MAX_DURATION - CONFIG.GLITCH_WORD_MIN_DURATION);
-  const timeoutId = setTimeout(() => {
-    const fallbackOriginal = span.dataset.glitchOriginal || original;
-    span.textContent = fallbackOriginal;
-    span.classList.remove('glitch');
-    delete span.dataset.glitchOriginal;
-    delete span.dataset.glitchTimeoutId;
-  }, duration);
-
-  span.dataset.glitchTimeoutId = String(timeoutId);
+  return textSystem.glitchRandomWord();
 }
 
-/**
- * Full blurb glitch effect
- */
 function fullGlitch() {
-  const blurbEl = document.getElementById('blurb');
-  if (!blurbEl) return;
-  blurbEl.classList.add('glitch-effect');
-  setTimeout(() => blurbEl.classList.remove('glitch-effect'), 300);
+  return textSystem.fullGlitch();
 }
 
-/**
- * Morph to a random sentence
- */
 function morphToRandomSentence() {
-  if (state.progressiveReveal.enabled) return;
-
-  const blurbEl = document.getElementById('blurb');
-  if (!blurbEl) return;
-
-  const currentTrimmed = state.currentSentence.trim();
-  const sentencePool = state.sentences.length ? state.sentences : SENTENCES;
-  const uniqueSentences = sentencePool.filter(s => s.trim() !== currentTrimmed);
-  if (uniqueSentences.length === 0) return;
-
-  const nextSentence = uniqueSentences[Math.floor(Math.random() * uniqueSentences.length)];
-  const currentWords = state.currentSentence.trim().split(" ");
-  const targetWords = nextSentence.trim().split(" ");
-  const maxLength = Math.max(currentWords.length, targetWords.length);
-
-  let spans = blurbEl.querySelectorAll('span:not(.cursor)');
-
-  // Add spans if needed
-  while (spans.length < maxLength) {
-    const span = document.createElement('span');
-    span.style.marginRight = "6px";
-    blurbEl.insertBefore(span, blurbEl.querySelector('.cursor'));
-    spans = blurbEl.querySelectorAll('span:not(.cursor)');
-  }
-
-  // Remove extra spans if target sentence shorter
-  if (spans.length > maxLength) {
-    for (let i = spans.length - 1; i >= maxLength; i--) {
-      spans[i].remove();
-    }
-    spans = blurbEl.querySelectorAll('span:not(.cursor)');
-  }
-
-  const changeOrder = Array.from({ length: maxLength }, (_, i) => i);
-  changeOrder.sort(() => Math.random() - 0.5);
-
-  let step = 0;
-  function changeNextWord() {
-    if (step >= changeOrder.length) {
-      state.currentSentence = nextSentence;
-      return;
-    }
-    const idx = changeOrder[step];
-    const newWord = targetWords[idx] || "";
-    spans[idx].textContent = newWord;
-    step++;
-    setTimeout(changeNextWord, 150);
-  }
-  changeNextWord();
+  return textSystem.morphToRandomSentence();
 }
 
 // ======== burst control ========
 
-/**
- * Begin a rapid series of morphs for a short duration.
- * Subsequent calls while a burst is active are ignored.
- */
-function startMorphBurst() {
-  if (state.burstActive) return;
-  const {duration, step} = getBurstSettings();
-  if (duration <= 0 || step <= 0) return;
-  state.burstActive = true;
-  // kick off first morph immediately
-  doBurstStep(step);
-  state.burstTimeoutId = setTimeout(endMorphBurst, duration);
-}
-
-/**
- * Perform one morph and schedule the next if burst still active.
- */
-function doBurstStep(step) {
-  if (!state.burstActive) return;
-  morphToRandomSentence();
-  state.morphStepId = setTimeout(() => doBurstStep(step), step);
-}
-
-/**
- * End the current morph burst, clearing timers.
- */
-function endMorphBurst() {
-  if (state.morphStepId) {
-    clearTimeout(state.morphStepId);
-    state.morphStepId = null;
-  }
-  state.burstActive = false;
-  state.burstTimeoutId = null;
-}
 
 /* ============================================
    POPUP MANAGEMENT SYSTEM
    ============================================ */
 
-/**
- * Check if two rectangles overlap
- */
+const popupSystem = createPopupSystem({
+  state,
+  config: CONFIG,
+  ads: ADS,
+  iconData: ICON_DATA,
+  popupColorSchemes: POPUP_COLOR_SCHEMES,
+  escapeHtml,
+  onOpenOracle: openOracle
+});
+
 function rectsOverlap(x, y, w, h, el) {
-  const r = el.getBoundingClientRect();
-  return !(x + w < r.left || x > r.right || y + h < r.top || y > r.bottom);
+  return popupSystem.rectsOverlap(x, y, w, h, el);
 }
 
-/**
- * Find non-overlapping position for a new popup
- */
 function findNonOverlappingPosition() {
-  const w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-w')) || 250;
-  const h = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-h')) || 150;
-  const maxX = Math.max(0, window.innerWidth - w);
-  const maxY = Math.max(0, window.innerHeight - h);
-
-  for (let i = 0; i < CONFIG.NON_OVERLAP_ATTEMPTS; i++) {
-    const x = Math.floor(Math.random() * (maxX + 1));
-    const y = Math.floor(Math.random() * (maxY + 1));
-    let collides = false;
-
-    for (const existing of state.activePopups) {
-      if (!existing || !existing.getBoundingClientRect) continue;
-      if (rectsOverlap(x, y, w, h, existing)) {
-        collides = true;
-        break;
-      }
-    }
-    if (!collides) return { x, y };
-  }
-
-  // Give up, return random position
-  return {
-    x: Math.floor(Math.random() * (maxX + 1)),
-    y: Math.floor(Math.random() * (maxY + 1))
-  };
+  return popupSystem.findNonOverlappingPosition();
 }
 
-/**
- * Remove popup element safely
- */
 function removePopupElement(el) {
-  if (!el) return;
-  const idx = state.activePopups.indexOf(el);
-  if (idx !== -1) state.activePopups.splice(idx, 1);
-  if (el.parentNode) el.parentNode.removeChild(el);
+  return popupSystem.removePopupElement(el);
 }
 
-/**
- * Color schemes for popups
- */
-const POPUP_COLOR_SCHEMES = [
-  { bg: '#2a1a1a', primary: '#cc3333', secondary: '#8b2635', highlight: '#ff6666' }, // Red
-  { bg: '#2a2a1a', primary: '#cccc33', secondary: '#8b8b35', highlight: '#ffff66' }, // Yellow
-  { bg: '#1a2a1a', primary: '#4a8c3a', secondary: '#7b5e8b', highlight: '#8fbc8f' }, // Green
-  { bg: '#1a1a1a', primary: '#666666', secondary: '#444444', highlight: '#cccccc' }  // Black
-];
-
-/**
- * Create and append a popup element
- */
 function makePopup(ad) {
-  const p = document.createElement('div');
-  p.className = 'popup';
-  p.setAttribute('role', 'dialog');
-  p.setAttribute('aria-label', `Popup: ${ad.label}`);
-
-  // Random rotation and scale
-  const rotation = (Math.random() * 12 - 6).toFixed(2) + 'deg';
-  const scale = (1 + (Math.random() * 0.08 - 0.04)).toFixed(3);
-  p.style.setProperty('--rotation', rotation);
-  p.style.transform = `scale(${scale}) rotate(${rotation})`;
-
-  // Random color scheme
-  const selectedScheme = POPUP_COLOR_SCHEMES[Math.floor(Math.random() * POPUP_COLOR_SCHEMES.length)];
-  p.style.setProperty('--bg', selectedScheme.bg);
-  p.style.setProperty('--primary', selectedScheme.primary);
-  p.style.setProperty('--secondary', selectedScheme.secondary);
-  p.style.setProperty('--highlight', selectedScheme.highlight);
-
-  // Position
-  const pos = findNonOverlappingPosition();
-  p.style.left = pos.x + 'px';
-  p.style.top = pos.y + 'px';
-
-  // Content
-  p.innerHTML = `
-    <div class="titlebar" role="presentation">
-      <div class="left">
-        <img src="${ICON_DATA}" alt="" aria-hidden="true">
-        <span>${escapeHtml(ad.label)}</span>
-      </div>
-      <div class="close" role="button" aria-label="Close popup" tabindex="0">×</div>
-    </div>
-    <div class="content">
-      <a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer" data-ad-link>
-        <img src="${escapeHtml(ad.gif)}" alt="${escapeHtml(ad.label)} animation" loading="lazy">
-      </a>
-    </div>
-  `;
-
-  // Close handlers
-  const closeBtn = p.querySelector('.close');
-  closeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    removePopupElement(p);
-  });
-  closeBtn.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Enter' || ev.key === ' ') {
-      ev.preventDefault();
-      removePopupElement(p);
-    }
-  });
-
-  document.body.appendChild(p);
-
-  // Internal oracle override
-  const link = p.querySelector('[data-ad-link]');
-  if (ad.href === '__INTERNAL_ORACLE__' && link) {
-    link.removeAttribute('target');
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      openOracle();
-    });
-  }
-
-  state.activePopups.push(p);
-
-  // Schedule lifetime removal
-  setTimeout(() => removePopupElement(p), CONFIG.POPUP_LIFETIME_MS);
-
-  // Enforce MAX_POPUPS
-  while (state.activePopups.length > CONFIG.MAX_POPUPS) {
-    const old = state.activePopups.shift();
-    if (old && old.parentNode) old.parentNode.removeChild(old);
-  }
-
-  return p;
+  return popupSystem.makePopup(ad);
 }
 
-/**
- * Spawn a random popup
- */
 function spawnPopup() {
-  if (state.popupsPaused) return null;
-  const ad = ADS[Math.floor(Math.random() * ADS.length)];
-  const p = makePopup(ad);
-  if (window.playAdSfx) window.playAdSfx();
-  return p;
+  return popupSystem.spawnPopup();
 }
 
-/**
- * Random popup glitch-out effect
- */
 function randomPopupGlitchOut() {
-  if (!state.activePopups.length) return;
-  const popup = state.activePopups[Math.floor(Math.random() * state.activePopups.length)];
-  if (!popup) return;
-
-  const effects = [
-    { cls: 'glitch-out', dur: 400 },
-    { cls: 'glitch-fade', dur: 500 },
-    { cls: 'glitch-slide', dur: 420 },
-    { cls: 'glitch-scale', dur: 350 }
-  ];
-
-  if (effects.some(e => popup.classList.contains(e.cls))) return;
-
-  const effect = effects[Math.floor(Math.random() * effects.length)];
-  popup.classList.add(effect.cls);
-  setTimeout(() => removePopupElement(popup), effect.dur);
+  return popupSystem.randomPopupGlitchOut();
 }
 
 /* ============================================
@@ -1015,65 +482,46 @@ function showFloatingWindow(id) {
    INTERVAL MANAGEMENT
    ============================================ */
 
+const intervalManager = createIntervalManager({
+  state,
+  config: CONFIG,
+  spawnPopup,
+  glitchRandomWord,
+  morphToRandomSentence,
+  startColorChaos,
+  stopColorChaos
+});
+
+function getIntervals() {
+  return intervalManager.getIntervals();
+}
+
+function startMorphBurst() {
+  return intervalManager.startMorphBurst();
+}
+
+function doBurstStep(step) {
+  return intervalManager.doBurstStep(step);
+}
+
+function endMorphBurst() {
+  return intervalManager.endMorphBurst();
+}
+
 function startIntervals() {
-  const intervals = getIntervals();
-  startColorChaos();
-
-  if (!state.intervalIds.popup && intervals.popup > 0 && !state.popupsPaused) {
-    state.intervalIds.popup = setInterval(spawnPopup, intervals.popup);
-  }
-
-  if (!state.intervalIds.glitch && intervals.glitch > 0) {
-    state.intervalIds.glitch = setInterval(glitchRandomWord, intervals.glitch);
-  }
-
-  // morphs are now triggered by mouse movement (see setupEventHandlers)
-  // no timer-based burst interval is started here
-
-  document.documentElement.classList.remove('paused');
+  return intervalManager.startIntervals();
 }
 
 function stopIntervals() {
-  if (state.intervalIds.popup) {
-    clearInterval(state.intervalIds.popup);
-    state.intervalIds.popup = null;
-  }
-  if (state.intervalIds.glitch) {
-    clearInterval(state.intervalIds.glitch);
-    state.intervalIds.glitch = null;
-  }
-  if (state.intervalIds.morph) {
-    clearInterval(state.intervalIds.morph);
-    state.intervalIds.morph = null;
-  }
-  // also clear any burst-related timers
-  if (state.burstIntervalId) {
-    clearInterval(state.burstIntervalId);
-    state.burstIntervalId = null;
-  }
-  if (state.morphStepId) {
-    clearTimeout(state.morphStepId);
-    state.morphStepId = null;
-  }
-  if (state.burstTimeoutId) {
-    clearTimeout(state.burstTimeoutId);
-    state.burstTimeoutId = null;
-  }
-  state.burstActive = false;
-
-  stopColorChaos();
-  document.documentElement.classList.add('paused');
+  return intervalManager.stopIntervals();
 }
 
 function restartIntervals() {
-  stopIntervals();
-  if (!document.hidden) {
-    startIntervals();
-  }
+  return intervalManager.restartIntervals();
 }
 
 function pauseBackground() {
-  stopIntervals();
+  return intervalManager.pauseBackground();
 }
 
 function hasOpenOverlay() {
@@ -1088,271 +536,23 @@ function resumeBackgroundIfNone() {
    MUSIC SYSTEM
    ============================================ */
 
-const MusicSystem = {
-  audio: null,
-  ctrl: null,
-  status: null,
-  attempting: false,
-  ready: false,
-
-  init() {
-    this.audio = document.getElementById('bgMusic');
-    this.ctrl = document.getElementById('music-control');
-    this.status = document.getElementById('music-status');
-
-    if (!this.audio || !this.ctrl) return;
-
-    // Load saved preference
-    state.musicEnabled = loadPreference(CONFIG.STORAGE_KEYS.MUSIC_ENABLED, false);
-
-    this.setupEventListeners();
-    this.normalizeAudioSource();
-    this.updateUI();
-
-    // Periodic glitch effect on button (only while mouse is active)
-    setInterval(() => {
-      if (Math.random() < 0.33 && state.mouseActive) this.glitchButton();
-    }, 2400);
-  },
-
-  setupEventListeners() {
-    // Control click
-    this.ctrl.addEventListener('click', e => {
-      e.stopPropagation();
-      this.toggle();
-    });
-
-    this.ctrl.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        this.toggle();
-      }
-    });
-
-    // Keyboard shortcut
-    window.addEventListener('keydown', e => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      if (e.key === 'm' || e.key === 'M') this.toggle();
-    });
-
-    // Visibility change
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        if (!this.audio.paused) this.audio._wasPlaying = true;
-        this.audio.pause();
-      } else if (this.audio._wasPlaying && state.musicEnabled) {
-        this.audio.play().catch(() => {});
-      }
-      if (!document.hidden) this.audio._wasPlaying = false;
-      this.updateUI();
-    });
-
-    // First gesture to enable autoplay
-    const firstGesture = () => {
-      if (state.musicEnabled && this.audio.paused) this.play();
-      window.removeEventListener('click', firstGesture);
-      window.removeEventListener('keydown', firstGesture);
-    };
-    window.addEventListener('click', firstGesture);
-    window.addEventListener('keydown', firstGesture);
-
-    // Audio ready
-    this.audio.addEventListener('canplaythrough', () => {
-      this.ready = true;
-      if (state.musicEnabled) this.play();
-    }, { once: true });
-
-    this.audio.addEventListener('error', () => {
-      setTimeout(() => {
-        if (!this.ready) {
-          try { this.audio.load(); } catch (e) {}
-        }
-      }, 1800);
-    });
-
-    // Fallback attempt
-    setTimeout(() => {
-      if (state.musicEnabled && !this.ready && this.audio.paused) this.play();
-    }, 2500);
-  },
-
-  normalizeAudioSource() {
-    if (!this.audio.getAttribute('data-src-set')) {
-      const srcTag = this.audio.querySelector('source');
-      if (srcTag) {
-        const raw = srcTag.getAttribute('src');
-        if (raw) this.audio.src = encodeURI(raw);
-        this.audio.setAttribute('data-src-set', '1');
-      }
-    }
-    try { this.audio.load(); } catch (e) {}
-  },
-
-  updateUI() {
-    if (!this.status) return;
-    const on = !this.audio.paused && !this.audio.ended;
-    this.status.textContent = 'MUSIC: ' + (on ? 'ON' : 'OFF');
-    this.ctrl.setAttribute('aria-pressed', String(on));
-  },
-
-  fadeTo(targetVol, ms = 1200) {
-    const steps = 30;
-    const start = this.audio.volume;
-    const delta = targetVol - start;
-    let i = 0;
-
-    clearInterval(this.audio._fadeInt);
-    this.audio._fadeInt = setInterval(() => {
-      i++;
-      this.audio.volume = Math.min(1, Math.max(0, start + delta * (i / steps)));
-      if (i >= steps) clearInterval(this.audio._fadeInt);
-    }, ms / steps);
-  },
-
-  async play() {
-    if (this.attempting) return;
-    this.attempting = true;
-
-    try {
-      this.audio.volume = 0;
-      await this.audio.play();
-      this.fadeTo(CONFIG.MUSIC_TARGET_VOLUME, CONFIG.MUSIC_FADE_DURATION);
-      state.musicEnabled = true;
-    } catch (err) {
-      // Autoplay blocked
-    } finally {
-      this.attempting = false;
-      this.updateUI();
-    }
-  },
-
-  stop() {
-    this.audio.pause();
-    this.updateUI();
-  },
-
-  toggle() {
-    if (this.audio.paused) {
-      state.musicEnabled = true;
-      this.play();
-      savePreference(CONFIG.STORAGE_KEYS.MUSIC_ENABLED, true);
-    } else {
-      state.musicEnabled = false;
-      this.stop();
-      savePreference(CONFIG.STORAGE_KEYS.MUSIC_ENABLED, false);
-    }
-  },
-
-  glitchButton() {
-    if (this.ctrl.classList.contains('glitching')) return;
-    this.ctrl.classList.add('glitching');
-    setTimeout(() => this.ctrl.classList.remove('glitching'), 260);
-  }
-};
+const MusicSystem = createMusicSystem({
+  state,
+  config: CONFIG,
+  loadPreference,
+  savePreference
+});
 
 /* ============================================
    SFX SYSTEM
    ============================================ */
 
-const SFXSystem = {
-  ctrl: null,
-  status: null,
-  lastPlay: 0,
-  pool: [],
-
-  SFX_FILES: [
-    'BreakBeat_Slice01.wav', 'BreakBeat_Slice02.wav', 'BreakBeat_Slice03.wav', 'BreakBeat_Slice04.wav',
-    'Clap02.wav', 'Clap03.wav', 'Clap04.wav', 'Clap05.wav', 'Clap06.wav'
-  ],
-
-  init() {
-    this.ctrl = document.getElementById('sfx-control');
-    this.status = document.getElementById('sfx-status');
-
-    if (!this.ctrl) return;
-
-    // Load saved preference
-    state.sfxEnabled = loadPreference(CONFIG.STORAGE_KEYS.SFX_ENABLED, false);
-
-    // Preload audio
-    this.pool = this.SFX_FILES.map(f => {
-      const a = new Audio('assets/sounds/' + f);
-      a.preload = 'auto';
-      return a;
-    });
-
-    this.setupEventListeners();
-    this.updateUI();
-
-    // Expose globally for popup system
-    window.playAdSfx = () => this.play();
-  },
-
-  setupEventListeners() {
-    this.ctrl.addEventListener('click', e => {
-      e.stopPropagation();
-      this.toggle();
-    });
-
-    this.ctrl.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        this.toggle();
-      }
-    });
-
-    window.addEventListener('keydown', e => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      if (e.key === 's' || e.key === 'S') this.toggle();
-    });
-
-    // Prime audio on first interaction
-    const prime = () => {
-      this.pool.forEach(a => {
-        try {
-          a.muted = true;
-          a.play().then(() => {
-            a.pause();
-            a.currentTime = 0;
-            a.muted = false;
-          }).catch(() => {});
-        } catch (e) {}
-      });
-      window.removeEventListener('click', prime);
-      window.removeEventListener('keydown', prime);
-    };
-    window.addEventListener('click', prime);
-    window.addEventListener('keydown', prime);
-  },
-
-  updateUI() {
-    if (!this.status) return;
-    this.status.textContent = 'SFX: ' + (state.sfxEnabled ? 'ON' : 'OFF');
-    this.ctrl.setAttribute('aria-pressed', String(state.sfxEnabled));
-  },
-
-  play() {
-    if (!state.sfxEnabled) return;
-
-    const now = Date.now();
-    if (now - this.lastPlay < CONFIG.SFX_MIN_INTERVAL) return;
-    this.lastPlay = now;
-
-    const base = this.pool[Math.floor(Math.random() * this.pool.length)];
-    try {
-      const inst = base.cloneNode();
-      inst.volume = CONFIG.SFX_BASE_VOLUME * (0.85 + Math.random() * 0.3);
-      inst.playbackRate = 0.95 + Math.random() * 0.1;
-      inst.play().catch(() => {});
-    } catch (e) {}
-  },
-
-  toggle() {
-    state.sfxEnabled = !state.sfxEnabled;
-    this.updateUI();
-    savePreference(CONFIG.STORAGE_KEYS.SFX_ENABLED, state.sfxEnabled);
-  }
-};
+const SFXSystem = createSfxSystem({
+  state,
+  config: CONFIG,
+  loadPreference,
+  savePreference
+});
 
 /* ============================================
    CHILL MODE TOGGLE
@@ -1880,51 +1080,15 @@ toggleChillMode = function() {
 function init() {
   if (state.initialized) return;
 
-  const gate = document.getElementById('age-gate');
-  const enterBtn = document.getElementById('age-gate-enter');
-  const exitBtn = document.getElementById('age-gate-exit');
-  const regionSelect = document.getElementById('age-gate-region');
-  const ageInput = document.getElementById('age-gate-age');
-  const gateFeedback = document.getElementById('age-gate-feedback');
-  const ageProfile = loadAgeGateProfile();
-
-  if (!isAgeGateValid(ageProfile) && gate) {
-    gate.classList.add('active');
-    if (enterBtn) {
-      enterBtn.addEventListener('click', () => {
-        const region = regionSelect?.value || 'us-ca';
-        const age = Number(ageInput?.value || 0);
-        const minAge = getRegionMinimumAge(region);
-
-        if (!Number.isFinite(age) || age <= 0) {
-          if (gateFeedback) gateFeedback.textContent = 'Enter a valid age to continue.';
-          return;
-        }
-
-        if (age < minAge) {
-          if (gateFeedback) gateFeedback.textContent = `Access denied: this region requires ${minAge}+.`;
-          return;
-        }
-
-        saveAgeGateProfile(region, age);
-        if (gateFeedback) gateFeedback.textContent = '';
-        gate.classList.remove('active');
-        init();
-      });
-    }
-    if (exitBtn) {
-      exitBtn.addEventListener('click', () => {
-        window.location.href = 'https://www.google.com';
-      });
-    }
-
-    if (ageProfile && regionSelect && ageInput) {
-      regionSelect.value = ageProfile.region;
-      ageInput.value = String(ageProfile.age);
-    }
-
-    return;
-  }
+  const gateResult = ensureAgeGateAccess({
+    storageKey: CONFIG.STORAGE_KEYS.AGE_GATE_PROFILE,
+    loadAgeGateProfile,
+    isAgeGateValid,
+    getRegionMinimumAge,
+    saveAgeGateProfile,
+    onAccessGranted: init
+  });
+  if (gateResult.blocked) return;
 
   state.initialized = true;
 

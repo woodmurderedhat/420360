@@ -1502,10 +1502,34 @@ function setupEventHandlers() {
     lastScrollRevealTime = now;
   }, { passive: true });
 
+  // Directional wheel glitch triggers: up and down map to distinct profiles.
+  let lastWheelGlitchAt = 0;
+  window.addEventListener('wheel', (ev) => {
+    const now = Date.now();
+    if (now - lastWheelGlitchAt < 90) return;
+
+    if (ev.deltaY < 0) {
+      window.glitchEngine?.triggerScrollUp?.();
+      lastWheelGlitchAt = now;
+      return;
+    }
+    if (ev.deltaY > 0) {
+      window.glitchEngine?.triggerScrollDown?.();
+      lastWheelGlitchAt = now;
+    }
+  }, { passive: true });
+
   // Click to spawn popup
   let lastClick = 0;
   document.addEventListener('click', (ev) => {
     const now = Date.now();
+
+    const isPrimaryClick = ev.button === 0 || ev.button === undefined;
+    const hasModifier = ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey;
+    if (isPrimaryClick && !hasModifier) {
+      window.glitchEngine?.triggerClickTear?.();
+    }
+
     if (ev.target.closest('.integrated-overlay')) return;
     if (ev.target.closest('.ctrl-btn')) return;
     if (ev.target.closest('.floating-window')) return;

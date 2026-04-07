@@ -6,15 +6,26 @@ function axisDirection(meta) {
   return { axis, direction };
 }
 
+function weightedDirectionalChance(meta, axisTarget, directionTarget, favored = 0.72) {
+  if (!meta || meta.axis !== axisTarget) return 0.5;
+  return meta.direction === directionTarget ? favored : 1 - favored;
+}
+
 export function registerDefaultEffects(registry) {
   registry.register({
     id: 'drift-shear',
     label: 'Drift Shear',
     cost: 1,
     chance: 1,
+    balance: 0,
     apply(ctx) {
+      const { axis } = axisDirection(ctx.meta);
       ops.displacePixels(ctx, 0.08 * ctx.quality.intensityScale, 3);
-      ops.scanlineShear(ctx, 1 + Math.floor(Math.random() * 2), 7, 1);
+      if (axis === 'x') {
+        ops.scanlineShear(ctx, 1 + Math.floor(Math.random() * 2), 7, 1);
+      } else {
+        ops.columnShear(ctx, 1 + Math.floor(Math.random() * 2), 7, 1);
+      }
       if (Math.random() < 0.3 * ctx.quality.chanceScale) ops.chromaBands(ctx, 1, 0, 2);
     }
   });
@@ -24,6 +35,7 @@ export function registerDefaultEffects(registry) {
     label: 'Chroma Banding',
     cost: 1,
     chance: 0.9,
+    balance: 0,
     apply(ctx) {
       const { axis, direction } = axisDirection(ctx.meta);
       const dx = axis === 'x' ? direction * (2 + Math.floor(Math.random() * 3)) : Math.floor(Math.random() * 4) - 2;
@@ -37,6 +49,7 @@ export function registerDefaultEffects(registry) {
     label: 'Swipe Tear',
     cost: 2,
     chance: 1,
+    balance: 0,
     apply(ctx) {
       const { axis, direction } = axisDirection(ctx.meta);
       ops.displacePixels(ctx, 0.14 * ctx.quality.intensityScale, 6);
@@ -51,6 +64,7 @@ export function registerDefaultEffects(registry) {
     label: 'Whip Burst',
     cost: 2,
     chance: 1,
+    balance: 0,
     apply(ctx) {
       ops.blockTears(ctx, 8 + Math.floor(Math.random() * 7));
       ops.scanlineShear(ctx, 5 + Math.floor(Math.random() * 3), 24, 1);
@@ -64,10 +78,16 @@ export function registerDefaultEffects(registry) {
     label: 'Jitter Grid',
     cost: 2,
     chance: 0.95,
+    balance: 1,
     apply(ctx) {
+      const axis = ctx.meta?.axis || 'x';
       ops.pixelateChunks(ctx, 14 + Math.floor(Math.random() * 10), 4, 14);
       ops.displacePixels(ctx, 0.12 * ctx.quality.intensityScale, 5);
-      ops.verticalScratches(ctx, 2 + Math.floor(Math.random() * 3));
+      if (axis === 'x') {
+        ops.horizontalScratches(ctx, 2 + Math.floor(Math.random() * 3));
+      } else {
+        ops.verticalScratches(ctx, 2 + Math.floor(Math.random() * 3));
+      }
     }
   });
 
@@ -76,6 +96,7 @@ export function registerDefaultEffects(registry) {
     label: 'Surge Overdrive',
     cost: 3,
     chance: 1,
+    balance: 1,
     apply(ctx) {
       const { axis, direction } = axisDirection(ctx.meta);
       ops.digitalTearExpand(ctx);
@@ -90,6 +111,7 @@ export function registerDefaultEffects(registry) {
     label: 'Stall Dropout',
     cost: 2,
     chance: 1,
+    balance: -1,
     apply(ctx) {
       const direction = ctx.meta?.direction || 1;
       ops.lumaDropout(ctx, 2 + Math.floor(Math.random() * 2), 20, 56);
@@ -104,6 +126,7 @@ export function registerDefaultEffects(registry) {
     label: 'Impact Fracture',
     cost: 3,
     chance: 1,
+    balance: 0,
     apply(ctx) {
       ops.digitalTearExpand(ctx);
       ops.blockTears(ctx, 6 + Math.floor(Math.random() * 6));
@@ -118,6 +141,7 @@ export function registerDefaultEffects(registry) {
     label: 'Scroll Up Rake',
     cost: 2,
     chance: 1,
+    balance: 1,
     apply(ctx) {
       ops.frameSlip(ctx, -1);
       ops.scanlineShear(ctx, 3 + Math.floor(Math.random() * 3), 16, 1);
@@ -131,6 +155,7 @@ export function registerDefaultEffects(registry) {
     label: 'Scroll Down Sink',
     cost: 2,
     chance: 1,
+    balance: -1,
     apply(ctx) {
       ops.frameSlip(ctx, 1);
       ops.lumaDropout(ctx, 2 + Math.floor(Math.random() * 2), 22, 64);
@@ -144,6 +169,7 @@ export function registerDefaultEffects(registry) {
     label: 'Ambient Flicker',
     cost: 1,
     chance: 1,
+    balance: 0,
     apply(ctx) {
       const roll = Math.random();
       if (roll < 0.33) {
@@ -162,11 +188,94 @@ export function registerDefaultEffects(registry) {
   });
 
   registry.register({
+    id: 'directional-exposure',
+    label: 'Directional Exposure Opposition',
+    cost: 2,
+    chance: 1,
+    balance: 0,
+    apply(ctx) {
+      const { axis } = axisDirection(ctx.meta);
+      const burnChance = weightedDirectionalChance(ctx.meta, 'x', -1, 0.72);
+
+      if (Math.random() < burnChance) {
+        ops.lumaBoost(ctx, 1 + Math.floor(Math.random() * 2), 16, 48);
+        ops.edgeCrawl(ctx, 2);
+      } else {
+        ops.lumaDropout(ctx, 1 + Math.floor(Math.random() * 2), 16, 48);
+        ops.edgeSink(ctx, 2);
+      }
+
+      if (axis === 'x') {
+        ops.scanlineShear(ctx, 3 + Math.floor(Math.random() * 3), 18, 1);
+        ops.horizontalScratches(ctx, 1 + Math.floor(Math.random() * 2));
+      } else {
+        ops.columnShear(ctx, 3 + Math.floor(Math.random() * 3), 18, 1);
+        ops.verticalScratches(ctx, 1 + Math.floor(Math.random() * 2));
+      }
+    }
+  });
+
+  registry.register({
+    id: 'cut-horizontal-burn',
+    label: 'Horizontal Cut Burn',
+    cost: 2,
+    chance: 0.9,
+    balance: 1,
+    apply(ctx) {
+      ops.scanlineShear(ctx, 4 + Math.floor(Math.random() * 3), 20, 1);
+      ops.horizontalScratches(ctx, 2 + Math.floor(Math.random() * 2));
+      ops.lumaBoost(ctx, 1 + Math.floor(Math.random() * 2), 12, 34);
+    }
+  });
+
+  registry.register({
+    id: 'cut-horizontal-sink',
+    label: 'Horizontal Cut Sink',
+    cost: 2,
+    chance: 0.9,
+    balance: -1,
+    apply(ctx) {
+      ops.scanlineShear(ctx, 4 + Math.floor(Math.random() * 3), 20, 1);
+      ops.horizontalScratches(ctx, 1 + Math.floor(Math.random() * 2));
+      ops.lumaDropout(ctx, 1 + Math.floor(Math.random() * 2), 12, 34);
+      ops.edgeSink(ctx, 2);
+    }
+  });
+
+  registry.register({
+    id: 'cut-vertical-burn',
+    label: 'Vertical Cut Burn',
+    cost: 2,
+    chance: 0.9,
+    balance: 1,
+    apply(ctx) {
+      ops.columnShear(ctx, 4 + Math.floor(Math.random() * 3), 20, 1);
+      ops.verticalScratches(ctx, 2 + Math.floor(Math.random() * 2));
+      ops.lumaBoost(ctx, 1 + Math.floor(Math.random() * 2), 12, 34);
+    }
+  });
+
+  registry.register({
+    id: 'cut-vertical-sink',
+    label: 'Vertical Cut Sink',
+    cost: 2,
+    chance: 0.9,
+    balance: -1,
+    apply(ctx) {
+      ops.columnShear(ctx, 4 + Math.floor(Math.random() * 3), 20, 1);
+      ops.verticalScratches(ctx, 1 + Math.floor(Math.random() * 2));
+      ops.lumaDropout(ctx, 1 + Math.floor(Math.random() * 2), 12, 34);
+      ops.edgeSink(ctx, 2);
+    }
+  });
+
+  registry.register({
     id: 'temporal-echo',
     label: 'Temporal Echo',
     cost: 2,
     chance: 0.85,
     minTier: 'balanced',
+    balance: 0,
     apply(ctx) {
       ops.temporalEcho(ctx, 3 + Math.floor(Math.random() * 3), 12);
     }
@@ -178,6 +287,7 @@ export function registerDefaultEffects(registry) {
     cost: 2,
     chance: 0.8,
     minTier: 'balanced',
+    balance: 0,
     apply(ctx) {
       ops.tileShatter(ctx, 14 + Math.floor(Math.random() * 14), 14);
     }
@@ -189,6 +299,7 @@ export function registerDefaultEffects(registry) {
     cost: 2,
     chance: 0.9,
     minTier: 'balanced',
+    balance: 0,
     apply(ctx) {
       ops.ribbonDesync(ctx, 5 + Math.floor(Math.random() * 4));
     }
@@ -200,6 +311,7 @@ export function registerDefaultEffects(registry) {
     cost: 2,
     chance: 0.85,
     minTier: 'balanced',
+    balance: 0,
     apply(ctx) {
       ops.ghostTrails(ctx, 1 + Math.floor(Math.random() * 2), 12);
     }
@@ -210,8 +322,20 @@ export function registerDefaultEffects(registry) {
     label: 'Edge Crawl Interference',
     cost: 1,
     chance: 0.95,
+    balance: 1,
     apply(ctx) {
       ops.edgeCrawl(ctx, 2);
+    }
+  });
+
+  registry.register({
+    id: 'edge-sink',
+    label: 'Edge Sink Interference',
+    cost: 1,
+    chance: 0.95,
+    balance: -1,
+    apply(ctx) {
+      ops.edgeSink(ctx, 2);
     }
   });
 }

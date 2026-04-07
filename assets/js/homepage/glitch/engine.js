@@ -29,6 +29,7 @@ export class PixelGlitchEngineV2 {
 
     this.glitchThrottle = 80;
     this.lastGlitchTime = 0;
+    this.brightnessTrend = 0;
     this.activeTier = this.computeTier();
     this.autoTiering = true;
     this.onResize = this.onResize.bind(this);
@@ -153,10 +154,14 @@ export class PixelGlitchEngineV2 {
       mouse: { x: this.mouseX, y: this.mouseY }
     };
 
-    const pipeline = this.pipelines.resolve(triggerType, this.activeTier.maxEffects);
+    const pipeline = this.pipelines.resolve(triggerType, this.activeTier.maxEffects, {
+      meta,
+      balanceTrend: this.brightnessTrend
+    });
     const tierFloor = tierIndex(this.activeTier.label);
     let consumedCost = 0;
     const maxCost = this.activeTier.maxCost ?? Number.POSITIVE_INFINITY;
+    let frameBalance = 0;
 
     pipeline.forEach((effectId) => {
       const effect = this.registry.get(effectId);
@@ -169,10 +174,13 @@ export class PixelGlitchEngineV2 {
       try {
         effect.apply(context);
         consumedCost += effect.cost || 1;
+        frameBalance += effect.balance || 0;
       } catch (error) {
         console.warn(`Glitch effect failed: ${effect.id}`, error);
       }
     });
+
+    this.brightnessTrend = Math.max(-2, Math.min(2, this.brightnessTrend * 0.86 + frameBalance * 0.22));
 
     this.surface.putFrame(frame.region);
     this.isProcessing = false;
@@ -229,6 +237,7 @@ export class PixelGlitchEngineV2 {
     return {
       preset: this.presetName,
       qualityTier: this.activeTier.label,
+      brightnessTrend: this.brightnessTrend,
       autoTiering: this.autoTiering,
       registeredEffects: this.registry.list().map((effect) => effect.id),
       isInitialized: this.isInitialized

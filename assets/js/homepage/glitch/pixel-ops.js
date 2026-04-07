@@ -107,6 +107,26 @@ export function scanlineShear({ data, source, width, height }, lineCount = 2, ma
   }
 }
 
+export function columnShear({ data, source, width, height }, columnCount = 2, maxShift = 6, columnWidth = 1) {
+  for (let c = 0; c < columnCount; c += 1) {
+    const x = randInt(0, width - 1);
+    const shift = randInt(-maxShift, maxShift);
+
+    for (let dx = 0; dx < columnWidth; dx += 1) {
+      const columnX = clamp(x + dx, 0, width - 1);
+      for (let y = 0; y < height; y += 1) {
+        const sy = clamp(y + shift, 0, height - 1);
+        const srcIdx = (sy * width + columnX) * 4;
+        const dstIdx = (y * width + columnX) * 4;
+        data[dstIdx] = source[srcIdx];
+        data[dstIdx + 1] = source[srcIdx + 1];
+        data[dstIdx + 2] = source[srcIdx + 2];
+        data[dstIdx + 3] = 255;
+      }
+    }
+  }
+}
+
 export function pixelateChunks({ data, source, width, height }, chunkCount = 12, minSize = 5, maxSize = 18) {
   for (let c = 0; c < chunkCount; c += 1) {
     const chunkSize = randInt(minSize, maxSize);
@@ -197,6 +217,24 @@ export function lumaDropout({ data, width, height }, stripeCount = 2, minH = 16,
   }
 }
 
+export function lumaBoost({ data, width, height }, stripeCount = 2, minH = 16, maxH = 42) {
+  for (let s = 0; s < stripeCount; s += 1) {
+    const startY = randInt(0, height - 1);
+    const stripeH = randInt(minH, maxH);
+    const factor = 1.14 + Math.random() * 0.28;
+
+    for (let y = 0; y < stripeH; y += 1) {
+      const py = clamp(startY + y, 0, height - 1);
+      for (let x = 0; x < width; x += 1) {
+        const idx = (py * width + x) * 4;
+        data[idx] = clamp(Math.floor(data[idx] * factor), 0, 255);
+        data[idx + 1] = clamp(Math.floor(data[idx + 1] * factor), 0, 255);
+        data[idx + 2] = clamp(Math.floor(data[idx + 2] * factor), 0, 255);
+      }
+    }
+  }
+}
+
 export function verticalScratches({ data, width, height }, count = 2) {
   for (let s = 0; s < count; s += 1) {
     const x = randInt(0, width - 1);
@@ -207,6 +245,24 @@ export function verticalScratches({ data, width, height }, count = 2) {
       for (let dx = 0; dx < thickness; dx += 1) {
         const px = clamp(x + dx, 0, width - 1);
         const idx = (y * width + px) * 4;
+        data[idx] = clamp(data[idx] + brightness * 0.17, 0, 255);
+        data[idx + 1] = clamp(data[idx + 1] + brightness * 0.17, 0, 255);
+        data[idx + 2] = clamp(data[idx + 2] + brightness * 0.12, 0, 255);
+      }
+    }
+  }
+}
+
+export function horizontalScratches({ data, width, height }, count = 2) {
+  for (let s = 0; s < count; s += 1) {
+    const y = randInt(0, height - 1);
+    const thickness = randInt(1, 2);
+    const brightness = 145 + randInt(0, 70);
+
+    for (let x = 0; x < width; x += 1) {
+      for (let dy = 0; dy < thickness; dy += 1) {
+        const py = clamp(y + dy, 0, height - 1);
+        const idx = (py * width + x) * 4;
         data[idx] = clamp(data[idx] + brightness * 0.17, 0, 255);
         data[idx + 1] = clamp(data[idx + 1] + brightness * 0.17, 0, 255);
         data[idx + 2] = clamp(data[idx + 2] + brightness * 0.12, 0, 255);
@@ -312,6 +368,24 @@ export function edgeCrawl({ data, source, width, height }, stride = 2) {
       data[idx] = clamp(data[idx] + randInt(10, 46), 0, 255);
       data[idx + 1] = clamp(data[idx + 1] + randInt(4, 20), 0, 255);
       data[idx + 2] = clamp(data[idx + 2] + randInt(8, 30), 0, 255);
+      data[idx + 3] = 255;
+    }
+  }
+}
+
+export function edgeSink({ data, source, width, height }, stride = 2) {
+  for (let y = 1; y < height - 1; y += stride) {
+    for (let x = 1; x < width - 1; x += stride) {
+      const idx = (y * width + x) * 4;
+      const right = (y * width + (x + 1)) * 4;
+      const down = ((y + 1) * width + x) * 4;
+
+      const diff = Math.abs(source[idx] - source[right]) + Math.abs(source[idx + 1] - source[down + 1]);
+      if (diff < 36) continue;
+
+      data[idx] = clamp(data[idx] - randInt(10, 34), 0, 255);
+      data[idx + 1] = clamp(data[idx + 1] - randInt(6, 24), 0, 255);
+      data[idx + 2] = clamp(data[idx + 2] - randInt(8, 28), 0, 255);
       data[idx + 3] = 255;
     }
   }

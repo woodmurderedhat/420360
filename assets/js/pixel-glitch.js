@@ -54,7 +54,13 @@ class PixelGlitchEngine {
     this.isProcessing = false;
     this.pendingEffect = null;
 
-    this.init();
+    this.initPromise = null;
+  }
+
+  start() {
+    if (this.initPromise) return this.initPromise;
+    this.initPromise = this.init();
+    return this.initPromise;
   }
 
   async init() {
@@ -524,5 +530,30 @@ class PixelGlitchEngine {
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   const imageUrl = 'assets/images/420360arcadebanner.png';
-  window.glitchEngine = new PixelGlitchEngine('glitch-bg', imageUrl);
+  const bootGlitchEngine = () => {
+    if (window.glitchEngine) return;
+    window.glitchEngine = new PixelGlitchEngine('glitch-bg', imageUrl);
+    window.glitchEngine.start();
+  };
+
+  const firstInteractionEvents = ['mousemove', 'touchstart', 'keydown', 'wheel'];
+  const onFirstInteraction = () => {
+    firstInteractionEvents.forEach((eventName) => {
+      window.removeEventListener(eventName, onFirstInteraction, interactionOptions);
+    });
+    bootGlitchEngine();
+  };
+  const interactionOptions = { passive: true, once: true };
+
+  firstInteractionEvents.forEach((eventName) => {
+    window.addEventListener(eventName, onFirstInteraction, interactionOptions);
+  });
+
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(() => {
+      bootGlitchEngine();
+    }, { timeout: 2500 });
+  } else {
+    setTimeout(bootGlitchEngine, 2500);
+  }
 });

@@ -190,9 +190,6 @@ const ADS = [
   { label: "DAUGHTERS OF ZION", href: "https://420360.xyz/esoteric/daughters-of-zion/index.html", gif: "https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif" }
 ];
 
-// Preload GIFs
-ADS.forEach(a => { const i = new Image(); i.src = a.gif; });
-
 /* ============================================
    UTILITY FUNCTIONS
    ============================================ */

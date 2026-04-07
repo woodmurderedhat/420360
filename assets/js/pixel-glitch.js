@@ -27,15 +27,15 @@ class PixelGlitchEngine {
     this.mouseY = 0;
     this.isInitialized = false;
 
-    // Glitch parameters
-      this.glitchRadius = 140;
-      this.glitchIntensity = 0.95;
-      this.maxDisplacement = 90;
-      this.scanLineHeight = 2;
+    // Glitch parameters tuned for subtle full-image distortion
+      this.glitchRadius = 0;
+      this.glitchIntensity = 0.08;
+      this.maxDisplacement = 3;
+      this.scanLineHeight = 1;
 
-    // Throttle mouse events
+    // Throttle mouse events to keep full-canvas processing lightweight
     this.lastGlitchTime = 0;
-      this.glitchThrottle = 16;
+      this.glitchThrottle = 80;
 
     this.init();
   }
@@ -126,53 +126,33 @@ class PixelGlitchEngine {
 
     const width = this.canvas.width;
     const height = this.canvas.height;
-    const radius = this.glitchRadius;
 
-    const minX = Math.max(0, this.mouseX - radius);
-    const maxX = Math.min(width - 1, this.mouseX + radius);
-    const minY = Math.max(0, this.mouseY - radius);
-    const maxY = Math.min(height - 1, this.mouseY + radius);
-
-    const regionW = Math.max(1, maxX - minX + 1);
-    const regionH = Math.max(1, maxY - minY + 1);
-
-    const region = this.ctx.getImageData(minX, minY, regionW, regionH);
+    // Apply to the entire existing image so glitch is global, not brush-like.
+    const region = this.ctx.getImageData(0, 0, width, height);
     const data = region.data;
     const source = new Uint8ClampedArray(data);
 
-    this.glitchDisplacePixels(data, source, regionW, regionH);
-    this.glitchBlockTears(data, source, regionW, regionH);
-    this.glitchScanlineShear(data, source, regionW, regionH);
-    this.glitchPixelateChunks(data, source, regionW, regionH);
+    this.glitchDisplacePixels(data, source, width, height);
+    this.glitchScanlineShear(data, source, width, height);
 
-    this.ctx.putImageData(region, minX, minY);
+    this.ctx.putImageData(region, 0, 0);
   }
 
   glitchDisplacePixels(data, source, width, height) {
-    const centerX = width * 0.5;
-    const centerY = height * 0.5;
-    const radiusSq = (Math.min(width, height) * 0.48) ** 2;
-
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
-        const dx = x - centerX;
-        const dy = y - centerY;
-        const distSq = dx * dx + dy * dy;
-        if (distSq > radiusSq) continue;
+        if (Math.random() > this.glitchIntensity) continue;
 
-        const falloff = 1 - distSq / radiusSq;
-        if (Math.random() > this.glitchIntensity * (0.35 + 0.65 * falloff)) continue;
-        const disp = Math.max(1, Math.floor(this.maxDisplacement * falloff));
-        const sx = this.clamp(x + this.randInt(-disp, disp), 0, width - 1);
-        const sy = this.clamp(y + this.randInt(-disp, disp), 0, height - 1);
+        const sx = this.clamp(x + this.randInt(-this.maxDisplacement, this.maxDisplacement), 0, width - 1);
+        const sy = this.clamp(y + this.randInt(-this.maxDisplacement, this.maxDisplacement), 0, height - 1);
 
         const targetIdx = (y * width + x) * 4;
         const srcIdxBase = (sy * width + sx) * 4;
 
         // Sample true nearby pixels, then split channels for chromatic corruption.
-        const rIdx = this.channelOffset(srcIdxBase, width, height, source, 0, this.randInt(-8, 8), this.randInt(-4, 4));
-        const gIdx = this.channelOffset(srcIdxBase, width, height, source, 1, this.randInt(-6, 6), this.randInt(-3, 3));
-        const bIdx = this.channelOffset(srcIdxBase, width, height, source, 2, this.randInt(-10, 10), this.randInt(-5, 5));
+        const rIdx = this.channelOffset(srcIdxBase, width, height, source, 0, this.randInt(-1, 1), this.randInt(-1, 1));
+        const gIdx = this.channelOffset(srcIdxBase, width, height, source, 1, this.randInt(-1, 1), this.randInt(-1, 1));
+        const bIdx = this.channelOffset(srcIdxBase, width, height, source, 2, this.randInt(-2, 2), this.randInt(-1, 1));
 
         data[targetIdx] = source[rIdx];
         data[targetIdx + 1] = source[gIdx];
@@ -214,11 +194,11 @@ class PixelGlitchEngine {
   }
 
   glitchScanlineShear(data, source, width, height) {
-    const lineCount = 8 + this.randInt(0, 10);
+    const lineCount = 1 + this.randInt(0, 2);
 
     for (let l = 0; l < lineCount; l++) {
       const y = this.randInt(0, height - 1);
-      const shift = this.randInt(-48, 48);
+      const shift = this.randInt(-6, 6);
 
       for (let dy = 0; dy < this.scanLineHeight; dy++) {
         const lineY = this.clamp(y + dy, 0, height - 1);

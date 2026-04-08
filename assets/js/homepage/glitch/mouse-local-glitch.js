@@ -1,8 +1,96 @@
-import { cascadingPixelSmear, colorShiftLocalRegion } from './pixel-ops.js';
+import * as pixelOps from './pixel-ops.js';
 import { MOUSE_LOCAL_DEFAULTS, MOUSE_LOCAL_TIER_PARAMS } from './constants.js';
-import { clamp, now } from './utils.js';
+import { clamp, now, randInt } from './utils.js';
 
 const MOVE_TRIGGER_PREFIX = 'move';
+
+function fallbackColorShiftLocalRegion(
+  { data, width, height },
+  centerX,
+  centerY,
+  radius,
+  {
+    maxShift = 4,
+    intensity = 1,
+    pixelBudget = Number.POSITIVE_INFINITY
+  } = {}
+) {
+  const cx = clamp(Math.floor(centerX), 0, width - 1);
+  const cy = clamp(Math.floor(centerY), 0, height - 1);
+  const r = Math.max(4, Math.floor(radius));
+  const rSq = r * r;
+  const minX = Math.max(0, cx - r);
+  const maxX = Math.min(width - 1, cx + r);
+  const minY = Math.max(0, cy - r);
+  const maxY = Math.min(height - 1, cy + r);
+  let processed = 0;
+
+  for (let y = minY; y <= maxY; y += 1) {
+    for (let x = minX; x <= maxX; x += 1) {
+      if (processed >= pixelBudget) return processed;
+
+      const dx = x - cx;
+      const dy = y - cy;
+      const distSq = dx * dx + dy * dy;
+      if (distSq > rSq) continue;
+
+      const falloff = 1 - distSq / rSq;
+      if (Math.random() > 0.32 + falloff * 0.62 * intensity) continue;
+
+      const shift = Math.max(1, Math.floor(maxShift * (0.6 + falloff)));
+      const sx = clamp(x + randInt(-shift, shift), 0, width - 1);
+      const sy = clamp(y + randInt(-shift, shift), 0, height - 1);
+      const srcIdx = (sy * width + sx) * 4;
+      const dstIdx = (y * width + x) * 4;
+
+      data[dstIdx] = clamp(data[srcIdx + randInt(0, 2)] + randInt(-28, 36), 0, 255);
+      data[dstIdx + 1] = clamp(data[srcIdx + randInt(0, 2)] + randInt(-28, 36), 0, 255);
+      data[dstIdx + 2] = clamp(data[srcIdx + randInt(0, 2)] + randInt(-28, 36), 0, 255);
+      data[dstIdx + 3] = 255;
+      processed += 1;
+    }
+  }
+
+  return processed;
+}
+
+function fallbackCascadingPixelSmear(
+  context,
+  centerX,
+  centerY,
+  baseRadius,
+  {
+    cascadeCount = 3,
+    intensity = 1,
+    pixelBudget = Number.POSITIVE_INFINITY
+  } = {}
+) {
+  let processed = 0;
+  const cascades = Math.max(1, Math.floor(cascadeCount));
+
+  for (let pass = 0; pass < cascades; pass += 1) {
+    if (processed >= pixelBudget) break;
+    const radius = Math.max(6, Math.floor(baseRadius * Math.pow(0.72, pass)));
+    const remaining = pixelBudget - processed;
+    const passBudget = Math.max(1, Math.floor(remaining / (cascades - pass)));
+    processed += fallbackColorShiftLocalRegion(
+      context,
+      centerX + randInt(-3 - pass, 3 + pass),
+      centerY + randInt(-3 - pass, 3 + pass),
+      radius,
+      {
+        maxShift: Math.max(2, Math.floor(2 + pass * 1.4 * intensity)),
+        intensity: intensity * Math.pow(0.78, pass),
+        pixelBudget: passBudget
+      }
+    );
+  }
+
+  return processed;
+}
+
+const colorShiftLocalRegion = pixelOps.colorShiftLocalRegion || fallbackColorShiftLocalRegion;
+const cascadingPixelSmear = pixelOps.cascadingPixelSmear || fallbackCascadingPixelSmear;
 
 function isMoveTrigger(triggerType) {
   return typeof triggerType === 'string' && triggerType.startsWith(MOVE_TRIGGER_PREFIX);

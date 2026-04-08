@@ -220,6 +220,17 @@ export function createInteractionSystem({
       });
     }
 
+    const applyBtn = document.getElementById('apply-control');
+    if (applyBtn) {
+      const openApplyForm = () => {
+        window.open('https://forms.gle/Tv4JTcSPm2yUBrWv7', '_blank', 'noopener');
+      };
+      applyBtn.addEventListener('click', e => { e.stopPropagation(); openApplyForm(); });
+      applyBtn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openApplyForm(); }
+      });
+    }
+
     const gamesBtn = document.getElementById('games-control');
     if (gamesBtn) {
       gamesBtn.addEventListener('click', e => { e.stopPropagation(); openGamesIndex(); });

@@ -12,7 +12,9 @@ function fallbackColorShiftLocalRegion(
   {
     maxShift = 4,
     intensity = 1,
-    pixelBudget = Number.POSITIVE_INFINITY
+    pixelBudget = Number.POSITIVE_INFINITY,
+    shape = 'circle',
+    hardEdge = false
   } = {}
 ) {
   const cx = clamp(Math.floor(centerX), 0, width - 1);
@@ -23,6 +25,7 @@ function fallbackColorShiftLocalRegion(
   const maxX = Math.min(width - 1, cx + r);
   const minY = Math.max(0, cy - r);
   const maxY = Math.min(height - 1, cy + r);
+  const useSquare = shape === 'square';
   let processed = 0;
 
   for (let y = minY; y <= maxY; y += 1) {
@@ -32,10 +35,15 @@ function fallbackColorShiftLocalRegion(
       const dx = x - cx;
       const dy = y - cy;
       const distSq = dx * dx + dy * dy;
-      if (distSq > rSq) continue;
+      if (!useSquare && distSq > rSq) continue;
 
-      const falloff = 1 - distSq / rSq;
-      if (Math.random() > 0.32 + falloff * 0.62 * intensity) continue;
+      const falloff = hardEdge
+        ? 1
+        : (useSquare
+          ? Math.max(0, 1 - Math.max(Math.abs(dx), Math.abs(dy)) / r)
+          : 1 - distSq / rSq);
+      const writeChance = hardEdge ? Math.min(0.98, 0.78 + 0.15 * intensity) : (0.32 + falloff * 0.62 * intensity);
+      if (Math.random() > writeChance) continue;
 
       const shift = Math.max(1, Math.floor(maxShift * (0.6 + falloff)));
       const sx = clamp(x + randInt(-shift, shift), 0, width - 1);
@@ -75,7 +83,9 @@ function fallbackCascadingPixelSmear(
   {
     cascadeCount = 3,
     intensity = 1,
-    pixelBudget = Number.POSITIVE_INFINITY
+    pixelBudget = Number.POSITIVE_INFINITY,
+    shape = 'circle',
+    hardEdge = false
   } = {}
 ) {
   let processed = 0;
@@ -94,7 +104,9 @@ function fallbackCascadingPixelSmear(
       {
         maxShift: Math.max(2, Math.floor(2 + pass * 1.4 * intensity)),
         intensity: intensity * Math.pow(0.78, pass),
-        pixelBudget: passBudget
+        pixelBudget: passBudget,
+        shape,
+        hardEdge
       }
     );
   }
@@ -170,6 +182,7 @@ export class MouseLocalGlitch {
       : 1;
     const intensity = tier.intensity * this.intensityMultiplier * speedBoost;
     const radius = clamp(Math.floor(tier.radius * this.radiusMultiplier * speedBoost), 20, 260);
+    const squareRadius = Math.max(10, Math.floor(radius * 0.5));
     const framePixels = width * height;
     const maxBudget = Math.floor(framePixels * tier.budgetFraction * this.budgetMultiplier);
 
@@ -182,17 +195,21 @@ export class MouseLocalGlitch {
       ? context
       : { ...context, source: pristineSource };
 
-    colorShiftLocalRegion(sourceContext, cx, cy, radius, {
+    colorShiftLocalRegion(sourceContext, cx, cy, squareRadius, {
       maxShift: Math.max(2, Math.floor(3 + intensity * 2.1)),
       intensity,
       pixelBudget: colorBudget,
-      useSource: true
+      useSource: true,
+      shape: 'square',
+      hardEdge: true
     });
 
-    cascadingPixelSmear(sourceContext, cx, cy, Math.floor(radius * 1.08), {
+    cascadingPixelSmear(sourceContext, cx, cy, squareRadius, {
       cascadeCount: Math.max(2, Math.floor(tier.cascades * (0.9 + intensity * 0.2))),
       intensity,
-      pixelBudget: smearBudget
+      pixelBudget: smearBudget,
+      shape: 'square',
+      hardEdge: true
     });
 
     this.lastApplyAt = currentTime;

@@ -18,7 +18,9 @@ export function colorShiftLocalRegion(
     maxShift = 4,
     intensity = 1,
     pixelBudget = Number.POSITIVE_INFINITY,
-    useSource = false
+    useSource = false,
+    shape = 'circle',
+    hardEdge = false
   } = {}
 ) {
   const cx = clamp(Math.floor(centerX), 0, width - 1);
@@ -29,6 +31,7 @@ export function colorShiftLocalRegion(
   const maxX = Math.min(width - 1, cx + r);
   const minY = Math.max(0, cy - r);
   const maxY = Math.min(height - 1, cy + r);
+  const useSquare = shape === 'square';
   const sample = useSource ? source : data;
   const chaos = Math.max(0.3, intensity);
   let processed = 0;
@@ -40,10 +43,14 @@ export function colorShiftLocalRegion(
       const dx = x - cx;
       const dy = y - cy;
       const distSq = dx * dx + dy * dy;
-      if (distSq > rSq) continue;
+      if (!useSquare && distSq > rSq) continue;
 
-      const falloff = 1 - distSq / rSq;
-      const writeChance = 0.33 + 0.62 * falloff * chaos;
+      const falloff = hardEdge
+        ? 1
+        : (useSquare
+          ? Math.max(0, 1 - Math.max(Math.abs(dx), Math.abs(dy)) / r)
+          : 1 - distSq / rSq);
+      const writeChance = hardEdge ? (0.72 + 0.2 * Math.min(1, chaos)) : (0.33 + 0.62 * falloff * chaos);
       if (Math.random() > writeChance) continue;
 
       const shift = Math.max(1, Math.floor(maxShift * (0.6 + falloff)));
@@ -108,13 +115,16 @@ export function cascadingPixelSmear(
   {
     cascadeCount = 3,
     intensity = 1,
-    pixelBudget = Number.POSITIVE_INFINITY
+    pixelBudget = Number.POSITIVE_INFINITY,
+    shape = 'circle',
+    hardEdge = false
   } = {}
 ) {
   let processed = 0;
   let anchorX = clamp(Math.floor(centerX), 0, width - 1);
   let anchorY = clamp(Math.floor(centerY), 0, height - 1);
   const cascades = Math.max(1, Math.floor(cascadeCount));
+  const useSquare = shape === 'square';
 
   for (let pass = 0; pass < cascades; pass += 1) {
     if (processed >= pixelBudget) break;
@@ -138,10 +148,16 @@ export function cascadingPixelSmear(
         const dx = x - anchorX;
         const dy = y - anchorY;
         const distSq = dx * dx + dy * dy;
-        if (distSq > rSq) continue;
+        if (!useSquare && distSq > rSq) continue;
 
-        const falloff = 1 - distSq / rSq;
-        const copyChance = Math.min(0.97, 0.42 + falloff * 0.66 * intensity);
+        const falloff = hardEdge
+          ? 1
+          : (useSquare
+            ? Math.max(0, 1 - Math.max(Math.abs(dx), Math.abs(dy)) / radius)
+            : 1 - distSq / rSq);
+        const copyChance = hardEdge
+          ? Math.min(0.97, 0.72 + 0.18 * intensity)
+          : Math.min(0.97, 0.42 + falloff * 0.66 * intensity);
         if (Math.random() > copyChance) continue;
 
         const sx = clamp(x + randInt(-directionalShift, directionalShift) + (pass + 1) * randInt(-1, 1), 0, width - 1);

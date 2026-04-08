@@ -2,10 +2,55 @@
   "meta": {
     "source": "https://letterboxd.com/woodmurderedhat/rss/",
     "profile": "https://letterboxd.com/woodmurderedhat/",
-    "lastSynced": "2026-04-07T06:53:16.180Z",
-    "total": 10
+    "lastSynced": "2026-04-08T06:54:07.795Z",
+    "total": 15
   },
   "items": [
+    {
+      "title": "Mercy, 2026 - ★★½",
+      "link": "https://letterboxd.com/woodmurderedhat/film/mercy-2026/",
+      "rating": 2.5,
+      "watchedDate": "2026-04-08T00:00:00.000Z",
+      "publishedAt": "2026-04-08T00:57:42.000Z",
+      "summary": "Some creative AI fear mongering. This time the AI is a judge on a screen.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/1/1/9/5/6/5/1119565-mercy-2026-0-600-0-900-crop.jpg?v=44de7ae605"
+    },
+    {
+      "title": "Starbright, 2026 - ★★½",
+      "link": "https://letterboxd.com/woodmurderedhat/film/starbright/",
+      "rating": 2.5,
+      "watchedDate": "2026-04-08T00:00:00.000Z",
+      "publishedAt": "2026-04-08T00:56:37.000Z",
+      "summary": "It was watchable.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/5/8/7/9/4/6/587946-starbright-0-600-0-900-crop.jpg?v=091a59fca0"
+    },
+    {
+      "title": "Pizza Movie, 2026 - ★★★½",
+      "link": "https://letterboxd.com/woodmurderedhat/film/pizza-movie-2026/",
+      "rating": 3.5,
+      "watchedDate": "2026-04-07T00:00:00.000Z",
+      "publishedAt": "2026-04-07T14:49:43.000Z",
+      "summary": "A cool college humour stoner movie.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/3/7/0/5/6/7/1370567-pizza-movie-2026-0-600-0-900-crop.jpg?v=166006d9dc"
+    },
+    {
+      "title": "A Season to Blossom, 2026 - ★½",
+      "link": "https://letterboxd.com/woodmurderedhat/film/a-season-to-blossom/",
+      "rating": 1.5,
+      "watchedDate": "2026-04-07T00:00:00.000Z",
+      "publishedAt": "2026-04-07T14:30:03.000Z",
+      "summary": "It is what it is. Your typical hallmark love story.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/5/0/4/4/7/9/1504479-a-season-to-blossom-0-600-0-900-crop.jpg?v=93f0fc0d80"
+    },
+    {
+      "title": "The Bride!, 2026 - ★★½",
+      "link": "https://letterboxd.com/woodmurderedhat/film/the-bride-2026/",
+      "rating": 2.5,
+      "watchedDate": "2026-04-07T00:00:00.000Z",
+      "publishedAt": "2026-04-07T14:29:05.000Z",
+      "summary": "Where did it get you?",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/0/4/5/7/6/7/1045767-the-bride-2026-0-600-0-900-crop.jpg?v=1a15412f4b"
+    },
     {
       "title": "Tin Man, 2007 - ★★★",
       "link": "https://letterboxd.com/woodmurderedhat/film/tin-man/",

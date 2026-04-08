@@ -54,21 +54,42 @@ export function colorShiftLocalRegion(
 
       const modeRoll = Math.random();
       if (modeRoll < 0.58) {
-        data[dstIdx] = clamp(sample[channelOffset(srcIdx, width, height, 0, randInt(-2, 3), randInt(-1, 1))] + randInt(-18, 24), 0, 255);
-        data[dstIdx + 1] = clamp(sample[channelOffset(srcIdx, width, height, 1, randInt(-2, 2), randInt(-1, 1))] + randInt(-18, 24), 0, 255);
-        data[dstIdx + 2] = clamp(sample[channelOffset(srcIdx, width, height, 2, randInt(-3, 3), randInt(-1, 1))] + randInt(-18, 24), 0, 255);
+        const restoreBlend = 0.2 + 0.35 * falloff;
+        data[dstIdx] = clamp(
+          Math.floor(
+            sample[channelOffset(srcIdx, width, height, 0, randInt(-2, 3), randInt(-1, 1))] * (1 - restoreBlend)
+            + source[dstIdx] * restoreBlend
+          ) + randInt(-7, 9),
+          0,
+          255
+        );
+        data[dstIdx + 1] = clamp(
+          Math.floor(
+            sample[channelOffset(srcIdx, width, height, 1, randInt(-2, 2), randInt(-1, 1))] * (1 - restoreBlend)
+            + source[dstIdx + 1] * restoreBlend
+          ) + randInt(-7, 9),
+          0,
+          255
+        );
+        data[dstIdx + 2] = clamp(
+          Math.floor(
+            sample[channelOffset(srcIdx, width, height, 2, randInt(-3, 3), randInt(-1, 1))] * (1 - restoreBlend)
+            + source[dstIdx + 2] * restoreBlend
+          ) + randInt(-7, 9),
+          0,
+          255
+        );
       } else if (modeRoll < 0.87) {
-        data[dstIdx] = clamp(sample[srcIdx + 1] + randInt(-30, 36), 0, 255);
-        data[dstIdx + 1] = clamp(sample[srcIdx + 2] + randInt(-30, 36), 0, 255);
-        data[dstIdx + 2] = clamp(sample[srcIdx] + randInt(-30, 36), 0, 255);
+        const restoreBlend = 0.24 + 0.4 * falloff;
+        data[dstIdx] = clamp(Math.floor(sample[srcIdx + 1] * (1 - restoreBlend) + source[dstIdx] * restoreBlend) + randInt(-10, 11), 0, 255);
+        data[dstIdx + 1] = clamp(Math.floor(sample[srcIdx + 2] * (1 - restoreBlend) + source[dstIdx + 1] * restoreBlend) + randInt(-10, 11), 0, 255);
+        data[dstIdx + 2] = clamp(Math.floor(sample[srcIdx] * (1 - restoreBlend) + source[dstIdx + 2] * restoreBlend) + randInt(-10, 11), 0, 255);
       } else {
-        const blend = 0.45 + Math.random() * 0.35;
-        const rr = randInt(0, 255);
-        const gg = randInt(0, 255);
-        const bb = randInt(0, 255);
-        data[dstIdx] = clamp(Math.floor(sample[srcIdx] * (1 - blend) + rr * blend), 0, 255);
-        data[dstIdx + 1] = clamp(Math.floor(sample[srcIdx + 1] * (1 - blend) + gg * blend), 0, 255);
-        data[dstIdx + 2] = clamp(Math.floor(sample[srcIdx + 2] * (1 - blend) + bb * blend), 0, 255);
+        // Restore-biased blend removes snow artifacts while keeping glitch motion.
+        const restoreBlend = 0.38 + 0.42 * falloff;
+        data[dstIdx] = clamp(Math.floor(sample[srcIdx] * (1 - restoreBlend) + source[dstIdx] * restoreBlend) + randInt(-6, 8), 0, 255);
+        data[dstIdx + 1] = clamp(Math.floor(sample[srcIdx + 1] * (1 - restoreBlend) + source[dstIdx + 1] * restoreBlend) + randInt(-6, 8), 0, 255);
+        data[dstIdx + 2] = clamp(Math.floor(sample[srcIdx + 2] * (1 - restoreBlend) + source[dstIdx + 2] * restoreBlend) + randInt(-6, 8), 0, 255);
       }
 
       data[dstIdx + 3] = 255;
@@ -80,7 +101,7 @@ export function colorShiftLocalRegion(
 }
 
 export function cascadingPixelSmear(
-  { data, width, height },
+  { data, source, width, height },
   centerX,
   centerY,
   baseRadius,
@@ -107,7 +128,7 @@ export function cascadingPixelSmear(
     const remaining = pixelBudget - processed;
     const passBudget = Math.max(1, Math.floor(remaining / (cascades - pass)));
     const directionalShift = Math.max(1, Math.floor((2 + pass * 1.8) * intensity));
-    const colorNoise = Math.floor(8 + pass * 7 * intensity);
+    const colorNoise = Math.floor(3 + pass * 3 * intensity);
     let passProcessed = 0;
 
     for (let y = minY; y <= maxY; y += 1) {
@@ -128,9 +149,22 @@ export function cascadingPixelSmear(
         const srcIdx = (sy * width + sx) * 4;
         const dstIdx = (y * width + x) * 4;
 
-        data[dstIdx] = clamp(data[srcIdx] + randInt(-colorNoise, colorNoise), 0, 255);
-        data[dstIdx + 1] = clamp(data[srcIdx + 1] + randInt(-colorNoise, colorNoise), 0, 255);
-        data[dstIdx + 2] = clamp(data[srcIdx + 2] + randInt(-colorNoise, colorNoise), 0, 255);
+        const restoreBlend = 0.22 + 0.3 * falloff;
+        data[dstIdx] = clamp(
+          Math.floor(data[srcIdx] * (1 - restoreBlend) + source[dstIdx] * restoreBlend) + randInt(-colorNoise, colorNoise),
+          0,
+          255
+        );
+        data[dstIdx + 1] = clamp(
+          Math.floor(data[srcIdx + 1] * (1 - restoreBlend) + source[dstIdx + 1] * restoreBlend) + randInt(-colorNoise, colorNoise),
+          0,
+          255
+        );
+        data[dstIdx + 2] = clamp(
+          Math.floor(data[srcIdx + 2] * (1 - restoreBlend) + source[dstIdx + 2] * restoreBlend) + randInt(-colorNoise, colorNoise),
+          0,
+          255
+        );
         data[dstIdx + 3] = 255;
 
         passProcessed += 1;

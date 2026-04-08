@@ -4,6 +4,9 @@ export class CanvasSurface {
     this.imageUrl = imageUrl;
     this.ctx = this.canvas?.getContext('2d', { willReadFrequently: true }) || null;
     this.image = null;
+    this.pristineSource = null;
+    this.pristineWidth = 0;
+    this.pristineHeight = 0;
   }
 
   get ready() {
@@ -46,6 +49,17 @@ export class CanvasSurface {
 
     this.ctx.clearRect(0, 0, canvasW, canvasH);
     this.ctx.drawImage(this.image, offsetX, offsetY, drawW, drawH);
+    this.capturePristineSource();
+  }
+
+  capturePristineSource() {
+    if (!this.ctx || !this.canvas) return;
+    const width = this.canvas.width;
+    const height = this.canvas.height;
+    const imageData = this.ctx.getImageData(0, 0, width, height);
+    this.pristineSource = new Uint8ClampedArray(imageData.data);
+    this.pristineWidth = width;
+    this.pristineHeight = height;
   }
 
   getFrame() {
@@ -53,10 +67,17 @@ export class CanvasSurface {
     const width = this.canvas.width;
     const height = this.canvas.height;
     const region = this.ctx.getImageData(0, 0, width, height);
+    const pristineSource = this.pristineSource
+      && this.pristineWidth === width
+      && this.pristineHeight === height
+      ? this.pristineSource
+      : new Uint8ClampedArray(region.data);
+
     return {
       region,
       data: region.data,
       source: new Uint8ClampedArray(region.data),
+      pristineSource,
       width,
       height
     };

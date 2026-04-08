@@ -5,7 +5,7 @@ import { clamp, now, randInt } from './utils.js';
 const MOVE_TRIGGER_PREFIX = 'move';
 
 function fallbackColorShiftLocalRegion(
-  { data, width, height },
+  { data, source, width, height },
   centerX,
   centerY,
   radius,
@@ -43,9 +43,22 @@ function fallbackColorShiftLocalRegion(
       const srcIdx = (sy * width + sx) * 4;
       const dstIdx = (y * width + x) * 4;
 
-      data[dstIdx] = clamp(data[srcIdx + randInt(0, 2)] + randInt(-28, 36), 0, 255);
-      data[dstIdx + 1] = clamp(data[srcIdx + randInt(0, 2)] + randInt(-28, 36), 0, 255);
-      data[dstIdx + 2] = clamp(data[srcIdx + randInt(0, 2)] + randInt(-28, 36), 0, 255);
+      const restoreBlend = 0.3 + 0.45 * falloff;
+      data[dstIdx] = clamp(
+        Math.floor(data[srcIdx] * (1 - restoreBlend) + source[dstIdx] * restoreBlend) + randInt(-8, 10),
+        0,
+        255
+      );
+      data[dstIdx + 1] = clamp(
+        Math.floor(data[srcIdx + 1] * (1 - restoreBlend) + source[dstIdx + 1] * restoreBlend) + randInt(-8, 10),
+        0,
+        255
+      );
+      data[dstIdx + 2] = clamp(
+        Math.floor(data[srcIdx + 2] * (1 - restoreBlend) + source[dstIdx + 2] * restoreBlend) + randInt(-8, 10),
+        0,
+        255
+      );
       data[dstIdx + 3] = 255;
       processed += 1;
     }
@@ -164,15 +177,19 @@ export class MouseLocalGlitch {
 
     const colorBudget = Math.floor(maxBudget * 0.44);
     const smearBudget = maxBudget - colorBudget;
+    const pristineSource = context.pristineSource || context.source;
+    const sourceContext = pristineSource === context.source
+      ? context
+      : { ...context, source: pristineSource };
 
-    colorShiftLocalRegion(context, cx, cy, radius, {
+    colorShiftLocalRegion(sourceContext, cx, cy, radius, {
       maxShift: Math.max(2, Math.floor(3 + intensity * 2.1)),
       intensity,
       pixelBudget: colorBudget,
-      useSource: false
+      useSource: true
     });
 
-    cascadingPixelSmear(context, cx, cy, Math.floor(radius * 1.08), {
+    cascadingPixelSmear(sourceContext, cx, cy, Math.floor(radius * 1.08), {
       cascadeCount: Math.max(2, Math.floor(tier.cascades * (0.9 + intensity * 0.2))),
       intensity,
       pixelBudget: smearBudget

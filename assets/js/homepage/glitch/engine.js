@@ -3,6 +3,7 @@ import { EFFECT_COOLDOWNS, PIPELINE_PRESETS, QUALITY_TIERS, TIER_ORDER } from '.
 import { registerDefaultEffects } from './effects.js';
 import { EffectRegistry, PipelineResolver } from './effect-registry.js';
 import { MotionAnalyzer } from './motion-analyzer.js';
+import { MouseLocalGlitch } from './mouse-local-glitch.js';
 import { now } from './utils.js';
 
 function tierIndex(label) {
@@ -15,6 +16,7 @@ export class PixelGlitchEngineV2 {
     this.motion = new MotionAnalyzer();
     this.registry = new EffectRegistry();
     this.pipelines = new PipelineResolver();
+    this.localGlitch = new MouseLocalGlitch();
 
     registerDefaultEffects(this.registry);
     this.setPreset(preset);
@@ -182,6 +184,8 @@ export class PixelGlitchEngineV2 {
 
     this.brightnessTrend = Math.max(-2, Math.min(2, this.brightnessTrend * 0.86 + frameBalance * 0.22));
 
+    this.localGlitch.apply(context);
+
     this.surface.putFrame(frame.region);
     this.isProcessing = false;
 
@@ -226,6 +230,26 @@ export class PixelGlitchEngineV2 {
     this.effectCooldowns[effectType] = Math.max(0, Math.floor(ms));
   }
 
+  setMouseLocalRadius(radiusMultiplier) {
+    this.localGlitch.setRadiusMultiplier(radiusMultiplier);
+  }
+
+  setMouseLocalCooldown(ms) {
+    this.localGlitch.setCooldown(ms);
+  }
+
+  setMouseLocalBudget(multiplier) {
+    this.localGlitch.setBudgetMultiplier(multiplier);
+  }
+
+  setMouseLocalIntensity(multiplier) {
+    this.localGlitch.setIntensityMultiplier(multiplier);
+  }
+
+  setMouseLocalEnabled(enabled) {
+    this.localGlitch.setEnabled(enabled);
+  }
+
   destroy() {
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('mousemove', this.onMouseMove);
@@ -239,6 +263,7 @@ export class PixelGlitchEngineV2 {
       qualityTier: this.activeTier.label,
       brightnessTrend: this.brightnessTrend,
       autoTiering: this.autoTiering,
+      mouseLocal: this.localGlitch.getDiagnostics(),
       registeredEffects: this.registry.list().map((effect) => effect.id),
       isInitialized: this.isInitialized
     };

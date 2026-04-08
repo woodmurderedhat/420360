@@ -9,6 +9,142 @@ function channelOffset(baseIdx, width, height, channel, dx, dy) {
   return (ny * width + nx) * 4 + channel;
 }
 
+export function colorShiftLocalRegion(
+  { data, source, width, height },
+  centerX,
+  centerY,
+  radius,
+  {
+    maxShift = 4,
+    intensity = 1,
+    pixelBudget = Number.POSITIVE_INFINITY,
+    useSource = false
+  } = {}
+) {
+  const cx = clamp(Math.floor(centerX), 0, width - 1);
+  const cy = clamp(Math.floor(centerY), 0, height - 1);
+  const r = Math.max(4, Math.floor(radius));
+  const rSq = r * r;
+  const minX = Math.max(0, cx - r);
+  const maxX = Math.min(width - 1, cx + r);
+  const minY = Math.max(0, cy - r);
+  const maxY = Math.min(height - 1, cy + r);
+  const sample = useSource ? source : data;
+  const chaos = Math.max(0.3, intensity);
+  let processed = 0;
+
+  for (let y = minY; y <= maxY; y += 1) {
+    for (let x = minX; x <= maxX; x += 1) {
+      if (processed >= pixelBudget) return processed;
+
+      const dx = x - cx;
+      const dy = y - cy;
+      const distSq = dx * dx + dy * dy;
+      if (distSq > rSq) continue;
+
+      const falloff = 1 - distSq / rSq;
+      const writeChance = 0.33 + 0.62 * falloff * chaos;
+      if (Math.random() > writeChance) continue;
+
+      const shift = Math.max(1, Math.floor(maxShift * (0.6 + falloff)));
+      const sx = clamp(x + randInt(-shift, shift), 0, width - 1);
+      const sy = clamp(y + randInt(-shift, shift), 0, height - 1);
+      const srcIdx = (sy * width + sx) * 4;
+      const dstIdx = (y * width + x) * 4;
+
+      const modeRoll = Math.random();
+      if (modeRoll < 0.58) {
+        data[dstIdx] = clamp(sample[channelOffset(srcIdx, width, height, 0, randInt(-2, 3), randInt(-1, 1))] + randInt(-18, 24), 0, 255);
+        data[dstIdx + 1] = clamp(sample[channelOffset(srcIdx, width, height, 1, randInt(-2, 2), randInt(-1, 1))] + randInt(-18, 24), 0, 255);
+        data[dstIdx + 2] = clamp(sample[channelOffset(srcIdx, width, height, 2, randInt(-3, 3), randInt(-1, 1))] + randInt(-18, 24), 0, 255);
+      } else if (modeRoll < 0.87) {
+        data[dstIdx] = clamp(sample[srcIdx + 1] + randInt(-30, 36), 0, 255);
+        data[dstIdx + 1] = clamp(sample[srcIdx + 2] + randInt(-30, 36), 0, 255);
+        data[dstIdx + 2] = clamp(sample[srcIdx] + randInt(-30, 36), 0, 255);
+      } else {
+        const blend = 0.45 + Math.random() * 0.35;
+        const rr = randInt(0, 255);
+        const gg = randInt(0, 255);
+        const bb = randInt(0, 255);
+        data[dstIdx] = clamp(Math.floor(sample[srcIdx] * (1 - blend) + rr * blend), 0, 255);
+        data[dstIdx + 1] = clamp(Math.floor(sample[srcIdx + 1] * (1 - blend) + gg * blend), 0, 255);
+        data[dstIdx + 2] = clamp(Math.floor(sample[srcIdx + 2] * (1 - blend) + bb * blend), 0, 255);
+      }
+
+      data[dstIdx + 3] = 255;
+      processed += 1;
+    }
+  }
+
+  return processed;
+}
+
+export function cascadingPixelSmear(
+  { data, width, height },
+  centerX,
+  centerY,
+  baseRadius,
+  {
+    cascadeCount = 3,
+    intensity = 1,
+    pixelBudget = Number.POSITIVE_INFINITY
+  } = {}
+) {
+  let processed = 0;
+  let anchorX = clamp(Math.floor(centerX), 0, width - 1);
+  let anchorY = clamp(Math.floor(centerY), 0, height - 1);
+  const cascades = Math.max(1, Math.floor(cascadeCount));
+
+  for (let pass = 0; pass < cascades; pass += 1) {
+    if (processed >= pixelBudget) break;
+
+    const radius = Math.max(6, Math.floor(baseRadius * Math.pow(0.72, pass)));
+    const rSq = radius * radius;
+    const minX = Math.max(0, anchorX - radius);
+    const maxX = Math.min(width - 1, anchorX + radius);
+    const minY = Math.max(0, anchorY - radius);
+    const maxY = Math.min(height - 1, anchorY + radius);
+    const remaining = pixelBudget - processed;
+    const passBudget = Math.max(1, Math.floor(remaining / (cascades - pass)));
+    const directionalShift = Math.max(1, Math.floor((2 + pass * 1.8) * intensity));
+    const colorNoise = Math.floor(8 + pass * 7 * intensity);
+    let passProcessed = 0;
+
+    for (let y = minY; y <= maxY; y += 1) {
+      for (let x = minX; x <= maxX; x += 1) {
+        if (passProcessed >= passBudget || processed >= pixelBudget) break;
+
+        const dx = x - anchorX;
+        const dy = y - anchorY;
+        const distSq = dx * dx + dy * dy;
+        if (distSq > rSq) continue;
+
+        const falloff = 1 - distSq / rSq;
+        const copyChance = Math.min(0.97, 0.42 + falloff * 0.66 * intensity);
+        if (Math.random() > copyChance) continue;
+
+        const sx = clamp(x + randInt(-directionalShift, directionalShift) + (pass + 1) * randInt(-1, 1), 0, width - 1);
+        const sy = clamp(y + randInt(-directionalShift, directionalShift) + (pass + 1) * randInt(-1, 1), 0, height - 1);
+        const srcIdx = (sy * width + sx) * 4;
+        const dstIdx = (y * width + x) * 4;
+
+        data[dstIdx] = clamp(data[srcIdx] + randInt(-colorNoise, colorNoise), 0, 255);
+        data[dstIdx + 1] = clamp(data[srcIdx + 1] + randInt(-colorNoise, colorNoise), 0, 255);
+        data[dstIdx + 2] = clamp(data[srcIdx + 2] + randInt(-colorNoise, colorNoise), 0, 255);
+        data[dstIdx + 3] = 255;
+
+        passProcessed += 1;
+        processed += 1;
+      }
+    }
+
+    anchorX = clamp(anchorX + randInt(-directionalShift * 2, directionalShift * 2), 0, width - 1);
+    anchorY = clamp(anchorY + randInt(-directionalShift * 2, directionalShift * 2), 0, height - 1);
+  }
+
+  return processed;
+}
+
 export function displacePixels({ data, source, width, height }, intensity = 0.08, maxDisplacement = 3) {
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {

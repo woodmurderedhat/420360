@@ -207,3 +207,21 @@ export const EFFECT_COOLDOWNS = {
 };
 
 export const TIER_ORDER = ['low', 'balanced', 'high'];
+
+export const MOUSE_LOCAL_DEFAULTS = {
+  enabled: true,
+  cooldownMs: 38,
+  radiusMultiplier: 1,
+  intensityMultiplier: 1.25,
+  budgetMultiplier: 1,
+  minCooldownMs: 12,
+  minRadiusMultiplier: 0.35,
+  minIntensityMultiplier: 0.25,
+  minBudgetMultiplier: 0.2
+};
+
+export const MOUSE_LOCAL_TIER_PARAMS = {
+  low: { radius: 42, budgetFraction: 0.04, cascades: 2, intensity: 0.72 },
+  balanced: { radius: 92, budgetFraction: 0.085, cascades: 3, intensity: 1.05 },
+  high: { radius: 132, budgetFraction: 0.13, cascades: 4, intensity: 1.2 }
+};

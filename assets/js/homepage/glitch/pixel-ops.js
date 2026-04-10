@@ -9,6 +9,11 @@ function channelOffset(baseIdx, width, height, channel, dx, dy) {
   return (ny * width + nx) * 4 + channel;
 }
 
+function anchoredBlend(current, sample, source, sourceBlend, noiseRange = 0) {
+  const noisy = sample + (noiseRange > 0 ? randInt(-noiseRange, noiseRange) : 0);
+  return clamp(Math.floor(current * (1 - sourceBlend) + noisy * (1 - sourceBlend) * 0.5 + source * sourceBlend), 0, 255);
+}
+
 export function colorShiftLocalRegion(
   { data, source, width, height },
   centerX,
@@ -60,8 +65,8 @@ export function colorShiftLocalRegion(
       const dstIdx = (y * width + x) * 4;
 
       const modeRoll = Math.random();
-      if (modeRoll < 0.58) {
-        const restoreBlend = 0.2 + 0.35 * falloff;
+      if (modeRoll < 0.52) {
+        const restoreBlend = 0.26 + 0.4 * falloff;
         data[dstIdx] = clamp(
           Math.floor(
             sample[channelOffset(srcIdx, width, height, 0, randInt(-2, 3), randInt(-1, 1))] * (1 - restoreBlend)
@@ -86,14 +91,35 @@ export function colorShiftLocalRegion(
           0,
           255
         );
-      } else if (modeRoll < 0.87) {
-        const restoreBlend = 0.24 + 0.4 * falloff;
-        data[dstIdx] = clamp(Math.floor(sample[srcIdx + 1] * (1 - restoreBlend) + source[dstIdx] * restoreBlend) + randInt(-10, 11), 0, 255);
-        data[dstIdx + 1] = clamp(Math.floor(sample[srcIdx + 2] * (1 - restoreBlend) + source[dstIdx + 1] * restoreBlend) + randInt(-10, 11), 0, 255);
-        data[dstIdx + 2] = clamp(Math.floor(sample[srcIdx] * (1 - restoreBlend) + source[dstIdx + 2] * restoreBlend) + randInt(-10, 11), 0, 255);
+      } else if (modeRoll < 0.82) {
+        const restoreBlend = 0.34 + 0.36 * falloff;
+        data[dstIdx] = clamp(
+          Math.floor(
+            sample[channelOffset(srcIdx, width, height, 0, randInt(-4, 4), randInt(-2, 2))] * (1 - restoreBlend)
+            + source[dstIdx] * restoreBlend
+          ) + randInt(-12, 13),
+          0,
+          255
+        );
+        data[dstIdx + 1] = clamp(
+          Math.floor(
+            sample[channelOffset(srcIdx, width, height, 1, randInt(-3, 3), randInt(-2, 2))] * (1 - restoreBlend)
+            + source[dstIdx + 1] * restoreBlend
+          ) + randInt(-10, 11),
+          0,
+          255
+        );
+        data[dstIdx + 2] = clamp(
+          Math.floor(
+            sample[channelOffset(srcIdx, width, height, 2, randInt(-4, 4), randInt(-2, 2))] * (1 - restoreBlend)
+            + source[dstIdx + 2] * restoreBlend
+          ) + randInt(-12, 13),
+          0,
+          255
+        );
       } else {
         // Restore-biased blend removes snow artifacts while keeping glitch motion.
-        const restoreBlend = 0.38 + 0.42 * falloff;
+        const restoreBlend = 0.44 + 0.4 * falloff;
         data[dstIdx] = clamp(Math.floor(sample[srcIdx] * (1 - restoreBlend) + source[dstIdx] * restoreBlend) + randInt(-6, 8), 0, 255);
         data[dstIdx + 1] = clamp(Math.floor(sample[srcIdx + 1] * (1 - restoreBlend) + source[dstIdx + 1] * restoreBlend) + randInt(-6, 8), 0, 255);
         data[dstIdx + 2] = clamp(Math.floor(sample[srcIdx + 2] * (1 - restoreBlend) + source[dstIdx + 2] * restoreBlend) + randInt(-6, 8), 0, 255);
@@ -165,19 +191,20 @@ export function cascadingPixelSmear(
         const srcIdx = (sy * width + sx) * 4;
         const dstIdx = (y * width + x) * 4;
 
-        const restoreBlend = 0.22 + 0.3 * falloff;
+        const restoreBlend = 0.3 + 0.34 * falloff;
+        const sampleBlend = 0.55 - Math.min(0.25, 0.12 * pass);
         data[dstIdx] = clamp(
-          Math.floor(data[srcIdx] * (1 - restoreBlend) + source[dstIdx] * restoreBlend) + randInt(-colorNoise, colorNoise),
+          Math.floor((data[srcIdx] * sampleBlend + source[srcIdx] * (1 - sampleBlend)) * (1 - restoreBlend) + source[dstIdx] * restoreBlend) + randInt(-colorNoise, colorNoise),
           0,
           255
         );
         data[dstIdx + 1] = clamp(
-          Math.floor(data[srcIdx + 1] * (1 - restoreBlend) + source[dstIdx + 1] * restoreBlend) + randInt(-colorNoise, colorNoise),
+          Math.floor((data[srcIdx + 1] * sampleBlend + source[srcIdx + 1] * (1 - sampleBlend)) * (1 - restoreBlend) + source[dstIdx + 1] * restoreBlend) + randInt(-colorNoise, colorNoise),
           0,
           255
         );
         data[dstIdx + 2] = clamp(
-          Math.floor(data[srcIdx + 2] * (1 - restoreBlend) + source[dstIdx + 2] * restoreBlend) + randInt(-colorNoise, colorNoise),
+          Math.floor((data[srcIdx + 2] * sampleBlend + source[srcIdx + 2] * (1 - sampleBlend)) * (1 - restoreBlend) + source[dstIdx + 2] * restoreBlend) + randInt(-colorNoise, colorNoise),
           0,
           255
         );
@@ -367,18 +394,22 @@ export function chromaBands({ data, source, width, height }, dx = 2, dy = 0, ban
   for (let b = 0; b < bandCount; b += 1) {
     const bandY = randInt(0, height - 1);
     const bandH = randInt(2, 8);
+    const polarity = b % 2 === 0 ? 1 : -1;
+    const localDx = Math.max(-8, Math.min(8, Math.floor(dx * polarity)));
+    const localDy = Math.max(-6, Math.min(6, Math.floor(dy * polarity)));
+    const anchorBlend = 0.28 + Math.random() * 0.22;
 
     for (let y = 0; y < bandH; y += 1) {
       const py = clamp(bandY + y, 0, height - 1);
       for (let x = 0; x < width; x += 1) {
         const base = (py * width + x) * 4;
-        const rIdx = channelOffset(base, width, height, 0, dx, dy);
-        const gIdx = channelOffset(base, width, height, 1, Math.floor(dx * 0.5), dy);
-        const bIdx = channelOffset(base, width, height, 2, -dx, -dy);
+        const rIdx = channelOffset(base, width, height, 0, localDx, localDy);
+        const gIdx = channelOffset(base, width, height, 1, Math.floor(localDx * 0.5), Math.floor(localDy * 0.5));
+        const bIdx = channelOffset(base, width, height, 2, -localDx, -localDy);
 
-        data[base] = source[rIdx];
-        data[base + 1] = source[gIdx];
-        data[base + 2] = source[bIdx];
+        data[base] = anchoredBlend(data[base], source[rIdx], source[base], anchorBlend, 7);
+        data[base + 1] = anchoredBlend(data[base + 1], source[gIdx], source[base + 1], anchorBlend, 6);
+        data[base + 2] = anchoredBlend(data[base + 2], source[bIdx], source[base + 2], anchorBlend, 7);
         data[base + 3] = 255;
       }
     }
@@ -433,7 +464,7 @@ export function verticalScratches({ data, width, height }, count = 2) {
         const idx = (y * width + px) * 4;
         data[idx] = clamp(data[idx] + brightness * 0.17, 0, 255);
         data[idx + 1] = clamp(data[idx + 1] + brightness * 0.17, 0, 255);
-        data[idx + 2] = clamp(data[idx + 2] + brightness * 0.12, 0, 255);
+        data[idx + 2] = clamp(data[idx + 2] + brightness * 0.16, 0, 255);
       }
     }
   }
@@ -451,7 +482,7 @@ export function horizontalScratches({ data, width, height }, count = 2) {
         const idx = (py * width + x) * 4;
         data[idx] = clamp(data[idx] + brightness * 0.17, 0, 255);
         data[idx + 1] = clamp(data[idx + 1] + brightness * 0.17, 0, 255);
-        data[idx + 2] = clamp(data[idx + 2] + brightness * 0.12, 0, 255);
+        data[idx + 2] = clamp(data[idx + 2] + brightness * 0.16, 0, 255);
       }
     }
   }
@@ -533,9 +564,161 @@ export function ghostTrails({ data, source, width, height }, trailCount = 2, off
         const srcIdx = (sy * width + sx) * 4;
         const dstIdx = (y * width + x) * 4;
 
-        data[dstIdx] = Math.floor(data[dstIdx] * 0.8 + source[srcIdx] * 0.2);
-        data[dstIdx + 1] = Math.floor(data[dstIdx + 1] * 0.8 + source[srcIdx + 1] * 0.2);
-        data[dstIdx + 2] = Math.floor(data[dstIdx + 2] * 0.8 + source[srcIdx + 2] * 0.2);
+        data[dstIdx] = Math.floor(data[dstIdx] * 0.68 + source[srcIdx] * 0.32);
+        data[dstIdx + 1] = Math.floor(data[dstIdx + 1] * 0.68 + source[srcIdx + 1] * 0.32);
+        data[dstIdx + 2] = Math.floor(data[dstIdx + 2] * 0.68 + source[srcIdx + 2] * 0.32);
+      }
+    }
+  }
+}
+
+export function directionalChannelFracture(
+  { data, source, width, height },
+  axis = 'x',
+  direction = 1,
+  intensity = 1
+) {
+  const axisIsX = axis !== 'y';
+  const bands = 3 + randInt(0, 3);
+  const baseShift = Math.max(1, Math.floor(2 + intensity * 4));
+  const blend = Math.min(0.5, 0.24 + intensity * 0.18);
+
+  for (let b = 0; b < bands; b += 1) {
+    const bandStart = axisIsX ? randInt(0, height - 1) : randInt(0, width - 1);
+    const bandSize = randInt(6, axisIsX ? 24 : 36);
+    const localShift = baseShift + randInt(-2, 2);
+    const signedShift = direction * (b % 2 === 0 ? localShift : -localShift);
+
+    if (axisIsX) {
+      for (let y = 0; y < bandSize; y += 1) {
+        const py = clamp(bandStart + y, 0, height - 1);
+        for (let x = 0; x < width; x += 1) {
+          const idx = (py * width + x) * 4;
+          const rIdx = channelOffset(idx, width, height, 0, signedShift, 0);
+          const gIdx = channelOffset(idx, width, height, 1, Math.floor(signedShift * 0.4), randInt(-1, 1));
+          const bIdx = channelOffset(idx, width, height, 2, -signedShift, 0);
+          data[idx] = anchoredBlend(data[idx], source[rIdx], source[idx], blend, 8);
+          data[idx + 1] = anchoredBlend(data[idx + 1], source[gIdx], source[idx + 1], blend, 7);
+          data[idx + 2] = anchoredBlend(data[idx + 2], source[bIdx], source[idx + 2], blend, 8);
+        }
+      }
+    } else {
+      for (let x = 0; x < bandSize; x += 1) {
+        const px = clamp(bandStart + x, 0, width - 1);
+        for (let y = 0; y < height; y += 1) {
+          const idx = (y * width + px) * 4;
+          const rIdx = channelOffset(idx, width, height, 0, randInt(-1, 1), signedShift);
+          const gIdx = channelOffset(idx, width, height, 1, randInt(-1, 1), Math.floor(signedShift * 0.4));
+          const bIdx = channelOffset(idx, width, height, 2, randInt(-1, 1), -signedShift);
+          data[idx] = anchoredBlend(data[idx], source[rIdx], source[idx], blend, 8);
+          data[idx + 1] = anchoredBlend(data[idx + 1], source[gIdx], source[idx + 1], blend, 7);
+          data[idx + 2] = anchoredBlend(data[idx + 2], source[bIdx], source[idx + 2], blend, 8);
+        }
+      }
+    }
+  }
+}
+
+export function waveScanTear(
+  { data, source, width, height },
+  axis = 'x',
+  direction = 1,
+  intensity = 1
+) {
+  const axisIsX = axis !== 'y';
+  const amplitude = Math.max(3, Math.floor(6 + intensity * 12));
+  const wavelength = Math.max(16, Math.floor((axisIsX ? width : height) / (5 + intensity * 2)));
+  const blend = Math.min(0.48, 0.26 + intensity * 0.14);
+  const phase = Math.random() * Math.PI * 2;
+
+  if (axisIsX) {
+    for (let y = 0; y < height; y += 1) {
+      const wave = Math.sin((y / wavelength) * Math.PI * 2 + phase);
+      const shift = Math.floor(wave * amplitude * direction);
+      for (let x = 0; x < width; x += 1) {
+        const idx = (y * width + x) * 4;
+        const srcX = clamp(x + shift + randInt(-1, 1), 0, width - 1);
+        const srcIdx = (y * width + srcX) * 4;
+        data[idx] = anchoredBlend(data[idx], source[srcIdx], source[idx], blend, 6);
+        data[idx + 1] = anchoredBlend(data[idx + 1], source[srcIdx + 1], source[idx + 1], blend, 6);
+        data[idx + 2] = anchoredBlend(data[idx + 2], source[srcIdx + 2], source[idx + 2], blend, 6);
+      }
+    }
+    return;
+  }
+
+  for (let x = 0; x < width; x += 1) {
+    const wave = Math.sin((x / wavelength) * Math.PI * 2 + phase);
+    const shift = Math.floor(wave * amplitude * direction);
+    for (let y = 0; y < height; y += 1) {
+      const idx = (y * width + x) * 4;
+      const srcY = clamp(y + shift + randInt(-1, 1), 0, height - 1);
+      const srcIdx = (srcY * width + x) * 4;
+      data[idx] = anchoredBlend(data[idx], source[srcIdx], source[idx], blend, 6);
+      data[idx + 1] = anchoredBlend(data[idx + 1], source[srcIdx + 1], source[idx + 1], blend, 6);
+      data[idx + 2] = anchoredBlend(data[idx + 2], source[srcIdx + 2], source[idx + 2], blend, 6);
+    }
+  }
+}
+
+export function edgeLockedShardJitter({ data, source, width, height }, intensity = 1) {
+  const shardCount = Math.max(8, Math.floor(12 + intensity * 16));
+  const maxShift = Math.max(4, Math.floor(7 + intensity * 12));
+
+  for (let i = 0; i < shardCount; i += 1) {
+    const w = randInt(8, 26);
+    const h = randInt(8, 26);
+    const x0 = randInt(1, Math.max(1, width - w - 2));
+    const y0 = randInt(1, Math.max(1, height - h - 2));
+    const centerX = x0 + Math.floor(w / 2);
+    const centerY = y0 + Math.floor(h / 2);
+    const centerIdx = (centerY * width + centerX) * 4;
+    const rightIdx = (centerY * width + clamp(centerX + 1, 0, width - 1)) * 4;
+    const downIdx = (clamp(centerY + 1, 0, height - 1) * width + centerX) * 4;
+    const edgeScore = Math.abs(source[centerIdx] - source[rightIdx]) + Math.abs(source[centerIdx + 1] - source[downIdx + 1]);
+    if (edgeScore < 26) continue;
+
+    const sx = clamp(x0 + randInt(-maxShift, maxShift), 0, width - w);
+    const sy = clamp(y0 + randInt(-maxShift, maxShift), 0, height - h);
+    const blend = Math.min(0.52, 0.28 + intensity * 0.2);
+
+    for (let y = 0; y < h; y += 1) {
+      for (let x = 0; x < w; x += 1) {
+        const srcIdx = ((sy + y) * width + (sx + x)) * 4;
+        const dstIdx = ((y0 + y) * width + (x0 + x)) * 4;
+        data[dstIdx] = anchoredBlend(data[dstIdx], source[srcIdx], source[dstIdx], blend, 7);
+        data[dstIdx + 1] = anchoredBlend(data[dstIdx + 1], source[srcIdx + 1], source[dstIdx + 1], blend, 7);
+        data[dstIdx + 2] = anchoredBlend(data[dstIdx + 2], source[srcIdx + 2], source[dstIdx + 2], blend, 7);
+      }
+    }
+  }
+}
+
+export function temporalEchoPerChannel(
+  { data, source, width, height },
+  slices = 4,
+  spreadR = 10,
+  spreadG = 8,
+  spreadB = 12,
+  anchor = 0.3
+) {
+  for (let s = 0; s < slices; s += 1) {
+    const y = randInt(0, height - 1);
+    const h = randInt(8, 30);
+    const shiftR = randInt(-spreadR, spreadR);
+    const shiftG = randInt(-spreadG, spreadG);
+    const shiftB = randInt(-spreadB, spreadB);
+
+    for (let dy = 0; dy < h; dy += 1) {
+      const py = clamp(y + dy, 0, height - 1);
+      for (let x = 0; x < width; x += 1) {
+        const dstIdx = (py * width + x) * 4;
+        const rIdx = (py * width + clamp(x + shiftR, 0, width - 1)) * 4;
+        const gIdx = (py * width + clamp(x + shiftG, 0, width - 1)) * 4;
+        const bIdx = (py * width + clamp(x + shiftB, 0, width - 1)) * 4;
+        data[dstIdx] = Math.floor(data[dstIdx] * (0.54 - anchor * 0.25) + source[rIdx] * (0.46 - anchor * 0.16) + source[dstIdx] * anchor);
+        data[dstIdx + 1] = Math.floor(data[dstIdx + 1] * (0.54 - anchor * 0.25) + source[gIdx + 1] * (0.46 - anchor * 0.16) + source[dstIdx + 1] * anchor);
+        data[dstIdx + 2] = Math.floor(data[dstIdx + 2] * (0.54 - anchor * 0.25) + source[bIdx + 2] * (0.46 - anchor * 0.16) + source[dstIdx + 2] * anchor);
       }
     }
   }

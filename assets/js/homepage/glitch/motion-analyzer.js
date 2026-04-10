@@ -13,6 +13,35 @@ export class MotionAnalyzer {
     };
   }
 
+  normalizeMovementMeta(movementMeta) {
+    if (!movementMeta) return null;
+
+    const speedNorm = Math.min(1, movementMeta.speed / 1.2);
+    const distanceNorm = Math.min(1, movementMeta.distance / 120);
+    const turnNorm = Math.min(1, movementMeta.angleDelta / 1.8);
+    const accelNorm = Math.min(1, Math.abs(movementMeta.accel) / 0.02);
+    const burstNorm = Math.min(
+      1,
+      (movementMeta.turnBurst + movementMeta.jitterBurst + movementMeta.accelBurst + movementMeta.stopShock) / 14
+    );
+
+    const motionEnergy = Math.max(
+      0,
+      Math.min(1, speedNorm * 0.45 + distanceNorm * 0.2 + turnNorm * 0.12 + accelNorm * 0.13 + burstNorm * 0.1)
+    );
+
+    return {
+      ...movementMeta,
+      speedNorm,
+      distanceNorm,
+      turnNorm,
+      accelNorm,
+      burstNorm,
+      motionEnergy,
+      intensityMultiplier: 0.82 + motionEnergy * 0.78
+    };
+  }
+
   classifyMouseMotion(event) {
     const now = performance.now();
     const state = this.state;
@@ -75,17 +104,19 @@ export class MotionAnalyzer {
   }
 
   pickMoveProfile(movementMeta) {
-    if (!movementMeta) {
+    const normalizedMeta = this.normalizeMovementMeta(movementMeta);
+
+    if (!normalizedMeta) {
       return { type: 'move', meta: null };
     }
 
-    if (movementMeta.stopShock >= 1) return { type: 'moveStall', meta: movementMeta };
-    if (movementMeta.accelBurst >= 2) return { type: 'moveSurge', meta: movementMeta };
-    if (movementMeta.jitterBurst >= 2) return { type: 'moveJitter', meta: movementMeta };
-    if (movementMeta.turnBurst >= 2 && movementMeta.speed > 0.3) return { type: 'moveWhip', meta: movementMeta };
-    if (movementMeta.speed > 0.95 || movementMeta.distance > 80) return { type: 'moveSwipe', meta: movementMeta };
-    if (movementMeta.speed < 0.13 || movementMeta.distance < 6) return { type: 'moveDrift', meta: movementMeta };
+    if (normalizedMeta.stopShock >= 1) return { type: 'moveStall', meta: normalizedMeta };
+    if (normalizedMeta.accelBurst >= 2) return { type: 'moveSurge', meta: normalizedMeta };
+    if (normalizedMeta.jitterBurst >= 2) return { type: 'moveJitter', meta: normalizedMeta };
+    if (normalizedMeta.turnBurst >= 2 && normalizedMeta.speed > 0.3) return { type: 'moveWhip', meta: normalizedMeta };
+    if (normalizedMeta.speed > 0.95 || normalizedMeta.distance > 80) return { type: 'moveSwipe', meta: normalizedMeta };
+    if (normalizedMeta.speed < 0.13 || normalizedMeta.distance < 6) return { type: 'moveDrift', meta: normalizedMeta };
 
-    return { type: 'move', meta: movementMeta };
+    return { type: 'move', meta: normalizedMeta };
   }
 }

@@ -11,6 +11,12 @@ function weightedDirectionalChance(meta, axisTarget, directionTarget, favored = 
   return meta.direction === directionTarget ? favored : 1 - favored;
 }
 
+function effectIntensity(ctx, baseline = 1) {
+  const motion = Number.isFinite(ctx.meta?.intensityMultiplier) ? ctx.meta.intensityMultiplier : 1;
+  const variation = Number.isFinite(ctx.variationBoost) ? ctx.variationBoost : 1;
+  return baseline * motion * variation;
+}
+
 export function registerDefaultEffects(registry) {
   registry.register({
     id: 'drift-shear',
@@ -20,7 +26,8 @@ export function registerDefaultEffects(registry) {
     balance: 0,
     apply(ctx) {
       const { axis } = axisDirection(ctx.meta);
-      ops.displacePixels(ctx, 0.08 * ctx.quality.intensityScale, 3);
+      const intensity = effectIntensity(ctx);
+      ops.displacePixels(ctx, 0.08 * ctx.quality.intensityScale * Math.min(1.45, intensity), 3 + Math.floor(intensity * 1.2));
       if (axis === 'x') {
         ops.scanlineShear(ctx, 1 + Math.floor(Math.random() * 2), 7, 1);
       } else {
@@ -38,8 +45,11 @@ export function registerDefaultEffects(registry) {
     balance: 0,
     apply(ctx) {
       const { axis, direction } = axisDirection(ctx.meta);
-      const dx = axis === 'x' ? direction * (2 + Math.floor(Math.random() * 3)) : Math.floor(Math.random() * 4) - 2;
-      const dy = axis === 'y' ? direction * (1 + Math.floor(Math.random() * 2)) : 0;
+      const intensity = effectIntensity(ctx, 1.1);
+      const dx = axis === 'x'
+        ? direction * (2 + Math.floor(Math.random() * 3 + intensity * 1.6))
+        : Math.floor(Math.random() * 4) - 2;
+      const dy = axis === 'y' ? direction * (1 + Math.floor(Math.random() * 2 + intensity * 0.8)) : 0;
       ops.chromaBands(ctx, dx, dy, 2 + Math.floor(Math.random() * 3));
     }
   });
@@ -52,7 +62,8 @@ export function registerDefaultEffects(registry) {
     balance: 0,
     apply(ctx) {
       const { axis, direction } = axisDirection(ctx.meta);
-      ops.displacePixels(ctx, 0.14 * ctx.quality.intensityScale, 6);
+      const intensity = effectIntensity(ctx, 1.1);
+      ops.displacePixels(ctx, 0.14 * ctx.quality.intensityScale * Math.min(1.4, intensity), 6 + Math.floor(intensity * 2));
       ops.scanlineShear(ctx, 4 + Math.floor(Math.random() * 3), 20, 1);
       ops.frameSlip(ctx, axis === 'y' ? direction : (Math.random() < 0.5 ? -1 : 1));
       ops.chromaBands(ctx, axis === 'x' ? direction * 4 : 2, axis === 'y' ? direction * 3 : 0, 3);
@@ -66,9 +77,10 @@ export function registerDefaultEffects(registry) {
     chance: 1,
     balance: 0,
     apply(ctx) {
+      const intensity = effectIntensity(ctx, 1.05);
       ops.blockTears(ctx, 8 + Math.floor(Math.random() * 7));
       ops.scanlineShear(ctx, 5 + Math.floor(Math.random() * 3), 24, 1);
-      ops.chromaBands(ctx, Math.floor(Math.random() * 13) - 6, Math.floor(Math.random() * 7) - 3, 5);
+      ops.chromaBands(ctx, Math.floor(Math.random() * 13) - 6, Math.floor(Math.random() * 7) - 3, 5 + Math.floor(intensity * 1.5));
       if (Math.random() < 0.45) ops.lumaDropout(ctx, 1 + Math.floor(Math.random() * 3), 16, 40);
     }
   });
@@ -98,9 +110,10 @@ export function registerDefaultEffects(registry) {
     chance: 1,
     balance: 1,
     apply(ctx) {
+      const intensity = effectIntensity(ctx, 1.2);
       const { axis, direction } = axisDirection(ctx.meta);
       ops.digitalTearExpand(ctx);
-      ops.displacePixels(ctx, 0.2 * ctx.quality.intensityScale, 8);
+      ops.displacePixels(ctx, 0.2 * ctx.quality.intensityScale * Math.min(1.35, intensity), 8 + Math.floor(intensity * 2.5));
       ops.scanlineShear(ctx, 5 + Math.floor(Math.random() * 4), 26, 1);
       ops.chromaBands(ctx, axis === 'x' ? direction * 6 : 2, axis === 'y' ? direction * 5 : 1, 5);
     }
@@ -314,6 +327,77 @@ export function registerDefaultEffects(registry) {
     balance: 0,
     apply(ctx) {
       ops.ghostTrails(ctx, 1 + Math.floor(Math.random() * 2), 12);
+    }
+  });
+
+  registry.register({
+    id: 'channel-fracture',
+    label: 'Directional Channel Fracture',
+    cost: 2,
+    chance: 0.96,
+    minTier: 'balanced',
+    balance: 0,
+    apply(ctx) {
+      const { axis, direction } = axisDirection(ctx.meta);
+      const intensity = effectIntensity(ctx, 1.25);
+      ops.directionalChannelFracture(ctx, axis, direction, Math.min(1.9, intensity));
+      if (Math.random() < 0.48) {
+        ops.chromaBands(
+          ctx,
+          axis === 'x' ? direction * (2 + Math.floor(intensity * 2)) : 1,
+          axis === 'y' ? direction * (1 + Math.floor(intensity * 2)) : 0,
+          2 + Math.floor(Math.random() * 3)
+        );
+      }
+    }
+  });
+
+  registry.register({
+    id: 'wave-tear',
+    label: 'Wave Scan Tear',
+    cost: 3,
+    chance: 0.9,
+    minTier: 'balanced',
+    balance: 0,
+    apply(ctx) {
+      const { axis, direction } = axisDirection(ctx.meta);
+      const intensity = effectIntensity(ctx, 1.18);
+      ops.waveScanTear(ctx, axis, direction, Math.min(1.8, intensity));
+      ops.scanlineShear(ctx, 3 + Math.floor(Math.random() * 3), 16 + Math.floor(intensity * 8), 1);
+    }
+  });
+
+  registry.register({
+    id: 'edge-shard-jitter',
+    label: 'Edge Locked Shard Jitter',
+    cost: 2,
+    chance: 0.92,
+    minTier: 'balanced',
+    balance: 0,
+    apply(ctx) {
+      const intensity = effectIntensity(ctx, 1.2);
+      ops.edgeLockedShardJitter(ctx, Math.min(1.95, intensity));
+      if (Math.random() < 0.42) ops.tileShatter(ctx, 8 + Math.floor(intensity * 7), 12);
+    }
+  });
+
+  registry.register({
+    id: 'per-channel-echo',
+    label: 'Per Channel Temporal Echo',
+    cost: 2,
+    chance: 0.9,
+    minTier: 'balanced',
+    balance: 0,
+    apply(ctx) {
+      const intensity = effectIntensity(ctx, 1.05);
+      ops.temporalEchoPerChannel(
+        ctx,
+        3 + Math.floor(Math.random() * 3),
+        8 + Math.floor(intensity * 5),
+        6 + Math.floor(intensity * 4),
+        10 + Math.floor(intensity * 6),
+        0.28
+      );
     }
   });
 

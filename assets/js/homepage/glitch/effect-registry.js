@@ -28,6 +28,24 @@ const VERTICAL_CUT_EFFECTS = new Set([
   'cut-vertical-sink'
 ]);
 
+const HIGH_ENERGY_EFFECTS = new Set([
+  'surge-overdrive',
+  'whip-burst',
+  'impact-fracture',
+  'swipe-tear',
+  'wave-tear',
+  'channel-fracture',
+  'edge-shard-jitter'
+]);
+
+const STABLE_ANCHOR_EFFECTS = new Set([
+  'temporal-echo',
+  'per-channel-echo',
+  'drift-shear',
+  'ambient-flicker',
+  'directional-exposure'
+]);
+
 export class EffectRegistry {
   constructor() {
     this.effects = new Map();
@@ -84,6 +102,7 @@ export class PipelineResolver {
 
     const meta = options?.meta || null;
     const balanceTrend = Number.isFinite(options?.balanceTrend) ? options.balanceTrend : 0;
+    const motionEnergy = Number.isFinite(meta?.motionEnergy) ? Math.max(0, Math.min(1, meta.motionEnergy)) : null;
 
     const resolved = [];
     const available = sourcePipeline.slice();
@@ -125,6 +144,15 @@ export class PipelineResolver {
           const darkTrend = Math.abs(balanceTrend);
           if (BRIGHT_EFFECTS.has(entry.id)) multiplier *= 1 + Math.min(0.7, darkTrend * 0.9);
           if (DARK_EFFECTS.has(entry.id)) multiplier *= Math.max(0.45, 1 - Math.min(0.65, darkTrend * 0.75));
+        }
+
+        if (motionEnergy !== null) {
+          if (HIGH_ENERGY_EFFECTS.has(entry.id)) {
+            multiplier *= 0.7 + motionEnergy * 1.3;
+          }
+          if (STABLE_ANCHOR_EFFECTS.has(entry.id)) {
+            multiplier *= 1.2 - motionEnergy * 0.35;
+          }
         }
 
         const adjustedWeight = Math.max(0.01, (entry.weight || 0) * multiplier);

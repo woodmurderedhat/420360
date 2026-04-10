@@ -11,17 +11,20 @@ export const PIPELINE_PRESETS = {
     move: [
       { id: 'drift-shear', weight: 1.4 },
       { id: 'chroma-banding', weight: 1.1 },
+      { id: 'channel-fracture', weight: 0.95 },
       { id: 'edge-crawl', weight: 0.9 },
       { id: 'edge-sink', weight: 0.8 },
       { id: 'directional-exposure', weight: 1.1 }
     ],
     moveSwipe: [
       { id: 'swipe-tear', weight: 1.2 },
+      { id: 'wave-tear', weight: 1.0 },
       { id: 'ribbon-desync', weight: 1.0 },
       { id: 'ghost-trails', weight: 0.8 }
     ],
     moveWhip: [
       { id: 'whip-burst', weight: 1.4 },
+      { id: 'channel-fracture', weight: 0.9 },
       { id: 'tile-shatter', weight: 0.8 }
     ],
     moveJitter: [
@@ -36,8 +39,10 @@ export const PIPELINE_PRESETS = {
     ],
     moveSurge: [
       { id: 'surge-overdrive', weight: 1.3 },
+      { id: 'wave-tear', weight: 1.0 },
       { id: 'ribbon-desync', weight: 1.0 },
       { id: 'temporal-echo', weight: 0.9 },
+      { id: 'per-channel-echo', weight: 0.95 },
       { id: 'cut-horizontal-burn', weight: 0.7 },
       { id: 'cut-horizontal-sink', weight: 0.7 },
       { id: 'cut-vertical-burn', weight: 0.7 },
@@ -53,6 +58,7 @@ export const PIPELINE_PRESETS = {
     ],
     click: [
       { id: 'impact-fracture', weight: 1.4 },
+      { id: 'edge-shard-jitter', weight: 1.05 },
       { id: 'ghost-trails', weight: 1.0 },
       { id: 'temporal-echo', weight: 0.8 }
     ],
@@ -67,6 +73,7 @@ export const PIPELINE_PRESETS = {
     ambient: [
       { id: 'ambient-flicker', weight: 1.1 },
       { id: 'temporal-echo', weight: 0.7 },
+      { id: 'per-channel-echo', weight: 0.75 },
       { id: 'edge-crawl', weight: 0.7 },
       { id: 'edge-sink', weight: 0.7 },
       { id: 'directional-exposure', weight: 0.8 }
@@ -76,6 +83,8 @@ export const PIPELINE_PRESETS = {
     move: [
       { id: 'surge-overdrive', weight: 1.0 },
       { id: 'whip-burst', weight: 1.0 },
+      { id: 'channel-fracture', weight: 1.0 },
+      { id: 'wave-tear', weight: 0.95 },
       { id: 'jitter-grid', weight: 1.0 },
       { id: 'ribbon-desync', weight: 0.8 },
       { id: 'directional-exposure', weight: 1.0 },
@@ -87,11 +96,13 @@ export const PIPELINE_PRESETS = {
     moveSwipe: [
       { id: 'swipe-tear', weight: 1.1 },
       { id: 'surge-overdrive', weight: 1.1 },
+      { id: 'wave-tear', weight: 1.05 },
       { id: 'tile-shatter', weight: 0.9 }
     ],
     moveWhip: [
       { id: 'whip-burst', weight: 1.2 },
       { id: 'impact-fracture', weight: 1.0 },
+      { id: 'edge-shard-jitter', weight: 0.95 },
       { id: 'ribbon-desync', weight: 0.8 }
     ],
     moveJitter: [
@@ -106,7 +117,9 @@ export const PIPELINE_PRESETS = {
     ],
     moveSurge: [
       { id: 'surge-overdrive', weight: 1.4 },
+      { id: 'channel-fracture', weight: 1.05 },
       { id: 'impact-fracture', weight: 1.0 },
+      { id: 'wave-tear', weight: 1.0 },
       { id: 'temporal-echo', weight: 0.8 }
     ],
     moveStall: [
@@ -121,6 +134,7 @@ export const PIPELINE_PRESETS = {
     click: [
       { id: 'impact-fracture', weight: 1.2 },
       { id: 'surge-overdrive', weight: 1.0 },
+      { id: 'edge-shard-jitter', weight: 1.0 },
       { id: 'ghost-trails', weight: 1.0 }
     ],
     scrollUp: [
@@ -136,6 +150,7 @@ export const PIPELINE_PRESETS = {
       { id: 'edge-crawl', weight: 0.9 },
       { id: 'edge-sink', weight: 0.9 },
       { id: 'temporal-echo', weight: 0.9 },
+      { id: 'per-channel-echo', weight: 0.85 },
       { id: 'directional-exposure', weight: 0.9 }
     ]
   },
@@ -221,7 +236,7 @@ export const MOUSE_LOCAL_DEFAULTS = {
 };
 
 export const MOUSE_LOCAL_TIER_PARAMS = {
-  low: { radius: 42, budgetFraction: 0.04, cascades: 2, intensity: 0.72 },
-  balanced: { radius: 92, budgetFraction: 0.085, cascades: 3, intensity: 1.05 },
-  high: { radius: 132, budgetFraction: 0.13, cascades: 4, intensity: 1.2 }
+  low: { radius: 42, budgetFraction: 0.038, cascades: 2, intensity: 0.72 },
+  balanced: { radius: 96, budgetFraction: 0.08, cascades: 3, intensity: 1.12 },
+  high: { radius: 124, budgetFraction: 0.115, cascades: 4, intensity: 1.25 }
 };

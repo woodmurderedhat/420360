@@ -177,10 +177,13 @@ export class MouseLocalGlitch {
     const cx = clamp(Math.floor(mouse.x), 0, width - 1);
     const cy = clamp(Math.floor(mouse.y), 0, height - 1);
 
-    const speedBoost = Number.isFinite(meta?.speed)
-      ? Math.min(1.45, 0.92 + meta.speed / 1600)
+    const speedBoost = Number.isFinite(meta?.speedNorm)
+      ? Math.min(1.5, 0.9 + meta.speedNorm * 0.62)
       : 1;
-    const intensity = tier.intensity * this.intensityMultiplier * speedBoost;
+    const energyBoost = Number.isFinite(meta?.motionEnergy)
+      ? 0.94 + meta.motionEnergy * 0.7
+      : 1;
+    const intensity = tier.intensity * this.intensityMultiplier * speedBoost * energyBoost;
     const radius = clamp(Math.floor(tier.radius * this.radiusMultiplier * speedBoost), 20, 260);
     const squareRadius = Math.max(10, Math.floor(radius * 0.5));
     const framePixels = width * height;
@@ -201,7 +204,7 @@ export class MouseLocalGlitch {
       pixelBudget: colorBudget,
       useSource: true,
       shape: 'square',
-      hardEdge: true
+      hardEdge: false
     });
 
     cascadingPixelSmear(sourceContext, cx, cy, squareRadius, {

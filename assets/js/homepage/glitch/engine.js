@@ -10,6 +10,61 @@ function tierIndex(label) {
   return Math.max(0, TIER_ORDER.indexOf(label));
 }
 
+const COVERAGE_TRIGGER_ORDER = [
+  'move',
+  'moveSwipe',
+  'moveWhip',
+  'moveJitter',
+  'moveSurge',
+  'moveStall',
+  'click',
+  'scrollUp',
+  'scrollDown',
+  'ambient'
+];
+
+function clonePipelines(pipelines) {
+  const cloned = {};
+  COVERAGE_TRIGGER_ORDER.forEach((triggerType) => {
+    const lane = pipelines?.[triggerType];
+    cloned[triggerType] = Array.isArray(lane) ? lane.map((entry) => ({ ...entry })) : [];
+  });
+  return cloned;
+}
+
+function fallbackTriggerForEffect(effectId) {
+  if (effectId === 'scroll-up-rake') return 'scrollUp';
+  if (effectId === 'scroll-down-sink') return 'scrollDown';
+  if (effectId === 'impact-fracture') return 'click';
+  if (effectId.includes('swipe')) return 'moveSwipe';
+  if (effectId.includes('whip')) return 'moveWhip';
+  if (effectId.includes('jitter')) return 'moveJitter';
+  if (effectId.includes('surge')) return 'moveSurge';
+  if (effectId.includes('stall')) return 'moveStall';
+  if (effectId.includes('ambient')) return 'ambient';
+  return 'move';
+}
+
+function ensurePresetCoverage(pipelines, registeredEffects) {
+  const covered = clonePipelines(pipelines);
+  const present = new Set();
+
+  COVERAGE_TRIGGER_ORDER.forEach((triggerType) => {
+    covered[triggerType].forEach((entry) => {
+      if (entry?.id) present.add(entry.id);
+    });
+  });
+
+  registeredEffects.forEach((effect) => {
+    if (!effect?.id || present.has(effect.id)) return;
+    const triggerType = fallbackTriggerForEffect(effect.id);
+    covered[triggerType].push({ id: effect.id, weight: 0.2 });
+    present.add(effect.id);
+  });
+
+  return covered;
+}
+
 export class PixelGlitchEngineV2 {
   constructor({ canvasId, imageUrl, preset = 'cinematic' }) {
     this.surface = new CanvasSurface(canvasId, imageUrl);
@@ -32,6 +87,9 @@ export class PixelGlitchEngineV2 {
     this.glitchThrottle = 80;
     this.lastGlitchTime = 0;
     this.brightnessTrend = 0;
+    this.fidelityStrength = 0.34;
+    this.aggressiveVariation = true;
+    this.lastDriftMetric = 0;
     this.activeTier = this.computeTier();
     this.autoTiering = true;
     this.onResize = this.onResize.bind(this);
@@ -41,7 +99,8 @@ export class PixelGlitchEngineV2 {
   setPreset(presetName) {
     const preset = PIPELINE_PRESETS[presetName] || PIPELINE_PRESETS.cinematic;
     this.presetName = PIPELINE_PRESETS[presetName] ? presetName : 'cinematic';
-    this.pipelines.setPipelines(preset);
+    const coveredPreset = ensurePresetCoverage(preset, this.registry.list());
+    this.pipelines.setPipelines(coveredPreset);
   }
 
   computeTier() {
@@ -153,6 +212,7 @@ export class PixelGlitchEngineV2 {
       quality: this.activeTier,
       triggerType,
       meta,
+      variationBoost: this.aggressiveVariation ? 1.22 : 1,
       mouse: { x: this.mouseX, y: this.mouseY }
     };
 
@@ -185,6 +245,7 @@ export class PixelGlitchEngineV2 {
     this.brightnessTrend = Math.max(-2, Math.min(2, this.brightnessTrend * 0.86 + frameBalance * 0.22));
 
     this.localGlitch.apply(context);
+    this.applyPaletteStabilization(context);
 
     this.surface.putFrame(frame.region);
     this.isProcessing = false;
@@ -250,6 +311,60 @@ export class PixelGlitchEngineV2 {
     this.localGlitch.setEnabled(enabled);
   }
 
+  setFidelityStrength(value) {
+    if (!Number.isFinite(value)) return;
+    this.fidelityStrength = Math.max(0, Math.min(1, value));
+  }
+
+  setAggressiveVariation(enabled) {
+    this.aggressiveVariation = !!enabled;
+  }
+
+  applyPaletteStabilization(context) {
+    const source = context.pristineSource || context.source;
+    if (!source) return;
+
+    const { data, width, height } = context;
+    const probeStride = 32;
+    let totalDrift = 0;
+    let samples = 0;
+
+    for (let y = 0; y < height; y += probeStride) {
+      for (let x = 0; x < width; x += probeStride) {
+        const idx = (y * width + x) * 4;
+        totalDrift += Math.abs(data[idx] - source[idx]);
+        totalDrift += Math.abs(data[idx + 1] - source[idx + 1]);
+        totalDrift += Math.abs(data[idx + 2] - source[idx + 2]);
+        samples += 3;
+      }
+    }
+
+    if (!samples) return;
+    const drift = totalDrift / samples;
+    this.lastDriftMetric = drift;
+
+    const threshold = 24;
+    if (drift < threshold || this.fidelityStrength <= 0) return;
+
+    const tier = context.quality?.label || 'balanced';
+    const tierScale = tier === 'low' ? 0.95 : tier === 'high' ? 0.82 : 0.88;
+    const severity = Math.min(1, (drift - threshold) / 70);
+    const blend = Math.min(0.36, (0.08 + severity * 0.26) * this.fidelityStrength * tierScale);
+
+    const step = drift > 62 ? 2 : 3;
+    const xPhase = Math.floor(Math.random() * step);
+    const yPhase = Math.floor(Math.random() * step);
+
+    for (let y = yPhase; y < height; y += step) {
+      for (let x = xPhase; x < width; x += step) {
+        const idx = (y * width + x) * 4;
+        data[idx] = Math.floor(data[idx] * (1 - blend) + source[idx] * blend);
+        data[idx + 1] = Math.floor(data[idx + 1] * (1 - blend) + source[idx + 1] * blend);
+        data[idx + 2] = Math.floor(data[idx + 2] * (1 - blend) + source[idx + 2] * blend);
+      }
+    }
+  }
+
   destroy() {
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('mousemove', this.onMouseMove);
@@ -264,6 +379,9 @@ export class PixelGlitchEngineV2 {
       brightnessTrend: this.brightnessTrend,
       autoTiering: this.autoTiering,
       mouseLocal: this.localGlitch.getDiagnostics(),
+      fidelityStrength: this.fidelityStrength,
+      aggressiveVariation: this.aggressiveVariation,
+      lastDriftMetric: this.lastDriftMetric,
       registeredEffects: this.registry.list().map((effect) => effect.id),
       isInitialized: this.isInitialized
     };

@@ -318,6 +318,7 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
 
   // ── Palette editor (double-click to edit slot color) ──────────────────────
   loadPersistedPalette();
+  updateColorUI();
 
   const paletteEditInput = document.getElementById("paletteColorEdit");
   let editingBtn = null;
@@ -326,8 +327,7 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     paletteEditInput.addEventListener("change", () => {
       if (!editingBtn) return;
       const newColor = paletteEditInput.value.toUpperCase();
-      editingBtn.dataset.paletteColor = newColor;
-      editingBtn.style.backgroundColor = newColor;
+      applyPaletteButtonColor(editingBtn, newColor);
       persistPalette();
       editingBtn = null;
     });
@@ -384,6 +384,14 @@ function selectTool(toolManager, button, toolName) {
   toolManager.setActiveTool(toolName);
 }
 
+function colorBrightness(hex) {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000;
+}
+
 function updateColorUI() {
   const colorPicker = document.getElementById("colorPicker");
   const colorSwatch = document.getElementById("currentColorSwatch");
@@ -392,12 +400,16 @@ function updateColorUI() {
   if (colorSwatch) {
     colorSwatch.textContent = state.selectedColor;
     colorSwatch.style.backgroundColor = state.selectedColor;
+    colorSwatch.style.color = colorBrightness(state.selectedColor) > 145 ? "#111827" : "#e7cfb5";
   }
 
-  // Update palette button active states
+  // Update palette button active states and text contrast
   document.querySelectorAll(".palette-btn").forEach((btn) => {
     const btnColor = (btn.dataset.paletteColor || "").toUpperCase();
     btn.classList.toggle("active", btnColor === state.selectedColor.toUpperCase());
+    if (btnColor) {
+      btn.style.color = colorBrightness(btnColor) > 145 ? "#111827" : "#e7cfb5";
+    }
   });
 }
 
@@ -438,6 +450,7 @@ function renderLayersList() {
       e.stopPropagation();
       layer.visible = !layer.visible;
       renderLayersList();
+      renderer.render();
     });
 
     // Layer opacity slider with optimized rendering
@@ -790,7 +803,19 @@ function persistPalette() {
   }
 }
 
+function applyPaletteButtonColor(btn, color) {
+  btn.dataset.paletteColor = color;
+  btn.style.backgroundColor = color;
+  btn.style.color = colorBrightness(color) > 145 ? "#111827" : "#e7cfb5";
+}
+
 function loadPersistedPalette() {
+  // Always apply data-palette-color first so colors show even with empty localStorage
+  document.querySelectorAll(".palette-btn").forEach((btn) => {
+    if (btn.dataset.paletteColor) {
+      applyPaletteButtonColor(btn, btn.dataset.paletteColor);
+    }
+  });
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.paletteColors);
     if (!raw) return;
@@ -800,8 +825,7 @@ function loadPersistedPalette() {
     btns.forEach((btn, i) => {
       const color = (colors[i] || "").toUpperCase();
       if (/^#[0-9A-F]{6}$/.test(color)) {
-        btn.dataset.paletteColor = color;
-        btn.style.backgroundColor = color;
+        applyPaletteButtonColor(btn, color);
       }
     });
   } catch {

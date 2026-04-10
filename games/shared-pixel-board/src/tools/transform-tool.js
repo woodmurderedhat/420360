@@ -11,72 +11,49 @@ import {
 } from "../core/math.js";
 
 export function createTransformTool(toolManager, renderer) {
+  function applyTransform(type) {
+    const layer = state.getActiveLayer();
+    if (!layer) return;
+
+    let transformedPixels = null;
+    switch (type) {
+      case "flipH":     transformedPixels = flipLayerHorizontal(layer.pixels); break;
+      case "flipV":     transformedPixels = flipLayerVertical(layer.pixels);   break;
+      case "rotateCW":  transformedPixels = rotateLayer90CW(layer.pixels);     break;
+      case "rotateCCW": transformedPixels = rotateLayer90CCW(layer.pixels);    break;
+      default: return;
+    }
+
+    if (!transformedPixels) return;
+
+    const previousPixels = new Map(layer.pixels);
+    layer.pixels = transformedPixels;
+
+    state.pushHistory({
+      id: Date.now(),
+      timestamp: new Date(),
+      layerId: layer.id,
+      tool: "transform",
+      previousPixels,
+      pixels: transformedPixels
+    });
+
+    renderer.render();
+    state.emit("notice", { message: "Transform applied", ok: true });
+  }
+
   return {
     name: "transform",
+    applyTransform,
 
     async onPointerDown(x, y, event) {
-      this.showTransformMenu(renderer);
+      // Transforms are applied via the Tool Options panel buttons
     },
 
-    onPointerMove(x, y, event) {
-      // No preview
-    },
+    onPointerMove(x, y, event) {},
 
-    async onPointerUp(x, y, event) {
-      // No-op
-    },
+    async onPointerUp(x, y, event) {},
 
-    showTransformMenu(renderer) {
-      const choice = prompt(
-        "Transform:\n1=Flip H\n2=Flip V\n3=Rotate 90 CW\n4=Rotate 90 CCW\n(Enter 1-4):",
-        "1"
-      );
-
-      if (!choice) return;
-
-      const layer = state.getActiveLayer();
-      let transformedPixels = null;
-
-      switch (choice) {
-        case "1":
-          transformedPixels = flipLayerHorizontal(layer.pixels);
-          break;
-        case "2":
-          transformedPixels = flipLayerVertical(layer.pixels);
-          break;
-        case "3":
-          transformedPixels = rotateLayer90CW(layer.pixels);
-          break;
-        case "4":
-          transformedPixels = rotateLayer90CCW(layer.pixels);
-          break;
-        default:
-          state.emit("notice", { message: "Invalid transform", ok: false });
-          return;
-      }
-
-      if (transformedPixels) {
-        const previousPixels = new Map(layer.pixels);
-        layer.pixels = transformedPixels;
-
-        // Create history entry
-        const historyEntry = {
-          id: Date.now(),
-          timestamp: new Date(),
-          layerId: layer.id,
-          tool: "transform",
-          previousPixels,
-          pixels: transformedPixels
-        };
-
-        state.pushHistory(historyEntry);
-        renderer.render();
-        state.emit("notice", { message: "Transform applied", ok: true });
-      }
-    },
-
-    cancel() {
-      // No-op
-    }
+    cancel() {}
   };
 }

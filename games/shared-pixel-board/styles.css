@@ -217,12 +217,19 @@ body {
   position: relative;
   background: #0a0a0a;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .canvas-wrap.panning {
   cursor: grabbing;
+}
+
+.canvas-inner {
+  position: relative;
+  flex-shrink: 0;
+  display: block;
+  line-height: 0;
 }
 
 .pixel-canvas {

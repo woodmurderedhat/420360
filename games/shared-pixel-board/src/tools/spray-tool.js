@@ -75,7 +75,11 @@ export function createSprayTool(toolManager, renderer) {
 
       for (const particle of particles) {
         if (validCoordinates(particle.x, particle.y)) {
-          this.cellsInSpray.add(`${particle.x}_${particle.y}`);
+          const key = `${particle.x}_${particle.y}`;
+          if (!this.cellsInSpray.has(key)) {
+            this.cellsInSpray.add(key);
+            renderer.drawPixel(particle.x, particle.y, state.selectedColor);
+          }
         }
       }
     },

@@ -23,9 +23,12 @@ export function createEraserTool(toolManager, renderer) {
       const cells = buildBrushStamp(x, y, state.brushSize);
       for (const cell of cells) {
         if (validCoordinates(cell.x, cell.y)) {
-          this.cellsInStroke.add(`${cell.x}_${cell.y}`);
+          const key = `${cell.x}_${cell.y}`;
+          this.cellsInStroke.add(key);
+          renderer.drawPixel(cell.x, cell.y, DEFAULT_COLOR);
         }
       }
+      renderer.renderBrushPreview(x, y, state.brushSize, DEFAULT_COLOR);
     },
 
     onPointerMove(x, y, event) {
@@ -43,7 +46,7 @@ export function createEraserTool(toolManager, renderer) {
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < 1) {
-        renderer.renderBrushPreview(x, y, state.brushSize, "#888888");
+        renderer.renderBrushPreview(x, y, state.brushSize, DEFAULT_COLOR);
         return;
       }
 
@@ -56,21 +59,25 @@ export function createEraserTool(toolManager, renderer) {
         const cells = buildBrushStamp(px, py, state.brushSize);
         for (const cell of cells) {
           if (validCoordinates(cell.x, cell.y)) {
-            this.cellsInStroke.add(`${cell.x}_${cell.y}`);
+            const key = `${cell.x}_${cell.y}`;
+            if (!this.cellsInStroke.has(key)) {
+              this.cellsInStroke.add(key);
+              renderer.drawPixel(cell.x, cell.y, DEFAULT_COLOR);
+            }
           }
         }
       }
 
       this.lastPoint = { x, y };
-      renderer.clearOverlay();
+      renderer.renderBrushPreview(x, y, state.brushSize, DEFAULT_COLOR);
     },
 
     async onPointerUp(x, y, event) {
       if (!this.strokeActive) return;
 
       const cells = Array.from(this.cellsInStroke).map((key) => {
-        const [x, y] = key.split("_").map(Number);
-        return { x, y };
+        const [cx, cy] = key.split("_").map(Number);
+        return { x: cx, y: cy };
       });
 
       toolManager.commitPixels(cells, DEFAULT_COLOR);

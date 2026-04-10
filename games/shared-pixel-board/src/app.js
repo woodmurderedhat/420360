@@ -296,11 +296,11 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     const canvasWrap = document.getElementById("canvasWrap");
     if (canvasWrap) canvasWrap.dataset.activeTool = data.tool;
     // Re-render dynamic tool options panel
-    renderToolOptions(data.tool, renderer);
+    renderToolOptions(data.tool, renderer, toolManager);
   });
 
   state.on("brushSizeChanged", (data) => {
-    renderToolOptions(state.activeTool, renderer);
+    renderToolOptions(state.activeTool, renderer, toolManager);
   });
 
   state.on("historyChanged", (data) => {
@@ -366,7 +366,7 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
   }
 
   // ── Initial tool options render ────────────────────────────────────────────
-  renderToolOptions(state.activeTool, renderer);
+  renderToolOptions(state.activeTool, renderer, toolManager);
 
   // ── Set initial cursor data attribute ─────────────────────────────────────
   const canvasWrapEl = document.getElementById("canvasWrap");
@@ -538,7 +538,7 @@ function setupLayerControls() {
 // DYNAMIC TOOL OPTIONS PANEL
 // ============================================================================
 
-function renderToolOptions(toolName, rendererRef) {
+function renderToolOptions(toolName, rendererRef, toolManagerRef) {
   const container = document.getElementById("toolOptionsContent");
   if (!container) return;
   container.innerHTML = "";
@@ -744,8 +744,29 @@ function renderToolOptions(toolName, rendererRef) {
     case "transform": {
       const desc = document.createElement("p");
       desc.className = "tool-desc";
-      desc.textContent = "Click canvas to flip or rotate active layer. Choose: 1=Flip H, 2=Flip V, 3=Rotate 90° CW, 4=Rotate 90° CCW.";
+      desc.textContent = "Apply a transform to the active layer.";
       container.appendChild(desc);
+
+      const transforms = [
+        { type: "flipH",     icon: "↔", label: "Flip H"   },
+        { type: "flipV",     icon: "↕", label: "Flip V"   },
+        { type: "rotateCW",  icon: "↻", label: "Rot CW"   },
+        { type: "rotateCCW", icon: "↺", label: "Rot CCW"  },
+      ];
+      const grid = document.createElement("div");
+      grid.className = "stamp-patterns";
+      for (const t of transforms) {
+        const btn = document.createElement("button");
+        btn.className = "stamp-pattern-btn";
+        btn.title = t.label;
+        btn.textContent = t.icon;
+        btn.addEventListener("click", () => {
+          const tool = toolManagerRef && toolManagerRef.getActiveTool();
+          if (tool && tool.applyTransform) tool.applyTransform(t.type);
+        });
+        grid.appendChild(btn);
+      }
+      container.appendChild(grid);
       container.appendChild(makeGridToggle());
       break;
     }

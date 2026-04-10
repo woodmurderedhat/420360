@@ -14,6 +14,11 @@ import { ZOOM_CONFIG, PAN_STEP_PX, SPECTATOR_MODE } from "../config/constants.js
 
 class EventManager {
   constructor(canvas, canvasWrap, renderer, toolManager) {
+    // Validate dependencies
+    if (!canvas || !canvasWrap || !renderer || !toolManager) {
+      throw new Error("EventManager: Missing required dependencies");
+    }
+
     this.canvas = canvas;
     this.canvasWrap = canvasWrap;
     this.renderer = renderer;

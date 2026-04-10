@@ -42,6 +42,9 @@ import {
 // Firebase database reference (set after initialization)
 let firebaseDb = null;
 
+// Renderer instance (set during initialization, needed by module-level UI helpers)
+let renderer = null;
+
 // ============================================================================
 // FIREBASE UTILITY FUNCTIONS
 // ============================================================================
@@ -73,6 +76,11 @@ async function initializeApplication() {
   try {
     console.log("🎨 Initializing Shared Pixel Board...");
 
+    // Validate DOM is ready
+    if (document.readyState === "loading") {
+      throw new Error("DOM not fully loaded");
+    }
+
     // Get DOM elements
     const canvas = document.getElementById("pixelCanvas");
     const overlayCanvas = document.getElementById("overlayCanvas");
@@ -87,7 +95,7 @@ async function initializeApplication() {
     }
 
     // Initialize canvas renderer
-    const renderer = new CanvasRenderer(canvas, overlayCanvas, state);
+    renderer = new CanvasRenderer(canvas, overlayCanvas, state);
     console.log("✓ Canvas renderer initialized");
 
     // Initialize tool manager
@@ -143,6 +151,10 @@ async function initializeApplication() {
   } catch (error) {
     console.error("❌ Initialization failed:", error);
     state.emit("notice", { message: `Init error: ${error.message}`, ok: false });
+    // Re-throw to prevent silent failures
+    if (error.message.includes("DOM not fully")) {
+      console.error("Critical: DOM initialization failed");
+    }
   }
 }
 

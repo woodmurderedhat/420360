@@ -92,7 +92,6 @@ class ToolManager {
     }
 
     // Update hover status
-    const layer = state.getActiveLayer();
     const color = state.getPixelAt(x, y);
     state.emit("hoverChanged", { x, y, color });
   }
@@ -201,10 +200,15 @@ class ToolManager {
   }
 
   /**
-   * Commit pixels to layer history
+   * Commit pixels to layer history with validation
    */
   commitPixels(cells, color, layerId = state.activeLayerId) {
-    const layer = state.layers.find((l) => l.id === layerId);
+    // Validate inputs
+    if (!cells || !Array.isArray(cells) || cells.length === 0) return;
+    if (!color || typeof color !== "string") return;
+    if (!/^#[0-9A-F]{6}$/i.test(color)) return;
+
+    const layer = state.layers.find((l) => l && l.id === layerId);
     if (!layer) return;
 
     const previousPixels = new Map();

@@ -93,9 +93,14 @@ class CanvasRenderer {
    * Render complete board from all layers
    */
   render() {
-    // Clear canvas
-    this.ctx.fillStyle = DEFAULT_COLOR;
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    // Safety checks
+    if (!this.ctx || !this.state) return;
+    if (!Array.isArray(this.state.layers)) return;
+
+    try {
+      // Clear canvas
+      this.ctx.fillStyle = DEFAULT_COLOR;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Composite visible layers
     for (const layer of this.state.layers) {
@@ -123,9 +128,12 @@ class CanvasRenderer {
     this.ctx.globalAlpha = 1;
     this.ctx.globalCompositeOperation = "source-over";
 
-    // Draw grid if enabled
-    if (this.state.gridEnabled) {
-      this.drawGrid();
+      // Draw grid if enabled
+      if (this.state.gridEnabled) {
+        this.drawGrid();
+      }
+    } catch (err) {
+      console.error("Render error:", err);
     }
   }
 

@@ -98,24 +98,56 @@ export const BLEND_MODES = [
   "color-burn"
 ];
 
-// Default tool options per tool
-export const TOOL_OPTIONS_DEFAULTS = {
-  [TOOLS.PIXEL]: { size: 1 },
-  [TOOLS.BRUSH]: { size: 2, opacity: 1 },
-  [TOOLS.ERASER]: { size: 2, opacity: 1 },
-  [TOOLS.SPRAY]: { radius: 5, density: 3, particleCount: 10 },
-  [TOOLS.PICKER]: { sampleLayer: "active" },
-  [TOOLS.LINE]: { snap: false },
-  [TOOLS.FILL]: { cap: FILL_PIXEL_CAP, tolerance: 0 },
-  [TOOLS.TEXT]: { fontSize: 8, fontFamily: "monospace", bold: false, italic: false },
-  [TOOLS.STAMP]: { selectedPattern: "square" },
-  [TOOLS.TRANSFORM]: { operation: "flipH", targetLayer: "active" }
+// Stamp patterns (offset cells relative to click point)
+export const STAMP_PATTERNS = {
+  square: {
+    cells: [
+      { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 },
+      { x: -1, y:  0 }, { x: 0, y:  0 }, { x: 1, y:  0 },
+      { x: -1, y:  1 }, { x: 0, y:  1 }, { x: 1, y:  1 }
+    ]
+  },
+  circle: {
+    cells: [
+                        { x: 0, y: -2 },
+      { x: -1, y: -1 }, { x: 0, y: -1 }, { x: 1, y: -1 },
+      { x: -2, y:  0 }, { x: -1, y:  0 }, { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 },
+      { x: -1, y:  1 }, { x: 0, y:  1 }, { x: 1, y:  1 },
+                        { x: 0, y:  2 }
+    ]
+  },
+  cross: {
+    cells: [
+                        { x: 0, y: -2 },
+                        { x: 0, y: -1 },
+      { x: -2, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 },
+                        { x: 0, y:  1 },
+                        { x: 0, y:  2 }
+    ]
+  },
+  star: {
+    cells: [
+      { x: -1, y: -2 }, { x: 0, y: -2 }, { x: 1, y: -2 },
+      { x: -2, y: -1 }, { x: 0, y: -1 }, { x: 2, y: -1 },
+      { x: -2, y:  0 }, { x: -1, y:  0 }, { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 },
+      { x: -2, y:  1 }, { x: 0, y:  1 }, { x: 2, y:  1 },
+      { x: -1, y:  2 }, { x: 0, y:  2 }, { x: 1, y:  2 }
+    ]
+  }
 };
 
-// Stamp patterns
-export const STAMP_PATTERNS = {
-  square: { name: "square", cells: [{ x: 0, y: 0 }] },
-  circle: { name: "circle", cells: [{ x: 0, y: -1 }, { x: -1, y: 0 }, { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }] },
-  cross: { name: "cross", cells: [{ x: -1, y: 0 }, { x: 0, y: -1 }, { x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }] },
-  star: { name: "star", cells: [{ x: 0, y: -2 }, { x: -1, y: -1 }, { x: 1, y: -1 }, { x: -2, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 }, { x: -1, y: 1 }, { x: 1, y: 1 }, { x: 0, y: 2 }] }
+// Default tool options
+export const TOOL_OPTIONS_DEFAULTS = {
+  spray: { radius: 5, density: 3, particleCount: 10 },
+  stamp: { selectedPattern: "square" },
+  brush: { continuous: true },
+  eraser: {},
+  pixel: {},
+  line: {},
+  fill: {},
+  text: {},
+  picker: {},
+  transform: {}
 };
+
+

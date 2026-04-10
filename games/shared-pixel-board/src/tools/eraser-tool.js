@@ -3,7 +3,8 @@
  */
 
 import state from "../core/state.js";
-import { validCoordinates, buildBrushStamp, DEFAULT_COLOR } from "../core/math.js";
+import { validCoordinates, buildBrushStamp } from "../core/math.js";
+import { DEFAULT_COLOR } from "../config/constants.js";
 
 export function createEraserTool(toolManager, renderer) {
   return {
@@ -72,8 +73,7 @@ export function createEraserTool(toolManager, renderer) {
         return { x, y };
       });
 
-      // Import DEFAULT_COLOR - use hardcoded for now
-      toolManager.commitPixels(cells, "#111827");
+      toolManager.commitPixels(cells, DEFAULT_COLOR);
 
       this.strokeActive = false;
       this.cellsInStroke.clear();

@@ -19,11 +19,12 @@ export function createBrushTool(toolManager, renderer) {
       this.cellsInStroke.clear();
       this.lastPoint = { x, y };
 
-      // Draw initial brush position
       const cells = buildBrushStamp(x, y, state.brushSize);
       for (const cell of cells) {
         if (validCoordinates(cell.x, cell.y)) {
           this.cellsInStroke.add(`${cell.x}_${cell.y}`);
+          // Draw immediately for live feedback
+          renderer.drawPixel(cell.x, cell.y, state.selectedColor);
         }
       }
     },
@@ -38,7 +39,6 @@ export function createBrushTool(toolManager, renderer) {
         this.lastPoint = { x, y };
       }
 
-      // Line from last point to current
       const dx = x - this.lastPoint.x;
       const dy = y - this.lastPoint.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
@@ -57,24 +57,29 @@ export function createBrushTool(toolManager, renderer) {
         const cells = buildBrushStamp(px, py, state.brushSize);
         for (const cell of cells) {
           if (validCoordinates(cell.x, cell.y)) {
-            this.cellsInStroke.add(`${cell.x}_${cell.y}`);
+            const key = `${cell.x}_${cell.y}`;
+            if (!this.cellsInStroke.has(key)) {
+              this.cellsInStroke.add(key);
+              // Draw immediately for live feedback
+              renderer.drawPixel(cell.x, cell.y, state.selectedColor);
+            }
           }
         }
       }
 
       this.lastPoint = { x, y };
-      renderer.clearOverlay(); // Don't show preview while painting
+      renderer.renderBrushPreview(x, y, state.brushSize, state.selectedColor);
     },
 
     async onPointerUp(x, y, event) {
       if (!this.strokeActive) return;
 
-      // Commit all cells from stroke
       const cells = Array.from(this.cellsInStroke).map((key) => {
-        const [x, y] = key.split("_").map(Number);
-        return { x, y };
+        const [cx, cy] = key.split("_").map(Number);
+        return { x: cx, y: cy };
       });
 
+      // Commit to history and fire Firebase; renderer.render() re-draws from state
       toolManager.commitPixels(cells, state.selectedColor);
 
       this.strokeActive = false;
@@ -86,6 +91,7 @@ export function createBrushTool(toolManager, renderer) {
       this.strokeActive = false;
       this.cellsInStroke.clear();
       this.lastPoint = null;
+      renderer.clearOverlay();
     }
   };
 }

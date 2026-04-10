@@ -11,18 +11,22 @@ export function createSprayTool(toolManager, renderer) {
     sprayActive: false,
     cellsInSpray: new Set(),
     sprayInterval: null,
+    currentX: 0,
+    currentY: 0,
 
     async onPointerDown(x, y, event) {
       if (!validCoordinates(x, y)) return;
 
       this.sprayActive = true;
       this.cellsInSpray.clear();
+      this.currentX = x;
+      this.currentY = y;
       this.spray(x, y);
 
-      // Continuous spray while held
+      // Continuous spray that follows the live cursor position
       this.sprayInterval = setInterval(() => {
         if (this.sprayActive) {
-          this.spray(x, y);
+          this.spray(this.currentX, this.currentY);
         } else {
           clearInterval(this.sprayInterval);
         }
@@ -32,6 +36,12 @@ export function createSprayTool(toolManager, renderer) {
     onPointerMove(x, y, event) {
       const radius = state.toolOptions[state.activeTool]?.radius || 5;
       renderer.renderSprayPreview(x, y, radius, state.selectedColor);
+
+      // Update position so the interval sprays at the current cursor location
+      if (this.sprayActive) {
+        this.currentX = x;
+        this.currentY = y;
+      }
     },
 
     async onPointerUp(x, y, event) {

@@ -4,7 +4,7 @@
 
 import state from "../core/state.js";
 import { validCoordinates } from "../core/math.js";
-import { STAMP_PATTERNS } from "../config/constants.js";
+import { STAMP_PATTERNS, PIXEL_SIZE } from "../config/constants.js";
 
 export function createStampTool(toolManager, renderer) {
   return {
@@ -48,7 +48,7 @@ export function createStampTool(toolManager, renderer) {
           const px = x + patternCell.x;
           const py = y + patternCell.y;
           if (validCoordinates(px, py)) {
-            renderer.overlayCtx.fillRect(px * 8, py * 8, 8, 8);
+            renderer.overlayCtx.fillRect(px * PIXEL_SIZE, py * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
           }
         }
 

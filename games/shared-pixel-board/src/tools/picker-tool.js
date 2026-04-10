@@ -4,6 +4,7 @@
 
 import state from "../core/state.js";
 import { validCoordinates } from "../core/math.js";
+import { PIXEL_SIZE } from "../config/constants.js";
 
 export function createPickerTool(toolManager, renderer) {
   return {
@@ -28,10 +29,10 @@ export function createPickerTool(toolManager, renderer) {
         );
         renderer.overlayCtx.fillStyle = "rgba(255,255,255,0.3)";
         renderer.overlayCtx.fillRect(
-          x * 8,
-          y * 8,
-          8,
-          8
+          x * PIXEL_SIZE,
+          y * PIXEL_SIZE,
+          PIXEL_SIZE,
+          PIXEL_SIZE
         );
       }
     },

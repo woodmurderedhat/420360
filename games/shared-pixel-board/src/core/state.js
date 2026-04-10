@@ -17,6 +17,11 @@ import {
 
 class PixelBoardState {
   constructor() {
+    // Validate environment
+    if (typeof Map === "undefined") {
+      throw new Error("Browser does not support Map - unsupported environment");
+    }
+
     // UI State
     this.selectedColor = PALETTE_COLORS[0];
     this.activeTool = TOOLS.PIXEL;

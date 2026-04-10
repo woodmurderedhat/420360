@@ -29,27 +29,34 @@ export function makeCellKey(x, y) {
  * Parse cell key back to coordinates
  */
 export function parseCellKey(key) {
-  const [x, y] = key.split("_").map(Number);
-  return { x, y };
+  if (!key || typeof key !== "string") {
+    return { x: 0, y: 0 };
+  }
+  const parts = key.split("_");
+  return {
+    x: parseInt(parts[0], 10) || 0,
+    y: parseInt(parts[1], 10) || 0
+  };
 }
 
 /**
  * Convert canvas mouse/touch event to board coordinates
+ * Uses rect dimensions directly so CSS zoom is already factored in —
+ * avoids the double-zoom bug that occurred when multiplying scaleX * (1/zoomLevel).
  */
 export function canvasToBoardCoordinates(canvas, event, zoomLevel = 1) {
   const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  
+
   const eventX = event.clientX ?? (event.touches && event.touches[0] ? event.touches[0].clientX : null);
   const eventY = event.clientY ?? (event.touches && event.touches[0] ? event.touches[0].clientY : null);
-  
+
   if (eventX === null || eventY === null) {
     return { x: -1, y: -1 };
   }
 
-  const x = Math.floor((eventX - rect.left) * scaleX / PIXEL_SIZE / zoomLevel);
-  const y = Math.floor((eventY - rect.top) * scaleY / PIXEL_SIZE / zoomLevel);
+  // rect.width already reflects CSS zoom, so dividing by it normalises correctly
+  const x = Math.floor((eventX - rect.left) / rect.width * BOARD_SIZE);
+  const y = Math.floor((eventY - rect.top) / rect.height * BOARD_SIZE);
   return { x, y };
 }
 

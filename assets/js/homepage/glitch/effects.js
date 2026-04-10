@@ -290,6 +290,7 @@ export function registerDefaultEffects(registry) {
     balance: 0,
     apply(ctx) {
       const { data, source, width, height } = ctx;
+      const baseSource = ctx.pristineSource || source;
       const intensity = Math.min(1.8, effectIntensity(ctx, 1.08) * ctx.quality.intensityScale);
       const blockCount = 5 + Math.floor(Math.random() * 6 + intensity * 3);
       const maxShiftX = Math.max(12, Math.floor(width * 0.22));
@@ -313,9 +314,9 @@ export function registerDefaultEffects(registry) {
             const srcIdx = (sy * width + sx) * 4;
             const dstIdx = (dy * width + dx) * 4;
 
-            data[dstIdx] = source[srcIdx];
-            data[dstIdx + 1] = source[srcIdx + 1];
-            data[dstIdx + 2] = source[srcIdx + 2];
+            data[dstIdx] = baseSource[srcIdx];
+            data[dstIdx + 1] = baseSource[srcIdx + 1];
+            data[dstIdx + 2] = baseSource[srcIdx + 2];
             data[dstIdx + 3] = 255;
           }
         }
@@ -332,6 +333,7 @@ export function registerDefaultEffects(registry) {
     balance: 0,
     apply(ctx) {
       const { data, source, width, height } = ctx;
+      const baseSource = ctx.pristineSource || source;
       const intensity = Math.min(1.9, effectIntensity(ctx, 1.1));
       const castCount = 3 + Math.floor(Math.random() * 4 + intensity * 1.7);
 
@@ -357,9 +359,9 @@ export function registerDefaultEffects(registry) {
             const srcIdx = (sy * width + sx) * 4;
             const dstIdx = (dy * width + dx) * 4;
 
-            data[dstIdx] = source[srcIdx];
-            data[dstIdx + 1] = source[srcIdx + 1];
-            data[dstIdx + 2] = source[srcIdx + 2];
+            data[dstIdx] = baseSource[srcIdx];
+            data[dstIdx + 1] = baseSource[srcIdx + 1];
+            data[dstIdx + 2] = baseSource[srcIdx + 2];
             data[dstIdx + 3] = 255;
           }
         }
@@ -375,6 +377,7 @@ export function registerDefaultEffects(registry) {
     balance: 0,
     apply(ctx) {
       const { data, source, width, height } = ctx;
+      const baseSource = ctx.pristineSource || source;
       const intensity = Math.min(1.8, effectIntensity(ctx, 1.06));
       const clusters = 4 + Math.floor(Math.random() * 5 + intensity * 2);
 
@@ -397,9 +400,9 @@ export function registerDefaultEffects(registry) {
               const srcIdx = ((srcY + y) * width + (srcX + x)) * 4;
               const dstIdx = ((dstY + y) * width + (dstX + x)) * 4;
 
-              data[dstIdx] = source[srcIdx];
-              data[dstIdx + 1] = source[srcIdx + 1];
-              data[dstIdx + 2] = source[srcIdx + 2];
+              data[dstIdx] = baseSource[srcIdx];
+              data[dstIdx + 1] = baseSource[srcIdx + 1];
+              data[dstIdx + 2] = baseSource[srcIdx + 2];
               data[dstIdx + 3] = 255;
             }
           }
@@ -417,6 +420,7 @@ export function registerDefaultEffects(registry) {
     balance: 0,
     apply(ctx) {
       const { data, source, width, height } = ctx;
+      const baseSource = ctx.pristineSource || source;
       const intensity = Math.min(1.7, effectIntensity(ctx, 1.04));
       const folds = 4 + Math.floor(Math.random() * 5 + intensity * 1.5);
 
@@ -438,9 +442,9 @@ export function registerDefaultEffects(registry) {
             const srcIdx = ((srcY + sampleY) * width + (srcX + sampleX)) * 4;
             const dstIdx = ((dstY + y) * width + (dstX + x)) * 4;
 
-            data[dstIdx] = source[srcIdx];
-            data[dstIdx + 1] = source[srcIdx + 1];
-            data[dstIdx + 2] = source[srcIdx + 2];
+            data[dstIdx] = baseSource[srcIdx];
+            data[dstIdx + 1] = baseSource[srcIdx + 1];
+            data[dstIdx + 2] = baseSource[srcIdx + 2];
             data[dstIdx + 3] = 255;
           }
         }
@@ -457,6 +461,7 @@ export function registerDefaultEffects(registry) {
     balance: 0,
     apply(ctx) {
       const { data, source, width, height } = ctx;
+      const baseSource = ctx.pristineSource || source;
       const intensity = Math.min(2, effectIntensity(ctx, 1.14));
       const passes = 2 + Math.floor(Math.random() * 2);
 
@@ -479,9 +484,9 @@ export function registerDefaultEffects(registry) {
             const srcIdx = (sy * width + sx) * 4;
             const restore = 0.16 + pass * 0.11;
 
-            data[dstIdx] = Math.floor(source[srcIdx] * (1 - restore) + source[dstIdx] * restore);
-            data[dstIdx + 1] = Math.floor(source[srcIdx + 1] * (1 - restore) + source[dstIdx + 1] * restore);
-            data[dstIdx + 2] = Math.floor(source[srcIdx + 2] * (1 - restore) + source[dstIdx + 2] * restore);
+            data[dstIdx] = Math.floor(baseSource[srcIdx] * (1 - restore) + baseSource[dstIdx] * restore);
+            data[dstIdx + 1] = Math.floor(baseSource[srcIdx + 1] * (1 - restore) + baseSource[dstIdx + 1] * restore);
+            data[dstIdx + 2] = Math.floor(baseSource[srcIdx + 2] * (1 - restore) + baseSource[dstIdx + 2] * restore);
             data[dstIdx + 3] = 255;
           }
         }

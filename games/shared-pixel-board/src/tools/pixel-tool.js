@@ -10,17 +10,10 @@ export function createPixelTool(toolManager) {
     name: "pixel",
     async onPointerDown(x, y, event) {
       if (!validCoordinates(x, y)) return;
-      
-      // Skip if write in flight
-      if (state.writeInFlight) {
-        state.emit("notice", { message: "Write in flight, wait for sync", ok: false });
-        return;
-      }
 
-      // Place pixel
+      // Place single pixel
       const cells = [{ x, y }];
       toolManager.commitPixels(cells, state.selectedColor);
-      state.stats.placements++;
     },
 
     onPointerMove(x, y, event) {

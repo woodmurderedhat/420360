@@ -27,9 +27,6 @@ class EventManager {
     this.bindCanvasEvents();
     this.bindKeyboardEvents();
     this.bindUIEvents();
-
-    // Cooldown badge update interval
-    this.cooldownInterval = setInterval(() => this.updateCooldownBadge(), 120);
   }
 
   /**
@@ -467,10 +464,6 @@ class EventManager {
   /**
    * Update cooldown badge (stub for now)
    */
-  updateCooldownBadge() {
-    state.emit("cooldownUpdated", { ready: true });
-  }
-
   /**
    * Emit notice
    */

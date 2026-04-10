@@ -37,6 +37,7 @@ class CanvasRenderer {
    * Initialize canvas with base color
    */
   initializeCanvas() {
+    if (!this.ctx) return;
     this.ctx.fillStyle = DEFAULT_COLOR;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
@@ -45,7 +46,8 @@ class CanvasRenderer {
    * Draw a single pixel at board coordinates
    */
   drawPixel(x, y, color) {
-    if (!validCoordinates(x, y)) return;
+    if (!this.ctx || !validCoordinates(x, y)) return;
+    if (!color || typeof color !== "string") return;
     
     this.ctx.fillStyle = color;
     this.ctx.fillRect(

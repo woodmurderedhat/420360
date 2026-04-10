@@ -257,25 +257,38 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     updateColorUI();
   });
 
+  // State event listener safety wrappers
   state.on("notice", (data) => {
-    const noticeBox = document.getElementById("noticeBox");
-    if (noticeBox) {
-      noticeBox.textContent = data.message;
-      noticeBox.classList.toggle("ok", data.ok);
+    try {
+      const noticeBox = document.getElementById("noticeBox");
+      if (noticeBox) {
+        noticeBox.textContent = data.message || "";
+        noticeBox.classList.toggle("ok", Boolean(data.ok));
+      }
+    } catch (err) {
+      console.error("Notice update failed:", err);
     }
   });
 
   state.on("hoverChanged", (data) => {
-    const hoverStatus = document.getElementById("hoverStatus");
-    if (hoverStatus) {
-      hoverStatus.textContent = `Cursor: ${data.x}, ${data.y} | ${data.color}`;
+    try {
+      const hoverStatus = document.getElementById("hoverStatus");
+      if (hoverStatus && data) {
+        hoverStatus.textContent = `Cursor: ${data.x}, ${data.y} | ${data.color || "#000000"}`;
+      }
+    } catch (err) {
+      console.error("Hover update failed:", err);
     }
   });
 
   state.on("zoomChanged", (data) => {
-    const zoomStatus = document.getElementById("zoomStatus");
-    if (zoomStatus) {
-      zoomStatus.textContent = `Zoom: ${Math.round(data.zoom * 100)}%`;
+    try {
+      const zoomStatus = document.getElementById("zoomStatus");
+      if (zoomStatus && data && data.zoom) {
+        zoomStatus.textContent = `Zoom: ${Math.round(data.zoom * 100)}%`;
+      }
+    } catch (err) {
+      console.error("Zoom update failed:", err);
     }
   });
 
@@ -287,9 +300,15 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
   });
 
   state.on("historyChanged", (data) => {
-    const historyStatus = document.getElementById("historyStatus");
-    if (historyStatus) {
-      historyStatus.textContent = `History: ${data.history.length} | Redo: ${data.redoHistory.length}`;
+    try {
+      const historyStatus = document.getElementById("historyStatus");
+      if (historyStatus && data) {
+        const histCount = (data.history && data.history.length) || 0;
+        const redoCount = (data.redoHistory && data.redoHistory.length) || 0;
+        historyStatus.textContent = `History: ${histCount} | Redo: ${redoCount}`;
+      }
+    } catch (err) {
+      console.error("History update failed:", err);
     }
   });
 }
@@ -361,7 +380,7 @@ function renderLayersList() {
       renderLayersList();
     });
 
-    // Opacity slider
+    // Layer opacity slider with optimized rendering
     const opacityInput = document.createElement("input");
     opacityInput.type = "range";
     opacityInput.min = "0";
@@ -370,8 +389,11 @@ function renderLayersList() {
     opacityInput.className = "layer-opacity";
     opacityInput.title = `Opacity: ${Math.round(layer.opacity * 100)}%`;
     opacityInput.addEventListener("input", (e) => {
-      layer.opacity = Number(e.target.value) / 100;
+      const newOpacity = Number(e.target.value) / 100;
+      layer.opacity = newOpacity;
       e.target.title = `Opacity: ${e.target.value}%`;
+      // Render canvas with new opacity immediately
+      renderer.render();
     });
 
     // Delete button

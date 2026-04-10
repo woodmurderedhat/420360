@@ -218,14 +218,14 @@ class PixelBoardState {
    * Check if can undo
    */
   canUndo() {
-    return this.history.length > 0 && !SPECTATOR_MODE && !this.writeInFlight;
+    return this.history.length > 0 && !SPECTATOR_MODE;
   }
 
   /**
    * Check if can redo
    */
   canRedo() {
-    return this.redoHistory.length > 0 && !SPECTATOR_MODE && !this.writeInFlight;
+    return this.redoHistory.length > 0 && !SPECTATOR_MODE;
   }
 
   /**

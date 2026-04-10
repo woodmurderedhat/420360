@@ -54,144 +54,231 @@
   </script>
 </head>
 <body>
-  <main class="shell">
+  <div class="app-container">
+    <!-- Top bar with header -->
     <header class="topbar">
-      <div>
-        <p class="kicker">Realtime Experiment</p>
+      <div class="topbar-left">
         <h1>Shared Pixel Board</h1>
-        <p class="subtitle">A public surface that expects sabotage.</p>
+        <p class="subtitle">Realtime collaborative canvas</p>
       </div>
-      <a class="back-link" href="../index.html">Back to Games</a>
+      <nav class="topbar-right">
+        <button id="toggleHelp" class="icon-button" title="Help (?)">?</button>
+        <a href="../index.html" class="back-link">Back to Games</a>
+      </nav>
     </header>
 
-    <section class="control-panel" aria-label="Pixel controls">
-      <label class="field">
-        <span>Color</span>
-        <input id="colorPicker" type="color" value="#ff4d4d" aria-label="Pick pixel color" />
-      </label>
+    <!-- Main application layout -->
+    <div class="app-layout">
+      <!-- Left toolbar (vertical) -->
+      <aside class="toolbar">
+        <div class="toolbar-title">Tools</div>
+        
+        <div class="tool-group">
+          <button class="tool-button active" data-tool="pixel" title="Pixel Tool (P)">
+            <span class="tool-icon">●</span>
+          </button>
+          <button class="tool-button" data-tool="brush" title="Brush Tool (B)">
+            <span class="tool-icon">✎</span>
+          </button>
+          <button class="tool-button" data-tool="line" title="Line Tool (L)">
+            <span class="tool-icon">/</span>
+          </button>
+          <button class="tool-button" data-tool="fill" title="Fill Tool (F)">
+            <span class="tool-icon">⊠</span>
+          </button>
+        </div>
 
-      <div class="field">
-        <span>Palette (1-9)</span>
-        <div id="paletteGrid" class="palette-grid" aria-label="Color palette shortcuts">
-          <button class="palette-btn active" type="button" data-palette-slot="1" data-palette-color="#FF4D4D" aria-label="Palette color 1 #FF4D4D">1</button>
-          <button class="palette-btn" type="button" data-palette-slot="2" data-palette-color="#4DFF88" aria-label="Palette color 2 #4DFF88">2</button>
-          <button class="palette-btn" type="button" data-palette-slot="3" data-palette-color="#4DB8FF" aria-label="Palette color 3 #4DB8FF">3</button>
-          <button class="palette-btn" type="button" data-palette-slot="4" data-palette-color="#FFE14D" aria-label="Palette color 4 #FFE14D">4</button>
-          <button class="palette-btn" type="button" data-palette-slot="5" data-palette-color="#C24DFF" aria-label="Palette color 5 #C24DFF">5</button>
-          <button class="palette-btn" type="button" data-palette-slot="6" data-palette-color="#FF8C4D" aria-label="Palette color 6 #FF8C4D">6</button>
-          <button class="palette-btn" type="button" data-palette-slot="7" data-palette-color="#00D4AA" aria-label="Palette color 7 #00D4AA">7</button>
-          <button class="palette-btn" type="button" data-palette-slot="8" data-palette-color="#F5F5F5" aria-label="Palette color 8 #F5F5F5">8</button>
-          <button class="palette-btn" type="button" data-palette-slot="9" data-palette-color="#111827" aria-label="Palette color 9 #111827">9</button>
+        <div class="tool-group">
+          <button class="tool-button" data-tool="eraser" title="Eraser Tool (E)">
+            <span class="tool-icon">⟲</span>
+          </button>
+          <button class="tool-button" data-tool="spray" title="Spray Tool (S)">
+            <span class="tool-icon">*</span>
+          </button>
+          <button class="tool-button" data-tool="picker" title="Color Picker (I)">
+            <span class="tool-icon">🔍</span>
+          </button>
+        </div>
+
+        <div class="tool-group">
+          <button class="tool-button" data-tool="text" title="Text Tool (T)">
+            <span class="tool-icon">A</span>
+          </button>
+          <button class="tool-button" data-tool="stamp" title="Stamp Tool">
+            <span class="tool-icon">■</span>
+          </button>
+          <button class="tool-button" data-tool="transform" title="Transform Tool">
+            <span class="tool-icon">⟳</span>
+          </button>
+        </div>
+
+        <div class="toolbar-spacer"></div>
+
+        <div class="mode-indicator" id="modeStatus">paint</div>
+      </aside>
+
+      <!-- Center canvas area -->
+      <main class="canvas-container">
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="pixelCanvas" class="pixel-canvas"></canvas>
+          <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
+        </div>
+
+        <!-- Bottom status bar -->
+        <footer class="statusbar">
+          <span id="connectionStatus" class="status-item offline">offline</span>
+          <span id="syncStatus" class="status-item">sync: -</span>
+          <span id="hoverStatus" class="status-item">hover: -</span>
+          <span id="zoomStatus" class="status-item">zoom: 100%</span>
+          <span id="userCount" class="status-item">users: 0</span>
+          <span id="boardStamp" class="status-item">last: -</span>
+        </footer>
+      </main>
+
+      <!-- Right sidebar (panels) -->
+      <aside class="panels">
+        <!-- Color panel -->
+        <div class="panel color-panel">
+          <div class="panel-header">
+            <span>Colors</span>
+          </div>
+          <div class="panel-body">
+            <div class="color-input-group">
+              <input id="colorPicker" type="color" value="#ff4d4d" class="color-picker" />
+              <div id="currentColorSwatch" class="color-swatch">#FF4D4D</div>
+            </div>
+
+            <div class="palette-section">
+              <label>Quick Palette (1-9)</label>
+              <div id="paletteGrid" class="palette-grid">
+                <button class="palette-btn active" data-palette-slot="1" data-palette-color="#FF4D4D" title="1">1</button>
+                <button class="palette-btn" data-palette-slot="2" data-palette-color="#4DFF88" title="2">2</button>
+                <button class="palette-btn" data-palette-slot="3" data-palette-color="#4DB8FF" title="3">3</button>
+                <button class="palette-btn" data-palette-slot="4" data-palette-color="#FFE14D" title="4">4</button>
+                <button class="palette-btn" data-palette-slot="5" data-palette-color="#C24DFF" title="5">5</button>
+                <button class="palette-btn" data-palette-slot="6" data-palette-color="#FF8C4D" title="6">6</button>
+                <button class="palette-btn" data-palette-slot="7" data-palette-color="#00D4AA" title="7">7</button>
+                <button class="palette-btn" data-palette-slot="8" data-palette-color="#F5F5F5" title="8">8</button>
+                <button class="palette-btn" data-palette-slot="9" data-palette-color="#111827" title="9">9</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tool options panel -->
+        <div class="panel tool-options-panel">
+          <div class="panel-header">
+            <span>Tool Options</span>
+          </div>
+          <div class="panel-body">
+            <div id="toolOptionsContainer">
+              <!-- Dynamic content based on selected tool -->
+              <div class="option-group">
+                <label>Brush Size</label>
+                <select id="brushSize" class="option-input">
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+              </div>
+
+              <div class="option-group">
+                <label>Grid</label>
+                <input id="gridToggle" type="checkbox" class="option-checkbox" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layers panel -->
+        <div class="panel layers-panel">
+          <div class="panel-header">
+            <span>Layers</span>
+            <button id="addLayerBtn" class="panel-action-btn" title="Add Layer">+</button>
+          </div>
+          <div class="panel-body">
+            <div id="layersContainer" class="layers-list">
+              <!-- Layers will be rendered here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- History panel -->
+        <div class="panel history-panel">
+          <div class="panel-header">
+            <span>History</span>
+          </div>
+          <div class="panel-body">
+            <div class="history-stats">
+              <span id="historyStatus" class="status-item">history: 0 | redo: 0</span>
+              <span id="sessionStats" class="status-item">session: ok 0</span>
+            </div>
+            <div class="history-buttons">
+              <button id="undoAction" class="action-btn">↶ Undo</button>
+              <button id="redoAction" class="action-btn">↷ Redo</button>
+              <button id="exportPng" class="action-btn">↓ Export PNG</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share panel -->
+        <div class="panel share-panel">
+          <div class="panel-header">
+            <span>Share</span>
+          </div>
+          <div class="panel-body">
+            <button id="copySpectatorLink" class="action-btn">Copy Spectator Link</button>
+            <div id="noticeBox" class="notice-box"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Help modal -->
+    <div id="helpPanel" class="help-modal" hidden>
+      <div class="help-content">
+        <button id="closeHelp" class="close-button">×</button>
+        <h2>Pixel Board Help</h2>
+        <div class="help-sections">
+          <section>
+            <h3>Tools</h3>
+            <ul>
+              <li><strong>P</strong> - Pixel: Place single pixels</li>
+              <li><strong>B</strong> - Brush: Paint with brush strokes</li>
+              <li><strong>L</strong> - Line: Draw straight lines (click twice)</li>
+              <li><strong>F</strong> - Fill: Flood fill regions</li>
+              <li><strong>E</strong> - Eraser: Erase pixels</li>
+              <li><strong>S</strong> - Spray: Paint dispersed spray</li>
+              <li><strong>I</strong> - Picker: Sample colors</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Controls</h3>
+            <ul>
+              <li><strong>1-9</strong> - Select palette color</li>
+              <li><strong>[/]</strong> - Change brush size</li>
+              <li><strong>G</strong> - Toggle grid</li>
+              <li><strong>Ctrl+Z / Ctrl+Shift+Z</strong> - Undo / Redo</li>
+              <li><strong>+/-</strong> - Zoom in / out</li>
+              <li><strong>0</strong> - Reset zoom</li>
+              <li><strong>Arrow keys</strong> - Pan canvas</li>
+              <li><strong>Shift+Click</strong> or <strong>Middle+Drag</strong> - Pan</li>
+              <li><strong>Scroll</strong> - Zoom</li>
+              <li><strong>Right-click</strong> - Pick color</li>
+            </ul>
+          </section>
+          <section>
+            <h3>About</h3>
+            <p>This is a realtime collaborative pixel board. Any pixel you place can be overwritten by others. Last-write-wins. No permanent state. Enjoy the chaos.</p>
+          </section>
         </div>
       </div>
+    </div>
+  </div>
 
-      <div class="field">
-        <span>Current</span>
-        <div id="currentColorSwatch" class="swatch" aria-live="polite">#FF4D4D</div>
-      </div>
-
-      <label class="field">
-        <span>Cooldown</span>
-        <div id="cooldownFixed" class="fixed-value" aria-label="Cooldown is locked">5s (locked)</div>
-      </label>
-
-      <label class="field">
-        <span>Tool (P/B/L/F)</span>
-        <select id="toolSelect" aria-label="Drawing tool">
-          <option value="pixel">Pixel</option>
-          <option value="brush">Brush</option>
-          <option value="line">Line</option>
-          <option value="fill">Fill</option>
-        </select>
-      </label>
-
-      <label class="field" id="brushSizeField">
-        <span>Brush Size ([ / ])</span>
-        <select id="brushSize" aria-label="Brush size">
-          <option value="1">1</option>
-          <option value="2" selected>2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
-      </label>
-
-      <label class="field">
-        <span>Fill Cap</span>
-        <div id="fillCapValue" class="fixed-value" aria-label="Fill cap is locked">480 px (locked)</div>
-      </label>
-
-      <label class="field checkbox-field">
-        <input id="gridToggle" type="checkbox" checked />
-        <span>Grid</span>
-      </label>
-
-      <div class="field">
-        <span>Actions</span>
-        <button id="exportPng" class="action-btn" type="button">Export PNG (E)</button>
-        <button id="copySpectatorLink" class="action-btn secondary" type="button">Copy Spectator Link</button>
-        <button id="toggleHelp" class="action-btn secondary" type="button">Help / Shortcuts (?)</button>
-        <div class="history-actions">
-          <button id="undoAction" class="action-btn secondary" type="button">Undo</button>
-          <button id="redoAction" class="action-btn secondary" type="button">Redo</button>
-        </div>
-        <small class="hotkey-note">Tools: P/B/L/F, Brush: [ ], Undo/Redo: U/R or Ctrl+Z/Y, Share: S, Help: ?, Zoom: +/-/0, Pan: arrows, Grid: G</small>
-      </div>
-    </section>
-
-    <section class="status-row" aria-live="polite">
-      <p id="connectionStatus" class="status-pill offline">offline</p>
-      <p id="modeStatus" class="status-pill">mode: paint</p>
-      <p id="toolStatus" class="status-pill">tool: pixel</p>
-      <p id="syncStatus" class="status-pill">sync: idle</p>
-      <p id="zoomStatus" class="status-pill">zoom: 100%</p>
-      <p id="cooldownStatus" class="status-pill">ready</p>
-      <p id="userCount" class="status-pill">users: 0</p>
-      <p id="boardStamp" class="status-pill">last update: -</p>
-      <p id="hoverStatus" class="status-pill">hover: -</p>
-      <p id="sessionStats" class="status-pill">session: ok 0 | cd 0 | noop 0</p>
-      <p id="historyStatus" class="status-pill">history: 0 | redo: 0</p>
-    </section>
-
-    <section class="canvas-wrap" aria-label="Collaborative board">
-      <div class="canvas-stage">
-        <canvas id="pixelCanvas" width="2048" height="2048" aria-label="256 by 256 shared pixel board"></canvas>
-        <canvas id="overlayCanvas" width="2048" height="2048" aria-hidden="true"></canvas>
-      </div>
-    </section>
-
-    <section id="reconnectBanner" class="reconnect-banner" aria-live="polite">
-      Connection lost. Reconnecting...
-    </section>
-
-    <section class="notice" id="noticeBox">
-      Configure Firebase in app.js before deployment.
-    </section>
-
-    <section class="mobile-toolbar" aria-label="Mobile quick actions">
-      <button type="button" id="mobilePixel" class="action-btn secondary">P</button>
-      <button type="button" id="mobileBrush" class="action-btn secondary">B</button>
-      <button type="button" id="mobileLine" class="action-btn secondary">L</button>
-      <button type="button" id="mobileFill" class="action-btn secondary">F</button>
-      <button type="button" id="mobilePan" class="action-btn secondary" aria-pressed="false">Pan</button>
-      <button type="button" id="mobileUndo" class="action-btn secondary">Undo</button>
-      <button type="button" id="mobileHelp" class="action-btn secondary">Help</button>
-    </section>
-
-    <section id="helpPanel" class="help-panel" hidden aria-label="Shortcuts and controls">
-      <div class="help-card">
-        <h2>Controls</h2>
-        <p><strong>Tools:</strong> P pixel, B brush, L line, F fill</p>
-        <p><strong>Brush size:</strong> [ smaller, ] larger</p>
-        <p><strong>View:</strong> + zoom in, - zoom out, 0 reset, arrows pan, G grid</p>
-        <p><strong>History:</strong> U undo, R redo, Ctrl/Cmd+Z undo, Ctrl/Cmd+Y redo</p>
-        <p><strong>Actions:</strong> E export PNG, S copy spectator link, Esc cancel gesture</p>
-        <p><strong>Eyedropper:</strong> Right-click (or Ctrl+click) any pixel to pick its color</p>
-        <button id="closeHelp" class="action-btn" type="button">Close</button>
-      </div>
-    </section>
-  </main>
-
-  <script type="module" src="./app.js"></script>
+  <!-- Firebase scripts -->
+  <script type="module" src="./src/app.js"></script>
 </body>
 </html>

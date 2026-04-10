@@ -62,6 +62,7 @@
         <p class="subtitle">Realtime collaborative canvas</p>
       </div>
       <nav class="topbar-right">
+        <button id="togglePanels" class="icon-button mobile-only" title="Toggle Panels">⊞</button>
         <button id="toggleHelp" class="icon-button" title="Help (?)">?</button>
         <a href="../index.html" class="back-link">Back to Games</a>
       </nav>
@@ -114,11 +115,19 @@
 
         <div class="toolbar-spacer"></div>
 
+        <button id="touchPanToggle" class="tool-button" title="Pan Mode (Touch)">✋</button>
+
         <div class="mode-indicator" id="modeStatus">paint</div>
       </aside>
 
       <!-- Center canvas area -->
       <main class="canvas-container">
+        <!-- Inline text tool input overlay -->
+        <div id="textInputOverlay" hidden>
+          <input type="text" id="textInputField" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30" placeholder="type here…" />
+          <span class="text-input-hint">Enter ↵ commit · Esc cancel</span>
+        </div>
+
         <div class="canvas-wrap" id="canvasWrap">
           <canvas id="pixelCanvas" class="pixel-canvas"></canvas>
           <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
@@ -151,15 +160,16 @@
             <div class="palette-section">
               <label>Quick Palette (1-9)</label>
               <div id="paletteGrid" class="palette-grid">
-                <button class="palette-btn active" data-palette-slot="1" data-palette-color="#FF4D4D" title="1">1</button>
-                <button class="palette-btn" data-palette-slot="2" data-palette-color="#4DFF88" title="2">2</button>
-                <button class="palette-btn" data-palette-slot="3" data-palette-color="#4DB8FF" title="3">3</button>
-                <button class="palette-btn" data-palette-slot="4" data-palette-color="#FFE14D" title="4">4</button>
-                <button class="palette-btn" data-palette-slot="5" data-palette-color="#C24DFF" title="5">5</button>
-                <button class="palette-btn" data-palette-slot="6" data-palette-color="#FF8C4D" title="6">6</button>
-                <button class="palette-btn" data-palette-slot="7" data-palette-color="#00D4AA" title="7">7</button>
-                <button class="palette-btn" data-palette-slot="8" data-palette-color="#F5F5F5" title="8">8</button>
-                <button class="palette-btn" data-palette-slot="9" data-palette-color="#111827" title="9">9</button>
+                <button class="palette-btn active" data-palette-slot="1" data-palette-color="#FF4D4D" title="1 (dblclick to edit)">1</button>
+                <button class="palette-btn" data-palette-slot="2" data-palette-color="#4DFF88" title="2 (dblclick to edit)">2</button>
+                <button class="palette-btn" data-palette-slot="3" data-palette-color="#4DB8FF" title="3 (dblclick to edit)">3</button>
+                <button class="palette-btn" data-palette-slot="4" data-palette-color="#FFE14D" title="4 (dblclick to edit)">4</button>
+                <button class="palette-btn" data-palette-slot="5" data-palette-color="#C24DFF" title="5 (dblclick to edit)">5</button>
+                <button class="palette-btn" data-palette-slot="6" data-palette-color="#FF8C4D" title="6 (dblclick to edit)">6</button>
+                <button class="palette-btn" data-palette-slot="7" data-palette-color="#00D4AA" title="7 (dblclick to edit)">7</button>
+                <button class="palette-btn" data-palette-slot="8" data-palette-color="#F5F5F5" title="8 (dblclick to edit)">8</button>
+                <button class="palette-btn" data-palette-slot="9" data-palette-color="#111827" title="9 (dblclick to edit)">9</button>
+                <input type="color" id="paletteColorEdit" tabindex="-1" aria-hidden="true" />
               </div>
             </div>
           </div>
@@ -172,21 +182,8 @@
           </div>
           <div class="panel-body">
             <div id="toolOptionsContainer">
-              <!-- Dynamic content based on selected tool -->
-              <div class="option-group">
-                <label>Brush Size</label>
-                <select id="brushSize" class="option-input">
-                  <option value="1">1</option>
-                  <option value="2" selected>2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                </select>
-              </div>
-
-              <div class="option-group">
-                <label>Grid</label>
-                <input id="gridToggle" type="checkbox" class="option-checkbox" />
+              <div id="toolOptionsContent">
+                <!-- Rendered dynamically based on active tool -->
               </div>
             </div>
           </div>
@@ -252,12 +249,13 @@
               <li><strong>E</strong> - Eraser: Erase pixels</li>
               <li><strong>S</strong> - Spray: Paint dispersed spray</li>
               <li><strong>I</strong> - Picker: Sample colors</li>
+              <li><strong>T</strong> - Text: Click canvas → type → Enter to commit</li>
             </ul>
           </section>
           <section>
             <h3>Controls</h3>
             <ul>
-              <li><strong>1-9</strong> - Select palette color</li>
+              <li><strong>1-9</strong> - Select palette color (double-click to edit)</li>
               <li><strong>[/]</strong> - Change brush size</li>
               <li><strong>G</strong> - Toggle grid</li>
               <li><strong>Ctrl+Z / Ctrl+Shift+Z</strong> - Undo / Redo</li>

@@ -58,7 +58,8 @@ export const STORAGE_KEYS = {
   gridEnabled: "sharedPixelGridEnabled",
   layerVisibility: "sharedPixelLayerVisibility",
   sessionId: "sharedPixelSessionId",
-  canvasDraft: "sharedPixelCanvasDraft"
+  canvasDraft: "sharedPixelCanvasDraft",
+  paletteColors: "sharedPixelPaletteColors"
 };
 
 // Spectator mode flag

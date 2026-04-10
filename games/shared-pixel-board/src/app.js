@@ -17,7 +17,7 @@ import { createSprayTool } from "./tools/spray-tool.js";
 import { createTextTool } from "./tools/text-tool.js";
 import { createStampTool } from "./tools/stamp-tool.js";
 import { createTransformTool } from "./tools/transform-tool.js";
-import { TOOLS, FIREBASE_CONFIG, SPECTATOR_MODE } from "./config/constants.js";
+import { TOOLS, FIREBASE_CONFIG, SPECTATOR_MODE, BLEND_MODES, STORAGE_KEYS, TOOL_OPTIONS_DEFAULTS } from "./config/constants.js";
 
 // Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -196,25 +196,8 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     });
   }
 
-  // Brush size
-  const brushSize = document.getElementById("brushSize");
-  if (brushSize) {
-    brushSize.addEventListener("change", (e) => {
-      state.brushSize = Number(e.target.value);
-      state.savePreferences();
-      state.emit("brushSizeChanged", { size: state.brushSize });
-    });
-  }
-
-  // Grid toggle
-  const gridToggle = document.getElementById("gridToggle");
-  if (gridToggle) {
-    gridToggle.addEventListener("change", () => {
-      state.gridEnabled = gridToggle.checked;
-      state.savePreferences();
-      renderer.render();
-    });
-  }
+  // Brush size and grid are now in the dynamic tool options panel
+  // (see renderToolOptions)
 
   // History actions
   const undoBtn = document.getElementById("undoAction");
@@ -309,6 +292,15 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     if (modeStatus) {
       modeStatus.textContent = `Tool: ${data.tool}`;
     }
+    // Update cursor via data attribute
+    const canvasWrap = document.getElementById("canvasWrap");
+    if (canvasWrap) canvasWrap.dataset.activeTool = data.tool;
+    // Re-render dynamic tool options panel
+    renderToolOptions(data.tool, renderer);
+  });
+
+  state.on("brushSizeChanged", (data) => {
+    renderToolOptions(state.activeTool, renderer);
   });
 
   state.on("historyChanged", (data) => {
@@ -323,6 +315,62 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
       console.error("History update failed:", err);
     }
   });
+
+  // ── Palette editor (double-click to edit slot color) ──────────────────────
+  loadPersistedPalette();
+
+  const paletteEditInput = document.getElementById("paletteColorEdit");
+  let editingBtn = null;
+
+  if (paletteEditInput) {
+    paletteEditInput.addEventListener("change", () => {
+      if (!editingBtn) return;
+      const newColor = paletteEditInput.value.toUpperCase();
+      editingBtn.dataset.paletteColor = newColor;
+      editingBtn.style.backgroundColor = newColor;
+      persistPalette();
+      editingBtn = null;
+    });
+  }
+
+  document.querySelectorAll(".palette-btn").forEach((btn) => {
+    btn.addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+      if (!paletteEditInput) return;
+      editingBtn = btn;
+      paletteEditInput.value = btn.dataset.paletteColor || "#ffffff";
+      paletteEditInput.click();
+    });
+  });
+
+  // ── Mobile panel toggle ────────────────────────────────────────────────────
+  const togglePanelsBtn = document.getElementById("togglePanels");
+  const panelsEl = document.querySelector(".panels");
+  if (togglePanelsBtn && panelsEl) {
+    togglePanelsBtn.addEventListener("click", () => {
+      panelsEl.classList.toggle("open");
+    });
+    document.getElementById("canvasWrap")?.addEventListener("click", () => {
+      if (window.innerWidth <= 768) panelsEl.classList.remove("open");
+    });
+  }
+
+  // ── Touch pan toggle button ────────────────────────────────────────────────
+  const touchPanBtn = document.getElementById("touchPanToggle");
+  if (touchPanBtn) {
+    touchPanBtn.classList.toggle("active", state.touchPanMode);
+    touchPanBtn.addEventListener("click", () => {
+      state.touchPanMode = !state.touchPanMode;
+      touchPanBtn.classList.toggle("active", state.touchPanMode);
+    });
+  }
+
+  // ── Initial tool options render ────────────────────────────────────────────
+  renderToolOptions(state.activeTool, renderer);
+
+  // ── Set initial cursor data attribute ─────────────────────────────────────
+  const canvasWrapEl = document.getElementById("canvasWrap");
+  if (canvasWrapEl) canvasWrapEl.dataset.activeTool = state.activeTool;
 }
 
 function selectTool(toolManager, button, toolName) {
@@ -429,10 +477,40 @@ function renderLayersList() {
       }
     });
 
-    layerEl.appendChild(visToggle);
-    layerEl.appendChild(nameEl);
-    layerEl.appendChild(opacityInput);
-    layerEl.appendChild(deleteBtn);
+    // Top row: visibility, name, delete
+    const topRow = document.createElement("div");
+    topRow.className = "layer-item-row";
+    topRow.appendChild(visToggle);
+    topRow.appendChild(nameEl);
+    topRow.appendChild(deleteBtn);
+    layerEl.appendChild(topRow);
+
+    // Bottom row: opacity, blend mode
+    const bottomRow = document.createElement("div");
+    bottomRow.className = "layer-item-row";
+    bottomRow.style.paddingLeft = "0.25rem";
+    bottomRow.appendChild(opacityInput);
+
+    // Blend mode select
+    const blendSelect = document.createElement("select");
+    blendSelect.className = "layer-blend";
+    blendSelect.title = "Blend mode";
+    blendSelect.style.flex = "1";
+    for (const mode of BLEND_MODES) {
+      const opt = document.createElement("option");
+      opt.value = mode;
+      opt.textContent = mode;
+      if (mode === layer.blendMode) opt.selected = true;
+      blendSelect.appendChild(opt);
+    }
+    blendSelect.addEventListener("change", (e) => {
+      e.stopPropagation();
+      layer.blendMode = e.target.value;
+      renderer.render();
+    });
+    bottomRow.appendChild(blendSelect);
+    layerEl.appendChild(bottomRow);
+
     container.appendChild(layerEl);
   });
 }
@@ -453,6 +531,260 @@ function setupLayerControls() {
       state.activeLayerId = newLayer.id;
       renderLayersList();
     });
+  }
+}
+
+// ============================================================================
+// DYNAMIC TOOL OPTIONS PANEL
+// ============================================================================
+
+function renderToolOptions(toolName, rendererRef) {
+  const container = document.getElementById("toolOptionsContent");
+  if (!container) return;
+  container.innerHTML = "";
+
+  // --- Grid toggle (shared by all tools) ---
+  function makeGridToggle() {
+    const row = document.createElement("div");
+    row.className = "grid-toggle-row";
+    const lbl = document.createElement("label");
+    lbl.textContent = "Grid";
+    lbl.htmlFor = "gridToggleDyn";
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.id = "gridToggleDyn";
+    chk.checked = state.gridEnabled;
+    chk.addEventListener("change", () => {
+      state.gridEnabled = chk.checked;
+      state.savePreferences();
+      if (rendererRef) rendererRef.render();
+    });
+    row.appendChild(lbl);
+    row.appendChild(chk);
+    return row;
+  }
+
+  // --- Brush size pills ---
+  function makeSizePills() {
+    const group = document.createElement("div");
+    group.className = "option-group";
+    const lbl = document.createElement("label");
+    lbl.textContent = "Brush Size";
+    group.appendChild(lbl);
+
+    const pillRow = document.createElement("div");
+    pillRow.className = "size-pills";
+    const dotSizes = [4, 6, 8, 11, 14];
+
+    for (let i = 1; i <= 5; i++) {
+      const pill = document.createElement("button");
+      pill.className = "size-pill" + (state.brushSize === i ? " active" : "");
+      pill.title = `Size ${i}`;
+      const dot = document.createElement("span");
+      dot.className = "size-pill-dot";
+      dot.style.width = `${dotSizes[i - 1]}px`;
+      dot.style.height = `${dotSizes[i - 1]}px`;
+      if (state.brushSize === i) dot.style.background = "var(--accent)";
+      pill.appendChild(dot);
+      const size = i;
+      pill.addEventListener("click", () => {
+        state.brushSize = size;
+        state.savePreferences();
+        state.emit("brushSizeChanged", { size });
+        pillRow.querySelectorAll(".size-pill").forEach((p, idx) => {
+          const active = idx + 1 === size;
+          p.classList.toggle("active", active);
+          p.querySelector(".size-pill-dot").style.background = active
+            ? "var(--accent)"
+            : "var(--text-primary)";
+        });
+      });
+      pillRow.appendChild(pill);
+    }
+
+    group.appendChild(pillRow);
+    return group;
+  }
+
+  switch (toolName) {
+    case "pixel": {
+      const desc = document.createElement("p");
+      desc.className = "tool-desc";
+      desc.textContent = "Click or drag to place individual pixels.";
+      container.appendChild(desc);
+      container.appendChild(makeGridToggle());
+      break;
+    }
+
+    case "brush":
+    case "eraser": {
+      container.appendChild(makeSizePills());
+      container.appendChild(makeGridToggle());
+      break;
+    }
+
+    case "line": {
+      const desc = document.createElement("p");
+      desc.className = "tool-desc";
+      desc.textContent = "Click to set start point, click again to draw. ESC cancels.";
+      container.appendChild(desc);
+      container.appendChild(makeGridToggle());
+      break;
+    }
+
+    case "fill": {
+      const desc = document.createElement("p");
+      desc.className = "tool-desc";
+      desc.textContent = "Flood-fills connected same-color pixels (max 480 cells).";
+      container.appendChild(desc);
+      container.appendChild(makeGridToggle());
+      break;
+    }
+
+    case "spray": {
+      const opts = state.toolOptions[toolName] || { ...TOOL_OPTIONS_DEFAULTS.spray };
+      const group = document.createElement("div");
+      group.className = "spray-slider-group";
+
+      function makeSliderRow(id, label, min, max, value, onInput) {
+        const row = document.createElement("div");
+        row.className = "spray-slider-row";
+        const labelRow = document.createElement("div");
+        labelRow.className = "spray-slider-label";
+        const labelSpan = document.createElement("span");
+        labelSpan.textContent = label;
+        const valSpan = document.createElement("span");
+        valSpan.id = id;
+        valSpan.textContent = value;
+        labelRow.appendChild(labelSpan);
+        labelRow.appendChild(valSpan);
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.className = "spray-range";
+        slider.min = String(min);
+        slider.max = String(max);
+        slider.value = String(value);
+        slider.addEventListener("input", () => {
+          valSpan.textContent = slider.value;
+          onInput(Number(slider.value));
+        });
+        row.appendChild(labelRow);
+        row.appendChild(slider);
+        return row;
+      }
+
+      group.appendChild(makeSliderRow("sprayRadiusVal", "Radius", 2, 12, opts.radius, (v) => {
+        state.toolOptions[toolName] = { ...state.toolOptions[toolName], radius: v };
+      }));
+      group.appendChild(makeSliderRow("sprayParticlesVal", "Particles", 5, 25, opts.particleCount, (v) => {
+        state.toolOptions[toolName] = { ...state.toolOptions[toolName], particleCount: v };
+      }));
+
+      container.appendChild(group);
+      container.appendChild(makeGridToggle());
+      break;
+    }
+
+    case "picker": {
+      const desc = document.createElement("p");
+      desc.className = "tool-desc";
+      desc.textContent = "Click a pixel to sample its color. Right-click works on any tool.";
+      container.appendChild(desc);
+      container.appendChild(makeGridToggle());
+      break;
+    }
+
+    case "text": {
+      const desc = document.createElement("p");
+      desc.className = "tool-desc";
+      desc.textContent = "Click canvas → type text → Enter to commit, Esc to cancel. 4×5 pixel bitmap font (A–Z, 0–9).";
+      container.appendChild(desc);
+      container.appendChild(makeGridToggle());
+      break;
+    }
+
+    case "stamp": {
+      const opts = state.toolOptions[toolName] || { ...TOOL_OPTIONS_DEFAULTS.stamp };
+      const group = document.createElement("div");
+      group.className = "option-group";
+      const lbl = document.createElement("label");
+      lbl.textContent = "Pattern";
+      group.appendChild(lbl);
+
+      const patterns = [
+        { key: "square", icon: "■", label: "Square" },
+        { key: "circle", icon: "●", label: "Circle" },
+        { key: "cross",  icon: "+", label: "Cross"  },
+        { key: "star",   icon: "✦", label: "Star"   }
+      ];
+
+      const patternGrid = document.createElement("div");
+      patternGrid.className = "stamp-patterns";
+
+      for (const p of patterns) {
+        const btn = document.createElement("button");
+        btn.className = "stamp-pattern-btn" + (opts.selectedPattern === p.key ? " active" : "");
+        btn.title = p.label;
+        btn.textContent = p.icon;
+        btn.addEventListener("click", () => {
+          state.toolOptions[toolName] = { ...state.toolOptions[toolName], selectedPattern: p.key };
+          patternGrid.querySelectorAll(".stamp-pattern-btn").forEach((b, i) => {
+            b.classList.toggle("active", patterns[i].key === p.key);
+          });
+        });
+        patternGrid.appendChild(btn);
+      }
+
+      group.appendChild(patternGrid);
+      container.appendChild(group);
+      container.appendChild(makeGridToggle());
+      break;
+    }
+
+    case "transform": {
+      const desc = document.createElement("p");
+      desc.className = "tool-desc";
+      desc.textContent = "Click canvas to flip or rotate active layer. Choose: 1=Flip H, 2=Flip V, 3=Rotate 90° CW, 4=Rotate 90° CCW.";
+      container.appendChild(desc);
+      container.appendChild(makeGridToggle());
+      break;
+    }
+
+    default:
+      container.appendChild(makeGridToggle());
+  }
+}
+
+// ============================================================================
+// PALETTE PERSISTENCE
+// ============================================================================
+
+function persistPalette() {
+  const btns = document.querySelectorAll(".palette-btn");
+  const colors = Array.from(btns).map((b) => b.dataset.paletteColor || "");
+  try {
+    localStorage.setItem(STORAGE_KEYS.paletteColors, JSON.stringify(colors));
+  } catch {
+    // localStorage unavailable
+  }
+}
+
+function loadPersistedPalette() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.paletteColors);
+    if (!raw) return;
+    const colors = JSON.parse(raw);
+    if (!Array.isArray(colors)) return;
+    const btns = document.querySelectorAll(".palette-btn");
+    btns.forEach((btn, i) => {
+      const color = (colors[i] || "").toUpperCase();
+      if (/^#[0-9A-F]{6}$/.test(color)) {
+        btn.dataset.paletteColor = color;
+        btn.style.backgroundColor = color;
+      }
+    });
+  } catch {
+    // JSON parse or localStorage error
   }
 }
 
@@ -516,6 +848,16 @@ async function initializeFirebase(toolManager, renderer) {
       const count = snap.exists() ? Object.keys(snap.val()).length : 0;
       const userCount = document.getElementById("userCount");
       if (userCount) userCount.textContent = `Users: ${count}`;
+    });
+
+    // Listen for last-updated timestamp
+    onValue(ref(firebaseDb, "meta/lastUpdated"), (snap) => {
+      const ts = snap.val();
+      const el = document.getElementById("boardStamp");
+      if (el && ts) {
+        const d = new Date(ts);
+        el.textContent = `Last: ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+      }
     });
 
     // Cleanup on unload

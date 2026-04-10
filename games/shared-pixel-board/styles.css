@@ -367,6 +367,7 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 0.35rem;
   margin-bottom: 1rem;
+  position: relative;
 }
 
 .palette-btn {
@@ -379,6 +380,7 @@ body {
   font-weight: 600;
   color: white;
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  position: relative;
 }
 
 .palette-btn:hover {
@@ -423,6 +425,150 @@ body {
   box-shadow: 0 0 0 2px rgba(240, 178, 77, 0.2);
 }
 
+/* Size pills (brush / eraser) */
+.size-pills {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.size-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.size-pill:hover {
+  border-color: var(--accent);
+}
+
+.size-pill.active {
+  border-color: var(--accent);
+  background: rgba(240, 178, 77, 0.15);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.size-pill-dot {
+  background: var(--text-primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.size-pill.active .size-pill-dot {
+  background: var(--accent);
+}
+
+/* Stamp pattern buttons */
+.stamp-patterns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+}
+
+.stamp-pattern-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+.stamp-pattern-btn:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.stamp-pattern-btn.active {
+  border-color: var(--accent);
+  background: rgba(240, 178, 77, 0.15);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* Spray sliders */
+.spray-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.spray-slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.spray-slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.spray-slider-label span:last-child {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+input[type="range"].spray-range {
+  width: 100%;
+  accent-color: var(--accent);
+  height: 4px;
+  cursor: pointer;
+}
+
+/* Tool option description text */
+.tool-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+/* Grid toggle row */
+.grid-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+.grid-toggle-row label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.grid-toggle-row input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+}
+
 /* LAYERS PANEL */
 .layers-list {
   display: flex;
@@ -432,8 +578,8 @@ body {
 
 .layer-item {
   display: flex;
-  align-items: center;
-  gap: 0.35rem;
+  flex-direction: column;
+  gap: 0.25rem;
   padding: 0.5rem;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
@@ -450,6 +596,12 @@ body {
 .layer-item.active {
   border-color: var(--accent);
   background: rgba(240, 178, 77, 0.1);
+}
+
+.layer-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .layer-toggle-visibility {
@@ -646,6 +798,154 @@ body {
 }
 
 /* ============================================================================
+   Cursor Styles per Active Tool
+   ============================================================================ */
+
+#canvasWrap[data-active-tool="pixel"],
+#canvasWrap[data-active-tool="brush"],
+#canvasWrap[data-active-tool="line"],
+#canvasWrap[data-active-tool="spray"],
+#canvasWrap[data-active-tool="picker"] {
+  cursor: crosshair;
+}
+
+#canvasWrap[data-active-tool="fill"],
+#canvasWrap[data-active-tool="eraser"] {
+  cursor: cell;
+}
+
+#canvasWrap[data-active-tool="text"] {
+  cursor: text;
+}
+
+#canvasWrap[data-active-tool="stamp"] {
+  cursor: copy;
+}
+
+#canvasWrap[data-active-tool="transform"] {
+  cursor: move;
+}
+
+/* Panning overrides any tool cursor */
+#canvasWrap.panning {
+  cursor: grabbing !important;
+}
+
+/* ============================================================================
+   Inline Text Input Overlay
+   ============================================================================ */
+
+#textInputOverlay {
+  position: fixed;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+#textInputField {
+  width: 220px;
+  padding: 0.5rem 0.625rem;
+  background: var(--bg-panel);
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: "JetBrains Mono", "Chakra Petch", monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  outline: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 0 3px rgba(240, 178, 77, 0.25);
+  caret-color: var(--accent);
+}
+
+#textInputField::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+#textInputField:focus {
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 0 3px rgba(240, 178, 77, 0.35);
+}
+
+.text-input-hint {
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.2rem 0.4rem;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   Layer Blend Mode Select
+   ============================================================================ */
+
+.layer-blend {
+  width: 100%;
+  padding: 0.25rem 0.375rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 10px;
+  cursor: pointer;
+  margin-top: 0.25rem;
+  transition: border-color 0.15s;
+}
+
+.layer-blend:hover,
+.layer-blend:focus {
+  border-color: var(--accent);
+  outline: none;
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   Palette Editor Hint
+   ============================================================================ */
+
+#paletteColorEdit {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  border: none;
+  padding: 0;
+}
+
+.palette-btn::after {
+  content: "✎";
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 8px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  text-shadow: 0 0 3px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+
+.palette-btn:hover::after {
+  opacity: 0.7;
+}
+
+/* ============================================================================
+   Mobile Toggle Button
+   ============================================================================ */
+
+.mobile-only {
+  display: none;
+}
+
+/* ============================================================================
    Responsive Adjustments
    ============================================================================ */
 
@@ -655,7 +955,26 @@ body {
   }
 }
 
+@media (max-width: 1024px) {
+  .panels {
+    width: 230px;
+  }
+
+  .toolbar {
+    width: 52px;
+  }
+
+  .tool-button {
+    height: 44px;
+    font-size: 16px;
+  }
+}
+
 @media (max-width: 768px) {
+  .mobile-only {
+    display: flex;
+  }
+
   .app-layout {
     flex-direction: column;
   }
@@ -663,9 +982,15 @@ body {
   .toolbar {
     flex-direction: row;
     width: auto;
-    height: 60px;
+    height: 52px;
     border-right: none;
     border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .toolbar-title {
+    display: none;
   }
 
   .tool-group {
@@ -673,36 +998,66 @@ body {
     margin-bottom: 0;
     border-right: 1px solid var(--border);
     border-bottom: none;
-    padding-right: 0.5rem;
+    padding-right: 0.25rem;
+    padding-bottom: 0;
   }
 
   .tool-button {
-    width: 48px;
-    height: 100%;
+    width: 44px;
+    height: 52px;
+    font-size: 16px;
   }
 
   .toolbar-spacer {
     flex: 1;
+    min-width: 8px;
   }
 
   .mode-indicator {
     border-left: 1px solid var(--border);
     border-top: none;
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
+    writing-mode: horizontal-tb;
+    align-self: center;
   }
 
   .panels {
-    width: 100%;
-    max-height: 300px;
-    flex-direction: row;
-    overflow-x: auto;
-    border-left: none;
-    border-top: 1px solid var(--border);
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 260px;
+    max-height: none;
+    flex-direction: column;
+    z-index: 150;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    border-left: 2px solid var(--accent);
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .panels.open {
+    transform: translateX(0);
   }
 
   .panel {
-    min-width: 280px;
-    border-right: 1px solid var(--border);
-    border-bottom: none;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+  }
+
+  .topbar-left .subtitle {
+    display: none;
+  }
+
+  .statusbar {
+    font-size: 10px;
+    gap: 0.4rem;
+    padding: 0.35rem 0.5rem;
   }
 }
 

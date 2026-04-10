@@ -1,1 +1,236 @@
-/**\n * Performance Monitoring and Debugging Utilities\n * Tracks metrics, memory usage, and performance bottlenecks\n */\n\n/**\n * Performance profiler for method timing\n */\nexport class Profiler {\n  constructor(name = \"Profiler\") {\n    this.name = name;\n    this.marks = new Map();\n    this.measures = new Map();\n  }\n\n  /**\n   * Mark a point in time\n   */\n  mark(label) {\n    const key = `${this.name}::${label}`;\n    if (typeof performance !== \"undefined\" && performance.mark) {\n      try {\n        performance.mark(key);\n      } catch (e) {\n        console.warn(`Failed to mark ${key}:`, e);\n      }\n    }\n    this.marks.set(label, performance.now());\n  }\n\n  /**\n   * Measure between two marks\n   */\n  measure(label, startMark, endMark = label) {\n    if (!this.marks.has(startMark)) {\n      console.warn(`Mark not found: ${startMark}`);\n      return null;\n    }\n\n    const startTime = this.marks.get(startMark);\n    const endTime = this.marks.get(endMark) || performance.now();\n    const duration = endTime - startTime;\n\n    this.measures.set(label, duration);\n\n    // Try to use Performance API\n    const key = `${this.name}::${label}`;\n    if (typeof performance !== \"undefined\" && performance.measure) {\n      try {\n        performance.measure(key, `${this.name}::${startMark}`, `${this.name}::${endMark}`);\n      } catch (e) {\n        // Silently fail if marks don't exist in performance API\n      }\n    }\n\n    return duration;\n  }\n\n  /**\n   * Get measure duration\n   */\n  getDuration(label) {\n    return this.measures.get(label);\n  }\n\n  /**\n   * Get all measures as report\n   */\n  getReport() {\n    const entries = Array.from(this.measures.entries()).sort(\n      ([, a], [, b]) => b - a\n    );\n\n    return entries.map(([label, duration]) => \n      `${label}: ${duration.toFixed(2)}ms`\n    ).join(\"\\n\");\n  }\n\n  /**\n   * Clear all marks and measures\n   */\n  clear() {\n    this.marks.clear();\n    this.measures.clear();\n  }\n}\n\n/**\n * Memory usage tracker\n */\nexport class MemoryTracker {\n  constructor(name = \"Memory\") {\n    this.name = name;\n    this.snapshots = [];\n    this.hasPerformanceMemory = \n      typeof performance !== \"undefined\" && \n      performance.memory;\n  }\n\n  /**\n   * Take memory snapshot\n   */\n  snapshot(label = \"snapshot\") {\n    const snapshot = {\n      label,\n      timestamp: Date.now(),\n      time: performance.now()\n    };\n\n    if (this.hasPerformanceMemory) {\n      snapshot.usedJSHeapSize = performance.memory.usedJSHeapSize;\n      snapshot.totalJSHeapSize = performance.memory.totalJSHeapSize;\n      snapshot.jsHeapSizeLimit = performance.memory.jsHeapSizeLimit;\n    }\n\n    this.snapshots.push(snapshot);\n    return snapshot;\n  }\n\n  /**\n   * Get memory delta between two snapshots\n   */\n  getDelta(startLabel, endLabel) {\n    const start = this.snapshots.find((s) => s.label === startLabel);\n    const end = this.snapshots.find((s) => s.label === endLabel);\n\n    if (!start || !end) {\n      return null;\n    }\n\n    if (!this.hasPerformanceMemory) {\n      return {\n        timeDelta: end.time - start.time\n      };\n    }\n\n    return {\n      timeDelta: end.time - start.time,\n      heapDelta: end.usedJSHeapSize - start.usedJSHeapSize,\n      heapPercent: \n        ((end.usedJSHeapSize - start.usedJSHeapSize) / start.usedJSHeapSize * 100).toFixed(2)\n    };\n  }\n\n  /**\n   * Get memory report\n   */\n  getReport() {\n    if (!this.hasPerformanceMemory || this.snapshots.length === 0) {\n      return \"Memory tracking not available\";\n    }\n\n    const latest = this.snapshots[this.snapshots.length - 1];\n    return [\n      `Used: ${(latest.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB`,\n      `Total: ${(latest.totalJSHeapSize / 1024 / 1024).toFixed(2)}MB`,\n      `Limit: ${(latest.jsHeapSizeLimit / 1024 / 1024).toFixed(2)}MB`\n    ].join(\" | \");\n  }\n\n  /**\n   * Clear snapshots\n   */\n  clear() {\n    this.snapshots = [];\n  }\n}\n\n/**\n * Performance monitor coordinator\n */\nexport class PerformanceMonitor {\n  constructor(name = \"App\") {\n    this.name = name;\n    this.profiler = new Profiler(name);\n    this.memory = new MemoryTracker(name);\n    this.metrics = new Map();\n  }\n\n  /**\n   * Track custom metric\n   */\n  trackMetric(name, value) {\n    if (!this.metrics.has(name)) {\n      this.metrics.set(name, []);\n    }\n    this.metrics.get(name).push({\n      value,\n      timestamp: performance.now()\n    });\n  }\n\n  /**\n   * Get metric average\n   */\n  getMetricAverage(name) {\n    const values = this.metrics.get(name);\n    if (!values || values.length === 0) return null;\n    \n    const sum = values.reduce((a, b) => a + b.value, 0);\n    return sum / values.length;\n  }\n\n  /**\n   * Get performance summary\n   */\n  getSummary() {\n    return {\n      profiler: this.profiler.getReport(),\n      memory: this.memory.getReport(),\n      customMetrics: Array.from(this.metrics.entries()).reduce(\n        (acc, [name, values]) => ({\n          ...acc,\n          [name]: {\n            count: values.length,\n            avg: (values.reduce((a, b) => a + b.value, 0) / values.length).toFixed(2)\n          }\n        }),\n        {}\n      )\n    };\n  }\n\n  /**\n   * Print summary to console\n   */\n  printSummary() {\n    console.log(`📊 Performance Summary: ${this.name}`);\n    console.log(this.getSummary());\n  }\n\n  /**\n   * Reset all tracking\n   */\n  reset() {\n    this.profiler.clear();\n    this.memory.clear();\n    this.metrics.clear();\n  }\n}\n"
+/**
+ * Performance Monitoring and Debugging Utilities
+ * Tracks metrics, memory usage, and performance bottlenecks
+ */
+
+/**
+ * Performance profiler for method timing
+ */
+export class Profiler {
+  constructor(name = "Profiler") {
+    this.name = name;
+    this.marks = new Map();
+    this.measures = new Map();
+  }
+
+  /**
+   * Mark a point in time
+   */
+  mark(label) {
+    const key = `${this.name}::${label}`;
+    if (typeof performance !== "undefined" && performance.mark) {
+      try {
+        performance.mark(key);
+      } catch (e) {
+        console.warn(`Failed to mark ${key}:`, e);
+      }
+    }
+    this.marks.set(label, performance.now());
+  }
+
+  /**
+   * Measure between two marks
+   */
+  measure(label, startMark, endMark = label) {
+    if (!this.marks.has(startMark)) {
+      console.warn(`Mark not found: ${startMark}`);
+      return null;
+    }
+
+    const startTime = this.marks.get(startMark);
+    const endTime = this.marks.get(endMark) || performance.now();
+    const duration = endTime - startTime;
+
+    this.measures.set(label, duration);
+
+    const key = `${this.name}::${label}`;
+    if (typeof performance !== "undefined" && performance.measure) {
+      try {
+        performance.measure(key, `${this.name}::${startMark}`, `${this.name}::${endMark}`);
+      } catch (e) {
+        // Silently fail if marks don't exist in performance API
+      }
+    }
+
+    return duration;
+  }
+
+  /**
+   * Get measure duration
+   */
+  getDuration(label) {
+    return this.measures.get(label);
+  }
+
+  /**
+   * Get all measures as report
+   */
+  getReport() {
+    const entries = Array.from(this.measures.entries()).sort(
+      ([, a], [, b]) => b - a
+    );
+    return entries.map(([label, duration]) =>
+      `${label}: ${duration.toFixed(2)}ms`
+    ).join("\n");
+  }
+
+  /**
+   * Clear all marks and measures
+   */
+  clear() {
+    this.marks.clear();
+    this.measures.clear();
+  }
+}
+
+/**
+ * Memory usage tracker
+ */
+export class MemoryTracker {
+  constructor(name = "Memory") {
+    this.name = name;
+    this.snapshots = [];
+    this.hasPerformanceMemory =
+      typeof performance !== "undefined" &&
+      performance.memory;
+  }
+
+  /**
+   * Take memory snapshot
+   */
+  snapshot(label = "snapshot") {
+    const snapshot = {
+      label,
+      timestamp: Date.now(),
+      time: performance.now()
+    };
+
+    if (this.hasPerformanceMemory) {
+      snapshot.usedJSHeapSize = performance.memory.usedJSHeapSize;
+      snapshot.totalJSHeapSize = performance.memory.totalJSHeapSize;
+      snapshot.jsHeapSizeLimit = performance.memory.jsHeapSizeLimit;
+    }
+
+    this.snapshots.push(snapshot);
+    return snapshot;
+  }
+
+  /**
+   * Get memory delta between two snapshots
+   */
+  getDelta(startLabel, endLabel) {
+    const start = this.snapshots.find((s) => s.label === startLabel);
+    const end = this.snapshots.find((s) => s.label === endLabel);
+
+    if (!start || !end) {
+      return null;
+    }
+
+    if (!this.hasPerformanceMemory) {
+      return { timeDelta: end.time - start.time };
+    }
+
+    return {
+      timeDelta: end.time - start.time,
+      heapDelta: end.usedJSHeapSize - start.usedJSHeapSize,
+      heapPercent:
+        ((end.usedJSHeapSize - start.usedJSHeapSize) / start.usedJSHeapSize * 100).toFixed(2)
+    };
+  }
+
+  /**
+   * Get memory report
+   */
+  getReport() {
+    if (!this.hasPerformanceMemory || this.snapshots.length === 0) {
+      return "Memory tracking not available";
+    }
+
+    const latest = this.snapshots[this.snapshots.length - 1];
+    return [
+      `Used: ${(latest.usedJSHeapSize / 1024 / 1024).toFixed(2)}MB`,
+      `Total: ${(latest.totalJSHeapSize / 1024 / 1024).toFixed(2)}MB`,
+      `Limit: ${(latest.jsHeapSizeLimit / 1024 / 1024).toFixed(2)}MB`
+    ].join(" | ");
+  }
+
+  /**
+   * Clear snapshots
+   */
+  clear() {
+    this.snapshots = [];
+  }
+}
+
+/**
+ * Performance monitor coordinator
+ */
+export class PerformanceMonitor {
+  constructor(name = "App") {
+    this.name = name;
+    this.profiler = new Profiler(name);
+    this.memory = new MemoryTracker(name);
+    this.metrics = new Map();
+  }
+
+  /**
+   * Track custom metric
+   */
+  trackMetric(name, value) {
+    if (!this.metrics.has(name)) {
+      this.metrics.set(name, []);
+    }
+    this.metrics.get(name).push({
+      value,
+      timestamp: performance.now()
+    });
+  }
+
+  /**
+   * Get metric average
+   */
+  getMetricAverage(name) {
+    const values = this.metrics.get(name);
+    if (!values || values.length === 0) return null;
+
+    const sum = values.reduce((a, b) => a + b.value, 0);
+    return sum / values.length;
+  }
+
+  /**
+   * Get performance summary
+   */
+  getSummary() {
+    return {
+      profiler: this.profiler.getReport(),
+      memory: this.memory.getReport(),
+      customMetrics: Array.from(this.metrics.entries()).reduce(
+        (acc, [name, values]) => ({
+          ...acc,
+          [name]: {
+            count: values.length,
+            avg: (values.reduce((a, b) => a + b.value, 0) / values.length).toFixed(2)
+          }
+        }),
+        {}
+      )
+    };
+  }
+
+  /**
+   * Print summary to console
+   */
+  printSummary() {
+    console.log(`📊 Performance Summary: ${this.name}`);
+    console.log(this.getSummary());
+  }
+
+  /**
+   * Reset all tracking
+   */
+  reset() {
+    this.profiler.clear();
+    this.memory.clear();
+    this.metrics.clear();
+  }
+}

@@ -18,6 +18,7 @@
   
   /* Timing constants (matching JS CONFIG) */
   --popup-anim-duration: 0.25s;
+  --popup-glitch-speed: 1;
   --glitch-duration: 0.12s;
   --overlay-fade-duration: 0.18s;
 }
@@ -462,10 +463,10 @@ main {
   100% { opacity: 0; transform: scale(0.3) rotate(var(--rotation)); filter: none; }
 }
 
-.popup.glitch-out { animation: popup-glitch-out 0.35s steps(2, jump-none) forwards; }
-.popup.glitch-fade { animation: popup-glitch-fade 0.45s linear forwards; }
-.popup.glitch-slide { animation: popup-glitch-slide 0.38s cubic-bezier(0.7, -0.2, 0.6, 1.5) forwards; }
-.popup.glitch-scale { animation: popup-glitch-scale 0.32s cubic-bezier(0.5, 1.5, 0.7, 1) forwards; }
+.popup.glitch-out { animation: popup-glitch-out calc(0.35s * var(--popup-glitch-speed, 1)) steps(2, jump-none) forwards; }
+.popup.glitch-fade { animation: popup-glitch-fade calc(0.45s * var(--popup-glitch-speed, 1)) linear forwards; }
+.popup.glitch-slide { animation: popup-glitch-slide calc(0.38s * var(--popup-glitch-speed, 1)) cubic-bezier(0.7, -0.2, 0.6, 1.5) forwards; }
+.popup.glitch-scale { animation: popup-glitch-scale calc(0.32s * var(--popup-glitch-speed, 1)) cubic-bezier(0.5, 1.5, 0.7, 1) forwards; }
 
 /* === OVERLAY FADE ANIMATION === */
 @keyframes overlayFade {

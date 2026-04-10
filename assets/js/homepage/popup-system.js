@@ -5,11 +5,121 @@ export function createPopupSystem({
   iconData,
   popupColorSchemes,
   escapeHtml,
-  onOpenOracle
+  onOpenOracle,
+  getGlitchContext
 }) {
+  const POPUP_GLITCH_COOLDOWN_MS = 220;
+  let lastPopupGlitchOutAt = 0;
+
   function rectsOverlap(x, y, w, h, el) {
     const r = el.getBoundingClientRect();
     return !(x + w < r.left || x > r.right || y + h < r.top || y > r.bottom);
+  }
+
+  function weightedPick(entries) {
+    const total = entries.reduce((sum, entry) => sum + entry.weight, 0);
+    if (!total) return entries[0];
+    let cursor = Math.random() * total;
+    for (const entry of entries) {
+      cursor -= entry.weight;
+      if (cursor <= 0) return entry;
+    }
+    return entries[entries.length - 1];
+  }
+
+  function readGlitchContext() {
+    if (typeof getGlitchContext === 'function') {
+      try {
+        return getGlitchContext();
+      } catch (_error) {
+        return null;
+      }
+    }
+
+    const engine = window.glitchEngineV2;
+    if (!engine) return null;
+
+    if (typeof engine.getRecentTriggerContext === 'function') {
+      const recent = engine.getRecentTriggerContext();
+      if (recent) return recent;
+    }
+
+    if (typeof engine.getDiagnostics === 'function') {
+      return engine.getDiagnostics();
+    }
+
+    return null;
+  }
+
+  function pickHarmonyGlitchEffect() {
+    const effects = [
+      { cls: 'glitch-out', dur: 400, weight: 1 },
+      { cls: 'glitch-fade', dur: 500, weight: 1 },
+      { cls: 'glitch-slide', dur: 420, weight: 1 },
+      { cls: 'glitch-scale', dur: 350, weight: 1 }
+    ];
+
+    const context = readGlitchContext();
+    if (!context) return { effect: effects[Math.floor(Math.random() * effects.length)], speed: 1 };
+
+    const triggerType = context.triggerType || context.lastTriggerType || '';
+    const triggerAgeMs = Number.isFinite(context.ageMs)
+      ? context.ageMs
+      : Number.isFinite(context.millisSinceLastTrigger)
+        ? context.millisSinceLastTrigger
+        : Number.POSITIVE_INFINITY;
+    const energetic = triggerType === 'moveSwipe'
+      || triggerType === 'moveWhip'
+      || triggerType === 'moveSurge'
+      || triggerType === 'click';
+    const calm = triggerType === 'ambient'
+      || triggerType === 'move'
+      || triggerType === 'moveStall'
+      || triggerType === 'scrollUp'
+      || triggerType === 'scrollDown';
+
+    if (triggerAgeMs < 380 && energetic) {
+      effects[0].weight += 0.75;
+      effects[2].weight += 1.2;
+      effects[3].weight += 1.05;
+      effects[1].weight -= 0.35;
+    } else if (triggerAgeMs < 380 && calm) {
+      effects[0].weight += 0.4;
+      effects[1].weight += 1.15;
+      effects[2].weight -= 0.2;
+      effects[3].weight -= 0.25;
+    }
+
+    const brightnessTrend = Number(context.brightnessTrend) || 0;
+    if (brightnessTrend > 0.6) {
+      effects[0].weight += 0.3;
+      effects[2].weight += 0.35;
+    } else if (brightnessTrend < -0.45) {
+      effects[1].weight += 0.45;
+      effects[3].weight -= 0.2;
+    }
+
+    const qualityTier = context.qualityTier || '';
+    if (state.reducedMotion || qualityTier === 'low') {
+      effects[1].weight += 0.35;
+      effects[2].weight *= 0.75;
+      effects[3].weight *= 0.7;
+    }
+
+    effects.forEach((entry) => {
+      entry.weight = Math.max(0.15, entry.weight);
+    });
+
+    const speed = triggerAgeMs < 380 && energetic
+      ? 0.92
+      : triggerAgeMs < 380 && calm
+        ? 1.08
+        : 1;
+
+    return {
+      effect: weightedPick(effects),
+      speed
+    };
   }
 
   function findNonOverlappingPosition() {
@@ -126,20 +236,22 @@ export function createPopupSystem({
 
   function randomPopupGlitchOut() {
     if (!state.activePopups.length) return;
+
+    const now = Date.now();
+    if (now - lastPopupGlitchOutAt < POPUP_GLITCH_COOLDOWN_MS) return;
+
     const popup = state.activePopups[Math.floor(Math.random() * state.activePopups.length)];
     if (!popup) return;
 
-    const effects = [
-      { cls: 'glitch-out', dur: 400 },
-      { cls: 'glitch-fade', dur: 500 },
-      { cls: 'glitch-slide', dur: 420 },
-      { cls: 'glitch-scale', dur: 350 }
-    ];
+    const effects = ['glitch-out', 'glitch-fade', 'glitch-slide', 'glitch-scale'];
 
-    if (effects.some(e => popup.classList.contains(e.cls))) return;
+    if (effects.some(e => popup.classList.contains(e))) return;
 
-    const effect = effects[Math.floor(Math.random() * effects.length)];
+    const harmony = pickHarmonyGlitchEffect();
+    const effect = harmony.effect;
+    popup.style.setProperty('--popup-glitch-speed', String(harmony.speed));
     popup.classList.add(effect.cls);
+    lastPopupGlitchOutAt = now;
     setTimeout(() => removePopupElement(popup), effect.dur);
   }
 

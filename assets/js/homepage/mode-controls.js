@@ -68,11 +68,8 @@ export function createModeControls({
       if (label) label.textContent = 'CHILL: ON';
     }
 
-    if (localStorage.getItem(config.STORAGE_KEYS.POPUPS_PAUSED) === 'false') {
-      localStorage.removeItem(config.STORAGE_KEYS.POPUPS_PAUSED);
-    }
-
-    state.popupsPaused = loadPreference(config.STORAGE_KEYS.POPUPS_PAUSED, true);
+    // Popups are enabled by default on first visit; persisted preference still wins.
+    state.popupsPaused = loadPreference(config.STORAGE_KEYS.POPUPS_PAUSED, false);
     const popupBtn = document.getElementById('popup-control');
     if (popupBtn) {
       if (state.popupsPaused) {

@@ -86,6 +86,7 @@ export class PixelGlitchEngineV2 {
 
     this.glitchThrottle = 80;
     this.lastGlitchTime = 0;
+    this.lastTriggerContext = null;
     this.brightnessTrend = 0;
     this.fidelityStrength = 0.34;
     this.aggressiveVariation = true;
@@ -190,6 +191,7 @@ export class PixelGlitchEngineV2 {
     const cooldown = this.effectCooldowns[triggerType] || 0;
     if (currentTime - (this.lastTriggerAt[triggerType] || 0) < cooldown) return;
     this.lastTriggerAt[triggerType] = currentTime;
+    this.lastTriggerContext = { triggerType, meta, at: currentTime };
 
     if (this.isProcessing) {
       this.pendingTrigger = { type: triggerType, meta };
@@ -373,6 +375,7 @@ export class PixelGlitchEngineV2 {
   }
 
   getDiagnostics() {
+    const sinceLastTrigger = this.lastTriggerContext ? Math.max(0, now() - this.lastTriggerContext.at) : null;
     return {
       preset: this.presetName,
       qualityTier: this.activeTier.label,
@@ -382,7 +385,21 @@ export class PixelGlitchEngineV2 {
       fidelityStrength: this.fidelityStrength,
       aggressiveVariation: this.aggressiveVariation,
       lastDriftMetric: this.lastDriftMetric,
+      lastTriggerType: this.lastTriggerContext?.triggerType || null,
+      millisSinceLastTrigger: sinceLastTrigger,
       registeredEffects: this.registry.list().map((effect) => effect.id),
+      isInitialized: this.isInitialized
+    };
+  }
+
+  getRecentTriggerContext() {
+    if (!this.lastTriggerContext) return null;
+    return {
+      triggerType: this.lastTriggerContext.triggerType,
+      meta: this.lastTriggerContext.meta,
+      ageMs: Math.max(0, now() - this.lastTriggerContext.at),
+      qualityTier: this.activeTier.label,
+      brightnessTrend: this.brightnessTrend,
       isInitialized: this.isInitialized
     };
   }

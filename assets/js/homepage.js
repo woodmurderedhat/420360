@@ -89,7 +89,19 @@ const popupSystem = createPopupSystem({
   iconData: ICON_DATA,
   popupColorSchemes: POPUP_COLOR_SCHEMES,
   escapeHtml,
-  onOpenOracle: () => overlaySystem.openOracle()
+  onOpenOracle: () => overlaySystem.openOracle(),
+  getGlitchContext: () => {
+    const engine = window.glitchEngineV2;
+    if (!engine) return null;
+    if (typeof engine.getRecentTriggerContext === 'function') {
+      const recent = engine.getRecentTriggerContext();
+      if (recent) return recent;
+    }
+    if (typeof engine.getDiagnostics === 'function') {
+      return engine.getDiagnostics();
+    }
+    return null;
+  }
 });
 
 /* ============================================

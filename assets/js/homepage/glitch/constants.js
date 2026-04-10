@@ -10,14 +10,18 @@ export const PIPELINE_PRESETS = {
   cinematic: {
     move: [
       { id: 'drift-shear', weight: 1.4 },
+      { id: 'square-clone-hop', weight: 1.05 },
+      { id: 'square-mosaic-drift', weight: 0.95 },
       { id: 'chroma-banding', weight: 1.1 },
       { id: 'channel-fracture', weight: 0.95 },
+      { id: 'square-mirror-fold', weight: 0.85 },
       { id: 'edge-crawl', weight: 0.9 },
       { id: 'edge-sink', weight: 0.8 },
       { id: 'directional-exposure', weight: 1.1 }
     ],
     moveSwipe: [
       { id: 'swipe-tear', weight: 1.2 },
+      { id: 'square-stretch-cast', weight: 0.95 },
       { id: 'wave-tear', weight: 1.0 },
       { id: 'ribbon-desync', weight: 1.0 },
       { id: 'ghost-trails', weight: 0.8 }
@@ -29,7 +33,10 @@ export const PIPELINE_PRESETS = {
     ],
     moveJitter: [
       { id: 'jitter-grid', weight: 1.3 },
+      { id: 'square-clone-hop', weight: 0.9 },
+      { id: 'square-mosaic-drift', weight: 1.0 },
       { id: 'chroma-banding', weight: 1.0 },
+      { id: 'square-mirror-fold', weight: 0.85 },
       { id: 'edge-crawl', weight: 0.7 },
       { id: 'edge-sink', weight: 0.7 },
       { id: 'cut-horizontal-burn', weight: 0.75 },
@@ -39,6 +46,8 @@ export const PIPELINE_PRESETS = {
     ],
     moveSurge: [
       { id: 'surge-overdrive', weight: 1.3 },
+      { id: 'square-stretch-cast', weight: 0.9 },
+      { id: 'square-recursive-warp', weight: 0.7 },
       { id: 'wave-tear', weight: 1.0 },
       { id: 'ribbon-desync', weight: 1.0 },
       { id: 'temporal-echo', weight: 0.9 },
@@ -72,6 +81,8 @@ export const PIPELINE_PRESETS = {
     ],
     ambient: [
       { id: 'ambient-flicker', weight: 1.1 },
+      { id: 'square-clone-hop', weight: 0.62 },
+      { id: 'square-mosaic-drift', weight: 0.66 },
       { id: 'temporal-echo', weight: 0.7 },
       { id: 'per-channel-echo', weight: 0.75 },
       { id: 'edge-crawl', weight: 0.7 },
@@ -83,9 +94,13 @@ export const PIPELINE_PRESETS = {
     move: [
       { id: 'surge-overdrive', weight: 1.0 },
       { id: 'whip-burst', weight: 1.0 },
+      { id: 'square-clone-hop', weight: 1.05 },
+      { id: 'square-mosaic-drift', weight: 1.0 },
       { id: 'channel-fracture', weight: 1.0 },
+      { id: 'square-mirror-fold', weight: 0.95 },
       { id: 'wave-tear', weight: 0.95 },
       { id: 'jitter-grid', weight: 1.0 },
+      { id: 'square-stretch-cast', weight: 0.9 },
       { id: 'ribbon-desync', weight: 0.8 },
       { id: 'directional-exposure', weight: 1.0 },
       { id: 'cut-horizontal-burn', weight: 0.8 },
@@ -95,6 +110,7 @@ export const PIPELINE_PRESETS = {
     ],
     moveSwipe: [
       { id: 'swipe-tear', weight: 1.1 },
+      { id: 'square-stretch-cast', weight: 1.0 },
       { id: 'surge-overdrive', weight: 1.1 },
       { id: 'wave-tear', weight: 1.05 },
       { id: 'tile-shatter', weight: 0.9 }
@@ -107,7 +123,10 @@ export const PIPELINE_PRESETS = {
     ],
     moveJitter: [
       { id: 'jitter-grid', weight: 1.2 },
+      { id: 'square-clone-hop', weight: 0.95 },
+      { id: 'square-mosaic-drift', weight: 1.0 },
       { id: 'ghost-trails', weight: 0.9 },
+      { id: 'square-mirror-fold', weight: 0.95 },
       { id: 'edge-crawl', weight: 0.9 },
       { id: 'edge-sink', weight: 0.9 },
       { id: 'cut-horizontal-burn', weight: 0.9 },
@@ -117,6 +136,8 @@ export const PIPELINE_PRESETS = {
     ],
     moveSurge: [
       { id: 'surge-overdrive', weight: 1.4 },
+      { id: 'square-stretch-cast', weight: 1.0 },
+      { id: 'square-recursive-warp', weight: 0.86 },
       { id: 'channel-fracture', weight: 1.05 },
       { id: 'impact-fracture', weight: 1.0 },
       { id: 'wave-tear', weight: 1.0 },
@@ -134,6 +155,7 @@ export const PIPELINE_PRESETS = {
     click: [
       { id: 'impact-fracture', weight: 1.2 },
       { id: 'surge-overdrive', weight: 1.0 },
+      { id: 'square-mirror-fold', weight: 0.9 },
       { id: 'edge-shard-jitter', weight: 1.0 },
       { id: 'ghost-trails', weight: 1.0 }
     ],
@@ -147,6 +169,8 @@ export const PIPELINE_PRESETS = {
     ],
     ambient: [
       { id: 'ambient-flicker', weight: 0.9 },
+      { id: 'square-clone-hop', weight: 0.72 },
+      { id: 'square-mosaic-drift', weight: 0.78 },
       { id: 'edge-crawl', weight: 0.9 },
       { id: 'edge-sink', weight: 0.9 },
       { id: 'temporal-echo', weight: 0.9 },
@@ -157,6 +181,8 @@ export const PIPELINE_PRESETS = {
   subtle: {
     move: [
       { id: 'drift-shear', weight: 1.4 },
+      { id: 'square-clone-hop', weight: 0.72 },
+      { id: 'square-mosaic-drift', weight: 0.68 },
       { id: 'chroma-banding', weight: 1.0 },
       { id: 'directional-exposure', weight: 0.8 }
     ],
@@ -164,6 +190,8 @@ export const PIPELINE_PRESETS = {
     moveWhip: [{ id: 'whip-burst', weight: 1.0 }],
     moveJitter: [
       { id: 'jitter-grid', weight: 1.0 },
+      { id: 'square-clone-hop', weight: 0.66 },
+      { id: 'square-mosaic-drift', weight: 0.7 },
       { id: 'cut-horizontal-burn', weight: 0.6 },
       { id: 'cut-horizontal-sink', weight: 0.6 },
       { id: 'cut-vertical-burn', weight: 0.6 },
@@ -176,6 +204,7 @@ export const PIPELINE_PRESETS = {
     scrollDown: [{ id: 'scroll-down-sink', weight: 1.0 }],
     ambient: [
       { id: 'ambient-flicker', weight: 1.0 },
+      { id: 'square-clone-hop', weight: 0.42 },
       { id: 'edge-crawl', weight: 0.7 },
       { id: 'edge-sink', weight: 0.7 }
     ]
@@ -183,6 +212,8 @@ export const PIPELINE_PRESETS = {
   mobileSafe: {
     move: [
       { id: 'drift-shear', weight: 1.3 },
+      { id: 'square-clone-hop', weight: 0.62 },
+      { id: 'square-mosaic-drift', weight: 0.58 },
       { id: 'directional-exposure', weight: 0.8 }
     ],
     moveSwipe: [{ id: 'swipe-tear', weight: 1.0 }],
@@ -201,6 +232,7 @@ export const PIPELINE_PRESETS = {
     scrollDown: [{ id: 'scroll-down-sink', weight: 1.0 }],
     ambient: [
       { id: 'ambient-flicker', weight: 1.0 },
+      { id: 'square-clone-hop', weight: 0.34 },
       { id: 'edge-crawl', weight: 0.6 },
       { id: 'edge-sink', weight: 0.6 }
     ]

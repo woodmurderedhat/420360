@@ -283,6 +283,213 @@ export function registerDefaultEffects(registry) {
   });
 
   registry.register({
+    id: 'square-clone-hop',
+    label: 'Square Clone Hop',
+    cost: 2,
+    chance: 0.92,
+    balance: 0,
+    apply(ctx) {
+      const { data, source, width, height } = ctx;
+      const intensity = Math.min(1.8, effectIntensity(ctx, 1.08) * ctx.quality.intensityScale);
+      const blockCount = 5 + Math.floor(Math.random() * 6 + intensity * 3);
+      const maxShiftX = Math.max(12, Math.floor(width * 0.22));
+      const maxShiftY = Math.max(8, Math.floor(height * 0.14));
+
+      for (let i = 0; i < blockCount; i += 1) {
+        const size = 10 + Math.floor(Math.random() * 38);
+        const srcX = Math.floor(Math.random() * Math.max(1, width - size));
+        const srcY = Math.floor(Math.random() * Math.max(1, height - size));
+        const dstX = Math.max(0, Math.min(width - size, srcX + Math.floor((Math.random() * 2 - 1) * maxShiftX)));
+        const dstY = Math.max(0, Math.min(height - size, srcY + Math.floor((Math.random() * 2 - 1) * maxShiftY)));
+
+        for (let y = 0; y < size; y += 1) {
+          for (let x = 0; x < size; x += 1) {
+            if (Math.random() > 0.76 * ctx.quality.chanceScale) continue;
+
+            const sx = Math.max(0, Math.min(width - 1, srcX + x + (Math.random() < 0.35 ? Math.floor(Math.random() * 5) - 2 : 0)));
+            const sy = Math.max(0, Math.min(height - 1, srcY + y + (Math.random() < 0.25 ? Math.floor(Math.random() * 3) - 1 : 0)));
+            const dx = dstX + x;
+            const dy = dstY + y;
+            const srcIdx = (sy * width + sx) * 4;
+            const dstIdx = (dy * width + dx) * 4;
+
+            data[dstIdx] = source[srcIdx];
+            data[dstIdx + 1] = source[srcIdx + 1];
+            data[dstIdx + 2] = source[srcIdx + 2];
+            data[dstIdx + 3] = 255;
+          }
+        }
+      }
+    }
+  });
+
+  registry.register({
+    id: 'square-stretch-cast',
+    label: 'Square Stretch Cast',
+    cost: 3,
+    chance: 0.86,
+    minTier: 'balanced',
+    balance: 0,
+    apply(ctx) {
+      const { data, source, width, height } = ctx;
+      const intensity = Math.min(1.9, effectIntensity(ctx, 1.1));
+      const castCount = 3 + Math.floor(Math.random() * 4 + intensity * 1.7);
+
+      for (let i = 0; i < castCount; i += 1) {
+        const side = 12 + Math.floor(Math.random() * 32);
+        const srcX = Math.floor(Math.random() * Math.max(1, width - side));
+        const srcY = Math.floor(Math.random() * Math.max(1, height - side));
+        const horizontal = Math.random() < 0.5;
+        const stretch = 1.5 + Math.random() * 1.7;
+        const dstW = horizontal ? Math.max(8, Math.floor(side * stretch)) : side;
+        const dstH = horizontal ? side : Math.max(8, Math.floor(side * stretch));
+        const dstX = Math.floor(Math.random() * Math.max(1, width - dstW));
+        const dstY = Math.floor(Math.random() * Math.max(1, height - dstH));
+
+        for (let y = 0; y < dstH; y += 1) {
+          const sy = Math.max(0, Math.min(height - 1, srcY + Math.floor((y / Math.max(1, dstH - 1)) * (side - 1))));
+          for (let x = 0; x < dstW; x += 1) {
+            if (Math.random() > 0.72 * ctx.quality.chanceScale) continue;
+
+            const sx = Math.max(0, Math.min(width - 1, srcX + Math.floor((x / Math.max(1, dstW - 1)) * (side - 1))));
+            const dx = dstX + x;
+            const dy = dstY + y;
+            const srcIdx = (sy * width + sx) * 4;
+            const dstIdx = (dy * width + dx) * 4;
+
+            data[dstIdx] = source[srcIdx];
+            data[dstIdx + 1] = source[srcIdx + 1];
+            data[dstIdx + 2] = source[srcIdx + 2];
+            data[dstIdx + 3] = 255;
+          }
+        }
+      }
+    }
+  });
+
+  registry.register({
+    id: 'square-mosaic-drift',
+    label: 'Square Mosaic Drift',
+    cost: 2,
+    chance: 0.9,
+    balance: 0,
+    apply(ctx) {
+      const { data, source, width, height } = ctx;
+      const intensity = Math.min(1.8, effectIntensity(ctx, 1.06));
+      const clusters = 4 + Math.floor(Math.random() * 5 + intensity * 2);
+
+      for (let c = 0; c < clusters; c += 1) {
+        const tile = 6 + Math.floor(Math.random() * 12);
+        const srcX = Math.floor(Math.random() * Math.max(1, width - tile));
+        const srcY = Math.floor(Math.random() * Math.max(1, height - tile));
+        const baseX = Math.max(0, Math.min(width - tile, srcX + (Math.floor(Math.random() * 81) - 40)));
+        const baseY = Math.max(0, Math.min(height - tile, srcY + (Math.floor(Math.random() * 51) - 25)));
+        const dupes = 3 + Math.floor(Math.random() * 4 + intensity);
+
+        for (let d = 0; d < dupes; d += 1) {
+          const dstX = Math.max(0, Math.min(width - tile, baseX + (Math.floor(Math.random() * 61) - 30)));
+          const dstY = Math.max(0, Math.min(height - tile, baseY + (Math.floor(Math.random() * 35) - 17)));
+
+          for (let y = 0; y < tile; y += 1) {
+            for (let x = 0; x < tile; x += 1) {
+              if (Math.random() > 0.68 * ctx.quality.chanceScale) continue;
+
+              const srcIdx = ((srcY + y) * width + (srcX + x)) * 4;
+              const dstIdx = ((dstY + y) * width + (dstX + x)) * 4;
+
+              data[dstIdx] = source[srcIdx];
+              data[dstIdx + 1] = source[srcIdx + 1];
+              data[dstIdx + 2] = source[srcIdx + 2];
+              data[dstIdx + 3] = 255;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  registry.register({
+    id: 'square-mirror-fold',
+    label: 'Square Mirror Fold',
+    cost: 2,
+    chance: 0.86,
+    minTier: 'balanced',
+    balance: 0,
+    apply(ctx) {
+      const { data, source, width, height } = ctx;
+      const intensity = Math.min(1.7, effectIntensity(ctx, 1.04));
+      const folds = 4 + Math.floor(Math.random() * 5 + intensity * 1.5);
+
+      for (let i = 0; i < folds; i += 1) {
+        const size = 10 + Math.floor(Math.random() * 34);
+        const srcX = Math.floor(Math.random() * Math.max(1, width - size));
+        const srcY = Math.floor(Math.random() * Math.max(1, height - size));
+        const dstX = Math.floor(Math.random() * Math.max(1, width - size));
+        const dstY = Math.floor(Math.random() * Math.max(1, height - size));
+        const flipX = Math.random() < 0.5;
+        const flipY = Math.random() < 0.5;
+
+        for (let y = 0; y < size; y += 1) {
+          for (let x = 0; x < size; x += 1) {
+            if (Math.random() > 0.74 * ctx.quality.chanceScale) continue;
+
+            const sampleX = flipX ? size - 1 - x : x;
+            const sampleY = flipY ? size - 1 - y : y;
+            const srcIdx = ((srcY + sampleY) * width + (srcX + sampleX)) * 4;
+            const dstIdx = ((dstY + y) * width + (dstX + x)) * 4;
+
+            data[dstIdx] = source[srcIdx];
+            data[dstIdx + 1] = source[srcIdx + 1];
+            data[dstIdx + 2] = source[srcIdx + 2];
+            data[dstIdx + 3] = 255;
+          }
+        }
+      }
+    }
+  });
+
+  registry.register({
+    id: 'square-recursive-warp',
+    label: 'Square Recursive Warp',
+    cost: 3,
+    chance: 0.8,
+    minTier: 'high',
+    balance: 0,
+    apply(ctx) {
+      const { data, source, width, height } = ctx;
+      const intensity = Math.min(2, effectIntensity(ctx, 1.14));
+      const passes = 2 + Math.floor(Math.random() * 2);
+
+      for (let pass = 0; pass < passes; pass += 1) {
+        const side = 14 + Math.floor(Math.random() * 26);
+        const srcX = Math.floor(Math.random() * Math.max(1, width - side));
+        const srcY = Math.floor(Math.random() * Math.max(1, height - side));
+        const scale = 0.65 + Math.random() * (1.35 + intensity * 0.25);
+        const dstSide = Math.max(8, Math.floor(side * scale));
+        const dstX = Math.floor(Math.random() * Math.max(1, width - dstSide));
+        const dstY = Math.floor(Math.random() * Math.max(1, height - dstSide));
+
+        for (let y = 0; y < dstSide; y += 1) {
+          const sy = Math.max(0, Math.min(height - 1, srcY + Math.floor((y / Math.max(1, dstSide - 1)) * (side - 1))));
+          for (let x = 0; x < dstSide; x += 1) {
+            if (Math.random() > 0.66 * ctx.quality.chanceScale) continue;
+
+            const sx = Math.max(0, Math.min(width - 1, srcX + Math.floor((x / Math.max(1, dstSide - 1)) * (side - 1))));
+            const dstIdx = ((dstY + y) * width + (dstX + x)) * 4;
+            const srcIdx = (sy * width + sx) * 4;
+            const restore = 0.16 + pass * 0.11;
+
+            data[dstIdx] = Math.floor(source[srcIdx] * (1 - restore) + source[dstIdx] * restore);
+            data[dstIdx + 1] = Math.floor(source[srcIdx + 1] * (1 - restore) + source[dstIdx + 1] * restore);
+            data[dstIdx + 2] = Math.floor(source[srcIdx + 2] * (1 - restore) + source[dstIdx + 2] * restore);
+            data[dstIdx + 3] = 255;
+          }
+        }
+      }
+    }
+  });
+
+  registry.register({
     id: 'temporal-echo',
     label: 'Temporal Echo',
     cost: 2,

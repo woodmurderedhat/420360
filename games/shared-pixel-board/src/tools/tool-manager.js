@@ -13,6 +13,7 @@ class ToolManager {
     this.renderer = renderer;
     this.tools = new Map();
     this.activeTool = null;
+    this.firebaseWriter = null;
 
     // Tools will be registered as they're created
     this.registerToolPlaceholders();
@@ -230,6 +231,20 @@ class ToolManager {
     state.pushHistory(historyEntry);
     this.renderer.render();
     state.stats.placements++;
+
+    // Write to Firebase if available (no cooldown - instant sync)
+    if (this.firebaseWriter) {
+      this.firebaseWriter(cells, color).catch((err) => {
+        console.error("Firebase write failed:", err);
+      });
+    }
+  }
+
+  /**
+   * Set Firebase writer function for pixel sync
+   */
+  setFirebaseWriter(writerFn) {
+    this.firebaseWriter = writerFn;
   }
 }
 

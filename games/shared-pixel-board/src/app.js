@@ -26,6 +26,7 @@ import {
   getDatabase,
   ref,
   set,
+  update,
   onChildAdded,
   onChildChanged,
   onValue,
@@ -35,10 +36,40 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
 // ============================================================================
+// GLOBAL STATE
+// ============================================================================
+
+// Firebase database reference (set after initialization)
+let firebaseDb = null;
+
+// ============================================================================
+// FIREBASE UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Write pixels to Firebase without cooldown
+ * Called by tools after committing pixels to local state
+ */
+async function writePixelsToFirebase(cells, color) {
+  if (!firebaseDb) return;
+
+  try {
+    const updates = {};
+    for (const cell of cells) {
+      const key = `pixels/${cell.x}_${cell.y}`;
+      updates[key] = color;
+    }
+    await update(ref(firebaseDb), updates);
+  } catch (error) {
+    console.error("Firebase write error:", error);
+  }
+}
+
+// ============================================================================
 // APPLICATION INITIALIZATION
 // ============================================================================
 
-async function initializeApp() {
+async function initializeApplication() {
   try {
     console.log("🎨 Initializing Shared Pixel Board...");
 
@@ -61,6 +92,9 @@ async function initializeApp() {
 
     // Initialize tool manager
     const toolManager = new ToolManager(renderer);
+    toolManager.setFirebaseWriter(firebaseDb 
+      ? (cells, color) => writePixelsToFirebase(cells, color)
+      : null);
 
     // Register tools
     toolManager.registerTool(TOOLS.PIXEL, createPixelTool(toolManager));
@@ -82,6 +116,11 @@ async function initializeApp() {
     // Bind UI events
     bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeHelpBtn, helpPanel);
     console.log("✓ UI events bound");
+
+    // Setup layers panel
+    setupLayerControls();
+    renderLayersList();
+    console.log("✓ Layers panel initialized");
 
     // Render initial board
     renderer.render();
@@ -284,6 +323,106 @@ function updateColorUI() {
 }
 
 // ============================================================================
+// LAYERS PANEL MANAGEMENT
+// ============================================================================
+
+function renderLayersList() {
+  const container = document.getElementById("layersContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  // Render each layer
+  state.layers.forEach((layer, index) => {
+    const layerEl = document.createElement("div");
+    layerEl.className = "layer-item";
+    layerEl.dataset.layerId = layer.id;
+
+    const isActive = layer.id === state.activeLayerId;
+    if (isActive) layerEl.classList.add("active");
+
+    // Layer name and controls
+    const nameEl = document.createElement("span");
+    nameEl.className = "layer-name";
+    nameEl.textContent = layer.name;
+    nameEl.addEventListener("click", () => {
+      state.activeLayerId = layer.id;
+      renderLayersList();
+    });
+
+    // Visibility toggle
+    const visToggle = document.createElement("button");
+    visToggle.className = "layer-toggle-visibility";
+    visToggle.textContent = layer.visible ? "👁️" : "🚫";
+    visToggle.title = layer.visible ? "Hide layer" : "Show layer";
+    visToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      layer.visible = !layer.visible;
+      renderLayersList();
+    });
+
+    // Opacity slider
+    const opacityInput = document.createElement("input");
+    opacityInput.type = "range";
+    opacityInput.min = "0";
+    opacityInput.max = "100";
+    opacityInput.value = Math.round(layer.opacity * 100);
+    opacityInput.className = "layer-opacity";
+    opacityInput.title = `Opacity: ${Math.round(layer.opacity * 100)}%`;
+    opacityInput.addEventListener("input", (e) => {
+      layer.opacity = Number(e.target.value) / 100;
+      e.target.title = `Opacity: ${e.target.value}%`;
+    });
+
+    // Delete button
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "layer-delete";
+    deleteBtn.textContent = "✕";
+    deleteBtn.title = "Delete layer";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (state.layers.length > 1) {
+        const idx = state.layers.findIndex((l) => l.id === layer.id);
+        if (idx >= 0) {
+          state.layers.splice(idx, 1);
+          if (state.activeLayerId === layer.id) {
+            state.activeLayerId = state.layers[0].id;
+          }
+          renderLayersList();
+        }
+      } else {
+        state.emit("notice", { message: "Cannot delete last layer", ok: false });
+      }
+    });
+
+    layerEl.appendChild(visToggle);
+    layerEl.appendChild(nameEl);
+    layerEl.appendChild(opacityInput);
+    layerEl.appendChild(deleteBtn);
+    container.appendChild(layerEl);
+  });
+}
+
+function setupLayerControls() {
+  const addLayerBtn = document.getElementById("addLayerBtn");
+  if (addLayerBtn) {
+    addLayerBtn.addEventListener("click", () => {
+      const newLayer = {
+        id: `layer_${Date.now()}`,
+        name: `Layer ${state.layers.length + 1}`,
+        pixels: new Map(),
+        visible: true,
+        opacity: 1,
+        blendMode: "normal"
+      };
+      state.layers.push(newLayer);
+      state.activeLayerId = newLayer.id;
+      renderLayersList();
+    });
+  }
+}
+
+// ============================================================================
 // FIREBASE INTEGRATION (NO COOLDOWN)
 // ============================================================================
 
@@ -298,10 +437,10 @@ async function initializeFirebase(toolManager, renderer) {
     // Initialize analytics
     getAnalytics(app);
 
-    const db = getDatabase(app);
+    firebaseDb = getDatabase(app);
 
     // Listen for connection status
-    onValue(ref(db, ".info/connected"), (snap) => {
+    onValue(ref(firebaseDb, ".info/connected"), (snap) => {
       const connected = Boolean(snap.val());
       state.isConnected = connected;
       const statusEl = document.getElementById("connectionStatus");
@@ -313,7 +452,7 @@ async function initializeFirebase(toolManager, renderer) {
     });
 
     // Listen for pixel updates
-    onChildAdded(ref(db, "pixels"), (snap) => {
+    onChildAdded(ref(firebaseDb, "pixels"), (snap) => {
       const key = snap.key;
       const color = String(snap.val() || "").toUpperCase();
       if (!/^#[0-9A-F]{6}$/.test(color) || !key.includes("_")) return;
@@ -323,7 +462,7 @@ async function initializeFirebase(toolManager, renderer) {
       renderer.render();
     });
 
-    onChildChanged(ref(db, "pixels"), (snap) => {
+    onChildChanged(ref(firebaseDb, "pixels"), (snap) => {
       const key = snap.key;
       const color = String(snap.val() || "").toUpperCase();
       if (!/^#[0-9A-F]{6}$/.test(color) || !key.includes("_")) return;
@@ -334,12 +473,12 @@ async function initializeFirebase(toolManager, renderer) {
     });
 
     // Update presence
-    const presenceRef = ref(db, `presence/${state.sessionId}`);
+    const presenceRef = ref(firebaseDb, `presence/${state.sessionId}`);
     await set(presenceRef, { at: serverTimestamp() });
     onDisconnect(presenceRef).remove();
 
     // Listen for user count
-    onValue(ref(db, "presence"), (snap) => {
+    onValue(ref(firebaseDb, "presence"), (snap) => {
       const count = snap.exists() ? Object.keys(snap.val()).length : 0;
       const userCount = document.getElementById("userCount");
       if (userCount) userCount.textContent = `Users: ${count}`;
@@ -355,6 +494,11 @@ async function initializeFirebase(toolManager, renderer) {
     });
 
     state.emit("notice", { message: "Firebase sync active (no cooldown)", ok: true });
+
+    // Now set the Firebase writer on tool manager
+    if (toolManager) {
+      toolManager.setFirebaseWriter((cells, color) => writePixelsToFirebase(cells, color));
+    }
   } catch (error) {
     console.error("Firebase init failed:", error);
     state.emit("notice", { message: `Firebase error: ${error.message}`, ok: false });
@@ -365,4 +509,4 @@ async function initializeFirebase(toolManager, renderer) {
 // START APPLICATION
 // ============================================================================
 
-document.addEventListener("DOMContentLoaded", initializeApp);
+document.addEventListener("DOMContentLoaded", initializeApplication);

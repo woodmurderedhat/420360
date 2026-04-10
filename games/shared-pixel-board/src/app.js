@@ -817,15 +817,26 @@ async function initializeFirebase(toolManager, renderer) {
       }
     });
 
+    // Debounced render to batch rapid incoming pixel updates (e.g. initial load)
+    let renderPending = false;
+    function scheduleRender() {
+      if (!renderPending) {
+        renderPending = true;
+        setTimeout(() => {
+          renderPending = false;
+          renderer.render();
+        }, 30);
+      }
+    }
+
     // Listen for pixel updates
     onChildAdded(ref(firebaseDb, "pixels"), (snap) => {
       const key = snap.key;
       const color = String(snap.val() || "").toUpperCase();
       if (!/^#[0-9A-F]{6}$/.test(color) || !key.includes("_")) return;
 
-      const [x, y] = key.split("_").map(Number);
       state.layers[0].pixels.set(key, color);
-      renderer.render();
+      scheduleRender();
     });
 
     onChildChanged(ref(firebaseDb, "pixels"), (snap) => {
@@ -833,9 +844,8 @@ async function initializeFirebase(toolManager, renderer) {
       const color = String(snap.val() || "").toUpperCase();
       if (!/^#[0-9A-F]{6}$/.test(color) || !key.includes("_")) return;
 
-      const [x, y] = key.split("_").map(Number);
       state.layers[0].pixels.set(key, color);
-      renderer.render();
+      scheduleRender();
     });
 
     // Update presence

@@ -8,27 +8,31 @@ import { validCoordinates } from "../core/math.js";
 export function createPixelTool(toolManager) {
   return {
     name: "pixel",
+    isDrawing: false,
+    lastCell: null,
+
     async onPointerDown(x, y, event) {
       if (!validCoordinates(x, y)) return;
-
-      // Place single pixel
-      const cells = [{ x, y }];
-      toolManager.commitPixels(cells, state.selectedColor);
+      this.isDrawing = true;
+      this.lastCell = { x, y };
+      toolManager.commitPixels([{ x, y }], state.selectedColor);
     },
 
     onPointerMove(x, y, event) {
-      // Render pixel preview on hover
-      if (validCoordinates(x, y)) {
-        // Preview handled by canvas hover state
-      }
+      if (!this.isDrawing || !validCoordinates(x, y)) return;
+      if (this.lastCell && this.lastCell.x === x && this.lastCell.y === y) return;
+      this.lastCell = { x, y };
+      toolManager.commitPixels([{ x, y }], state.selectedColor);
     },
 
     async onPointerUp(x, y, event) {
-      // No-op
+      this.isDrawing = false;
+      this.lastCell = null;
     },
 
     cancel() {
-      // No-op
+      this.isDrawing = false;
+      this.lastCell = null;
     }
   };
 }

@@ -2,27 +2,23 @@
 // Contains large text chunks for homepage blurb system
 
 window.SENTENCES = [
-  `Hell yeah. 420 and chill. The web's all fucked up in the best way. We're stoned on code, blazed on nostalgia, vibing through the digital haze.
+  `Ever notice how every piece of technology is just one update away from ruining your whole damn life? Phone works perfect, then boom, update. Now it needs WiFi, a password, a blood sacrifice, and your childhood dog's name just to open the calculator.`,
 
-Get baked and build shit. The homepage is where the weed-haze hits different. CRT glow, infinite scroll, your mind dissolving into pixels.
+  `I love how people say "just be yourself." That's terrible advice. Have you met people? Some of you shouldn't be yourselves unsupervised.`,
 
-Yo, smoke this internet. It hits hard. Memes are the new weed, and the algorithms are always watching. But idgaf. We're here, we're high, we're creating.`,
+  `You ever argue with someone who's clearly wrong, but they got that confidence? That blind, psychotic confidence. You start doubting reality. Like maybe gravity is optional and you're the idiot.`,
 
-  `Puff the web. 1996 called and it's damn high. Click through the void, get lost in the chat rooms, fall into banner ads like they're black holes.
+  `Why does every guy suddenly become a doctor the second he gets sick? "Nah I don't need help." Meanwhile he's coughing like a haunted accordion and Googling his own funeral playlist.`,
 
-The internet's a damn trip. Code is the new weed, and bugs are features when you're stoned enough. The server's burning, the connection's shit, but honestly? It's beautiful.
+  `I don't trust anyone who wakes up happy. That's not natural. You shouldn't wake up like a Disney character. You should wake up confused, slightly angry, wondering why the hell you're still alive.`,
 
-Dude, the web fucking rules. Let's get blazed and make something weird. Something broken. Something that matters.`,
+  `People say "money can't buy happiness." Yeah? Try being broke for a while and tell me how spiritually fulfilled you feel eating instant noodles like some defeated raccoon.`,
 
-  `Fuck yeah, build it all. Break it. Fix it with code and cannabis. The homepage glows like a bong hit at 3AM.
+  `Why is it that every group chat has one psycho who replies instantly? Like relax. What are you doing, just staring at the screen waiting for human interaction like a damn lighthouse keeper?`,
 
-Every crash is enlightenment. Every error a cosmic joke. We're architects of dumb shit that somehow works when you're high enough to see the pattern.
+  `You ever read the terms and conditions? Of course not. Nobody does. We all just scroll to the bottom like "yeah yeah, take my soul, just let me watch the video."`,
 
-The internet's our playground. Let's get wrecked and pioneer this bitch together.`,
+  `Gym culture is insane. People in there acting like they're training for war. You're lifting a heavy circle and putting it down again. Calm down, Achilles.`,
 
-  `Smoke up. The pixels are calling. Short, weird, and gloriously fucked. That's the spirit.
-
-Weed and web. Code and chaos. A match made in some fever dream. We're building monuments to all that's beautifully broken.
-
-Welcome back. The joint's already lit. Come get high on pixels and possibility.`
+  `The older you get, the less dramatic your goals become. When you're young it's "I wanna change the world." Now it's like, "I hope nothing weird happens today."`
 ];

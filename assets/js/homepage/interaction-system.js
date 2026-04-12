@@ -10,6 +10,7 @@ export function createInteractionSystem({
   openOracle,
   openIssues,
   toggleVideoWindow,
+  toggleCommunePanel,
   toggleChillMode,
   togglePopupPause,
   closeOverlay,
@@ -140,6 +141,7 @@ export function createInteractionSystem({
         case 'o': openOracle(); break;
         case 'i': openIssues(); break;
         case 'v': toggleVideoWindow(); break;
+        case 'n': toggleCommunePanel?.(); break;
         case 'c': toggleChillMode(); break;
         case 'p': togglePopupPause(); break;
         case 'x': triggerControlChaosPulse(); break;
@@ -296,6 +298,14 @@ export function createInteractionSystem({
       videoBtn.addEventListener('click', e => { e.stopPropagation(); toggleVideoWindow(); });
       videoBtn.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleVideoWindow(); }
+      });
+    }
+
+    const communeBtn = document.getElementById('commune-control');
+    if (communeBtn) {
+      communeBtn.addEventListener('click', e => { e.stopPropagation(); toggleCommunePanel?.(); });
+      communeBtn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCommunePanel?.(); }
       });
     }
   }

@@ -30,6 +30,7 @@ import { createVisualEffects } from './homepage/visual-effects.js';
 import { createModeControls } from './homepage/mode-controls.js';
 import { startHomepageBootstrap } from './homepage/bootstrap.js';
 import { createHomepageActions } from './homepage/actions.js';
+import { initAddons } from './homepage/addons/index.js';
 
 
 /* ============================================
@@ -164,6 +165,7 @@ const interactionSystem = createInteractionSystem({
   openOracle: overlaySystem.openOracle,
   openIssues: actions.openIssues,
   toggleVideoWindow: actions.toggleVideoWindow,
+  toggleCommunePanel: () => window._toggleCommunePanel?.(),
   toggleChillMode: modeControls.toggleChillMode,
   togglePopupPause: modeControls.togglePopupPause,
   closeOverlay: overlaySystem.closeOverlay,
@@ -178,6 +180,9 @@ const interactionSystem = createInteractionSystem({
   stopButtonChaos: visualEffects.stopButtonChaos,
   triggerControlChaosPulse: visualEffects.triggerControlChaosPulse
 });
+
+// Addons are loaded after boot so they don't block the initial render
+initAddons({ textSystem });
 
 startHomepageBootstrap({
   state,

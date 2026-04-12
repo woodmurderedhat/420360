@@ -25,6 +25,38 @@
         ".validate": "$uid.matches(/^anon_[a-z0-9]+_[a-z0-9]+$/) && newData.hasChildren(['at']) && newData.child('at').val() == now"
       }
     },
+    "shoutbox": {
+      ".read": true,
+      "$msgId": {
+        ".write": "!data.exists() || (auth == null && newData.child('uid').val() == data.child('uid').val())",
+        ".validate": "newData.hasChildren(['text','ts','uid','up','dn']) && newData.child('text').isString() && newData.child('text').val().length >= 1 && newData.child('text').val().length <= 280 && newData.child('ts').isNumber() && newData.child('uid').isString() && newData.child('uid').val().length <= 64 && newData.child('up').isNumber() && newData.child('dn').isNumber()"
+      }
+    },
+    "shoutbox-votes": {
+      ".read": true,
+      "$uid": {
+        "$msgId": {
+          ".write": "!data.exists()",
+          ".validate": "newData.isString() && (newData.val() == 'up' || newData.val() == 'dn')"
+        }
+      }
+    },
+    "decisions": {
+      ".read": true,
+      "active": {
+        ".write": "auth != null",
+        ".validate": "newData.hasChildren(['id','q','optA','optB','votesA','votesB','effect']) && newData.child('q').isString() && newData.child('q').val().length <= 280 && newData.child('optA').isString() && newData.child('optB').isString() && newData.child('effect').isString() && newData.child('votesA').isNumber() && newData.child('votesB').isNumber()"
+      }
+    },
+    "decision-votes": {
+      ".read": true,
+      "$uid": {
+        "$decId": {
+          ".write": "!data.exists()",
+          ".validate": "newData.isString() && (newData.val() == 'A' || newData.val() == 'B')"
+        }
+      }
+    },
     "$other": {
       ".read": false,
       ".write": false

@@ -169,6 +169,10 @@ export function createTextSystem({ state, config, getSentencesFallback }) {
     revealNextProgressiveWord,
     glitchRandomWord,
     fullGlitch,
-    morphToRandomSentence
+    morphToRandomSentence,
+    setSentencePool(pool) {
+      if (!Array.isArray(pool) || !pool.length) return;
+      state.sentences = pool.filter(s => typeof s === 'string' && s.trim());
+    }
   };
 }

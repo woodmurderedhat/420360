@@ -1,4 +1,6 @@
 export function createTextSystem({ state, config, getSentencesFallback }) {
+  let sentenceIndex = 0;
+
   function randomGlitchString(len) {
     const chars = '!@#$%^&*()_+=-[]{};:<>,.?/|~420360';
     return Array.from({ length: len }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
@@ -28,15 +30,28 @@ export function createTextSystem({ state, config, getSentencesFallback }) {
 
   function initializeProgressiveSentence() {
     const sentencePool = state.sentences.length ? state.sentences : getSentencesFallback();
-    const randomSentence = sentencePool.length
-      ? sentencePool[Math.floor(Math.random() * sentencePool.length)]
-      : '';
-    const sentence = String(randomSentence || '').trim();
+    if (!sentencePool.length) return;
+    sentenceIndex = Math.floor(Math.random() * sentencePool.length);
+    const sentence = String(sentencePool[sentenceIndex] || '').trim();
     if (!sentence) return;
     state.currentSentence = sentence;
     state.progressiveReveal.words = sentence.split(/\s+/).filter(Boolean);
     state.progressiveReveal.revealedCount = Math.min(1, state.progressiveReveal.words.length);
     state.progressiveReveal.lastRevealAt = 0;
+  }
+
+  function advanceToNextSentence() {
+    const sentencePool = state.sentences.length ? state.sentences : getSentencesFallback();
+    if (!sentencePool.length) return;
+    sentenceIndex = (sentenceIndex + 1) % sentencePool.length;
+    const sentence = String(sentencePool[sentenceIndex] || '').trim();
+    if (!sentence) return;
+    state.currentSentence = sentence;
+    state.progressiveReveal.words = sentence.split(/\s+/).filter(Boolean);
+    state.progressiveReveal.revealedCount = Math.min(1, state.progressiveReveal.words.length);
+    state.progressiveReveal.lastRevealAt = 0;
+    setBlurbText(sentence);
+    applyProgressiveReveal();
   }
 
   function applyProgressiveReveal() {
@@ -61,7 +76,11 @@ export function createTextSystem({ state, config, getSentencesFallback }) {
     if (!state.progressiveReveal.enabled) return;
 
     const wordsTotal = state.progressiveReveal.words.length;
-    if (!wordsTotal || state.progressiveReveal.revealedCount >= wordsTotal) return;
+    if (!wordsTotal) return;
+    if (state.progressiveReveal.revealedCount >= wordsTotal) {
+      advanceToNextSentence();
+      return;
+    }
 
     const now = Date.now();
     if (now - state.progressiveReveal.lastRevealAt < config.POINTER_REVEAL_MIN_INTERVAL) return;

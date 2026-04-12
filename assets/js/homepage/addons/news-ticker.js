@@ -37,11 +37,17 @@ export function initNewsTicker() {
     // Show the bar before measuring so scrollWidth is accurate.
     bar.classList.add('visible');
 
-    // Measure and set animation duration after layout.
+    // Reset the animation fully so the loop always starts clean from position 0.
+    // Changing animationDuration on a running animation causes a mid-scroll jump.
     requestAnimationFrame(() => {
+      // 1. Freeze the animation at the origin
+      content.style.animation = 'none';
+      // 2. Force a synchronous reflow so the browser commits "none" before we proceed
+      void content.offsetWidth;
+      // 3. Re-apply with the correct duration derived from the rendered width
       const halfWidth = content.scrollWidth / 2;
       const duration = Math.max(halfWidth / PX_PER_S, MIN_DURATION_S);
-      content.style.animationDuration = `${duration.toFixed(2)}s`;
+      content.style.animation = `ticker-scroll ${duration.toFixed(2)}s linear infinite`;
     });
   }
 

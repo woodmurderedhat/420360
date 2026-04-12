@@ -1768,7 +1768,6 @@ a.start-menu-link:focus-visible {
   line-height: 30px;
   will-change: transform;
   animation: ticker-scroll linear infinite;
-  animation-duration: 30s; /* overridden by JS */
 }
 
 #news-ticker-content .ticker-sep {

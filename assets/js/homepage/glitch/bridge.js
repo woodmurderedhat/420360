@@ -8,7 +8,8 @@ export function bootGlobalGlitchFramework(options = {}) {
 
   if (window.glitchEngineV2) return window.glitchEngineV2;
 
-  const engine = new PixelGlitchEngineV2({ canvasId, imageUrl, preset });
+  const pixelBoardSource = options.pixelBoardSource || null;
+  const engine = new PixelGlitchEngineV2({ canvasId, imageUrl, preset, pixelBoardSource });
   window.glitchEngineV2 = engine;
 
   // Legacy bridge for current homepage integrations.

@@ -27,6 +27,14 @@ export class CanvasSurface {
     });
   }
 
+  /**
+   * Use an already-rendered HTMLCanvasElement as the source image.
+   * Call this instead of loadImage() when the source is the pixel board.
+   */
+  setSourceCanvas(canvas) {
+    this.image = canvas;
+  }
+
   resizeCanvas() {
     if (!this.canvas) return;
     this.canvas.width = window.innerWidth;
@@ -38,8 +46,8 @@ export class CanvasSurface {
 
     const canvasW = this.canvas.width;
     const canvasH = this.canvas.height;
-    const imageW = this.image.naturalWidth || this.image.width;
-    const imageH = this.image.naturalHeight || this.image.height;
+    const imageW = this.image.naturalWidth ?? this.image.width;
+    const imageH = this.image.naturalHeight ?? this.image.height;
 
     const scale = Math.max(canvasW / imageW, canvasH / imageH);
     const drawW = imageW * scale;

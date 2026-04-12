@@ -66,8 +66,9 @@ function ensurePresetCoverage(pipelines, registeredEffects) {
 }
 
 export class PixelGlitchEngineV2 {
-  constructor({ canvasId, imageUrl, preset = 'cinematic' }) {
+  constructor({ canvasId, imageUrl, preset = 'cinematic', pixelBoardSource = null }) {
     this.surface = new CanvasSurface(canvasId, imageUrl);
+    this.pixelBoardSource = pixelBoardSource;
     this.motion = new MotionAnalyzer();
     this.registry = new EffectRegistry();
     this.pipelines = new PipelineResolver();
@@ -126,7 +127,23 @@ export class PixelGlitchEngineV2 {
   async init() {
     try {
       this.surface.resizeCanvas();
-      await this.surface.loadImage();
+
+      if (this.pixelBoardSource) {
+        try {
+          const { fetchPixelBoardCanvas } = await import('./pixel-board-source.js');
+          const boardCanvas = await fetchPixelBoardCanvas(
+            this.pixelBoardSource.firebaseConfig,
+            { timeoutMs: this.pixelBoardSource.timeoutMs ?? 5000 }
+          );
+          this.surface.setSourceCanvas(boardCanvas);
+        } catch (boardError) {
+          console.warn('Pixel board fetch failed, falling back to static image:', boardError);
+          await this.surface.loadImage();
+        }
+      } else {
+        await this.surface.loadImage();
+      }
+
       this.surface.drawImage();
       this.activeTier = this.computeTier();
       window.addEventListener('resize', this.onResize);

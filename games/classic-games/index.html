@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Classic Games Archive • 420360</title>
+
+<meta name="description" content="The Classic Games Archive — a collection of retro browser games from 420360. Puzzles, arcade titles, memory challenges, and experimental experiences." />
+<meta name="keywords" content="420360 classic games, retro browser games, stoner arcade archive, pixel games, cannabis games" />
+<meta name="robots" content="index,follow" />
+<meta name="author" content="woodmurderedhat" />
+<meta name="theme-color" content="#4a8c3a" />
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://420360.xyz/games/classic-games/" />
+<meta property="og:title" content="Classic Games Archive • 420360" />
+<meta property="og:description" content="The Classic Games Archive — retro browser games from the 420360 stoner arcade vault." />
+<meta property="og:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+<meta property="og:site_name" content="420360" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@woodenhat" />
+<meta name="twitter:title" content="Classic Games Archive • 420360" />
+<meta name="twitter:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+
+<link rel="canonical" href="https://420360.xyz/games/classic-games/" />
+<link rel="icon" type="image/x-icon" href="../../assets/images/favicon.ico" />
+<link rel="author" href="/humans.txt" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://420360.xyz/" },
+    { "@type": "ListItem", "position": 2, "name": "Games", "item": "https://420360.xyz/games/" },
+    { "@type": "ListItem", "position": 3, "name": "Classic Games", "item": "https://420360.xyz/games/classic-games/" }
+  ]
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+	:root{
+		--bg:#0e1a0f;--primary:#3f8a44;--secondary:#e4a432;--highlight:#b9f2a5;--text:#f3ffe9;--dim:#7ab87e;
+	}
+	html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Press Start 2P','Courier New',monospace;image-rendering:pixelated;}
+	body{padding:20px 10px 60px 10px;}
+
+	.breadcrumb{max-width:1200px;margin:0 auto 20px auto;font-size:8px;color:var(--dim);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+	.breadcrumb a{color:var(--secondary);text-decoration:none;}
+	.breadcrumb a:hover{color:var(--highlight);}
+	.breadcrumb span{color:var(--dim);}
+
+	.vault-header{text-align:center;margin:0 0 32px 0;}
+	.vault-header h1{font-size:18px;letter-spacing:2px;margin:0 0 10px 0;color:var(--highlight);text-shadow:2px 2px 0 var(--primary),4px 4px 0 #000;}
+	.vault-header p{font-size:8px;color:var(--secondary);line-height:1.8;margin:0;}
+
+	.archive-badge{display:inline-block;font-size:8px;padding:4px 8px;background:#000;border:3px solid var(--secondary);color:var(--secondary);letter-spacing:2px;margin:12px 0 0 0;box-shadow:0 0 0 3px var(--primary),3px 3px 0 0 var(--highlight),0 0 0 6px #000;}
+
+	.controls{max-width:1200px;margin:0 auto 18px auto;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;}
+	.controls .searchWrap input{background:#000;color:var(--highlight);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;padding:8px 10px;font-family:'Press Start 2P',monospace;font-size:9px;width:220px;}
+	.filters{max-width:1200px;margin:0 auto 18px auto;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+	.filters button{font-family:'Press Start 2P',monospace;font-size:8px;padding:5px 9px;background:var(--bg);color:var(--highlight);border:3px solid var(--secondary);box-shadow:0 0 0 3px var(--primary),4px 4px 0 0 var(--highlight),0 0 0 6px #000;cursor:pointer;}
+	.filters button.active,.filters button:hover{background:var(--secondary);color:#000;}
+
+	.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:24px;max-width:1200px;margin:0 auto;}
+	.card{position:relative;background:var(--bg);border:4px solid var(--dim);box-shadow:0 0 0 4px #1a2e1a,5px 5px 0 0 var(--dim),0 0 0 8px #000;padding:10px 8px 14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:200px;transition:transform .18s,filter .18s,border-color .18s;cursor:pointer;text-align:center;}
+	.card:hover{transform:translate(-3px,-3px);filter:brightness(1.15);border-color:var(--secondary);box-shadow:0 0 0 4px var(--primary),5px 5px 0 0 var(--highlight),0 0 0 8px #000;}
+	.card:active{transform:translate(1px,1px);}
+	.card h2{font-size:9px;line-height:1.4;margin:4px 0 8px 0;color:var(--highlight);text-shadow:2px 2px 0 var(--primary);}
+	.card small{display:block;font-size:8px;opacity:.8;line-height:1.5;color:var(--secondary);}
+	.tagrow{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:auto;}
+	.tag{font-size:7px;padding:2px 4px;background:#1a2e1a;color:var(--dim);letter-spacing:1px;border:1px solid var(--primary);}
+	.card img.preview{width:100%;height:90px;object-fit:cover;image-rendering:pixelated;border:3px solid var(--primary);box-shadow:0 0 0 3px #1a2e1a,4px 4px 0 0 var(--dim);background:#000;margin:0 0 6px 0;opacity:.85;}
+	.card:hover img.preview{opacity:1;}
+
+	.empty{margin:40px 0;text-align:center;font-size:12px;color:var(--secondary);}
+	.count{max-width:1200px;margin:0 auto 14px auto;font-size:8px;color:var(--dim);text-align:right;}
+
+	footer{margin-top:40px;text-align:center;font-size:8px;letter-spacing:1px;color:var(--highlight);opacity:.6;}
+	footer a{color:var(--secondary);text-decoration:none;}
+	footer a:hover{color:var(--highlight);}
+
+	@media (max-width:600px){.grid{gap:16px;} .vault-header h1{font-size:13px;} .card{min-height:150px;}}
+</style>
+</head>
+<body>
+	<nav class="breadcrumb" aria-label="Breadcrumb">
+		<a href="../../index.html">HOME</a>
+		<span>›</span>
+		<a href="../index.html">GAMES</a>
+		<span>›</span>
+		<span>CLASSIC GAMES</span>
+	</nav>
+
+	<header class="vault-header">
+		<h1>CLASSIC GAMES ARCHIVE</h1>
+		<p>The vault. Legacy titles from the 420360 arcade.</p>
+		<div class="archive-badge">◆ ARCHIVED ◆</div>
+	</header>
+
+	<div class="filters" aria-label="Tag filters">
+		<button data-tag="all" class="active">ALL</button>
+		<button data-tag="arcade">ARCADE</button>
+		<button data-tag="puzzle">PUZZLE</button>
+		<button data-tag="memory">MEMORY</button>
+		<button data-tag="retro">RETRO</button>
+		<button data-tag="experimental">EXPERIMENTAL</button>
+	</div>
+	<div class="controls">
+		<div class="searchWrap"><input type="text" id="gameSearch" placeholder="SEARCH VAULT" aria-label="Search classic games" /></div>
+	</div>
+
+	<div class="count" id="countDisplay"></div>
+	<div class="grid" id="gamesGrid" aria-live="polite"></div>
+	<div class="empty" id="emptyMsg" style="display:none;">NO MATCHES IN THE VAULT</div>
+
+	<footer>
+		← <a href="../index.html">BACK TO GAMES</a>&nbsp;&nbsp;•&nbsp;&nbsp;<a href="../../index.html">HOME</a>
+	</footer>
+
+<script>
+const GAMES = [
+	{ id:'tarot-tetromino', name:'TAROT TETROMINO', url:'tarot-tetromino/', tags:['puzzle','experimental','retro'], blurb:'Arcana-fused blocks for smoke-break focus.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif', scoreKey:'tetrisLeaderboard', scoreType:'leaderboard' },
+	{ id:'glitch-maze', name:'GLITCH MAZE', url:'glitch-maze/', tags:['puzzle','experimental'], blurb:'Escape distortion.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif', scoreKey:'glitchMazeBestLevel', scoreType:'level' },
+	{ id:'neon-simon', name:'NEON SIMON', url:'neon-simon/', tags:['memory','retro'], blurb:'Sequence recall glow.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif', scoreKey:'neonSimonBest', scoreType:'score' },
+	{ id:'pixel-rain', name:'PIXEL RAIN', url:'pixel-rain/', tags:['experimental','retro'], blurb:'Cannabis lounge ambience in falling pixels.', gif:'https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif', scoreKey:'pixelRainBest', scoreType:'score' },
+	{ id:'pong', name:'PONG CLASSIC', url:'pong/', tags:['arcade','retro'], blurb:'OG duel of reflex, now with stoner tempo.', gif:'https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif', scoreKey:'pongBestWins', scoreType:'wins' },
+	{ id:'snake', name:'SNAKE', url:'snake/', tags:['arcade','retro'], blurb:'Devour & grow.', gif:'https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif', scoreKey:'snakeHighScore', scoreType:'score' },
+	{ id:'memory', name:'MEMORY CARDS', url:'memory/', tags:['memory','puzzle'], blurb:'Flip & match pairs.', gif:'https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif', scoreKey:'memoryBestScore', scoreType:'score' },
+	{ id:'breakout', name:'BREAKOUT', url:'breakout/', tags:['arcade','retro'], blurb:'Brick-smashing weed-lounge zen.', gif:'https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif', scoreKey:'breakoutHighScore', scoreType:'score' },
+	{ id:'flappy-bird', name:'FLAPPY BIRD', url:'flappy-bird/', tags:['arcade','retro'], blurb:'Navigate through the pipes.', gif:'https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif', scoreKey:'flappyBirdHighScore', scoreType:'score' },
+	{ id:'space-invaders', name:'SPACE INVADERS', url:'space-invaders/', tags:['arcade','retro'], blurb:'Defend against the alien wave.', gif:'https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif', scoreKey:'spaceInvadersHighScore', scoreType:'score' },
+	{ id:'asteroids', name:'ASTEROIDS', url:'asteroids/', tags:['arcade','retro'], blurb:'Navigate & destroy the rocks.', gif:'https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif', scoreKey:'asteroidsHighScore', scoreType:'score' },
+	{ id:'infinite-jumper', name:'INFINITE JUMPER', url:'infinite-jumper/', tags:['arcade','retro'], blurb:'Jump to infinite heights.', gif:'https://media.giphy.com/media/eYDnuFt0MckAb3xdSH/giphy.gif', scoreKey:'infiniteJumperHighScore', scoreType:'score' },
+	{ id:'generative-art', name:'GENERATIVE ART', url:'generative-art/', tags:['experimental'], blurb:'Procedural visuals for high-minded sessions.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif' },
+	{ id:'noctis-reverie', name:'NOCTIS REVERIE', url:'noctis-reverie/', tags:['experimental'], blurb:'Dreamlike voyage through cannabis-night aesthetics.', gif:'https://media.giphy.com/media/WveGOgFwcI6uTn2khE/giphy.gif' },
+	{ id:'pixel-crush', name:'PIXEL CRUSH', url:'pixel-crush/', tags:['puzzle','experimental'], blurb:'Match-3 pixel mayhem.', gif:'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif', scoreKey:'pixelCrushProgress', scoreType:'total' },
+	{ id:'casino', name:'CASINO', url:'casino/', tags:['arcade','experimental'], blurb:'Lay your bets in the neon-lit lounge.', gif:'https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif' },
+	{ id:'tim-the-dialogue-oracle', name:'TIM • ORACLE', url:'tim-the-dialogue-oracle/', tags:['experimental'], blurb:'Conversational mystic. Ask, receive.', gif:'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif' }
+];
+
+const grid = document.getElementById('gamesGrid');
+const emptyMsg = document.getElementById('emptyMsg');
+const countDisplay = document.getElementById('countDisplay');
+const searchInput = document.getElementById('gameSearch');
+const filterBtns = Array.from(document.querySelectorAll('.filters button'));
+let activeTag = 'all';
+
+function getScore(game) {
+	if (!game.scoreKey) return null;
+	try {
+		const stored = localStorage.getItem(game.scoreKey);
+		if (!stored) return null;
+		if (game.scoreType === 'leaderboard') {
+			const s = JSON.parse(stored);
+			return s.length > 0 ? s[0].score : null;
+		}
+		if (game.scoreType === 'total') {
+			const p = JSON.parse(stored);
+			return p.bestScores ? p.bestScores.total : null;
+		}
+		return parseInt(stored) || null;
+	} catch (e) { return null; }
+}
+
+function fmtScore(score, type) {
+	if (score === null) return null;
+	if (type === 'level') return 'LVL ' + score;
+	if (type === 'wins') return score + ' wins';
+	return String(score);
+}
+
+function escHtml(s) {
+	if (typeof s !== 'string') return '';
+	return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function render() {
+	grid.innerHTML = '';
+	const term = searchInput.value.trim().toLowerCase();
+	const filtered = GAMES.filter(g => {
+		const tagOk = activeTag === 'all' || g.tags.includes(activeTag);
+		const termOk = !term || g.name.toLowerCase().includes(term) || g.blurb.toLowerCase().includes(term);
+		return tagOk && termOk;
+	});
+	countDisplay.textContent = filtered.length + ' TITLE' + (filtered.length !== 1 ? 'S' : '') + ' IN VAULT';
+	if (!filtered.length) { emptyMsg.style.display = 'block'; return; }
+	emptyMsg.style.display = 'none';
+
+	filtered.forEach(g => {
+		const card = document.createElement('div');
+		card.className = 'card';
+		card.tabIndex = 0;
+		const score = getScore(g);
+		const scoreHtml = (g.scoreKey && score !== null) ? `<div style="font-size:8px;color:var(--highlight);margin:4px 0 2px 0;">Best: ${escHtml(fmtScore(score, g.scoreType))}</div>` : '';
+		card.innerHTML = `<img class="preview" src="${escHtml(g.gif)}" alt="Preview for ${escHtml(g.name)}" loading="lazy"><h2>${escHtml(g.name)}</h2><small>${escHtml(g.blurb)}</small>${scoreHtml}<div class="tagrow">${g.tags.map(t => `<span class="tag">${escHtml(t.toUpperCase())}</span>`).join('')}</div>`;
+		card.addEventListener('click', () => {
+			try {
+				if (window.parent) {
+					window.parent.postMessage({ type: 'open-game', label: g.name, url: 'games/classic-games/' + g.url + 'index.html' }, '*');
+					window.parent.postMessage({ type: 'close-overlay', id: 'gamesIndexOverlay' }, '*');
+					return;
+				}
+			} catch (e) {}
+			window.open(g.url, '_blank');
+		});
+		card.addEventListener('keydown', e => { if (e.key === 'Enter') card.click(); });
+		grid.appendChild(card);
+	});
+}
+
+filterBtns.forEach(btn => {
+	btn.addEventListener('click', () => {
+		filterBtns.forEach(b => b.classList.remove('active'));
+		btn.classList.add('active');
+		activeTag = btn.dataset.tag;
+		render();
+	});
+});
+searchInput.addEventListener('input', render);
+render();
+
+window.addEventListener('keydown', e => {
+	if (e.key === 'Escape') {
+		try { window.parent.document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); } catch (err) {}
+	}
+});
+</script>
+</body>
+</html>

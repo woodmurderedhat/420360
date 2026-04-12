@@ -21,6 +21,17 @@ export function initNewsTicker() {
 
   if (!bar || !content) return { setMessages: () => {} };
 
+  // Open the commune panel when the SHOUTBOX label is clicked.
+  // _toggleCommunePanel is set by addons/index.js after panel init.
+  const label = document.getElementById('news-ticker-label');
+  if (label) {
+    label.addEventListener('click', () => {
+      if (typeof window._toggleCommunePanel === 'function') {
+        window._toggleCommunePanel();
+      }
+    });
+  }
+
   function setMessages(msgs) {
     if (!msgs || !msgs.length) {
       bar.classList.remove('visible');

@@ -1721,8 +1721,20 @@ a.start-menu-link:focus-visible {
   letter-spacing: 0.08em;
   white-space: nowrap;
   text-transform: uppercase;
+  border: none;
   border-right: 3px solid var(--primary);
   user-select: none;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+#news-ticker-label:hover {
+  background: var(--primary);
+  color: #07120f;
+}
+
+#news-ticker-label:active {
+  background: var(--highlight);
 }
 
 #news-ticker-label .ticker-dot {

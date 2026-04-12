@@ -31,6 +31,7 @@ import { createModeControls } from './homepage/mode-controls.js';
 import { startHomepageBootstrap } from './homepage/bootstrap.js';
 import { createHomepageActions } from './homepage/actions.js';
 import { initAddons } from './homepage/addons/index.js';
+import { createTaskbar } from './homepage/taskbar.js';
 
 
 /* ============================================
@@ -183,6 +184,9 @@ const interactionSystem = createInteractionSystem({
 
 // Addons are loaded after boot so they don't block the initial render
 initAddons({ textSystem });
+
+// Build the taskbar in the DOM before bootstrap runs setupControlButtons()
+createTaskbar();
 
 startHomepageBootstrap({
   state,

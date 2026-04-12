@@ -183,7 +183,7 @@ body::after {
 main {
   width: min(1000px, 94vw);
   z-index: 2;
-  padding: 88px 12px 120px;
+  padding: 58px 12px 60px;
 }
 
 .hero-shell {
@@ -692,7 +692,11 @@ main {
 
 .ctrl-btn-icon {
   color: var(--secondary);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0;
   transition: color 0.5s ease;
+  white-space: nowrap;
 }
 
 /* Chill mode indicator */
@@ -724,87 +728,277 @@ main {
   animation: musicGlitch 0.18s steps(2) 3;
 }
 
-/* === HEADER CONTROLS LAYOUT === */
-#header-controls {
+/* ============================================================
+   TASKBAR LAYOUT
+   ============================================================ */
+#taskbar {
   position: fixed;
-  top: 16px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 38px;
   display: flex;
-  gap: 10px;
-  z-index: 6000;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  z-index: 6500;
+  background: rgba(6, 18, 13, 0.97);
+  border-bottom: 2px solid var(--primary);
+  box-shadow:
+    inset 0 1px 0 rgba(154, 249, 199, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 2px 12px rgba(0, 0, 0, 0.55);
+  padding: 0 0 0 1px;
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* === START BUTTON === */
+#start-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 14px;
+  background: rgba(10, 32, 22, 0.95);
+  border: none;
+  border-right: 1px solid rgba(47, 217, 130, 0.3);
+  /* Win98 raised-button feel: lighter edges top/left, darker bottom/right */
+  box-shadow:
+    inset 1px 1px 0 rgba(154, 249, 199, 0.35),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.7);
+  color: var(--secondary);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  transition: background 0.15s, box-shadow 0.1s;
+  flex-shrink: 0;
+}
+
+#start-btn:hover {
+  background: rgba(15, 42, 28, 0.98);
+  color: var(--highlight);
+}
+
+#start-btn:active,
+#start-btn.active {
+  background: rgba(6, 22, 15, 0.99);
+  box-shadow:
+    inset -1px -1px 0 rgba(154, 249, 199, 0.25),
+    inset 1px 1px 0 rgba(0, 0, 0, 0.7);
+  color: var(--secondary);
+}
+
+.start-btn-icon {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--primary);
+}
+
+.start-btn-label {
+  font-size: 10px;
+}
+
+/* === TASKBAR TRAY === */
+#taskbar-tray {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  border-left: 1px solid rgba(47, 217, 130, 0.22);
+  padding: 0 4px;
+  gap: 2px;
+}
+
+/* Compact ctrl-btn override inside tray */
+#taskbar-tray .ctrl-btn {
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 9px;
+  gap: 4px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+#taskbar-tray .ctrl-btn:hover {
+  background: rgba(47, 217, 130, 0.1);
+  box-shadow: none;
+  transform: none;
+  border-color: rgba(154, 249, 199, 0.2);
+}
+
+#taskbar-tray .ctrl-btn:active {
+  background: rgba(47, 217, 130, 0.18);
+  box-shadow: inset 1px 1px 0 rgba(0,0,0,0.4);
+  transform: none;
+}
+
+/* === TASKBAR CLOCK === */
+#taskbar-clock {
+  padding: 0 12px 0 8px;
+  font-size: 9px;
+  color: var(--highlight);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  border-left: 1px solid rgba(47, 217, 130, 0.18);
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================================
+   START MENU
+   ============================================================ */
+#start-menu {
+  position: fixed;
+  top: 38px;
+  left: 0;
+  z-index: 6400;
+  display: flex;
+  flex-direction: row;
+  min-width: 280px;
+  max-width: 320px;
+  background: rgba(6, 18, 13, 0.98);
+  border: 2px solid var(--primary);
+  border-top: none;
+  border-left: none;
+  box-shadow:
+    3px 3px 0 0 var(--primary),
+    6px 6px 0 0 rgba(0,0,0,0.5),
+    inset 1px 0 0 rgba(154, 249, 199, 0.1);
+  font-family: 'Press Start 2P', monospace;
+}
+
+#start-menu[hidden] {
+  display: none;
+}
+
+/* Vertical sidebar strip */
+#start-menu-sidebar {
+  width: 28px;
+  background: var(--secondary);
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
   justify-content: center;
-  max-width: 96vw;
+  padding-bottom: 10px;
+  border-right: 1px solid rgba(0,0,0,0.35);
 }
 
-/* === BOTTOM CONTROLS LAYOUT === */
-#bottom-controls-left {
-  position: fixed;
-  bottom: 16px;
-  left: 16px;
-  z-index: 5000;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+.start-menu-brand {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: rgba(6, 18, 13, 0.75);
+  letter-spacing: 0.1em;
+  user-select: none;
 }
 
-#bottom-controls-right {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  z-index: 5000;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap-reverse;
-  justify-content: flex-end;
-}
-
-/* === SOCIALS SECTION === */
-#socials-emoticons {
-  position: fixed;
-  bottom: 86px;
-  right: 18px;
-  z-index: 4600;
-}
-
-.social-links-row {
+/* Items panel */
+#start-menu-items {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  overflow-y: auto;
+  padding: 6px 0;
+  max-height: calc(100vh - 38px);
 }
 
-#socials-emoticons a {
-  display: inline-flex;
+/* Group label */
+.start-menu-group-label {
+  font-size: 7px;
+  color: rgba(154, 249, 199, 0.45);
+  letter-spacing: 0.12em;
+  padding: 6px 12px 3px;
+  user-select: none;
+}
+
+.start-menu-separator {
+  height: 1px;
+  background: rgba(47, 217, 130, 0.15);
+  margin: 5px 8px;
+}
+
+/* === START MENU ITEMS === */
+.start-menu-item {
+  display: flex;
   align-items: center;
-  gap: 5px;
-  text-decoration: none;
-  padding: 8px 10px;
-  border: 1px solid rgba(154, 249, 199, 0.3);
-  border-radius: 11px;
-  background: rgba(8, 24, 19, 0.92);
+  gap: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
   color: var(--highlight);
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: background 0.1s, color 0.1s;
+  width: 100%;
+  text-align: left;
 }
 
-#socials-emoticons a:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.15);
+.start-menu-item:hover,
+.start-menu-item:focus-visible {
+  background: var(--primary);
+  color: #022114;
+  outline: none;
+  /* Inverted contrast on hover — classic Win98 highlight */
 }
 
-.social-icon {
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-  font-size: 12px;
+.start-menu-item:hover .start-menu-item-icon,
+.start-menu-item:focus-visible .start-menu-item-icon {
+  filter: none;
 }
 
-.social-label {
-  font-family: 'Space Grotesk', sans-serif;
-  letter-spacing: 0.07em;
+.start-menu-item-icon {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.start-menu-item-label {
+  flex: 1;
+  font-size: 9px;
+}
+
+.start-menu-shortcut {
+  font-size: 7px;
+  color: rgba(154, 249, 199, 0.5);
+  background: rgba(47, 217, 130, 0.08);
+  border: 1px solid rgba(154, 249, 199, 0.2);
+  padding: 1px 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.start-menu-item:hover .start-menu-shortcut,
+.start-menu-item:focus-visible .start-menu-shortcut {
+  color: rgba(2, 33, 20, 0.65);
+  background: rgba(2, 33, 20, 0.15);
+  border-color: rgba(2, 33, 20, 0.25);
+}
+
+/* Social link items */
+a.start-menu-link {
+  text-decoration: none;
+  color: var(--highlight);
+}
+
+a.start-menu-link:hover,
+a.start-menu-link:focus-visible {
+  background: var(--primary);
+  color: #022114;
+  outline: none;
 }
 
 /* === ACCESSIBILITY IMPROVEMENTS === */
@@ -885,10 +1079,8 @@ main {
     transform: translateX(50%);
   }
 
-  #header-controls {
-    gap: 8px;
-    padding: 0 10px;
-    top: 10px;
+  #taskbar-tray .ctrl-btn-label {
+    display: none;
   }
 
   .ctrl-btn {
@@ -902,7 +1094,7 @@ main {
   }
 
   main {
-    padding: 78px 8px 130px;
+    padding: 52px 8px 40px;
   }
 
   .hero-shell {
@@ -910,38 +1102,9 @@ main {
   }
 }
 
+
+
 @media (max-width: 600px) {
-  #bottom-controls-left,
-  #bottom-controls-right {
-    position: fixed;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    justify-content: center;
-  }
-
-  #bottom-controls-left {
-    bottom: 60px;
-  }
-
-  #bottom-controls-right {
-    bottom: 10px;
-  }
-
-  #socials-emoticons {
-    bottom: 126px;
-    right: 10px;
-  }
-
-  #socials-emoticons a {
-    font-size: 9px;
-    padding: 6px 8px;
-  }
-
-  .social-icon {
-    font-size: 10px;
-  }
-
   .ctrl-btn {
     font-size: 9px;
     padding: 6px 8px;
@@ -965,14 +1128,20 @@ main {
     --popup-w: 200px;
     --popup-h: 120px;
   }
+
+  #start-menu {
+    max-width: 100vw;
+    width: 100vw;
+    border-right: none;
+  }
+
+  #taskbar-tray .ctrl-btn-label,
+  #taskbar-clock {
+    display: none;
+  }
 }
 
 @media (max-width: 400px) {
-  #header-controls {
-    top: 5px;
-    gap: 6px;
-  }
-
   .ctrl-btn {
     font-size: 8px;
     padding: 5px 6px;
@@ -993,7 +1162,7 @@ main {
 
 #commune-panel {
   position: fixed;
-  top: 70px;
+  top: 46px;
   right: 18px;
   width: 340px;
   max-height: 520px;

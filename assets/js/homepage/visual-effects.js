@@ -5,7 +5,7 @@ export function createVisualEffects({ state }) {
   const chaosIntervals = new WeakMap();
 
   function getControlButtons() {
-    return document.querySelectorAll('#header-controls .ctrl-btn, #bottom-controls-left .ctrl-btn, #bottom-controls-right .ctrl-btn');
+    return document.querySelectorAll('#taskbar .ctrl-btn, #start-menu .ctrl-btn');
   }
 
   function randomizeColors() {

@@ -272,7 +272,7 @@ export function createInteractionSystem({
       });
     }
 
-    document.querySelectorAll('#header-controls .ctrl-btn, #bottom-controls-left .ctrl-btn, #bottom-controls-right .ctrl-btn').forEach(btn => {
+    document.querySelectorAll('#taskbar .ctrl-btn, #start-menu .ctrl-btn').forEach(btn => {
       btn.addEventListener('mouseenter', () => startButtonChaos(btn));
       btn.addEventListener('mouseleave', () => stopButtonChaos(btn));
     });

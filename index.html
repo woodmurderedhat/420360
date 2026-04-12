@@ -165,66 +165,9 @@
 <!-- Skip to main content for accessibility -->
 <a href="#blurb" class="skip-to-main">Skip to main content</a>
 
-<!-- === HEADER CONTROLS (Top Bar) === -->
-<div id="header-controls">
-  <div id="about-control" class="ctrl-btn" role="button" tabindex="0" title="About (A)" aria-label="About 420360">
-    <span class="ctrl-btn-label">ABOUT</span>
-    <span class="ctrl-btn-icon">ℹ️</span>
-  </div>
-  <div id="apply-control" class="ctrl-btn" role="button" tabindex="0" title="Apply" aria-label="Apply using Google Form">
-    <span class="ctrl-btn-label">APPLY</span>
-    <span class="ctrl-btn-icon">📋</span>
-  </div>
-  <div id="games-control" class="ctrl-btn" role="button" tabindex="0" title="Games Index (G)" aria-label="Open games index">
-    <span class="ctrl-btn-label">GAMES</span>
-    <span class="ctrl-btn-icon">🕹️</span>
-  </div>
-  <div id="esoteric-control" class="ctrl-btn" role="button" tabindex="0" title="Esoteric Hub (E)" aria-label="Open Esoteric Hub">
-    <span class="ctrl-btn-label">ESOTERIC</span>
-    <span class="ctrl-btn-icon">✦</span>
-  </div>
-  <div id="reviews-control" class="ctrl-btn" role="button" tabindex="0" title="Movie Reviews (R)" aria-label="Open movie reviews">
-    <span class="ctrl-btn-label">REVIEWS</span>
-    <span class="ctrl-btn-icon">🎬</span>
-  </div>
-  <div id="commune-control" class="ctrl-btn" role="button" tabindex="0" title="Commune — chat, vote, decide (N)" aria-label="Open commune panel">
-    <span class="ctrl-btn-label">COMMUNE</span>
-    <span class="ctrl-btn-icon">◈</span>
-  </div>
-
-</div>
-
-<!-- Bottom Controls Left -->
-<div id="bottom-controls-left">
-  <div id="issue-report" class="ctrl-btn" role="button" tabindex="0" title="Report an issue on GitHub (I)" aria-label="Report an issue on GitHub">
-    <span class="ctrl-btn-label">ISSUES</span>
-    <span class="ctrl-btn-icon">🐞</span>
-  </div>
-  <div id="legal-control" class="ctrl-btn" role="button" tabindex="0" title="Legal disclaimer" aria-label="Open legal disclaimer" onclick="window.location.href='/legal.html'">
-    <span class="ctrl-btn-label">LEGAL</span>
-    <span class="ctrl-btn-icon">⚖️</span>
-  </div>
-</div>
-
-<!-- Bottom Controls Right -->
-<div id="bottom-controls-right">
-  <div id="popup-control" class="ctrl-btn" role="button" tabindex="0" title="Toggle Popups (P)" aria-label="Pause/resume popup spawning">
-    <span class="ctrl-btn-label">POPUPS</span>
-    <span class="ctrl-btn-icon">📦</span>
-  </div>
-  <div id="chill-control" class="ctrl-btn" role="button" tabindex="0" title="Chill Mode (C)" aria-label="Toggle chill mode">
-    <span class="ctrl-btn-label">CHILL</span>
-    <span class="ctrl-btn-icon">🌿</span>
-  </div>
-  <div id="sfx-control" class="ctrl-btn" role="button" aria-pressed="false" tabindex="0" title="Toggle sound effects (S)">
-    <span id="sfx-status" class="ctrl-btn-label">SFX: OFF</span>
-    <span class="ctrl-btn-icon">🔊</span>
-  </div>
-  <div id="music-control" class="ctrl-btn" role="button" aria-pressed="false" tabindex="0" title="Toggle music (M)">
-    <span id="music-status" class="ctrl-btn-label">MUSIC: OFF</span>
-    <span class="ctrl-btn-icon">♫</span>
-  </div>
-</div>
+<!-- === TASKBAR (rendered by taskbar.js) === -->
+<div id="taskbar" role="toolbar" aria-label="Site taskbar"></div>
+<nav id="start-menu" aria-label="Start menu" hidden></nav>
 
 <!-- Background Music -->
 <audio id="bgMusic" preload="metadata" loop hidden>
@@ -232,16 +175,7 @@
   Your browser does not support the audio element.
 </audio>
 
-<!-- Emoticon & Socials Section -->
-<div id="socials-emoticons">
-  <div class="social-links-row" aria-label="Social links">
-    <a href="https://www.youtube.com/@woodenhat" target="_blank" rel="noopener noreferrer" title="YouTube"><span class="social-icon" aria-hidden="true">▶️</span><span class="social-label">YT</span></a>
-    <a href="https://github.com/woodmurderedhat" target="_blank" rel="noopener noreferrer" title="GitHub"><span class="social-icon" aria-hidden="true">⌘</span><span class="social-label">GH</span></a>
-    <a href="https://blog.420360.xyz" target="_blank" rel="noopener noreferrer" title="Blog"><span class="social-icon" aria-hidden="true">✎</span><span class="social-label">BLOG</span></a>
-    <a href="/cartoons/" title="Cartoons"><span class="social-icon" aria-hidden="true">★</span><span class="social-label">ART</span></a>
-    <a href="/legal.html" title="Legal"><span class="social-icon" aria-hidden="true">⚖</span><span class="social-label">LEGAL</span></a>
-  </div>
-</div>
+
 
 <!-- Main Blurb Content -->
 <main>

@@ -3,7 +3,7 @@ export function createIntervalManager({
   config,
   spawnPopup,
   glitchRandomWord,
-  morphToRandomSentence,
+  streamNextWord,
   startColorChaos,
   stopColorChaos
 }) {
@@ -12,67 +12,21 @@ export function createIntervalManager({
       return {
         popup: config.POPUP_INTERVAL_REDUCED,
         glitch: config.GLITCH_INTERVAL_REDUCED,
-        morph: config.MORPH_INTERVAL_REDUCED
+        wordStream: config.WORD_STREAM_INTERVAL_REDUCED
       };
     }
     if (state.chillMode) {
       return {
         popup: config.POPUP_INTERVAL_CHILL,
         glitch: config.GLITCH_INTERVAL_CHILL,
-        morph: config.MORPH_INTERVAL_CHILL
+        wordStream: config.WORD_STREAM_INTERVAL_CHILL
       };
     }
     return {
       popup: config.POPUP_INTERVAL_MS,
       glitch: config.GLITCH_INTERVAL_DEFAULT,
-      morph: config.MORPH_INTERVAL_DEFAULT
+      wordStream: config.WORD_STREAM_INTERVAL_DEFAULT
     };
-  }
-
-  function getBurstSettings() {
-    if (state.reducedMotion) {
-      return {
-        interval: config.MORPH_BURST_INTERVAL_REDUCED,
-        duration: config.MORPH_BURST_DURATION_REDUCED,
-        step: config.MORPH_BURST_STEP_REDUCED
-      };
-    }
-    if (state.chillMode) {
-      return {
-        interval: config.MORPH_BURST_INTERVAL_CHILL,
-        duration: config.MORPH_BURST_DURATION_CHILL,
-        step: config.MORPH_BURST_STEP_CHILL
-      };
-    }
-    return {
-      interval: config.MORPH_BURST_INTERVAL_DEFAULT,
-      duration: config.MORPH_BURST_DURATION_DEFAULT,
-      step: config.MORPH_BURST_STEP_DEFAULT
-    };
-  }
-
-  function doBurstStep(step) {
-    if (!state.burstActive) return;
-    morphToRandomSentence();
-    state.morphStepId = setTimeout(() => doBurstStep(step), step);
-  }
-
-  function endMorphBurst() {
-    if (state.morphStepId) {
-      clearTimeout(state.morphStepId);
-      state.morphStepId = null;
-    }
-    state.burstActive = false;
-    state.burstTimeoutId = null;
-  }
-
-  function startMorphBurst() {
-    if (state.burstActive) return;
-    const { duration, step } = getBurstSettings();
-    if (duration <= 0 || step <= 0) return;
-    state.burstActive = true;
-    doBurstStep(step);
-    state.burstTimeoutId = setTimeout(endMorphBurst, duration);
   }
 
   function startIntervals() {
@@ -87,6 +41,10 @@ export function createIntervalManager({
       state.intervalIds.glitch = setInterval(glitchRandomWord, intervals.glitch);
     }
 
+    if (!state.intervalIds.wordStream && intervals.wordStream > 0) {
+      state.intervalIds.wordStream = setInterval(streamNextWord, intervals.wordStream);
+    }
+
     document.documentElement.classList.remove('paused');
   }
 
@@ -99,23 +57,10 @@ export function createIntervalManager({
       clearInterval(state.intervalIds.glitch);
       state.intervalIds.glitch = null;
     }
-    if (state.intervalIds.morph) {
-      clearInterval(state.intervalIds.morph);
-      state.intervalIds.morph = null;
+    if (state.intervalIds.wordStream) {
+      clearInterval(state.intervalIds.wordStream);
+      state.intervalIds.wordStream = null;
     }
-    if (state.burstIntervalId) {
-      clearInterval(state.burstIntervalId);
-      state.burstIntervalId = null;
-    }
-    if (state.morphStepId) {
-      clearTimeout(state.morphStepId);
-      state.morphStepId = null;
-    }
-    if (state.burstTimeoutId) {
-      clearTimeout(state.burstTimeoutId);
-      state.burstTimeoutId = null;
-    }
-    state.burstActive = false;
 
     stopColorChaos();
     document.documentElement.classList.add('paused');
@@ -134,10 +79,6 @@ export function createIntervalManager({
 
   return {
     getIntervals,
-    getBurstSettings,
-    startMorphBurst,
-    doBurstStep,
-    endMorphBurst,
     startIntervals,
     stopIntervals,
     restartIntervals,

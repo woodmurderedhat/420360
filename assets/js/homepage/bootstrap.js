@@ -44,12 +44,7 @@ export function startHomepageBootstrap({
       ? window.SENTENCES.filter(s => typeof s === 'string' && s.trim())
       : getThemeSentences();
 
-    textSystem.initializeProgressiveSentence();
-    if (!state.currentSentence) {
-      state.currentSentence = state.sentences[0];
-    }
-
-    textSystem.setBlurbText(state.currentSentence);
+    textSystem.initWordStream();
     modeControls.loadUserPreferences();
     interactionSystem.setupControlButtons();
     interactionSystem.setupEventHandlers();

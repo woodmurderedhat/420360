@@ -115,7 +115,7 @@ const intervalManager = createIntervalManager({
   config: CONFIG,
   spawnPopup: popupSystem.spawnPopup,
   glitchRandomWord: textSystem.glitchRandomWord,
-  morphToRandomSentence: textSystem.morphToRandomSentence,
+  streamNextWord: textSystem.streamNextWord,
   startColorChaos: visualEffects.startColorChaos,
   stopColorChaos: visualEffects.stopColorChaos
 });
@@ -172,7 +172,6 @@ const interactionSystem = createInteractionSystem({
   closeOverlay: overlaySystem.closeOverlay,
   openGameOverlay: overlaySystem.openGameOverlay,
   openContentOverlay: overlaySystem.openContentOverlay,
-  revealNextProgressiveWord: textSystem.revealNextProgressiveWord,
   startIntervals: () => intervalManager.startIntervals(),
   stopIntervals: () => intervalManager.stopIntervals(),
   hasOpenOverlay: overlaySystem.hasOpenOverlay,

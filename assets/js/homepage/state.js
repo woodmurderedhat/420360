@@ -12,14 +12,9 @@ export const state = {
   intervalIds: {
     popup: null,
     glitch: null,
-    morph: null
+    wordStream: null
   },
 
-  // Burst control IDs for rapid sentence morphing
-  burstIntervalId: null,
-  morphStepId: null,
-  burstTimeoutId: null,
-  burstActive: false,
   initialized: false,
   sentences: [],
 
@@ -27,10 +22,8 @@ export const state = {
   currentSentence: '',
   videoWindowLoaded: false,
 
-  progressiveReveal: {
-    enabled: true,
-    words: [],
-    revealedCount: 1,
-    lastRevealAt: 0
+  wordStream: {
+    sentenceIndex: 0,
+    wordIndex: 0
   }
 };

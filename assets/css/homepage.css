@@ -263,17 +263,14 @@ main {
   margin: 0;
   z-index: 2;
   user-select: none;
-  min-height: 124px;
+  height: calc(1.55em * 5 + 38px);
+  overflow: hidden;
 }
 
 .blurb span { 
   display: inline-block; 
   margin-right: 5px; 
   transition: color 0.2s, background 0.2s, opacity 0.22s ease;
-}
-
-.blurb span.is-hidden-word {
-  display: none;
 }
 
 .blurb .glitch {
@@ -285,6 +282,15 @@ main {
 
 .blurb.glitch-effect { 
   animation: screen-glitch 0.15s steps(2) 3; 
+}
+
+@keyframes word-fadein {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.blurb span.word-new {
+  animation: word-fadein 0.22s ease forwards;
 }
 
 /* === CURSOR === */

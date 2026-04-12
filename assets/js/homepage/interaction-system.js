@@ -16,7 +16,6 @@ export function createInteractionSystem({
   closeOverlay,
   openGameOverlay,
   openContentOverlay,
-  revealNextProgressiveWord,
   startIntervals,
   stopIntervals,
   hasOpenOverlay,
@@ -74,17 +73,13 @@ export function createInteractionSystem({
         const dy = e.clientY - lastMorphY;
         if (Math.sqrt(dx * dx + dy * dy) < config.POINTER_REVEAL_MIN_DISTANCE) return;
       }
-      revealNextProgressiveWord();
       lastMorphX = e.clientX;
       lastMorphY = e.clientY;
       lastMorphTime = now;
     });
 
     window.addEventListener('scroll', () => {
-      const now = Date.now();
-      if (now - lastScrollRevealTime < config.SCROLL_REVEAL_MIN_INTERVAL) return;
-      revealNextProgressiveWord();
-      lastScrollRevealTime = now;
+      lastScrollRevealTime = Date.now();
     }, { passive: true });
 
     let lastWheelGlitchAt = 0;

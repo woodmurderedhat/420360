@@ -1,93 +1,74 @@
 export function createTextSystem({ state, config, getSentencesFallback }) {
-  let sentenceIndex = 0;
-
   function randomGlitchString(len) {
     const chars = '!@#$%^&*()_+=-[]{};:<>,.?/|~420360';
     return Array.from({ length: len }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
   }
 
-  function setBlurbText(sentence) {
+  function initWordStream() {
     const blurbEl = document.getElementById('blurb');
     if (!blurbEl) return;
 
+    const sentencePool = state.sentences.length ? state.sentences : getSentencesFallback();
+    if (!sentencePool.length) return;
+
+    state.wordStream.sentenceIndex = Math.floor(Math.random() * sentencePool.length);
+    state.wordStream.wordIndex = 0;
+    state.currentSentence = String(sentencePool[state.wordStream.sentenceIndex] || '').trim();
+
     blurbEl.innerHTML = '';
-    const words = sentence.trim().split(' ').filter(Boolean);
-    words.forEach(w => {
-      const s = document.createElement('span');
-      s.textContent = w;
-      blurbEl.appendChild(s);
-    });
     const cursor = document.createElement('span');
     cursor.className = 'cursor';
     cursor.textContent = '_';
     cursor.setAttribute('aria-hidden', 'true');
     blurbEl.appendChild(cursor);
+  }
 
-    if (state.progressiveReveal.enabled) {
-      applyProgressiveReveal();
+  function pruneToFit(blurbEl) {
+    const maxIter = 200;
+    let iter = 0;
+    while (blurbEl.scrollHeight > blurbEl.clientHeight && iter < maxIter) {
+      const first = blurbEl.querySelector('span:not(.cursor)');
+      if (!first) break;
+      const timeoutId = Number(first.dataset.glitchTimeoutId || 0);
+      if (timeoutId) clearTimeout(timeoutId);
+      first.remove();
+      iter++;
     }
   }
 
-  function initializeProgressiveSentence() {
-    const sentencePool = state.sentences.length ? state.sentences : getSentencesFallback();
-    if (!sentencePool.length) return;
-    sentenceIndex = Math.floor(Math.random() * sentencePool.length);
-    const sentence = String(sentencePool[sentenceIndex] || '').trim();
-    if (!sentence) return;
-    state.currentSentence = sentence;
-    state.progressiveReveal.words = sentence.split(/\s+/).filter(Boolean);
-    state.progressiveReveal.revealedCount = Math.min(1, state.progressiveReveal.words.length);
-    state.progressiveReveal.lastRevealAt = 0;
-  }
-
-  function advanceToNextSentence() {
-    const sentencePool = state.sentences.length ? state.sentences : getSentencesFallback();
-    if (!sentencePool.length) return;
-    sentenceIndex = (sentenceIndex + 1) % sentencePool.length;
-    const sentence = String(sentencePool[sentenceIndex] || '').trim();
-    if (!sentence) return;
-    state.currentSentence = sentence;
-    state.progressiveReveal.words = sentence.split(/\s+/).filter(Boolean);
-    state.progressiveReveal.revealedCount = Math.min(1, state.progressiveReveal.words.length);
-    state.progressiveReveal.lastRevealAt = 0;
-    setBlurbText(sentence);
-    applyProgressiveReveal();
-  }
-
-  function applyProgressiveReveal() {
+  function streamNextWord() {
     const blurbEl = document.getElementById('blurb');
     if (!blurbEl) return;
 
-    const spans = blurbEl.querySelectorAll('span:not(.cursor)');
-    const maxWords = spans.length;
-    const revealCount = Math.max(1, Math.min(state.progressiveReveal.revealedCount, maxWords));
+    const sentencePool = state.sentences.length ? state.sentences : getSentencesFallback();
+    if (!sentencePool.length) return;
 
-    spans.forEach((span, index) => {
-      if (index < revealCount) span.classList.remove('is-hidden-word');
-      else span.classList.add('is-hidden-word');
-    });
+    const words = String(sentencePool[state.wordStream.sentenceIndex] || '').trim().split(/\s+/).filter(Boolean);
 
-    const cursor = blurbEl.querySelector('.cursor');
-    const lastRevealedSpan = spans[revealCount - 1];
-    if (cursor && lastRevealedSpan) lastRevealedSpan.after(cursor);
-  }
-
-  function revealNextProgressiveWord() {
-    if (!state.progressiveReveal.enabled) return;
-
-    const wordsTotal = state.progressiveReveal.words.length;
-    if (!wordsTotal) return;
-    if (state.progressiveReveal.revealedCount >= wordsTotal) {
-      advanceToNextSentence();
+    if (!words.length) {
+      state.wordStream.sentenceIndex = (state.wordStream.sentenceIndex + 1) % sentencePool.length;
+      state.wordStream.wordIndex = 0;
       return;
     }
 
-    const now = Date.now();
-    if (now - state.progressiveReveal.lastRevealAt < config.POINTER_REVEAL_MIN_INTERVAL) return;
+    const word = words[state.wordStream.wordIndex];
+    if (!word) return;
 
-    state.progressiveReveal.revealedCount += 1;
-    state.progressiveReveal.lastRevealAt = now;
-    applyProgressiveReveal();
+    const cursor = blurbEl.querySelector('.cursor');
+    const span = document.createElement('span');
+    span.textContent = word;
+    span.classList.add('word-new');
+    blurbEl.insertBefore(span, cursor);
+    setTimeout(() => span.classList.remove('word-new'), 220);
+
+    requestAnimationFrame(() => pruneToFit(blurbEl));
+
+    state.wordStream.wordIndex += 1;
+    if (state.wordStream.wordIndex >= words.length) {
+      state.wordStream.sentenceIndex = (state.wordStream.sentenceIndex + 1) % sentencePool.length;
+      state.wordStream.wordIndex = 0;
+      state.currentSentence = String(sentencePool[state.wordStream.sentenceIndex] || '').trim();
+    }
   }
 
   function fullGlitch() {
@@ -101,7 +82,7 @@ export function createTextSystem({ state, config, getSentencesFallback }) {
     const blurbEl = document.getElementById('blurb');
     if (!blurbEl) return;
 
-    const spans = blurbEl.querySelectorAll('span:not(.cursor):not(.is-hidden-word)');
+    const spans = blurbEl.querySelectorAll('span:not(.cursor)');
     if (!spans.length) return;
 
     if (Math.random() < 0.02) fullGlitch();
@@ -130,65 +111,12 @@ export function createTextSystem({ state, config, getSentencesFallback }) {
     span.dataset.glitchTimeoutId = String(timeoutId);
   }
 
-  function morphToRandomSentence() {
-    if (state.progressiveReveal.enabled) return;
-
-    const blurbEl = document.getElementById('blurb');
-    if (!blurbEl) return;
-
-    const currentTrimmed = state.currentSentence.trim();
-    const sentencePool = state.sentences.length ? state.sentences : getSentencesFallback();
-    const uniqueSentences = sentencePool.filter(s => s.trim() !== currentTrimmed);
-    if (uniqueSentences.length === 0) return;
-
-    const nextSentence = uniqueSentences[Math.floor(Math.random() * uniqueSentences.length)];
-    const currentWords = state.currentSentence.trim().split(' ');
-    const targetWords = nextSentence.trim().split(' ');
-    const maxLength = Math.max(currentWords.length, targetWords.length);
-
-    let spans = blurbEl.querySelectorAll('span:not(.cursor)');
-
-    while (spans.length < maxLength) {
-      const span = document.createElement('span');
-      span.style.marginRight = '6px';
-      blurbEl.insertBefore(span, blurbEl.querySelector('.cursor'));
-      spans = blurbEl.querySelectorAll('span:not(.cursor)');
-    }
-
-    if (spans.length > maxLength) {
-      for (let i = spans.length - 1; i >= maxLength; i--) {
-        spans[i].remove();
-      }
-      spans = blurbEl.querySelectorAll('span:not(.cursor)');
-    }
-
-    const changeOrder = Array.from({ length: maxLength }, (_, i) => i);
-    changeOrder.sort(() => Math.random() - 0.5);
-
-    let step = 0;
-    function changeNextWord() {
-      if (step >= changeOrder.length) {
-        state.currentSentence = nextSentence;
-        return;
-      }
-      const idx = changeOrder[step];
-      const newWord = targetWords[idx] || '';
-      spans[idx].textContent = newWord;
-      step++;
-      setTimeout(changeNextWord, 150);
-    }
-    changeNextWord();
-  }
-
   return {
     randomGlitchString,
-    setBlurbText,
-    initializeProgressiveSentence,
-    applyProgressiveReveal,
-    revealNextProgressiveWord,
+    initWordStream,
+    streamNextWord,
     glitchRandomWord,
     fullGlitch,
-    morphToRandomSentence,
     setSentencePool(pool) {
       if (!Array.isArray(pool) || !pool.length) return;
       state.sentences = pool.filter(s => typeof s === 'string' && s.trim());

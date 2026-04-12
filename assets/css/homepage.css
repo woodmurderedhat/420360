@@ -848,6 +848,175 @@ main {
   height: 100%;
   display: flex;
   align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+#taskbar-clock:hover {
+  background: rgba(47, 217, 130, 0.1);
+  color: var(--secondary);
+}
+
+#taskbar-clock.widget-open {
+  background: rgba(47, 217, 130, 0.15);
+  color: var(--secondary);
+  box-shadow: inset -1px -1px 0 rgba(0,0,0,0.5), inset 1px 1px 0 rgba(154,249,199,0.15);
+}
+
+/* ============================================================
+   CLOCK WIDGET (Moon + Tarot popup)
+   ============================================================ */
+#clock-widget {
+  position: fixed;
+  top: 38px;
+  right: 0;
+  z-index: 6400;
+  width: 290px;
+  background: rgba(5, 15, 11, 0.99);
+  border: 2px solid var(--primary);
+  border-top: none;
+  border-right: none;
+  box-shadow:
+    -3px 3px 0 0 var(--primary),
+    -6px 6px 0 0 rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(154,249,199,0.08);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--highlight);
+  padding: 0;
+  animation: cw-drop-in 0.12s steps(2) both;
+}
+
+@keyframes cw-drop-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+#clock-widget[hidden] { display: none; }
+
+#cw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: rgba(47, 217, 130, 0.08);
+  border-bottom: 1px solid rgba(47, 217, 130, 0.2);
+}
+
+#cw-title {
+  color: var(--secondary);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+#cw-close {
+  background: none;
+  border: 1px solid rgba(154,249,199,0.25);
+  color: var(--highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 2px 5px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+#cw-close:hover { color: var(--secondary); border-color: var(--secondary); }
+
+#cw-date {
+  padding: 6px 10px 4px;
+  font-size: 7px;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(47, 217, 130, 0.1);
+  letter-spacing: 0.08em;
+}
+
+/* -- Moon section -- */
+#cw-section-moon {
+  padding: 8px 10px 6px;
+}
+
+.cw-section-label {
+  font-size: 7px;
+  color: var(--secondary);
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+
+.cw-moon-art {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+  color: var(--highlight);
+  margin: 0 0 6px 0;
+  background: rgba(47,217,130,0.04);
+  border: 1px solid rgba(47,217,130,0.12);
+  padding: 4px 8px;
+  letter-spacing: 0.05em;
+  white-space: pre;
+}
+
+.cw-moon-phase {
+  font-size: 9px;
+  color: var(--highlight);
+  margin-bottom: 4px;
+}
+
+.cw-moon-bar {
+  font-size: 7px;
+  color: var(--primary);
+  letter-spacing: 0;
+  margin-bottom: 3px;
+}
+
+.cw-moon-pct {
+  font-size: 6px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+#cw-divider {
+  padding: 0 10px;
+  font-size: 7px;
+  color: rgba(47,217,130,0.3);
+  letter-spacing: 0.05em;
+}
+
+/* -- Tarot section -- */
+#cw-section-tarot {
+  padding: 6px 10px 10px;
+}
+
+.cw-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.cw-card-num {
+  font-size: 7px;
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.cw-card-name {
+  font-size: 9px;
+  color: var(--highlight);
+}
+
+.cw-card-keyword {
+  font-size: 7px;
+  color: var(--muted);
+  margin-bottom: 5px;
+  letter-spacing: 0.08em;
+}
+
+.cw-card-reading {
+  font-size: 7px;
+  color: rgba(236,255,244,0.75);
+  line-height: 1.8;
+  letter-spacing: 0.04em;
 }
 
 /* ============================================================

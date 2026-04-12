@@ -103,15 +103,14 @@ function createCtrlBtn({ id, label, icon, title, ariaLabel, statusId }) {
    the synodic period (29.53059 days). Returns 0–29 day age.
    ============================================================ */
 const MOON_PHASES = [
-  { name: 'New Moon',        glyph: '(  )',  range: [0,  1.85] },
-  { name: 'Waxing Crescent', glyph: '(> )',  range: [1.85, 7.38] },
-  { name: 'First Quarter',   glyph: '(>> )', range: [7.38, 11.07] },
+  { name: 'New Moon',        glyph: '(  )',   range: [0,     3.69] },
+  { name: 'Waxing Crescent', glyph: '(> )',   range: [3.69,  7.38] },
+  { name: 'First Quarter',   glyph: '(>> )',  range: [7.38,  11.07] },
   { name: 'Waxing Gibbous',  glyph: '(>>>)',  range: [11.07, 14.77] },
-  { name: 'Full Moon',       glyph: '(@@)',  range: [14.77, 16.61] },
-  { name: 'Waning Gibbous',  glyph: '(<<<',  range: [16.61, 22.15] },
+  { name: 'Full Moon',       glyph: '(@@)',   range: [14.77, 18.45] },
+  { name: 'Waning Gibbous',  glyph: '(<<<)',  range: [18.45, 22.15] },
   { name: 'Last Quarter',    glyph: '( <<)',  range: [22.15, 25.84] },
-  { name: 'Waning Crescent', glyph: '( < )',  range: [25.84, 27.68] },
-  { name: 'New Moon',        glyph: '(  )',   range: [27.68, 29.54] },
+  { name: 'Waning Crescent', glyph: '( < )',  range: [25.84, 29.54] },
 ];
 
 // Visual bar: 16-char wide ASCII moon bar, filled by illumination %
@@ -178,16 +177,24 @@ function getDailyTarot(date = new Date()) {
    ============================================================ */
 function moonAsciiArt(ageDays) {
   const norm = ageDays / 29.53059; // 0..1
-  // Simple 5x3 ASCII moon phases
+  // 5-line × 7-char ASCII moon phases. * = illuminated, space = dark.
   const phases = [
-    [' .-. ','(   )','`-\'-\''], // new
-    [' .-. ','(-  )',' `-.\''], // waxing crescent
-    [' .-. ','(-- )',' `-.\''], // first quarter
-    [' .-. ','(--+)',' \`-.\''], // waxing gibbous
-    [' .-. ','(@@@)','`-\'-\''], // full
-    [' .-. ','(+--)',' \`-.\''], // waning gibbous
-    [' .-. ','( --)',' \`-.\''], // last quarter
-    [' .-. ','(  -)',' \`-.\''], // waning crescent
+    // New Moon
+    ['  ___  ', ' /   \\ ', '|     |', ' \\   / ', '  ---  '],
+    // Waxing Crescent (right sliver)
+    ['  ___  ', ' /  *\\ ', '|   **|', ' \\  */ ', '  ---  '],
+    // First Quarter (right half)
+    ['  ___  ', ' / **\\ ', '|  ***|', ' \\ **/ ', '  ---  '],
+    // Waxing Gibbous (mostly lit, left edge dark)
+    ['  ___  ', ' /***\\ ', '| ****|', ' \\***/ ', '  ---  '],
+    // Full Moon
+    ['  ___  ', ' /***\\ ', '|*****|', ' \\***/ ', '  ---  '],
+    // Waning Gibbous (mostly lit, right edge dark)
+    ['  ___  ', ' /***\\ ', '|**** |', ' \\***/ ', '  ---  '],
+    // Last Quarter (left half)
+    ['  ___  ', ' /** \\ ', '|***  |', ' \\** / ', '  ---  '],
+    // Waning Crescent (left sliver)
+    ['  ___  ', ' /*  \\ ', '|**   |', ' \\*  / ', '  ---  '],
   ];
   const i = Math.floor(norm * 8) % 8;
   return phases[i];

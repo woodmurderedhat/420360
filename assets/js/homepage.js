@@ -203,6 +203,7 @@ startHomepageBootstrap({
   overlaySystem,
   popupSystem,
   randomizeColors: visualEffects.randomizeColors,
+  startIntervals: () => intervalManager.startIntervals(),
   stopIntervals: () => intervalManager.stopIntervals()
 });
 

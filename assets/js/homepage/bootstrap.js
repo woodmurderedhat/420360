@@ -14,6 +14,7 @@ export function startHomepageBootstrap({
   overlaySystem,
   popupSystem,
   randomizeColors,
+  startIntervals,
   stopIntervals
 }) {
   function getThemeSentences() {
@@ -55,7 +56,7 @@ export function startHomepageBootstrap({
     overlaySystem.createFloatingWindow('videoThreadWindow', 'VIDEOS • SCHWEPE', 'https://schwepe.247420.xyz/videos-thread.html', false);
 
     randomizeColors();
-    stopIntervals();
+    startIntervals();
 
     setInterval(() => {
       if (Math.random() < 0.5) popupSystem.randomPopupGlitchOut();

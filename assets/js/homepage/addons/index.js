@@ -7,6 +7,7 @@ import { getDb } from './rtdb.js';
 import { initShoutbox } from './shoutbox.js';
 import { initDecisions } from './collective-decisions.js';
 import { createAddonPanel } from './panel.js';
+import { initNewsTicker } from './news-ticker.js';
 
 const FB_VERSION = "12.11.0";
 const FB_BASE = `https://www.gstatic.com/firebasejs/${FB_VERSION}`;
@@ -20,9 +21,11 @@ export async function initAddons({ textSystem }) {
     ]);
 
     panel = createAddonPanel();
+    const ticker = initNewsTicker();
 
     await initShoutbox(db, rtdbModule, msgs => {
       panel.setMessages(msgs);
+      ticker.setMessages(msgs);
     });
 
     await initDecisions(db, rtdbModule, textSystem, decision => {

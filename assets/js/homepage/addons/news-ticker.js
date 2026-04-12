@@ -1,0 +1,49 @@
+/**
+ * News Ticker — scrolls live shoutbox messages across a fixed bottom bar.
+ *
+ * Usage:
+ *   const ticker = initNewsTicker();
+ *   ticker.setMessages(msgs);  // msgs = [{ text, ts, uid, up, dn }, ...]
+ *
+ * The ticker element is hidden when there are no messages and shown once
+ * at least one message is available. Content is doubled so the animation
+ * loops seamlessly. Scroll speed is calculated from the rendered width
+ * at 80 px/s (minimum 8 s duration).
+ */
+
+const PX_PER_S = 80;
+const MIN_DURATION_S = 8;
+const SEP = '<span class="ticker-sep" aria-hidden="true">&#9670;</span>';
+
+export function initNewsTicker() {
+  const bar     = document.getElementById('news-ticker');
+  const content = document.getElementById('news-ticker-content');
+
+  if (!bar || !content) return { setMessages: () => {} };
+
+  function setMessages(msgs) {
+    if (!msgs || !msgs.length) {
+      bar.classList.remove('visible');
+      return;
+    }
+
+    // Build a single pass of all messages joined by diamond separators.
+    // Text is already HTML-entity-escaped by shoutbox.js so safe for innerHTML.
+    const pass = msgs.map(m => m.text).join(SEP);
+
+    // Double the content so the loop is seamless (the animation shifts by -50%).
+    content.innerHTML = pass + SEP + pass + SEP;
+
+    // Show the bar before measuring so scrollWidth is accurate.
+    bar.classList.add('visible');
+
+    // Measure and set animation duration after layout.
+    requestAnimationFrame(() => {
+      const halfWidth = content.scrollWidth / 2;
+      const duration = Math.max(halfWidth / PX_PER_S, MIN_DURATION_S);
+      content.style.animationDuration = `${duration.toFixed(2)}s`;
+    });
+  }
+
+  return { setMessages };
+}

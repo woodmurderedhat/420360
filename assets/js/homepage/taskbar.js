@@ -310,6 +310,14 @@ export function createTaskbar() {
   clock.setAttribute('title', 'Moon phase & daily tarot');
   startClock(clock);
 
+  const microSettingsBtn = document.createElement('button');
+  microSettingsBtn.id = 'micro-settings-taskbar-btn';
+  microSettingsBtn.type = 'button';
+  microSettingsBtn.setAttribute('aria-label', 'Toggle micro settings panel');
+  microSettingsBtn.setAttribute('aria-pressed', 'false');
+  microSettingsBtn.setAttribute('title', 'Micro settings (^_^)');
+  microSettingsBtn.textContent = ':)';
+
   // ---- Clock Widget ----
   const { el: widgetEl, render: renderWidget } = buildClockWidget();
   // closeWidget needs to be accessible inside buildClockWidget — hoist via closure trick
@@ -351,9 +359,29 @@ export function createTaskbar() {
     }
   });
 
+  function syncMicroSettingsButton(open) {
+    microSettingsBtn.classList.toggle('active', !!open);
+    microSettingsBtn.setAttribute('aria-pressed', open ? 'true' : 'false');
+  }
+
+  microSettingsBtn.addEventListener('click', () => {
+    closeWidget();
+    if (window.__microSettingsPanel && typeof window.__microSettingsPanel.toggle === 'function') {
+      window.__microSettingsPanel.toggle();
+      syncMicroSettingsButton(!!window.__microSettingsPanel.isOpen);
+      return;
+    }
+    window.dispatchEvent(new CustomEvent('micro-settings:toggle-request'));
+  });
+
+  window.addEventListener('micro-settings:visibility', (evt) => {
+    syncMicroSettingsButton(!!evt?.detail?.open);
+  });
+
   taskbarEl.appendChild(startBtn);
   taskbarEl.appendChild(tray);
   taskbarEl.appendChild(clock);
+  taskbarEl.appendChild(microSettingsBtn);
   taskbarEl.appendChild(widgetEl);
 
   // ---- Build Start Menu ----

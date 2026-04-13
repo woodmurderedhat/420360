@@ -859,6 +859,39 @@ main {
   transition: background 0.15s, color 0.15s;
 }
 
+#micro-settings-taskbar-btn {
+  all: unset;
+  box-sizing: border-box;
+  height: 100%;
+  min-width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid rgba(47, 217, 130, 0.18);
+  background: transparent;
+  color: var(--highlight);
+  padding: 0 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+#micro-settings-taskbar-btn:hover {
+  background: rgba(47, 217, 130, 0.1);
+  color: var(--secondary);
+}
+
+#micro-settings-taskbar-btn.active {
+  background: rgba(47, 217, 130, 0.15);
+  color: var(--secondary);
+  box-shadow: inset -1px -1px 0 rgba(0,0,0,0.5), inset 1px 1px 0 rgba(154,249,199,0.15);
+}
+
 #taskbar-clock:hover {
   background: rgba(47, 217, 130, 0.1);
   color: var(--secondary);

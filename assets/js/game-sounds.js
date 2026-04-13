@@ -31,10 +31,30 @@
 
     /**
      * Check if sound is enabled from main page SFX setting
+     * Also checks microSettings.soundDefault if available
      */
     function isSoundEnabled() {
+        // First check microSettings if available (global state from homepage)
+        if (window.__microSettingsState && window.__microSettingsState.microSettings) {
+            return window.__microSettingsState.microSettings.soundDefault > 0;
+        }
+        
+        // Fallback to classic sfxEnabled check
         const sfxEnabled = localStorage.getItem('sfxEnabled');
         return sfxEnabled === 'true';
+    }
+
+    /**
+     * Get sound volume multiplier from microSettings or config default
+     */
+    function getSoundVolume() {
+        // Check microSettings first
+        if (window.__microSettingsState && window.__microSettingsState.microSettings) {
+            return window.__microSettingsState.microSettings.soundDefault;
+        }
+        
+        // Default to base SFX volume from config
+        return 0.55;
     }
 
     /**
@@ -62,7 +82,11 @@
             oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
             oscillator.type = type;
             
-            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+            // Apply microSettings sound volume multiplier
+            const soundVolume = getSoundVolume();
+            const adjustedVolume = volume * soundVolume;
+            
+            gainNode.gain.setValueAtTime(adjustedVolume, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
             
             oscillator.start(audioContext.currentTime);

@@ -11,7 +11,7 @@
  */
 
 import { CONFIG, ICON_DATA, ADS, POPUP_COLOR_SCHEMES } from './homepage/config.js';
-import { state } from './homepage/state.js';
+import { state, initMicroSettings, setupSessionResume } from './homepage/state.js';
 import { loadPreference, savePreference } from './homepage/storage.js';
 import {
   getRegionMinimumAge,
@@ -191,6 +191,15 @@ const interactionSystem = createInteractionSystem({
 
 // Build the taskbar in the DOM before bootstrap runs setupControlButtons()
 createTaskbar();
+
+// Initialize Micro Settings from localStorage
+initMicroSettings(CONFIG);
+
+// Setup session resume tracking
+setupSessionResume();
+
+// Expose state globally for game-sounds.js and other modules
+window.__microSettingsState = state;
 
 startHomepageBootstrap({
   state,

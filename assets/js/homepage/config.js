@@ -58,6 +58,15 @@ export const CONFIG = {
     SFX_ENABLED: 'sfxEnabled',
     CHILL_MODE: 'chillMode',
     POPUPS_PAUSED: 'popupsPaused'
+  },
+
+  // Micro Settings Panel keys
+  MICRO_SETTINGS: {
+    EFFECTS_ENABLED: 'microSettingsEffectsEnabled',
+    SOUND_DEFAULT: 'microSettingsSoundDefault',
+    POPUP_INTENSITY: 'microSettingsPopupIntensity',
+    SESSION_RESUME_ENABLED: 'microSettingsSessionResumeEnabled',
+    LAST_VISITED_TAB: 'microSettingsLastVisitedTab'
   }
 };
 

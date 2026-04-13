@@ -326,6 +326,16 @@ export function createPopupSystem({
 
   function spawnPopup() {
     if (state.popupsPaused) return null;
+    
+    // Check Micro Settings popup intensity
+    const microPopupIntensity = state.microSettings?.popupIntensity ?? 100;
+    if (microPopupIntensity === 0) return null; // Popups completely disabled
+    if (microPopupIntensity < 100) {
+      // Roll probability based on intensity percentage
+      const chance = microPopupIntensity / 100;
+      if (Math.random() > chance) return null;
+    }
+    
     const ad = ads[Math.floor(Math.random() * ads.length)];
     const p = makePopup(ad);
     if (window.playAdSfx) window.playAdSfx();

@@ -23,7 +23,7 @@ import { createIntervalManager } from './homepage/interval-manager.js';
 import { createMusicSystem, createSfxSystem } from './homepage/audio-system.js';
 import { ensureAgeGateAccess } from './homepage/init-flow.js';
 import { createPopupSystem } from './homepage/popup-system.js';
-import { createTextSystem } from './homepage/text-system.js';
+import { createBlurbSystem } from './homepage/blurb/system.js';
 import { createOverlaySystem } from './homepage/overlay-system.js';
 import { createInteractionSystem } from './homepage/interaction-system.js';
 import { createVisualEffects } from './homepage/visual-effects.js';
@@ -35,9 +35,13 @@ import { createTaskbar } from './homepage/taskbar.js';
 
 
 /* ============================================
-  SENTENCES FOR BLURB (global, loaded via script)
+  SENTENCES FOR BLURB
   ============================================ */
-// SENTENCES is now loaded globally from sentences.js
+function resolveInitialSentencePool() {
+  if (typeof window === 'undefined') return [];
+  if (!Array.isArray(window.SENTENCES)) return [];
+  return window.SENTENCES.filter(s => typeof s === 'string' && s.trim());
+}
 
 /* ============================================
    AD/POPUP DATA
@@ -57,14 +61,19 @@ function escapeHtml(s) {
 }
 
 
-const textSystem = createTextSystem({
+const initialSentencePool = resolveInitialSentencePool();
+
+const blurb = createBlurbSystem({
   state,
   config: CONFIG,
-  getSentencesFallback: () => (
-    typeof window !== 'undefined' && Array.isArray(window.SENTENCES)
-      ? window.SENTENCES
-      : []
-  )
+  sentencePool: initialSentencePool,
+  getSentencesFallback: resolveInitialSentencePool,
+  allowExternalSentencePoolUpdates: false,
+  hooks: {
+    onWarning: info => {
+      console.warn('[blurb]', info?.message || 'Unknown warning', info?.details || '');
+    }
+  }
 });
 
 const visualEffects = createVisualEffects({ state });
@@ -114,8 +123,7 @@ const intervalManager = createIntervalManager({
   state,
   config: CONFIG,
   spawnPopup: popupSystem.spawnPopup,
-  glitchRandomWord: textSystem.glitchRandomWord,
-  streamNextWord: textSystem.streamNextWord,
+  blurb,
   startColorChaos: visualEffects.startColorChaos,
   stopColorChaos: visualEffects.stopColorChaos
 });
@@ -181,9 +189,6 @@ const interactionSystem = createInteractionSystem({
   triggerControlChaosPulse: visualEffects.triggerControlChaosPulse
 });
 
-// Addons are loaded after boot so they don't block the initial render
-initAddons({ textSystem });
-
 // Build the taskbar in the DOM before bootstrap runs setupControlButtons()
 createTaskbar();
 
@@ -195,7 +200,8 @@ startHomepageBootstrap({
   isAgeGateValid,
   getRegionMinimumAge,
   saveAgeGateProfile,
-  textSystem,
+  blurb,
+  initialSentencePool: blurb.getSentencePool(),
   modeControls,
   interactionSystem,
   musicSystem: MusicSystem,
@@ -204,6 +210,9 @@ startHomepageBootstrap({
   popupSystem,
   randomizeColors: visualEffects.randomizeColors,
   startIntervals: () => intervalManager.startIntervals(),
-  stopIntervals: () => intervalManager.stopIntervals()
+  onStarted: () => {
+    // Addons are loaded after boot so they don't block initial render.
+    initAddons({ blurb });
+  }
 });
 

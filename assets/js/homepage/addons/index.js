@@ -1,6 +1,6 @@
 /**
  * Addons bootstrapper — wires RTDB, shoutbox, decisions, and panel together.
- * Call initAddons({ textSystem }) after homepage bootstrap completes.
+ * Call initAddons({ blurb }) after homepage bootstrap completes.
  */
 
 import { getDb } from './rtdb.js';
@@ -12,7 +12,7 @@ import { initNewsTicker } from './news-ticker.js';
 const FB_VERSION = "12.11.0";
 const FB_BASE = `https://www.gstatic.com/firebasejs/${FB_VERSION}`;
 
-export async function initAddons({ textSystem }) {
+export async function initAddons({ blurb }) {
   let panel;
   try {
     const [db, rtdbModule] = await Promise.all([
@@ -28,7 +28,7 @@ export async function initAddons({ textSystem }) {
       ticker.setMessages(msgs);
     });
 
-    await initDecisions(db, rtdbModule, textSystem, decision => {
+    await initDecisions(db, rtdbModule, blurb, decision => {
       panel.setDecision(decision);
     });
 

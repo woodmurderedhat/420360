@@ -2,11 +2,20 @@ export function createIntervalManager({
   state,
   config,
   spawnPopup,
-  glitchRandomWord,
-  streamNextWord,
+  blurb,
   startColorChaos,
   stopColorChaos
 }) {
+  const runBlurbGlitch = () => {
+    if (!blurb || typeof blurb.glitchRandomWord !== 'function') return;
+    blurb.glitchRandomWord();
+  };
+
+  const runBlurbStream = () => {
+    if (!blurb || typeof blurb.streamNextWord !== 'function') return;
+    blurb.streamNextWord();
+  };
+
   function getIntervals() {
     if (state.reducedMotion) {
       return {
@@ -38,11 +47,11 @@ export function createIntervalManager({
     }
 
     if (!state.intervalIds.glitch && intervals.glitch > 0) {
-      state.intervalIds.glitch = setInterval(glitchRandomWord, intervals.glitch);
+      state.intervalIds.glitch = setInterval(runBlurbGlitch, intervals.glitch);
     }
 
     if (!state.intervalIds.wordStream && intervals.wordStream > 0) {
-      state.intervalIds.wordStream = setInterval(streamNextWord, intervals.wordStream);
+      state.intervalIds.wordStream = setInterval(runBlurbStream, intervals.wordStream);
     }
 
     document.documentElement.classList.remove('paused');

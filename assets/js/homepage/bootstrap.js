@@ -6,7 +6,8 @@ export function startHomepageBootstrap({
   isAgeGateValid,
   getRegionMinimumAge,
   saveAgeGateProfile,
-  textSystem,
+  blurb,
+  initialSentencePool = [],
   modeControls,
   interactionSystem,
   musicSystem,
@@ -15,7 +16,7 @@ export function startHomepageBootstrap({
   popupSystem,
   randomizeColors,
   startIntervals,
-  stopIntervals
+  onStarted
 }) {
   function init() {
     if (state.initialized) return;
@@ -32,11 +33,15 @@ export function startHomepageBootstrap({
 
     state.initialized = true;
 
-    state.sentences = (Array.isArray(window.SENTENCES) && window.SENTENCES.length)
-      ? window.SENTENCES.filter(s => typeof s === 'string' && s.trim())
+    state.sentences = Array.isArray(initialSentencePool)
+      ? initialSentencePool.filter(s => typeof s === 'string' && s.trim())
       : [];
 
-    textSystem.initWordStream();
+    if (!blurb || typeof blurb.start !== 'function') {
+      console.warn('[blurb] Missing start() implementation on injected blurb API.');
+      return;
+    }
+    blurb.start();
     modeControls.loadUserPreferences();
     interactionSystem.setupControlButtons();
     interactionSystem.setupEventHandlers();
@@ -52,6 +57,8 @@ export function startHomepageBootstrap({
     setInterval(() => {
       if (Math.random() < 0.5) popupSystem.randomPopupGlitchOut();
     }, 4500 + Math.random() * 6000);
+
+    if (typeof onStarted === 'function') onStarted();
   }
 
   if (document.readyState === 'loading') {

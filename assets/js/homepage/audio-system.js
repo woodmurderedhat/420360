@@ -84,11 +84,18 @@ export function createMusicSystem({ state, config, loadPreference, savePreferenc
         const srcTag = this.audio.querySelector('source');
         if (srcTag) {
           const raw = srcTag.getAttribute('src');
-          if (raw) this.audio.src = encodeURI(raw);
-          this.audio.setAttribute('data-src-set', '1');
+          const normalized = raw ? encodeURI(raw) : '';
+          if (normalized && raw !== normalized) {
+            srcTag.setAttribute('src', normalized);
+          }
         }
+        this.audio.setAttribute('data-src-set', '1');
       }
-      try { this.audio.load(); } catch (e) {}
+
+      // Avoid restarting an in-flight request on every init.
+      if (!this.audio.currentSrc) {
+        try { this.audio.load(); } catch (e) {}
+      }
     },
 
     updateUI() {

@@ -174,10 +174,9 @@ export function createTaskbar() {
   const oracleWidget = oracleApplet.widgetEl;
 
   function positionOracleWidget() {
-    const clockRect = clock.getBoundingClientRect();
     oracleWidget.style.right = '0px';
     oracleWidget.style.left = 'auto';
-    oracleWidget.style.top = `${Math.round(clockRect.bottom + 12)}px`;
+    oracleWidget.style.top = `${taskbarEl.offsetHeight}px`;
   }
 
   clock.addEventListener('click', (evt) => {

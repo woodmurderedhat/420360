@@ -843,20 +843,25 @@ main {
   transform: none;
 }
 
-/* === TASKBAR CLOCK === */
+/* === TASKBAR MINI APPLETS === */
 #taskbar-clock {
-  padding: 0 12px 0 8px;
-  font-size: 9px;
-  color: var(--highlight);
-  letter-spacing: 0.05em;
-  white-space: nowrap;
   border-left: 1px solid rgba(47, 217, 130, 0.18);
   height: 100%;
   display: flex;
   align-items: center;
-  cursor: pointer;
+  color: var(--highlight);
+  font-size: 9px;
   user-select: none;
   transition: background 0.15s, color 0.15s;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+#taskbar-clock {
+  padding: 0 12px 0 8px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 #micro-settings-taskbar-btn {
@@ -904,12 +909,13 @@ main {
 }
 
 /* ============================================================
-   CLOCK WIDGET (Moon + Tarot popup)
+   ORACLE WIDGET (Moon + Tarot popup)
    ============================================================ */
-#clock-widget {
+#oracle-widget {
   position: fixed;
   top: 38px;
   right: 0;
+  left: auto;
   z-index: 6400;
   width: 290px;
   background: rgba(5, 15, 11, 0.99);
@@ -925,6 +931,10 @@ main {
   color: var(--highlight);
   padding: 0;
   animation: cw-drop-in 0.12s steps(2) both;
+  max-height: calc(100vh - 42px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 @keyframes cw-drop-in {
@@ -932,9 +942,52 @@ main {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-#clock-widget[hidden] { display: none; }
+#oracle-widget[hidden] { display: none; }
 
-#cw-header {
+/* Oracle widget custom scrollbar */
+#oracle-widget {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(154, 249, 199, 0.75) rgba(7, 20, 14, 0.88);
+}
+
+#oracle-widget::-webkit-scrollbar {
+  width: 10px;
+}
+
+#oracle-widget::-webkit-scrollbar-track {
+  background: rgba(7, 20, 14, 0.88);
+  border-left: 1px solid rgba(47, 217, 130, 0.2);
+}
+
+#oracle-widget::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(154, 249, 199, 0.78) 0%, rgba(47, 217, 130, 0.65) 100%);
+  border: 1px solid rgba(6, 18, 13, 0.8);
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(236, 255, 244, 0.15);
+}
+
+#oracle-widget::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(236, 255, 244, 0.9) 0%, rgba(47, 217, 130, 0.78) 100%);
+}
+
+#oracle-widget::-webkit-scrollbar-corner {
+  background: rgba(7, 20, 14, 0.88);
+}
+
+@media (max-width: 600px) {
+  #oracle-widget {
+    width: min(290px, calc(100vw - 8px));
+    max-height: calc(100vh - 72px);
+  }
+}
+
+@media (max-height: 700px) {
+  #oracle-widget {
+    max-height: calc(100vh - 78px);
+  }
+}
+
+#ow-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -943,13 +996,13 @@ main {
   border-bottom: 1px solid rgba(47, 217, 130, 0.2);
 }
 
-#cw-title {
+#ow-title {
   color: var(--secondary);
   font-size: 9px;
   letter-spacing: 0.1em;
 }
 
-#cw-close {
+#ow-close {
   background: none;
   border: 1px solid rgba(154,249,199,0.25);
   color: var(--highlight);
@@ -960,9 +1013,9 @@ main {
   line-height: 1;
 }
 
-#cw-close:hover { color: var(--secondary); border-color: var(--secondary); }
+#ow-close:hover { color: var(--secondary); border-color: var(--secondary); }
 
-#cw-date {
+#ow-date {
   padding: 6px 10px 4px;
   font-size: 7px;
   color: var(--muted);
@@ -971,18 +1024,18 @@ main {
 }
 
 /* -- Moon section -- */
-#cw-section-moon {
+#ow-section-moon {
   padding: 8px 10px 6px;
 }
 
-.cw-section-label {
+.ow-section-label {
   font-size: 7px;
   color: var(--secondary);
   letter-spacing: 0.12em;
   margin-bottom: 6px;
 }
 
-.cw-moon-art {
+.ow-moon-art {
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;
   line-height: 1.5;
@@ -995,26 +1048,26 @@ main {
   white-space: pre;
 }
 
-.cw-moon-phase {
+.ow-moon-phase {
   font-size: 9px;
   color: var(--highlight);
   margin-bottom: 4px;
 }
 
-.cw-moon-bar {
+.ow-moon-bar {
   font-size: 7px;
   color: var(--primary);
   letter-spacing: 0;
   margin-bottom: 3px;
 }
 
-.cw-moon-pct {
+.ow-moon-pct {
   font-size: 6px;
   color: var(--muted);
   letter-spacing: 0.05em;
 }
 
-#cw-divider {
+#ow-divider {
   padding: 0 10px;
   font-size: 7px;
   color: rgba(47,217,130,0.3);
@@ -1022,40 +1075,108 @@ main {
 }
 
 /* -- Tarot section -- */
-#cw-section-tarot {
+#ow-section-tarot {
   padding: 6px 10px 10px;
 }
 
-.cw-card-header {
+.ow-card-header {
   display: flex;
   align-items: baseline;
   gap: 6px;
   margin-bottom: 4px;
 }
 
-.cw-card-num {
+.ow-card-num {
   font-size: 7px;
   color: var(--secondary);
   flex-shrink: 0;
 }
 
-.cw-card-name {
+.ow-card-name {
   font-size: 9px;
   color: var(--highlight);
 }
 
-.cw-card-keyword {
+.ow-card-keyword {
   font-size: 7px;
   color: var(--muted);
   margin-bottom: 5px;
   letter-spacing: 0.08em;
 }
 
-.cw-card-reading {
+.ow-card-reading {
   font-size: 7px;
   color: rgba(236,255,244,0.75);
   line-height: 1.8;
   letter-spacing: 0.04em;
+}
+
+#ow-section-horoscope,
+#ow-section-omens {
+  padding: 6px 10px 10px;
+}
+
+.ow-horo-sign {
+  font-size: 8px;
+  color: var(--secondary);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+.ow-horo-reading,
+.ow-omen-line,
+.ow-ritual-line {
+  font-size: 7px;
+  color: rgba(236,255,244,0.78);
+  line-height: 1.75;
+  letter-spacing: 0.03em;
+}
+
+.ow-omen-line {
+  margin-bottom: 6px;
+}
+
+.ow-ritual-line {
+  color: var(--highlight);
+  margin-bottom: 8px;
+}
+
+.ow-signal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 6px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(47, 217, 130, 0.12);
+  background: rgba(47, 217, 130, 0.04);
+  padding: 6px 7px;
+}
+
+#ow-footer {
+  margin: 0 10px 8px;
+  font-size: 6px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+#ow-record {
+  margin: 0 10px 10px;
+  width: calc(100% - 20px);
+  border: 1px solid rgba(154, 249, 199, 0.25);
+  background: rgba(47, 217, 130, 0.08);
+  color: var(--highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+#ow-record:hover {
+  color: var(--secondary);
+  border-color: var(--secondary);
+  background: rgba(47, 217, 130, 0.15);
 }
 
 /* ============================================================

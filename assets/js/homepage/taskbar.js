@@ -13,6 +13,8 @@
  *   'toggle' – interactive ctrl-btn with optional dynamic status span
  */
 
+import { createOracleApplet } from './oracle-applet.js';
+
 /* ============================================================
    MENU ITEMS CONFIG
    Add new navigation items here — one object per entry.
@@ -98,159 +100,6 @@ function createCtrlBtn({ id, label, icon, title, ariaLabel, statusId }) {
 }
 
 /* ============================================================
-   MOON PHASE CALCULATOR
-   Algorithm: count days since a known new moon, mod against
-   the synodic period (29.53059 days). Returns 0–29 day age.
-   ============================================================ */
-const MOON_PHASES = [
-  { name: 'New Moon',        glyph: '(  )',   range: [0,     3.69] },
-  { name: 'Waxing Crescent', glyph: '(> )',   range: [3.69,  7.38] },
-  { name: 'First Quarter',   glyph: '(>> )',  range: [7.38,  11.07] },
-  { name: 'Waxing Gibbous',  glyph: '(>>>)',  range: [11.07, 14.77] },
-  { name: 'Full Moon',       glyph: '(@@)',   range: [14.77, 18.45] },
-  { name: 'Waning Gibbous',  glyph: '(<<<)',  range: [18.45, 22.15] },
-  { name: 'Last Quarter',    glyph: '( <<)',  range: [22.15, 25.84] },
-  { name: 'Waning Crescent', glyph: '( < )',  range: [25.84, 29.54] },
-];
-
-// Visual bar: 16-char wide ASCII moon bar, filled by illumination %
-function moonBar(illumination) {
-  const filled = Math.round(illumination * 14);
-  return '[' + '#'.repeat(filled) + '-'.repeat(14 - filled) + ']';
-}
-
-function getMoonData(date = new Date()) {
-  // Known new moon: 2000-01-06 18:14 UTC (J2000 epoch ref)
-  const knownNewMoonMs = Date.UTC(2000, 0, 6, 18, 14, 0);
-  const SYNODIC = 29.53059 * 24 * 60 * 60 * 1000; // ms
-  const age = ((date.getTime() - knownNewMoonMs) % SYNODIC + SYNODIC) % SYNODIC;
-  const ageDays = age / (24 * 60 * 60 * 1000);
-  const phase = MOON_PHASES.find(p => ageDays >= p.range[0] && ageDays < p.range[1])
-    || MOON_PHASES[0];
-  // Illumination: simple sinusoidal approximation
-  const illum = (1 - Math.cos((ageDays / 29.53059) * 2 * Math.PI)) / 2;
-  return { phase: phase.name, glyph: phase.glyph, illum, ageDays };
-}
-
-/* ============================================================
-   DAILY TAROT CARD
-   Seeded by date — same card all day, cycles through deck.
-   ============================================================ */
-const TAROT_DECK = [
-  { num: '0',    name: 'The Fool',           keyword: 'New beginnings',    upright: 'Leap into the unknown. Something fresh is calling.',         rev: 'Recklessness. Look before you leap today.' },
-  { num: 'I',    name: 'The Magician',       keyword: 'Willpower',         upright: 'You have the tools. Use them.',                               rev: 'Trickery. Someone (or you) may be bluffing.' },
-  { num: 'II',   name: 'The High Priestess', keyword: 'Intuition',         upright: 'Be still. The answer is already inside you.',                 rev: 'Secrets withheld. Trust your gut more.' },
-  { num: 'III',  name: 'The Empress',        keyword: 'Abundance',         upright: 'Fertile ground. Create, nurture, grow.',                      rev: 'Smothering. Let things breathe.' },
-  { num: 'IV',   name: 'The Emperor',        keyword: 'Structure',         upright: 'Build the foundation. Order serves you now.',                 rev: 'Tyranny or chaos — choose neither.' },
-  { num: 'V',    name: 'The Hierophant',     keyword: 'Tradition',         upright: 'Seek a mentor. Wisdom lives in established paths.',            rev: 'Break the rules. Convention may be the cage.' },
-  { num: 'VI',   name: 'The Lovers',         keyword: 'Choice',            upright: 'A meaningful decision. Follow your values.',                  rev: 'Misalignment. What do you actually want?' },
-  { num: 'VII',  name: 'The Chariot',        keyword: 'Determination',     upright: 'Drive forward. Focus wins the day.',                          rev: 'Spinning wheels. Re-align your direction.' },
-  { num: 'VIII', name: 'Strength',           keyword: 'Courage',           upright: 'Gentle power over fear. The beast bows to kindness.',         rev: 'Self-doubt gnaws. Reclaim your spine.' },
-  { num: 'IX',   name: 'The Hermit',         keyword: 'Solitude',          upright: 'Withdraw and listen. Your inner lantern knows the way.',       rev: 'Isolation as avoidance. Reconnect.' },
-  { num: 'X',    name: 'Wheel of Fortune',   keyword: 'Cycles',            upright: 'The wheel turns. Good luck rides in with change.',            rev: 'Resistance to change keeps you stuck.' },
-  { num: 'XI',   name: 'Justice',            keyword: 'Truth',             upright: 'Cause and effect. Be honest. Be fair.',                       rev: 'A bias is clouding your judgment.' },
-  { num: 'XII',  name: 'The Hanged Man',     keyword: 'Surrender',         upright: 'Pause willingly. A different angle reveals everything.',       rev: 'Stalling. The delay is no longer useful.' },
-  { num: 'XIII', name: 'Death',              keyword: 'Transformation',    upright: 'An ending clears the way. Let it go.',                        rev: 'Clinging to the old form. Release is growth.' },
-  { num: 'XIV',  name: 'Temperance',         keyword: 'Balance',           upright: 'Mix it slowly. The blend is the medicine.',                   rev: 'Excess in one direction. Find the middle.' },
-  { num: 'XV',   name: 'The Devil',          keyword: 'Shadow',            upright: 'Stare at what binds you. The chain is shorter than you think.',rev: 'The chains are already loose. Walk away.' },
-  { num: 'XVI',  name: 'The Tower',          keyword: 'Disruption',        upright: 'Something shatters to let light in. Trust the rubble.',       rev: 'Disaster narrowly averted — or postponed.' },
-  { num: 'XVII', name: 'The Star',           keyword: 'Hope',              upright: 'Calm after the storm. Healing is real.',                      rev: 'Despair whispers. Counter it with small acts.' },
-  { num: 'XVIII',name: 'The Moon',           keyword: 'Illusion',          upright: 'Things are not what they seem. Sit with the uncertainty.',    rev: 'A confusion is clearing. Trust returns.' },
-  { num: 'XIX',  name: 'The Sun',            keyword: 'Clarity',           upright: 'Full brightness. Joy, vitality, success.',                    rev: 'A cloud dims the vision. It will pass.' },
-  { num: 'XX',   name: 'Judgement',          keyword: 'Reckoning',         upright: 'The call has come. Rise and answer it.',                      rev: 'Self-judgment runs too deep. Forgive yourself.' },
-  { num: 'XXI',  name: 'The World',          keyword: 'Completion',        upright: 'A cycle closes in triumph. Celebrate.',                       rev: 'Almost there — tie the last loose end.' },
-];
-
-function getDailyTarot(date = new Date()) {
-  // Seed = YYYYMMDD integer — deterministic per calendar day
-  const seed = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
-  // Simple hash to spread across deck evenly
-  const idx = Math.abs((seed * 2654435761) >>> 0) % TAROT_DECK.length;
-  // Reversed if seed digit sum is odd
-  const digitSum = String(seed).split('').reduce((a, c) => a + +c, 0);
-  const reversed = (digitSum % 2 === 1);
-  return { card: TAROT_DECK[idx], reversed };
-}
-
-/* ============================================================
-   ASCII MOON GLYPH (2-line art)
-   ============================================================ */
-function moonAsciiArt(ageDays) {
-  const norm = ageDays / 29.53059; // 0..1
-  // 5-line × 7-char ASCII moon phases. * = illuminated, space = dark.
-  const phases = [
-    // New Moon
-    ['  ___  ', ' /   \\ ', '|     |', ' \\   / ', '  ---  '],
-    // Waxing Crescent (right sliver)
-    ['  ___  ', ' /  *\\ ', '|   **|', ' \\  */ ', '  ---  '],
-    // First Quarter (right half)
-    ['  ___  ', ' / **\\ ', '|  ***|', ' \\ **/ ', '  ---  '],
-    // Waxing Gibbous (mostly lit, left edge dark)
-    ['  ___  ', ' /***\\ ', '| ****|', ' \\***/ ', '  ---  '],
-    // Full Moon
-    ['  ___  ', ' /***\\ ', '|*****|', ' \\***/ ', '  ---  '],
-    // Waning Gibbous (mostly lit, right edge dark)
-    ['  ___  ', ' /***\\ ', '|**** |', ' \\***/ ', '  ---  '],
-    // Last Quarter (left half)
-    ['  ___  ', ' /** \\ ', '|***  |', ' \\** / ', '  ---  '],
-    // Waning Crescent (left sliver)
-    ['  ___  ', ' /*  \\ ', '|**   |', ' \\*  / ', '  ---  '],
-  ];
-  const i = Math.floor(norm * 8) % 8;
-  return phases[i];
-}
-
-/* ============================================================
-   CLOCK WIDGET
-   ============================================================ */
-function buildClockWidget() {
-  const widget = document.createElement('div');
-  widget.id = 'clock-widget';
-  widget.hidden = true;
-  widget.setAttribute('role', 'dialog');
-  widget.setAttribute('aria-label', 'Moon & Tarot widget');
-
-  function render() {
-    const now   = new Date();
-    const moon  = getMoonData(now);
-    const { card, reversed } = getDailyTarot(now);
-    const art   = moonAsciiArt(moon.ageDays);
-    const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    const pct   = Math.round(moon.illum * 100);
-
-    widget.innerHTML = `
-      <div id="cw-header">
-        <span id="cw-title">// ORACLE //</span>
-        <button id="cw-close" aria-label="Close widget" type="button">[-]</button>
-      </div>
-      <div id="cw-date">${dateStr}</div>
-
-      <div id="cw-section-moon">
-        <div class="cw-section-label">-- MOON --</div>
-        <pre class="cw-moon-art">${art.join('\n')}</pre>
-        <div class="cw-moon-phase">${moon.phase}</div>
-        <div class="cw-moon-bar">${moonBar(moon.illum)}</div>
-        <div class="cw-moon-pct">${pct}% illuminated &bull; day ${Math.floor(moon.ageDays)}</div>
-      </div>
-
-      <div id="cw-divider">-----------------------</div>
-
-      <div id="cw-section-tarot">
-        <div class="cw-section-label">-- DAILY CARD --</div>
-        <div class="cw-card-header">
-          <span class="cw-card-num">[${card.num}]</span>
-          <span class="cw-card-name">${card.name}${reversed ? ' (R)' : ''}</span>
-        </div>
-        <div class="cw-card-keyword">&lt;${card.keyword}&gt;</div>
-        <div class="cw-card-reading">${reversed ? card.rev : card.upright}</div>
-      </div>
-    `;
-  }
-
-  return { el: widget, render };
-}
-
-/* ============================================================
    CLOCK
    ============================================================ */
 function startClock(el) {
@@ -306,9 +155,45 @@ export function createTaskbar() {
   clock.id = 'taskbar-clock';
   clock.setAttribute('role', 'button');
   clock.setAttribute('tabindex', '0');
-  clock.setAttribute('aria-label', 'Current time — click for moon & tarot widget');
-  clock.setAttribute('title', 'Moon phase & daily tarot');
+  clock.setAttribute('aria-label', 'Current time - click for daily oracle signal');
+  clock.setAttribute('aria-expanded', 'false');
+  clock.setAttribute('title', 'Daily Oracle Signal');
   startClock(clock);
+
+  const oracleApplet = createOracleApplet({
+    onOpen: () => {
+      positionOracleWidget();
+      clock.classList.add('widget-open');
+      clock.setAttribute('aria-expanded', 'true');
+    },
+    onClose: () => {
+      clock.classList.remove('widget-open');
+      clock.setAttribute('aria-expanded', 'false');
+    }
+  });
+  const oracleWidget = oracleApplet.widgetEl;
+
+  function positionOracleWidget() {
+    const clockRect = clock.getBoundingClientRect();
+    oracleWidget.style.right = '0px';
+    oracleWidget.style.left = 'auto';
+    oracleWidget.style.top = `${Math.round(clockRect.bottom + 12)}px`;
+  }
+
+  clock.addEventListener('click', (evt) => {
+    evt.stopPropagation();
+    oracleApplet.toggleWidget();
+  });
+
+  clock.addEventListener('keydown', (evt) => {
+    if (evt.key === 'Enter' || evt.key === ' ') {
+      evt.preventDefault();
+      oracleApplet.toggleWidget();
+    }
+    if (evt.key === 'Escape') {
+      oracleApplet.closeWidget();
+    }
+  });
 
   const microSettingsBtn = document.createElement('button');
   microSettingsBtn.id = 'micro-settings-taskbar-btn';
@@ -318,54 +203,13 @@ export function createTaskbar() {
   microSettingsBtn.setAttribute('title', 'Micro settings (^_^)');
   microSettingsBtn.textContent = ':)';
 
-  // ---- Clock Widget ----
-  const { el: widgetEl, render: renderWidget } = buildClockWidget();
-  // closeWidget needs to be accessible inside buildClockWidget — hoist via closure trick
-  function closeWidget() {
-    widgetEl.hidden = true;
-    clock.classList.remove('widget-open');
-    clock.setAttribute('aria-expanded', 'false');
-  }
-  // Patch the close button handler from within build scope
-  // (render() re-attaches it each time, so we pass closeWidget via re-render)
-  function openWidget() {
-    renderWidget();
-    widgetEl.hidden = false;
-    clock.classList.add('widget-open');
-    clock.setAttribute('aria-expanded', 'true');
-    widgetEl.querySelector('#cw-close').addEventListener('click', e => {
-      e.stopPropagation();
-      closeWidget();
-    });
-  }
-
-  clock.addEventListener('click', e => {
-    e.stopPropagation();
-    if (!widgetEl.hidden) {
-      closeWidget();
-    } else {
-      closeMenu(); // close start menu if open
-      openWidget();
-    }
-  });
-  clock.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); clock.click(); }
-    if (e.key === 'Escape') closeWidget();
-  });
-
-  document.addEventListener('click', e => {
-    if (!widgetEl.hidden && !widgetEl.contains(e.target) && e.target !== clock && !clock.contains(e.target)) {
-      closeWidget();
-    }
-  });
-
   function syncMicroSettingsButton(open) {
     microSettingsBtn.classList.toggle('active', !!open);
     microSettingsBtn.setAttribute('aria-pressed', open ? 'true' : 'false');
   }
 
   microSettingsBtn.addEventListener('click', () => {
-    closeWidget();
+    oracleApplet.closeWidget();
     if (window.__microSettingsPanel && typeof window.__microSettingsPanel.toggle === 'function') {
       window.__microSettingsPanel.toggle();
       syncMicroSettingsButton(!!window.__microSettingsPanel.isOpen);
@@ -378,11 +222,15 @@ export function createTaskbar() {
     syncMicroSettingsButton(!!evt?.detail?.open);
   });
 
+  window.addEventListener('resize', () => {
+    if (oracleApplet.isOpen()) positionOracleWidget();
+  });
+
   taskbarEl.appendChild(startBtn);
   taskbarEl.appendChild(tray);
   taskbarEl.appendChild(clock);
   taskbarEl.appendChild(microSettingsBtn);
-  taskbarEl.appendChild(widgetEl);
+  taskbarEl.appendChild(oracleWidget);
 
   // ---- Build Start Menu ----
   const sidebar = document.createElement('div');
@@ -510,6 +358,7 @@ export function createTaskbar() {
   document.addEventListener('click', e => {
     if (!menuOpen) return;
     if (startMenuEl.contains(e.target) || e.target === startBtn || startBtn.contains(e.target)) return;
+    if (oracleWidget.contains(e.target) || e.target === clock || clock.contains(e.target)) return;
     closeMenu();
   });
 

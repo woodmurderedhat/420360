@@ -46,7 +46,7 @@ const TRAY_ITEMS = [
   { id: 'popup-control',  icon: '[P]', statusId: null,          title: 'Toggle Popups (P)',       ariaLabel: 'Pause/resume popup spawning' },
   { id: 'chill-control',  icon: '~_~', statusId: null,          title: 'Chill Mode (C)',           ariaLabel: 'Toggle chill mode' },
   { id: 'sfx-control',    icon: '(S)', statusId: 'sfx-status',  title: 'Toggle sound effects (S)', ariaLabel: 'Toggle sound effects' },
-  { id: 'music-control',  icon: '[#]', statusId: 'music-status',title: 'Toggle music (M)',         ariaLabel: 'Toggle music' },
+  { id: 'music-control',  icon: '[#]', statusId: 'music-status',title: 'Ambient radio widget (M)', ariaLabel: 'Open ambient radio widget' },
 ];
 
 /* ============================================================

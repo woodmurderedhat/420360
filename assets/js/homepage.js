@@ -20,7 +20,8 @@ import {
   isAgeGateValid
 } from './homepage/age-gate.js';
 import { createIntervalManager } from './homepage/interval-manager.js';
-import { createMusicSystem, createSfxSystem } from './homepage/audio-system.js';
+import { createSfxSystem } from './homepage/audio-system.js';
+import { createAmbientRadioSystem } from './homepage/ambient-radio.js';
 import { ensureAgeGateAccess } from './homepage/init-flow.js';
 import { createPopupSystem } from './homepage/popup-system.js';
 import { createBlurbSystem } from './homepage/blurb/system.js';
@@ -139,10 +140,10 @@ const modeControls = createModeControls({
 });
 
 /* ============================================
-   MUSIC SYSTEM
+   AMBIENT RADIO SYSTEM
    ============================================ */
 
-const MusicSystem = createMusicSystem({
+const ambientRadioSystem = createAmbientRadioSystem({
   state,
   config: CONFIG,
   loadPreference,
@@ -213,7 +214,7 @@ startHomepageBootstrap({
   initialSentencePool: blurb.getSentencePool(),
   modeControls,
   interactionSystem,
-  musicSystem: MusicSystem,
+  ambientRadioSystem,
   sfxSystem: SFXSystem,
   overlaySystem,
   popupSystem,

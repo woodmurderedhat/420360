@@ -55,9 +55,44 @@ export const CONFIG = {
   STORAGE_KEYS: {
     AGE_GATE_PROFILE: 'ageGateProfile',
     MUSIC_ENABLED: 'musicEnabled',
+    AMBIENT_RADIO_PROGRESS: 'ambientRadioProgress',
     SFX_ENABLED: 'sfxEnabled',
     CHILL_MODE: 'chillMode',
     POPUPS_PAUSED: 'popupsPaused'
+  },
+
+  AMBIENT_RADIO: {
+    STARTER_CHANNEL_COUNT: 2,
+    CHANNELS: [
+      {
+        id: 'mist',
+        label: 'Neon Mist',
+        description: 'Groove Salad — ambient/trip-hop drift for focus sessions.',
+        streamUrl: 'https://ice1.somafm.com/groovesalad-256-mp3',
+        unlock: { dwellSeconds: 0, interactions: 0, plays: 0 }
+      },
+      {
+        id: 'pulse',
+        label: 'Signal Pulse',
+        description: 'Space Station Soma — late-night transmissions from orbit.',
+        streamUrl: 'https://ice1.somafm.com/spacestation-128-mp3',
+        unlock: { dwellSeconds: 0, interactions: 0, plays: 0 }
+      },
+      {
+        id: 'nocturne',
+        label: 'Nocturne Field',
+        description: 'Drone Zone — deep dark ambient. Unlocked through dwell.',
+        streamUrl: 'https://ice1.somafm.com/dronezone-256-mp3',
+        unlock: { dwellSeconds: 300, interactions: 40, plays: 3 }
+      },
+      {
+        id: 'afterglow',
+        label: 'Afterglow Tape',
+        description: 'The Trip — psychedelic/prog transmissions. Long-session unlock.',
+        streamUrl: 'https://ice1.somafm.com/thetrip-128-mp3',
+        unlock: { dwellSeconds: 600, interactions: 80, plays: 6 }
+      }
+    ]
   },
 
   // Micro Settings Panel keys

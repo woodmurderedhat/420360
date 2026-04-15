@@ -10,7 +10,7 @@ export function startHomepageBootstrap({
   initialSentencePool = [],
   modeControls,
   interactionSystem,
-  musicSystem,
+  ambientRadioSystem,
   sfxSystem,
   overlaySystem,
   popupSystem,
@@ -46,7 +46,7 @@ export function startHomepageBootstrap({
     interactionSystem.setupControlButtons();
     interactionSystem.setupEventHandlers();
 
-    musicSystem.init();
+    ambientRadioSystem.init();
     sfxSystem.init();
 
     overlaySystem.createFloatingWindow('videoThreadWindow', 'VIDEOS • SCHWEPE', 'https://schwepe.247420.xyz/videos-thread.html', false);

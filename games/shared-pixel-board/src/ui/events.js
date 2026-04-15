@@ -15,6 +15,7 @@ import { ZOOM_CONFIG, PAN_STEP_PX, SPECTATOR_MODE } from "../config/constants.js
 const TOUCH_TAP_MAX_MS = 260;
 const TOUCH_TAP_MAX_MOVE_PX = 12;
 const TOUCH_DOUBLE_TAP_MAX_DISTANCE_PX = 18;
+const TOUCH_DRAW_START_MOVE_PX = 6;
 
 class EventManager {
   constructor(canvas, canvasWrap, renderer, toolManager) {
@@ -32,6 +33,7 @@ class EventManager {
     this.dragStartY = 0;
     this.dragStartScrollLeft = 0;
     this.dragStartScrollTop = 0;
+    this.pendingSingleTapCommit = null;
 
     this.bindCanvasEvents();
     this.bindKeyboardEvents();
@@ -114,6 +116,7 @@ class EventManager {
         now - lastTap.time <= TOUCH_TAP_MAX_MS &&
         getPointDistance(lastTap, { x: event.clientX, y: event.clientY }) <= TOUCH_DOUBLE_TAP_MAX_DISTANCE_PX
       ) {
+        this.clearPendingSingleTapCommit();
         state.lastTouchTap = null;
         state.touchTapCandidate = null;
         state.touchGestureMode = "idle";
@@ -127,9 +130,11 @@ class EventManager {
         startX: event.clientX,
         startY: event.clientY,
         startTime: now,
-        moved: false
+        moved: false,
+        drawStarted: false
       };
-      state.touchGestureMode = "drawing";
+      state.touchGestureMode = "pendingTouchDraw";
+      return;
     }
 
     // Middle mouse button or Shift+Click = drag pan
@@ -179,6 +184,22 @@ class EventManager {
       if (movedDistance > TOUCH_TAP_MAX_MOVE_PX) {
         state.touchTapCandidate.moved = true;
       }
+
+      if (
+        state.activePointers.size === 1 &&
+        !state.touchTapCandidate.drawStarted &&
+        movedDistance > TOUCH_DRAW_START_MOVE_PX
+      ) {
+        const startEvent = this.createSyntheticTouchEvent(
+          state.touchTapCandidate.startX,
+          state.touchTapCandidate.startY,
+          event.pointerId
+        );
+        const startPoint = canvasToBoardCoordinates(this.canvas, startEvent, state.zoomLevel);
+        this.toolManager.handleToolPointerDown(startPoint.x, startPoint.y, startEvent);
+        state.touchTapCandidate.drawStarted = true;
+        state.touchGestureMode = "drawing";
+      }
     }
 
     // Pinch zoom
@@ -190,6 +211,10 @@ class EventManager {
     // Drag pan
     if (state.dragPanActive) {
       this.continueDragPan(event);
+      return;
+    }
+
+    if (event.pointerType === "touch" && state.touchGestureMode !== "drawing") {
       return;
     }
 
@@ -212,7 +237,12 @@ class EventManager {
       state.touchTapCandidate.pointerId === event.pointerId
     ) {
       const tapDuration = performance.now() - state.touchTapCandidate.startTime;
-      if (!state.touchTapCandidate.moved && tapDuration <= TOUCH_TAP_MAX_MS) {
+      if (
+        !state.touchTapCandidate.moved &&
+        !state.touchTapCandidate.drawStarted &&
+        tapDuration <= TOUCH_TAP_MAX_MS
+      ) {
+        this.queueSingleTapCommit(event.clientX, event.clientY, event.pointerId);
         state.lastTouchTap = {
           x: event.clientX,
           y: event.clientY,
@@ -264,6 +294,7 @@ class EventManager {
     if (event.pointerType === "touch") {
       state.touchTapCandidate = null;
       state.touchGestureMode = "idle";
+      this.clearPendingSingleTapCommit();
     }
 
     if (state.dragPanActive) {
@@ -305,6 +336,7 @@ class EventManager {
    * Initialize two-finger touch navigation
    */
   beginTwoFingerNavigation() {
+    this.clearPendingSingleTapCommit();
     const pointers = Array.from(state.activePointers.values());
     if (pointers.length < 2) return;
 
@@ -349,6 +381,53 @@ class EventManager {
     const color = state.getPixelAt(x, y);
     state.setColor(color);
     this.emitNotice(`Color picked: ${color}`, true);
+  }
+
+  /**
+   * Create a minimal synthetic touch-like pointer event object.
+   */
+  createSyntheticTouchEvent(clientX, clientY, pointerId) {
+    return {
+      clientX,
+      clientY,
+      pointerType: "touch",
+      pointerId,
+      button: 0,
+      buttons: 1
+    };
+  }
+
+  /**
+   * Cancel pending single-tap draw commit.
+   */
+  clearPendingSingleTapCommit() {
+    if (this.pendingSingleTapCommit && this.pendingSingleTapCommit.timerId) {
+      clearTimeout(this.pendingSingleTapCommit.timerId);
+    }
+    this.pendingSingleTapCommit = null;
+  }
+
+  /**
+   * Queue single-tap draw commit so double-tap can cancel it for color picking.
+   */
+  queueSingleTapCommit(clientX, clientY, pointerId) {
+    this.clearPendingSingleTapCommit();
+
+    const timerId = setTimeout(async () => {
+      const downEvent = this.createSyntheticTouchEvent(clientX, clientY, pointerId);
+      const upEvent = this.createSyntheticTouchEvent(clientX, clientY, pointerId);
+      const { x, y } = canvasToBoardCoordinates(this.canvas, downEvent, state.zoomLevel);
+      await this.toolManager.handleToolPointerDown(x, y, downEvent);
+      await this.toolManager.handleToolPointerUp(x, y, upEvent);
+      this.pendingSingleTapCommit = null;
+    }, TOUCH_TAP_MAX_MS);
+
+    this.pendingSingleTapCommit = {
+      timerId,
+      clientX,
+      clientY,
+      pointerId
+    };
   }
 
   /**

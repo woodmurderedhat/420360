@@ -12,6 +12,10 @@ import {
 } from "../core/math.js";
 import { ZOOM_CONFIG, PAN_STEP_PX, SPECTATOR_MODE } from "../config/constants.js";
 
+const TOUCH_TAP_MAX_MS = 260;
+const TOUCH_TAP_MAX_MOVE_PX = 12;
+const TOUCH_DOUBLE_TAP_MAX_DISTANCE_PX = 18;
+
 class EventManager {
   constructor(canvas, canvasWrap, renderer, toolManager) {
     // Validate dependencies
@@ -84,16 +88,48 @@ class EventManager {
    * Handle pointer down event
    */
   handlePointerDown(event) {
+    if (event.pointerType === "touch") {
+      event.preventDefault();
+    }
+
     state.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
-    // Cancel drag-pan if transitioning to pinch
-    if (
-      event.pointerType === "touch" &&
-      state.activePointers.size > 1 &&
-      state.dragPanActive
-    ) {
-      state.dragPanActive = false;
-      this.canvasWrap.classList.remove("panning");
+    if (event.pointerType === "touch") {
+      // Two fingers always enter navigation mode on touch devices.
+      if (state.activePointers.size === 2) {
+        state.touchGestureMode = "twoFingerNav";
+        this.toolManager.cancelActiveTool();
+        this.beginTwoFingerNavigation();
+        return;
+      }
+
+      if (state.activePointers.size > 1) {
+        return;
+      }
+
+      const now = performance.now();
+      const lastTap = state.lastTouchTap;
+      if (
+        lastTap &&
+        now - lastTap.time <= TOUCH_TAP_MAX_MS &&
+        getPointDistance(lastTap, { x: event.clientX, y: event.clientY }) <= TOUCH_DOUBLE_TAP_MAX_DISTANCE_PX
+      ) {
+        state.lastTouchTap = null;
+        state.touchTapCandidate = null;
+        state.touchGestureMode = "idle";
+        this.toolManager.cancelActiveTool();
+        this.handleColorPicker(event);
+        return;
+      }
+
+      state.touchTapCandidate = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        startTime: now,
+        moved: false
+      };
+      state.touchGestureMode = "drawing";
     }
 
     // Middle mouse button or Shift+Click = drag pan
@@ -113,12 +149,6 @@ class EventManager {
       return;
     }
 
-    // Touch pan mode on single touch
-    if (event.pointerType === "touch" && state.touchPanMode && state.activePointers.size === 1) {
-      this.startDragPan(event);
-      return;
-    }
-
     // Delegate to tool manager
     const { x, y } = canvasToBoardCoordinates(this.canvas, event, state.zoomLevel);
     this.toolManager.handleToolPointerDown(x, y, event);
@@ -128,13 +158,31 @@ class EventManager {
    * Handle pointer move event
    */
   handlePointerMove(event) {
+    if (event.pointerType === "touch") {
+      event.preventDefault();
+    }
+
     // Update active pointers
     if (state.activePointers.has(event.pointerId)) {
       state.activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     }
 
+    if (
+      event.pointerType === "touch" &&
+      state.touchTapCandidate &&
+      state.touchTapCandidate.pointerId === event.pointerId
+    ) {
+      const movedDistance = getPointDistance(
+        { x: state.touchTapCandidate.startX, y: state.touchTapCandidate.startY },
+        { x: event.clientX, y: event.clientY }
+      );
+      if (movedDistance > TOUCH_TAP_MAX_MOVE_PX) {
+        state.touchTapCandidate.moved = true;
+      }
+    }
+
     // Pinch zoom
-    if (state.activePointers.size === 2) {
+    if (state.activePointers.size >= 2) {
       this.handlePinchZoom(event);
       return;
     }
@@ -154,18 +202,49 @@ class EventManager {
    * Handle pointer up event
    */
   async handlePointerUp(event) {
+    if (event.pointerType === "touch") {
+      event.preventDefault();
+    }
+
+    if (
+      event.pointerType === "touch" &&
+      state.touchTapCandidate &&
+      state.touchTapCandidate.pointerId === event.pointerId
+    ) {
+      const tapDuration = performance.now() - state.touchTapCandidate.startTime;
+      if (!state.touchTapCandidate.moved && tapDuration <= TOUCH_TAP_MAX_MS) {
+        state.lastTouchTap = {
+          x: event.clientX,
+          y: event.clientY,
+          time: performance.now()
+        };
+      }
+      state.touchTapCandidate = null;
+    }
+
     state.activePointers.delete(event.pointerId);
 
     // End pinch
     if (state.activePointers.size < 2) {
       state.pinchDistanceStart = 0;
       state.pinchMidpointLast = null;
+      if (event.pointerType === "touch" && state.touchGestureMode === "twoFingerNav") {
+        state.touchGestureMode = "idle";
+      }
     }
 
     // End drag pan
-    if (state.dragPanActive) {
+    if (state.dragPanActive && (event.pointerType !== "touch" || state.activePointers.size < 2)) {
       state.dragPanActive = false;
       this.canvasWrap.classList.remove("panning");
+    }
+
+    if (event.pointerType === "touch" && state.touchGestureMode !== "drawing") {
+      return;
+    }
+
+    if (event.pointerType === "touch") {
+      state.touchGestureMode = "idle";
     }
 
     // Delegate to tool manager
@@ -177,7 +256,15 @@ class EventManager {
    * Handle pointer cancel
    */
   handlePointerCancel(event) {
+    if (event.pointerType === "touch") {
+      event.preventDefault();
+    }
+
     state.activePointers.delete(event.pointerId);
+    if (event.pointerType === "touch") {
+      state.touchTapCandidate = null;
+      state.touchGestureMode = "idle";
+    }
 
     if (state.dragPanActive) {
       state.dragPanActive = false;
@@ -212,6 +299,20 @@ class EventManager {
     this.canvasWrap.scrollLeft = this.dragStartScrollLeft - (event.clientX - this.dragStartX);
     this.canvasWrap.scrollTop = this.dragStartScrollTop - (event.clientY - this.dragStartY);
     this.clampScrollBounds();
+  }
+
+  /**
+   * Initialize two-finger touch navigation
+   */
+  beginTwoFingerNavigation() {
+    const pointers = Array.from(state.activePointers.values());
+    if (pointers.length < 2) return;
+
+    state.dragPanActive = true;
+    this.canvasWrap.classList.add("panning");
+    state.pinchDistanceStart = getPointDistance(pointers[0], pointers[1]);
+    state.pinchZoomStart = state.zoomLevel;
+    state.pinchMidpointLast = getPointMidpoint(pointers[0], pointers[1]);
   }
 
   /**

@@ -219,6 +219,7 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
+  touch-action: none;
 }
 
 .canvas-wrap.panning {
@@ -237,6 +238,7 @@ body {
   image-rendering: crisp-edges;
   display: block;
   border: 2px solid var(--border);
+  touch-action: none;
 }
 
 .overlay-canvas {
@@ -246,6 +248,7 @@ body {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
+  touch-action: none;
 }
 
 .statusbar {

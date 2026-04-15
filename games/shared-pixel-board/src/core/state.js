@@ -27,7 +27,6 @@ class PixelBoardState {
     this.activeTool = TOOLS.PIXEL;
     this.gridEnabled = false;
     this.helpVisible = false;
-    this.touchPanMode = false;
 
     // Canvas rendering state
     this.zoomLevel = 1;
@@ -67,6 +66,9 @@ class PixelBoardState {
     this.pinchZoomStart = 1;
     this.pinchMidpointLast = null;
     this.dragPanActive = false;
+    this.touchGestureMode = "idle";
+    this.touchTapCandidate = null;
+    this.lastTouchTap = null;
 
     // Connection state
     this.isConnected = false;

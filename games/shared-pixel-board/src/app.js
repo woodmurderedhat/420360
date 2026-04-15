@@ -355,16 +355,6 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     });
   }
 
-  // ── Touch pan toggle button ────────────────────────────────────────────────
-  const touchPanBtn = document.getElementById("touchPanToggle");
-  if (touchPanBtn) {
-    touchPanBtn.classList.toggle("active", state.touchPanMode);
-    touchPanBtn.addEventListener("click", () => {
-      state.touchPanMode = !state.touchPanMode;
-      touchPanBtn.classList.toggle("active", state.touchPanMode);
-    });
-  }
-
   // ── Initial tool options render ────────────────────────────────────────────
   renderToolOptions(state.activeTool, renderer, toolManager);
 

@@ -687,6 +687,18 @@ export function createAmbientRadioSystem({ state, config, loadPreference, savePr
 
     openWidget() {
       if (!this.widget) return;
+
+      // Prevent overlap/state conflicts with the clock-oracle widget.
+      const oracleWidget = document.getElementById('oracle-widget');
+      if (oracleWidget && !oracleWidget.hidden) {
+        oracleWidget.hidden = true;
+        const clockBtn = document.getElementById('taskbar-clock');
+        if (clockBtn) {
+          clockBtn.classList.remove('widget-open');
+          clockBtn.setAttribute('aria-expanded', 'false');
+        }
+      }
+
       this.widget.hidden = false;
       this.ctrl.classList.add('widget-open');
       this.ctrl.setAttribute('aria-pressed', 'true');

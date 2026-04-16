@@ -132,7 +132,7 @@ function initWebGL(targetCanvas) {
 
     // Try to get WebGL context
     try {
-        gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        gl = canvas.getContext('webgl');
     } catch (e) {
         console.warn('WebGL initialization failed:', e);
         return false;

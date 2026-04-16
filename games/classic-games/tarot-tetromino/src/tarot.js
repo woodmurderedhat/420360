@@ -626,9 +626,9 @@ TarotTetris.Board.prototype.addGarbageRow = function() {
 };
 
 // Helper function to safely execute board methods
-function safeBoardCall(methodName) {
+function safeBoardCall(methodName, ...args) {
     if (typeof board[methodName] === 'function') {
-        board[methodName].apply(board, Array.prototype.slice.call(arguments, 1));
+        board[methodName].apply(board, args);
     } else {
         console.warn('board.' + methodName + ' is not a function.');
     }

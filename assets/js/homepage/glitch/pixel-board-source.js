@@ -55,10 +55,12 @@ export async function fetchPixelBoardCanvas(firebaseConfig, { timeoutMs = 5000 }
   );
 
   const fetchPromise = (async () => {
-    const [{ initializeApp, getApp }, { getDatabase, ref, get }] = await Promise.all([
+    const [{ initializeApp, getApp }, { getDatabase, ref, get, forceWebSockets }] = await Promise.all([
       import(`${FIREBASE_BASE}app.js`),
       import(`${FIREBASE_BASE}database.js`)
     ]);
+
+    forceWebSockets();
 
     // Reuse an existing Firebase app instance if one was already created under
     // our dedicated name, otherwise initialize a new one.

@@ -24,10 +24,12 @@ export async function getDb() {
   if (_initPromise) return _initPromise;
 
   _initPromise = (async () => {
-    const [{ initializeApp, getApps, getApp }, { getDatabase }] = await Promise.all([
+    const [{ initializeApp, getApps, getApp }, { getDatabase, forceWebSockets }] = await Promise.all([
       import(`${FB_BASE}/firebase-app.js`),
       import(`${FB_BASE}/firebase-database.js`)
     ]);
+
+    forceWebSockets();
 
     const existingApps = getApps();
     const existingApp = existingApps.find(a => a.name === 'homepage-addons');

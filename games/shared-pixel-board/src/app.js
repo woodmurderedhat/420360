@@ -24,6 +24,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/fireba
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
 import {
   getDatabase,
+  forceWebSockets,
   ref,
   set,
   update,
@@ -834,6 +835,7 @@ function isFirebaseConfigured() {
 async function initializeFirebase(toolManager, renderer) {
   try {
     const app = initializeApp(FIREBASE_CONFIG);
+    forceWebSockets();
 
     // Initialize analytics
     getAnalytics(app);

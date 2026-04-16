@@ -25,7 +25,10 @@ export class AudioManager {
     
     try {
       // Create audio context
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (!window.AudioContext) {
+        throw new Error('Web Audio API is not supported');
+      }
+      this.ctx = new window.AudioContext();
       
       // Create master gain node
       this.masterGain = this.ctx.createGain();

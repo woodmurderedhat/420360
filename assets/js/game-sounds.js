@@ -20,7 +20,10 @@
         if (isInitialized) return true;
         
         try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (!window.AudioContext) {
+                throw new Error('Web Audio API is not supported');
+            }
+            audioContext = new window.AudioContext();
             isInitialized = true;
             return true;
         } catch (e) {

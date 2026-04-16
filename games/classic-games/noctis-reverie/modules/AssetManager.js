@@ -205,7 +205,10 @@ export class AssetManager {
       
       // Create AudioContext on demand
       if (!this.audioContext) {
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (!window.AudioContext) {
+          throw new Error('Web Audio API is not supported');
+        }
+        this.audioContext = new window.AudioContext();
       }
       
       // Decode audio data

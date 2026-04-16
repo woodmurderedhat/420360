@@ -325,7 +325,10 @@ export function createAmbientRadioSystem({ state, config, loadPreference, savePr
       if (this.audioCtx) return;
       if (!this.fallbackAudio) return;
       try {
-        this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (!window.AudioContext) {
+          throw new Error('Web Audio API is not supported');
+        }
+        this.audioCtx = new window.AudioContext();
         const source = this.audioCtx.createMediaElementSource(this.fallbackAudio);
         this.analyser = this.audioCtx.createAnalyser();
         this.analyser.fftSize = 64;

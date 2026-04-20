@@ -398,6 +398,83 @@ main {
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
 }
 
+.popup--calendar {
+  width: min(420px, calc(100vw - 24px));
+  min-height: 320px;
+  background:
+    linear-gradient(180deg, rgba(18, 12, 28, 0.98), rgba(5, 15, 12, 0.98)),
+    radial-gradient(circle at top, rgba(154, 249, 199, 0.2), transparent 50%);
+  box-shadow:
+    0 0 0 4px #f7a63f,
+    0 0 0 8px #9af9c7,
+    0 0 28px rgba(154, 249, 199, 0.55),
+    10px 10px 0 0 #000;
+}
+
+.popup--calendar .titlebar {
+  padding: 4px 8px;
+  background: linear-gradient(90deg, #f7a63f 0%, #9af9c7 100%);
+  border-bottom-color: #000;
+}
+
+.popup--calendar .titlebar .left span {
+  letter-spacing: 0.08em;
+}
+
+.popup--calendar .content {
+  padding: 12px;
+  text-align: left;
+}
+
+.popup-ascii-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.popup-ascii-link {
+  display: block;
+  text-decoration: none;
+}
+
+.popup-ascii-art {
+  margin: 0;
+  padding: 16px 14px;
+  white-space: pre;
+  overflow-x: auto;
+  border: 3px solid var(--secondary);
+  background:
+    linear-gradient(180deg, rgba(3, 8, 6, 0.95), rgba(10, 22, 18, 0.98));
+  box-shadow:
+    inset 0 0 0 2px var(--primary),
+    0 0 18px rgba(154, 249, 199, 0.25);
+  color: #d9ffd9;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 15px;
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(154, 249, 199, 0.35);
+}
+
+.popup-ascii-footer {
+  padding: 8px 10px;
+  border: 2px dashed var(--highlight);
+  background: rgba(247, 166, 63, 0.1);
+  color: #fff4c2;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.popup--calendar .popup-copy {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--secondary);
+  background: rgba(154, 249, 199, 0.08);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
 /* === KEYFRAME ANIMATIONS === */
 @keyframes blink {
   0%, 49% { opacity: 1; }

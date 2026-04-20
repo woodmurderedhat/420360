@@ -78,15 +78,17 @@ function formatTemplate(template, date) {
 function normalizeTheme(themeId, theme, date) {
   if (!theme || typeof theme !== 'object') return null;
 
-  const gifPool = Array.isArray(theme.gifs)
-    ? theme.gifs.filter((gif) => typeof gif === 'string' && gif.trim())
+  const asciiArtPool = Array.isArray(theme.asciiArt)
+    ? theme.asciiArt.filter((art) => typeof art === 'string' && art.trim())
     : [];
-  if (!gifPool.length) return null;
+  if (!asciiArtPool.length) return null;
 
   return {
     label: formatTemplate(theme.labelTemplate || theme.label || themeId || 'CALENDAR POPUP', date),
     href: typeof theme.href === 'string' && theme.href.trim() ? theme.href.trim() : '#',
-    gif: gifPool[(getDayOfYear(date) - 1) % gifPool.length],
+    asciiArt: formatTemplate(asciiArtPool[(getDayOfYear(date) - 1) % asciiArtPool.length], date),
+    asciiFooter: formatTemplate(theme.asciiFooterTemplate || '', date),
+    variant: 'calendar-ascii',
     message: formatTemplate(theme.messageTemplate || '', date),
     imageAlt: formatTemplate(theme.imageAlt || `${theme.labelTemplate || theme.label || themeId} celebration`, date)
   };

@@ -1,220 +1,406 @@
-const BASE_GIFS = {
-  greenBurst: 'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif',
-  signalPulse: 'https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif',
-  staticWave: 'https://media.giphy.com/media/qxJ9pAQCBIJLxfelCv/giphy.gif',
-  redField: 'https://media.giphy.com/media/HtCcDJ134eAICJZjLb/giphy.gif',
-  goldFlash: 'https://media.giphy.com/media/JeEjGpM2TVZGaM5BuE/giphy.gif',
-  neonLoop: 'https://media.giphy.com/media/R7roNpEGCKqzjs1kkO/giphy.gif',
-  smokeOrbit: 'https://media.giphy.com/media/8Javw7WzqetpyiT3ls/giphy.gif',
-  arcadeBlink: 'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif'
+const ASCII_ART = {
+  rebootPanel: String.raw`+----------------------+
+|  BOOT SECTOR: GREEN  |
+|  [#####-----] 42%    |
+|  LOOP: DAY {day}        |
++----------------------+`,
+  heartBeacon: String.raw`      .:::.      .:::.
+   .::::::::.  .:::::::.
+  :::::::::::::::::::::::
+  ':::::::::::::::::::::'
+    ':::::::::::::::::'
+      ':::::::::::::'
+         ':::::::'`,
+  leafTotem: String.raw`          //
+       \\\\||////
+     ---  420  ---
+       ////||\\\\
+          \\
+       GREEN RISE`,
+  cloudTemple: String.raw`      .--.      .--.
+   .-(    )----(    )-.
+  (___.__)      (___.__)
+       \    SKY    /
+        '--------'`,
+  bloomGate: String.raw`      _ _  _ _
+    _( V )( V )_
+   /__  BLOOM __\
+      \  ||  /
+       \_||_/`,
+  solsticeWheel: String.raw`       \  |  /
+     ---  O  ---
+       /  |  \
+    LONG DAY SIGNAL
+        \ | /`,
+  fireworksTower: String.raw`         .
+       .'*'.
+    .'* / \ *'.
+      *.<*>.*
+    .'* \ / *'.
+       '*.*'`,
+  tapeDeck: String.raw`   .----------------.
+  /  AFTERGLOW TAPE /
+ /_________________/
+ | []  []  ==  [] |
+ |________________|`,
+  resetConsole: String.raw`  __________________
+ |  RESET STACK   |
+ |  > calm.exe    |
+ |  > focus.bat   |
+ |________________|`,
+  ghostWindow: String.raw`      .-.
+     (o o)
+   oo| O |oo
+     |   |
+     '~~~'
+   SPOOK FEED`,
+  harvestTable: String.raw`     _____________
+    / HARVEST  /|
+   /__________/ |
+   | TEA  PIE | |
+   | STATIC   | /
+   |__________|/`,
+  glitchTree: String.raw`         *
+         /|\
+        /*|*\
+       /**|**\
+      /___|___\
+         /_\\`,
+  launchPad: String.raw`         /\
+         /  \
+        /_420\
+        |    |
+        |____|
+       /_/  \_\\`,
+  civicBoard: String.raw`+------------------+
+|  CIVIC STATIC    |
+|  [ VOTE ] [ COPE ] |
+|  KEEP BREATHING  |
++------------------+`,
+  feastPlate: String.raw`     ____________
+    / THANKSGLOW /|
+   /____________/ |
+   | PIE  TEA  |  |
+   | GOOD NOISE| / 
+   |___________|/`,
+  giftStack: String.raw`   +-----------+
+   | []  []   |
+   |    ||    |
+   | []_||_[] |
+   +-----------+
+      ||  ||`,
+  moonSignal: String.raw`       _..._
+    .:::::::::.
+   ::::::::::::: 
+   ':::::::::::'
+      ':::::'`,
+  weekendBanner: String.raw`~^~^~^~^~^~^~^~^~^
+  WEEKEND STATIC
+~^~^~^~^~^~^~^~^~^`,
+  yearEndCore: String.raw`    2 0 2 {year}
+  < MELTDOWN CORE >
+    \\\\ || || //
+      \\|| ||//
+        \\  //`,
+  pumpkinFace: String.raw`      .-"""-.
+     / .===. \
+     \/ 6 6 \/
+     ( \___/ )
+ ___ooo_____ooo___`,
+  equinoxAxis: String.raw`       LIGHT
+         |
+      ---+---
+         |
+        DARK
+    {monthName} {day}`,
+  mondayStack: String.raw`   .-----------.
+  / MONDAY FIX /
+ /___________ /
+ | reboot now|
+ |__||||||||_|`,
+  fridaySignal: String.raw`  _________
+ / FRIDAY /|
+/_______ / |
+| LIFT  |  |
+| OFF   | /`,
+  leftoversTray: String.raw`   .------------.
+  / LEFTOVERS  /|
+ /___________ / |
+ | ROUND TWO |  |
+ |___________| /`,
+  valentineLock: String.raw`    .--------.
+  .'  LOVE   '.
+ /  SIGNAL  42 \
+ \  HEART      /
+  '._.__.__._.'`,
+  luckyArch: String.raw`      ____
+   .-' __ '-.
+  /  .'  '.  \
+ |  / LUCK \  |
+ |  \ 420 /  |
+  \  '.__.'  /
+   '-.____.-'`
 };
+
+const ASCII_FOOTERS = {
+  games: '[ OPEN /GAMES/ ]   [ STAY LIFTED ]',
+  about: '[ OPEN /ABOUT/ ]   [ READ THE STATIC ]',
+  cartoons: '[ OPEN /CARTOONS/ ]   [ DRAW OUTSIDE THE LINES ]',
+  reviews: '[ OPEN /MOVIE-REVIEWS/ ]   [ LET IT MARINATE ]',
+  esoteric: '[ OPEN /ESOTERIC/ ]   [ ENTER THE SHRINE ]',
+  nullVesper: '[ OPEN /NULL-VESPER/ ]   [ ARCHIVE THE GLITCH ]'
+};
+
+function theme(labelTemplate, href, messageTemplate, asciiArt, asciiFooterTemplate) {
+  return {
+    labelTemplate,
+    href,
+    messageTemplate,
+    asciiArt,
+    asciiFooterTemplate
+  };
+}
 
 // Theme definitions are reusable content blocks. Calendar rules below decide when a theme appears.
 export const CALENDAR_POPUP_THEMES = {
-  januaryReboot: {
-    labelTemplate: 'JANUARY REBOOT • DAY {day}',
-    href: '/games/',
-    messageTemplate: '{weekdayName} {day}: cold-start the year with fresh static and greener habits.',
-    gifs: [BASE_GIFS.greenBurst, BASE_GIFS.staticWave, BASE_GIFS.goldFlash]
-  },
-  februaryLoveStatic: {
-    labelTemplate: 'FEBRUARY LOVE STATIC • DAY {day}',
-    href: '/about/',
-    messageTemplate: '{weekdayName} {day}: send a little extra glow to your favorite chaos gremlin.',
-    gifs: [BASE_GIFS.redField, BASE_GIFS.neonLoop, BASE_GIFS.staticWave]
-  },
-  marchGreenRiot: {
-    labelTemplate: 'MARCH GREEN RIOT • DAY {day}',
-    href: '/games/',
-    messageTemplate: '{weekdayName} {day}: spring the traps, crack the haze, and let the green riot in.',
-    gifs: [BASE_GIFS.greenBurst, BASE_GIFS.smokeOrbit, BASE_GIFS.signalPulse]
-  },
-  aprilCloudParade: {
-    labelTemplate: 'APRIL CLOUD PARADE • DAY {day}',
-    href: '/games/',
-    messageTemplate: '{weekdayName} {day}: keep the celebration lit and let the cloud parade roll through.',
-    gifs: [BASE_GIFS.greenBurst, BASE_GIFS.arcadeBlink, BASE_GIFS.neonLoop]
-  },
-  mayBloomBlitz: {
-    labelTemplate: 'MAY BLOOM BLITZ • DAY {day}',
-    href: '/cartoons/',
-    messageTemplate: '{weekdayName} {day}: bloom loud, blink weird, and give the month a little extra color.',
-    gifs: [BASE_GIFS.goldFlash, BASE_GIFS.greenBurst, BASE_GIFS.redField]
-  },
-  juneSunStatic: {
-    labelTemplate: 'JUNE SUN STATIC • DAY {day}',
-    href: '/movie-reviews/',
-    messageTemplate: '{weekdayName} {day}: stretch the daylight and keep the summer static humming.',
-    gifs: [BASE_GIFS.goldFlash, BASE_GIFS.signalPulse, BASE_GIFS.neonLoop]
-  },
-  julyHeatWave: {
-    labelTemplate: 'JULY HEAT WAVE • DAY {day}',
-    href: '/games/',
-    messageTemplate: '{weekdayName} {day}: spark up the heat wave and let the arcade melt around you.',
-    gifs: [BASE_GIFS.arcadeBlink, BASE_GIFS.redField, BASE_GIFS.goldFlash]
-  },
-  augustAfterglow: {
-    labelTemplate: 'AUGUST AFTERGLOW • DAY {day}',
-    href: '/movie-reviews/',
-    messageTemplate: '{weekdayName} {day}: ride the afterglow and keep the late-summer buzz alive.',
-    gifs: [BASE_GIFS.smokeOrbit, BASE_GIFS.staticWave, BASE_GIFS.goldFlash]
-  },
-  septemberReset: {
-    labelTemplate: 'SEPTEMBER RESET • DAY {day}',
-    href: '/about/',
-    messageTemplate: '{weekdayName} {day}: reset the stack, sharpen the vibe, and drift into a cooler loop.',
-    gifs: [BASE_GIFS.signalPulse, BASE_GIFS.greenBurst, BASE_GIFS.staticWave]
-  },
-  octoberSpookStatic: {
-    labelTemplate: 'OCTOBER SPOOK STATIC • DAY {day}',
-    href: '/esoteric/',
-    messageTemplate: '{weekdayName} {day}: ghost the routine and let the spook static leak in.',
-    gifs: [BASE_GIFS.redField, BASE_GIFS.smokeOrbit, BASE_GIFS.neonLoop]
-  },
-  novemberHarvestHaze: {
-    labelTemplate: 'NOVEMBER HARVEST HAZE • DAY {day}',
-    href: '/about/',
-    messageTemplate: '{weekdayName} {day}: harvest the good noise and keep the room warm with haze.',
-    gifs: [BASE_GIFS.goldFlash, BASE_GIFS.greenBurst, BASE_GIFS.signalPulse]
-  },
-  decemberGlitchmas: {
-    labelTemplate: 'DECEMBER GLITCHMAS • DAY {day}',
-    href: '/games/',
-    messageTemplate: '{weekdayName} {day}: wrap the year in glittering static and keep the lights weird.',
-    gifs: [BASE_GIFS.redField, BASE_GIFS.goldFlash, BASE_GIFS.arcadeBlink]
-  },
-  mondayMotivation: {
-    labelTemplate: 'MONDAY REBOOT',
-    href: '/about/',
-    messageTemplate: 'It is {weekdayName}. Pretend the timeline is fixable and reboot anyway.',
-    gifs: [BASE_GIFS.staticWave, BASE_GIFS.signalPulse]
-  },
-  fridayLiftOff: {
-    labelTemplate: 'FRIDAY LIFT-OFF',
-    href: '/games/',
-    messageTemplate: '{weekdayName} is here. Clock out of reality and boot the weird stuff.',
-    gifs: [BASE_GIFS.arcadeBlink, BASE_GIFS.greenBurst]
-  },
-  weekendStatic: {
-    labelTemplate: 'WEEKEND STATIC',
-    href: '/games/',
-    messageTemplate: '{weekdayName} unlocked. Stay up late and click on something irresponsible.',
-    gifs: [BASE_GIFS.neonLoop, BASE_GIFS.arcadeBlink, BASE_GIFS.smokeOrbit]
-  },
-  newYear: {
-    labelTemplate: 'HAPPY NEW YEAR!',
-    href: '/games/',
-    messageTemplate: 'Fresh orbit, fresh static, fresh excuses to keep clicking.',
-    gifs: [BASE_GIFS.goldFlash]
-  },
-  valentines: {
-    labelTemplate: 'LOVE & HAZE DAY',
-    href: '/about/',
-    messageTemplate: 'Send somebody a weird little heart-shaped puff of chaos.',
-    gifs: [BASE_GIFS.redField]
-  },
-  stPatricks: {
-    labelTemplate: 'LUCKY LEAF DAY',
-    href: '/games/',
-    messageTemplate: 'Wear the green, chase the glow, and hoard the lucky static.',
-    gifs: [BASE_GIFS.greenBurst]
-  },
-  aprilFools: {
-    labelTemplate: 'APRIL FOOLS STATIC',
-    href: '/cartoons/',
-    messageTemplate: 'Trust nothing. Laugh loudly. Click recklessly.',
-    gifs: [BASE_GIFS.neonLoop]
-  },
-  fourTwenty: {
-    labelTemplate: 'HAPPY 420!',
-    href: '/games/',
-    messageTemplate: 'This whole site was built for days like this. Stay lifted.',
-    gifs: [BASE_GIFS.greenBurst]
-  },
-  memorialDay: {
-    labelTemplate: 'LONG WEEKEND STATIC',
-    href: '/about/',
-    messageTemplate: 'Memorial Day drift is active. Keep it reflective, keep it hazy.',
-    gifs: [BASE_GIFS.goldFlash, BASE_GIFS.smokeOrbit]
-  },
-  summerSolstice: {
-    labelTemplate: 'SUMMER SOLSTICE SIGNAL',
-    href: '/movie-reviews/',
-    messageTemplate: 'Longest day, loudest glow. Let the sunshine glitch a little.',
-    gifs: [BASE_GIFS.goldFlash]
-  },
-  fireworkStatic: {
-    labelTemplate: 'FIREWORK STATIC',
-    href: '/games/',
-    messageTemplate: 'Explode the timeline and celebrate the sky-noise.',
-    gifs: [BASE_GIFS.arcadeBlink]
-  },
-  sevenTen: {
-    labelTemplate: 'HAPPY 710',
-    href: '/games/',
-    messageTemplate: 'Oil flipped is 710. You know the assignment.',
-    gifs: [BASE_GIFS.signalPulse]
-  },
-  laborDay: {
-    labelTemplate: 'LABOR DAY LAZE',
-    href: '/movie-reviews/',
-    messageTemplate: 'Drop the workload, pick up the glow, and coast through the static.',
-    gifs: [BASE_GIFS.goldFlash, BASE_GIFS.neonLoop]
-  },
-  autumnEquinox: {
-    labelTemplate: 'AUTUMN EQUINOX',
-    href: '/esoteric/',
-    messageTemplate: 'Equal light, equal dark, unequal levels of weird.',
-    gifs: [BASE_GIFS.smokeOrbit]
-  },
-  halloweed: {
-    labelTemplate: 'HALLOWEED',
-    href: '/esoteric/',
-    messageTemplate: 'Happy Halloweed. Haunted vibes only.',
-    gifs: [BASE_GIFS.redField]
-  },
-  electionStatic: {
-    labelTemplate: 'CIVIC STATIC TUESDAY',
-    href: '/about/',
-    messageTemplate: 'Deep breaths, weird thoughts, and one more lap through democracy.',
-    gifs: [BASE_GIFS.staticWave, BASE_GIFS.signalPulse]
-  },
-  thanksgiving: {
-    labelTemplate: 'THANKSGLOWING',
-    href: '/movie-reviews/',
-    messageTemplate: 'Eat well, drift slow, and keep the room full of grateful noise.',
-    gifs: [BASE_GIFS.goldFlash, BASE_GIFS.greenBurst]
-  },
-  leftovers: {
-    labelTemplate: 'LEFTOVER HAZE DAY',
-    href: '/movie-reviews/',
-    messageTemplate: 'Round two. More snacks, more static, less pretending.',
-    gifs: [BASE_GIFS.goldFlash]
-  },
-  xmasEve: {
-    labelTemplate: 'XMAS EVE STATIC',
-    href: '/games/',
-    messageTemplate: 'The lights are blinking. The cookies are gone. The weirdness is peaking.',
-    gifs: [BASE_GIFS.arcadeBlink]
-  },
-  xmas: {
-    labelTemplate: 'MERRY XMAS!',
-    href: '/games/',
-    messageTemplate: 'Merry Xmas from the smoke-filled arcade.',
-    gifs: [BASE_GIFS.redField]
-  },
-  twixmas: {
-    labelTemplate: 'TWIXMAS DRIFT',
-    href: '/movie-reviews/',
-    messageTemplate: 'Time is fake between Xmas and New Year. Lean into it.',
-    gifs: [BASE_GIFS.neonLoop, BASE_GIFS.smokeOrbit]
-  },
-  yearEnd: {
-    labelTemplate: 'YEAR-END MELTDOWN',
-    href: '/null-vesper/',
-    messageTemplate: 'Close the tabs you can. Keep the best glitches forever.',
-    gifs: [BASE_GIFS.neonLoop]
-  }
+  januaryReboot: theme(
+    'JANUARY REBOOT - DAY {day}',
+    '/games/',
+    '{weekdayName} {day}: cold-start the year with fresh static and greener habits.',
+    [ASCII_ART.rebootPanel, ASCII_ART.launchPad, ASCII_ART.resetConsole],
+    ASCII_FOOTERS.games
+  ),
+  februaryLoveStatic: theme(
+    'FEBRUARY LOVE STATIC - DAY {day}',
+    '/about/',
+    '{weekdayName} {day}: send a little extra glow to your favorite chaos gremlin.',
+    [ASCII_ART.heartBeacon, ASCII_ART.valentineLock, ASCII_ART.moonSignal],
+    ASCII_FOOTERS.about
+  ),
+  marchGreenRiot: theme(
+    'MARCH GREEN RIOT - DAY {day}',
+    '/games/',
+    '{weekdayName} {day}: spring the traps, crack the haze, and let the green riot in.',
+    [ASCII_ART.leafTotem, ASCII_ART.luckyArch, ASCII_ART.launchPad],
+    ASCII_FOOTERS.games
+  ),
+  aprilCloudParade: theme(
+    'APRIL CLOUD PARADE - DAY {day}',
+    '/games/',
+    '{weekdayName} {day}: keep the celebration lit and let the cloud parade roll through.',
+    [ASCII_ART.cloudTemple, ASCII_ART.launchPad, ASCII_ART.leafTotem],
+    ASCII_FOOTERS.games
+  ),
+  mayBloomBlitz: theme(
+    'MAY BLOOM BLITZ - DAY {day}',
+    '/cartoons/',
+    '{weekdayName} {day}: bloom loud, blink weird, and give the month a little extra color.',
+    [ASCII_ART.bloomGate, ASCII_ART.leafTotem, ASCII_ART.heartBeacon],
+    ASCII_FOOTERS.cartoons
+  ),
+  juneSunStatic: theme(
+    'JUNE SUN STATIC - DAY {day}',
+    '/movie-reviews/',
+    '{weekdayName} {day}: stretch the daylight and keep the summer static humming.',
+    [ASCII_ART.solsticeWheel, ASCII_ART.cloudTemple, ASCII_ART.tapeDeck],
+    ASCII_FOOTERS.reviews
+  ),
+  julyHeatWave: theme(
+    'JULY HEAT WAVE - DAY {day}',
+    '/games/',
+    '{weekdayName} {day}: spark up the heat wave and let the arcade melt around you.',
+    [ASCII_ART.fireworksTower, ASCII_ART.solsticeWheel, ASCII_ART.launchPad],
+    ASCII_FOOTERS.games
+  ),
+  augustAfterglow: theme(
+    'AUGUST AFTERGLOW - DAY {day}',
+    '/movie-reviews/',
+    '{weekdayName} {day}: ride the afterglow and keep the late-summer buzz alive.',
+    [ASCII_ART.tapeDeck, ASCII_ART.weekendBanner, ASCII_ART.moonSignal],
+    ASCII_FOOTERS.reviews
+  ),
+  septemberReset: theme(
+    'SEPTEMBER RESET - DAY {day}',
+    '/about/',
+    '{weekdayName} {day}: reset the stack, sharpen the vibe, and drift into a cooler loop.',
+    [ASCII_ART.resetConsole, ASCII_ART.rebootPanel, ASCII_ART.mondayStack],
+    ASCII_FOOTERS.about
+  ),
+  octoberSpookStatic: theme(
+    'OCTOBER SPOOK STATIC - DAY {day}',
+    '/esoteric/',
+    '{weekdayName} {day}: ghost the routine and let the spook static leak in.',
+    [ASCII_ART.ghostWindow, ASCII_ART.pumpkinFace, ASCII_ART.moonSignal],
+    ASCII_FOOTERS.esoteric
+  ),
+  novemberHarvestHaze: theme(
+    'NOVEMBER HARVEST HAZE - DAY {day}',
+    '/about/',
+    '{weekdayName} {day}: harvest the good noise and keep the room warm with haze.',
+    [ASCII_ART.harvestTable, ASCII_ART.feastPlate, ASCII_ART.moonSignal],
+    ASCII_FOOTERS.about
+  ),
+  decemberGlitchmas: theme(
+    'DECEMBER GLITCHMAS - DAY {day}',
+    '/games/',
+    '{weekdayName} {day}: wrap the year in glittering static and keep the lights weird.',
+    [ASCII_ART.glitchTree, ASCII_ART.giftStack, ASCII_ART.fireworksTower],
+    ASCII_FOOTERS.games
+  ),
+  mondayMotivation: theme(
+    'MONDAY REBOOT',
+    '/about/',
+    'It is {weekdayName}. Pretend the timeline is fixable and reboot anyway.',
+    [ASCII_ART.mondayStack, ASCII_ART.resetConsole],
+    ASCII_FOOTERS.about
+  ),
+  fridayLiftOff: theme(
+    'FRIDAY LIFT-OFF',
+    '/games/',
+    '{weekdayName} is here. Clock out of reality and boot the weird stuff.',
+    [ASCII_ART.fridaySignal, ASCII_ART.launchPad, ASCII_ART.fireworksTower],
+    ASCII_FOOTERS.games
+  ),
+  weekendStatic: theme(
+    'WEEKEND STATIC',
+    '/games/',
+    '{weekdayName} unlocked. Stay up late and click on something irresponsible.',
+    [ASCII_ART.weekendBanner, ASCII_ART.moonSignal, ASCII_ART.tapeDeck],
+    ASCII_FOOTERS.games
+  ),
+  newYear: theme(
+    'HAPPY NEW YEAR!',
+    '/games/',
+    'Fresh orbit, fresh static, fresh excuses to keep clicking.',
+    [ASCII_ART.yearEndCore, ASCII_ART.fireworksTower],
+    ASCII_FOOTERS.games
+  ),
+  valentines: theme(
+    'LOVE & HAZE DAY',
+    '/about/',
+    'Send somebody a weird little heart-shaped puff of chaos.',
+    [ASCII_ART.valentineLock, ASCII_ART.heartBeacon],
+    ASCII_FOOTERS.about
+  ),
+  stPatricks: theme(
+    'LUCKY LEAF DAY',
+    '/games/',
+    'Wear the green, chase the glow, and hoard the lucky static.',
+    [ASCII_ART.luckyArch, ASCII_ART.leafTotem],
+    ASCII_FOOTERS.games
+  ),
+  aprilFools: theme(
+    'APRIL FOOLS STATIC',
+    '/cartoons/',
+    'Trust nothing. Laugh loudly. Click recklessly.',
+    [ASCII_ART.cloudTemple, ASCII_ART.fireworksTower],
+    ASCII_FOOTERS.cartoons
+  ),
+  fourTwenty: theme(
+    'HAPPY 420!',
+    '/games/',
+    'This whole site was built for days like this. Stay lifted.',
+    [ASCII_ART.leafTotem, ASCII_ART.launchPad, ASCII_ART.luckyArch],
+    ASCII_FOOTERS.games
+  ),
+  memorialDay: theme(
+    'LONG WEEKEND STATIC',
+    '/about/',
+    'Memorial Day drift is active. Keep it reflective, keep it hazy.',
+    [ASCII_ART.weekendBanner, ASCII_ART.moonSignal, ASCII_ART.harvestTable],
+    ASCII_FOOTERS.about
+  ),
+  summerSolstice: theme(
+    'SUMMER SOLSTICE SIGNAL',
+    '/movie-reviews/',
+    'Longest day, loudest glow. Let the sunshine glitch a little.',
+    [ASCII_ART.solsticeWheel],
+    ASCII_FOOTERS.reviews
+  ),
+  fireworkStatic: theme(
+    'FIREWORK STATIC',
+    '/games/',
+    'Explode the timeline and celebrate the sky-noise.',
+    [ASCII_ART.fireworksTower],
+    ASCII_FOOTERS.games
+  ),
+  sevenTen: theme(
+    'HAPPY 710',
+    '/games/',
+    'Oil flipped is 710. You know the assignment.',
+    [ASCII_ART.tapeDeck, ASCII_ART.launchPad],
+    ASCII_FOOTERS.games
+  ),
+  laborDay: theme(
+    'LABOR DAY LAZE',
+    '/movie-reviews/',
+    'Drop the workload, pick up the glow, and coast through the static.',
+    [ASCII_ART.weekendBanner, ASCII_ART.solsticeWheel],
+    ASCII_FOOTERS.reviews
+  ),
+  autumnEquinox: theme(
+    'AUTUMN EQUINOX',
+    '/esoteric/',
+    'Equal light, equal dark, unequal levels of weird.',
+    [ASCII_ART.equinoxAxis, ASCII_ART.moonSignal],
+    ASCII_FOOTERS.esoteric
+  ),
+  halloweed: theme(
+    'HALLOWEED',
+    '/esoteric/',
+    'Happy Halloweed. Haunted vibes only.',
+    [ASCII_ART.pumpkinFace, ASCII_ART.ghostWindow],
+    ASCII_FOOTERS.esoteric
+  ),
+  electionStatic: theme(
+    'CIVIC STATIC TUESDAY',
+    '/about/',
+    'Deep breaths, weird thoughts, and one more lap through democracy.',
+    [ASCII_ART.civicBoard],
+    ASCII_FOOTERS.about
+  ),
+  thanksgiving: theme(
+    'THANKSGLOWING',
+    '/movie-reviews/',
+    'Eat well, drift slow, and keep the room full of grateful noise.',
+    [ASCII_ART.feastPlate, ASCII_ART.harvestTable],
+    ASCII_FOOTERS.reviews
+  ),
+  leftovers: theme(
+    'LEFTOVER HAZE DAY',
+    '/movie-reviews/',
+    'Round two. More snacks, more static, less pretending.',
+    [ASCII_ART.leftoversTray, ASCII_ART.feastPlate],
+    ASCII_FOOTERS.reviews
+  ),
+  xmasEve: theme(
+    'XMAS EVE STATIC',
+    '/games/',
+    'The lights are blinking. The cookies are gone. The weirdness is peaking.',
+    [ASCII_ART.glitchTree, ASCII_ART.giftStack],
+    ASCII_FOOTERS.games
+  ),
+  xmas: theme(
+    'MERRY XMAS!',
+    '/games/',
+    'Merry Xmas from the smoke-filled arcade.',
+    [ASCII_ART.giftStack, ASCII_ART.glitchTree],
+    ASCII_FOOTERS.games
+  ),
+  twixmas: theme(
+    'TWIXMAS DRIFT',
+    '/movie-reviews/',
+    'Time is fake between Xmas and New Year. Lean into it.',
+    [ASCII_ART.giftStack, ASCII_ART.tapeDeck, ASCII_ART.weekendBanner],
+    ASCII_FOOTERS.reviews
+  ),
+  yearEnd: theme(
+    'YEAR-END MELTDOWN',
+    '/null-vesper/',
+    'Close the tabs you can. Keep the best glitches forever.',
+    [ASCII_ART.yearEndCore, ASCII_ART.fireworksTower],
+    ASCII_FOOTERS.nullVesper
+  )
 };
 
 // Rules are evaluated top-to-bottom. Higher-priority celebrations should appear earlier.

@@ -254,15 +254,21 @@ export function createPopupSystem({
     const gif = typeof ad.gif === 'string' && ad.gif.trim()
       ? ad.gif.trim()
       : '';
+    const asciiArt = typeof ad.asciiArt === 'string' && ad.asciiArt.trim()
+      ? ad.asciiArt
+      : '';
 
-    if (!gif) return null;
+    if (!gif && !asciiArt) return null;
 
     return {
       label,
       href,
       gif,
+      asciiArt,
+      asciiFooter: typeof ad.asciiFooter === 'string' && ad.asciiFooter.trim() ? ad.asciiFooter.trim() : '',
       message: typeof ad.message === 'string' && ad.message.trim() ? ad.message.trim() : '',
-      imageAlt: typeof ad.imageAlt === 'string' && ad.imageAlt.trim() ? ad.imageAlt.trim() : `${label} animation`
+      imageAlt: typeof ad.imageAlt === 'string' && ad.imageAlt.trim() ? ad.imageAlt.trim() : `${label} art`,
+      variant: typeof ad.variant === 'string' && ad.variant.trim() ? ad.variant.trim() : ''
     };
   }
 
@@ -274,6 +280,9 @@ export function createPopupSystem({
     p.className = 'popup';
     p.setAttribute('role', 'dialog');
     p.setAttribute('aria-label', `Popup: ${normalizedAd.label}`);
+    if (normalizedAd.variant === 'calendar-ascii') {
+      p.classList.add('popup--calendar', 'popup--ascii');
+    }
 
     const spawn = pickSpawnGlitchEffect();
     p.classList.add(spawn.effect.cls);
@@ -300,6 +309,23 @@ export function createPopupSystem({
     const popupMessage = normalizedAd.message
       ? `<p class="popup-copy">${escapeHtml(normalizedAd.message)}</p>`
       : '';
+    const popupAsciiFooter = normalizedAd.asciiFooter
+      ? `<div class="popup-ascii-footer">${escapeHtml(normalizedAd.asciiFooter)}</div>`
+      : '';
+    const popupMedia = normalizedAd.asciiArt
+      ? `
+        <div class="popup-ascii-stack">
+          <a href="${escapeHtml(normalizedAd.href)}" target="_blank" rel="noopener noreferrer" class="popup-ascii-link" data-ad-link aria-label="${escapeHtml(normalizedAd.label)}">
+            <pre class="popup-ascii-art">${escapeHtml(normalizedAd.asciiArt)}</pre>
+          </a>
+          ${popupAsciiFooter}
+        </div>
+      `
+      : `
+        <a href="${escapeHtml(normalizedAd.href)}" target="_blank" rel="noopener noreferrer" data-ad-link>
+          <img src="${escapeHtml(normalizedAd.gif)}" alt="${escapeHtml(normalizedAd.imageAlt)}" loading="lazy">
+        </a>
+      `;
 
     p.innerHTML = `
       <div class="titlebar" role="presentation">
@@ -310,9 +336,7 @@ export function createPopupSystem({
         <div class="close" role="button" aria-label="Close popup" tabindex="0">×</div>
       </div>
       <div class="content">
-        <a href="${escapeHtml(normalizedAd.href)}" target="_blank" rel="noopener noreferrer" data-ad-link>
-          <img src="${escapeHtml(normalizedAd.gif)}" alt="${escapeHtml(normalizedAd.imageAlt)}" loading="lazy">
-        </a>
+        ${popupMedia}
         ${popupMessage}
       </div>
     `;

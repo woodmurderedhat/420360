@@ -24,6 +24,8 @@ import { createSfxSystem } from './homepage/audio-system.js';
 import { createAmbientRadioSystem } from './homepage/ambient-radio.js';
 import { ensureAgeGateAccess } from './homepage/init-flow.js';
 import { createPopupSystem } from './homepage/popup-system.js';
+import { CALENDAR_POPUP_MONTH_THEMES, CALENDAR_POPUP_SPECIAL_DATES } from './homepage/calendar-popup-data.js';
+import { createCalendarPopupSystem } from './homepage/calendar-popup-system.js';
 import { createBlurbSystem } from './homepage/blurb/system.js';
 import { createOverlaySystem } from './homepage/overlay-system.js';
 import { createInteractionSystem } from './homepage/interaction-system.js';
@@ -114,6 +116,13 @@ const popupSystem = createPopupSystem({
     }
     return null;
   }
+});
+
+const calendarPopupSystem = createCalendarPopupSystem({
+  popupSystem,
+  monthThemes: CALENDAR_POPUP_MONTH_THEMES,
+  specialDates: CALENDAR_POPUP_SPECIAL_DATES,
+  topLayerZIndex: CONFIG.TOP_LAYER_POPUP_Z_INDEX
 });
 
 /* ============================================
@@ -218,6 +227,7 @@ startHomepageBootstrap({
   sfxSystem: SFXSystem,
   overlaySystem,
   popupSystem,
+  calendarPopupSystem,
   randomizeColors: visualEffects.randomizeColors,
   startIntervals: () => intervalManager.startIntervals(),
   onStarted: () => {
@@ -225,4 +235,3 @@ startHomepageBootstrap({
     initAddons({ blurb });
   }
 });
-

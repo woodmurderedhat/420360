@@ -242,11 +242,38 @@ export function createPopupSystem({
     setTimeout(() => removePopupElement(popup), harmony.effect.dur);
   }
 
-  function makePopup(ad) {
+  function normalizePopupAd(ad) {
+    if (!ad || typeof ad !== 'object') return null;
+
+    const label = typeof ad.label === 'string' && ad.label.trim()
+      ? ad.label.trim()
+      : 'POPUP';
+    const href = typeof ad.href === 'string' && ad.href.trim()
+      ? ad.href.trim()
+      : '#';
+    const gif = typeof ad.gif === 'string' && ad.gif.trim()
+      ? ad.gif.trim()
+      : '';
+
+    if (!gif) return null;
+
+    return {
+      label,
+      href,
+      gif,
+      message: typeof ad.message === 'string' && ad.message.trim() ? ad.message.trim() : '',
+      imageAlt: typeof ad.imageAlt === 'string' && ad.imageAlt.trim() ? ad.imageAlt.trim() : `${label} animation`
+    };
+  }
+
+  function makePopup(ad, options = {}) {
+    const normalizedAd = normalizePopupAd(ad);
+    if (!normalizedAd) return null;
+
     const p = document.createElement('div');
     p.className = 'popup';
     p.setAttribute('role', 'dialog');
-    p.setAttribute('aria-label', `Popup: ${ad.label}`);
+    p.setAttribute('aria-label', `Popup: ${normalizedAd.label}`);
 
     const spawn = pickSpawnGlitchEffect();
     p.classList.add(spawn.effect.cls);
@@ -262,23 +289,31 @@ export function createPopupSystem({
     p.style.setProperty('--primary', selectedScheme.primary);
     p.style.setProperty('--secondary', selectedScheme.secondary);
     p.style.setProperty('--highlight', selectedScheme.highlight);
+    if (Number.isFinite(options.zIndex)) {
+      p.style.zIndex = String(options.zIndex);
+    }
 
     const pos = findNonOverlappingPosition();
     p.style.left = pos.x + 'px';
     p.style.top = pos.y + 'px';
 
+    const popupMessage = normalizedAd.message
+      ? `<p class="popup-copy">${escapeHtml(normalizedAd.message)}</p>`
+      : '';
+
     p.innerHTML = `
       <div class="titlebar" role="presentation">
         <div class="left">
           <img src="${iconData}" alt="" aria-hidden="true">
-          <span>${escapeHtml(ad.label)}</span>
+          <span>${escapeHtml(normalizedAd.label)}</span>
         </div>
         <div class="close" role="button" aria-label="Close popup" tabindex="0">×</div>
       </div>
       <div class="content">
-        <a href="${escapeHtml(ad.href)}" target="_blank" rel="noopener noreferrer" data-ad-link>
-          <img src="${escapeHtml(ad.gif)}" alt="${escapeHtml(ad.label)} animation" loading="lazy">
+        <a href="${escapeHtml(normalizedAd.href)}" target="_blank" rel="noopener noreferrer" data-ad-link>
+          <img src="${escapeHtml(normalizedAd.gif)}" alt="${escapeHtml(normalizedAd.imageAlt)}" loading="lazy">
         </a>
+        ${popupMessage}
       </div>
     `;
 
@@ -297,7 +332,7 @@ export function createPopupSystem({
     document.body.appendChild(p);
 
     const link = p.querySelector('[data-ad-link]');
-    if (ad.href === '__INTERNAL_ORACLE__' && link) {
+    if (normalizedAd.href === '__INTERNAL_ORACLE__' && link) {
       link.removeAttribute('target');
       link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -324,22 +359,32 @@ export function createPopupSystem({
     return p;
   }
 
-  function spawnPopup() {
-    if (state.popupsPaused) return null;
-    
-    // Check Micro Settings popup intensity
+  function shouldRenderPopup(options = {}) {
+    if (!options.bypassPause && state.popupsPaused) return false;
+
     const microPopupIntensity = state.microSettings?.popupIntensity ?? 100;
-    if (microPopupIntensity === 0) return null; // Popups completely disabled
-    if (microPopupIntensity < 100) {
+    if (microPopupIntensity <= 0) return false;
+    if (!options.bypassIntensity && microPopupIntensity < 100) {
       // Roll probability based on intensity percentage
       const chance = microPopupIntensity / 100;
-      if (Math.random() > chance) return null;
+      if (Math.random() > chance) return false;
     }
-    
-    const ad = ads[Math.floor(Math.random() * ads.length)];
-    const p = makePopup(ad);
+
+    return true;
+  }
+
+  function spawnPopupWithAd(ad, options = {}) {
+    if (!shouldRenderPopup(options)) return null;
+
+    const p = makePopup(ad, options);
+    if (!p) return null;
     if (window.playAdSfx) window.playAdSfx();
     return p;
+  }
+
+  function spawnPopup() {
+    const ad = ads[Math.floor(Math.random() * ads.length)];
+    return spawnPopupWithAd(ad);
   }
 
   function randomPopupGlitchOut() {
@@ -356,6 +401,7 @@ export function createPopupSystem({
     findNonOverlappingPosition,
     removePopupElement,
     makePopup,
+    spawnPopupWithAd,
     spawnPopup,
     randomPopupGlitchOut
   };

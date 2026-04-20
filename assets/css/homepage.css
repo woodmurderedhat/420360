@@ -391,6 +391,13 @@ main {
   outline-offset: 3px;
 }
 
+.popup-copy {
+  margin: 12px 0 0;
+  line-height: 1.5;
+  color: var(--highlight);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
 /* === KEYFRAME ANIMATIONS === */
 @keyframes blink {
   0%, 49% { opacity: 1; }
@@ -2115,4 +2122,3 @@ a.start-menu-link:focus-visible {
     font-size: 8px;
   }
 }
-

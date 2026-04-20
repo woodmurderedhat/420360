@@ -14,6 +14,7 @@ export function startHomepageBootstrap({
   sfxSystem,
   overlaySystem,
   popupSystem,
+  calendarPopupSystem,
   randomizeColors,
   startIntervals,
   onStarted
@@ -52,6 +53,7 @@ export function startHomepageBootstrap({
     overlaySystem.createFloatingWindow('videoThreadWindow', 'VIDEOS • SCHWEPE', 'https://schwepe.247420.xyz/videos-thread.html', false);
 
     randomizeColors();
+    calendarPopupSystem?.showToday();
     startIntervals();
 
     setInterval(() => {

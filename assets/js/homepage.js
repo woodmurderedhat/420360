@@ -24,7 +24,7 @@ import { createSfxSystem } from './homepage/audio-system.js';
 import { createAmbientRadioSystem } from './homepage/ambient-radio.js';
 import { ensureAgeGateAccess } from './homepage/init-flow.js';
 import { createPopupSystem } from './homepage/popup-system.js';
-import { CALENDAR_POPUP_MONTH_THEMES, CALENDAR_POPUP_SPECIAL_DATES } from './homepage/calendar-popup-data.js';
+import { CALENDAR_POPUP_THEMES, CALENDAR_POPUP_RULES } from './homepage/calendar-popup-data.js';
 import { createCalendarPopupSystem } from './homepage/calendar-popup-system.js';
 import { createBlurbSystem } from './homepage/blurb/system.js';
 import { createOverlaySystem } from './homepage/overlay-system.js';
@@ -120,8 +120,8 @@ const popupSystem = createPopupSystem({
 
 const calendarPopupSystem = createCalendarPopupSystem({
   popupSystem,
-  monthThemes: CALENDAR_POPUP_MONTH_THEMES,
-  specialDates: CALENDAR_POPUP_SPECIAL_DATES,
+  themes: CALENDAR_POPUP_THEMES,
+  rules: CALENDAR_POPUP_RULES,
   topLayerZIndex: CONFIG.TOP_LAYER_POPUP_Z_INDEX
 });
 

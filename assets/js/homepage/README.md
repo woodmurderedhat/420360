@@ -21,9 +21,9 @@ This folder contains the first extraction slice from the root homepage monolith.
 - `popup-system.js`
   - Exports popup rendering, placement, lifecycle, and glitch-out behavior.
 - `calendar-popup-data.js`
-  - Exports date-specific popup overrides and full-year monthly fallback themes for the homepage celebration popup system.
+  - Exports reusable celebration themes plus ordered calendar rules (fixed dates, ranges, weekday patterns, and month fallbacks) for the homepage popup system.
 - `calendar-popup-system.js`
-  - Exports the one-shot calendar popup resolver that maps the current date to a celebration ad and displays it during homepage startup.
+  - Exports the one-shot calendar popup resolver that evaluates rule types, formats date-aware popup copy, and displays the matched celebration during homepage startup.
 - `text-system.js`
   - Exports blurb rendering, progressive reveal, glitch effects, and sentence morphing.
 - `overlay-system.js`

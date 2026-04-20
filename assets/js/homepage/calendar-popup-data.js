@@ -1,5 +1,3 @@
-// Specific month/day entries override the monthly theme fallback, so every calendar date
-// resolves to a celebration without needing a full hand-maintained 365-entry map.
 const BASE_GIFS = {
   greenBurst: 'https://media.giphy.com/media/7Ti0iZdo5QCiWJfMvA/giphy.gif',
   signalPulse: 'https://media.giphy.com/media/DfqSbJVYLHmO8QFn1R/giphy.gif',
@@ -11,164 +9,249 @@ const BASE_GIFS = {
   arcadeBlink: 'https://media.giphy.com/media/3PLAXg1osLVVttjRTN/giphy.gif'
 };
 
-export const CALENDAR_POPUP_MONTH_THEMES = {
-  '01': {
-    label: 'JANUARY REBOOT',
+// Theme definitions are reusable content blocks. Calendar rules below decide when a theme appears.
+export const CALENDAR_POPUP_THEMES = {
+  januaryReboot: {
+    labelTemplate: 'JANUARY REBOOT • DAY {day}',
     href: '/games/',
-    messageTemplate: 'Day {day}: cold-start the year with fresh static and greener habits.',
+    messageTemplate: '{weekdayName} {day}: cold-start the year with fresh static and greener habits.',
     gifs: [BASE_GIFS.greenBurst, BASE_GIFS.staticWave, BASE_GIFS.goldFlash]
   },
-  '02': {
-    label: 'FEBRUARY LOVE STATIC',
+  februaryLoveStatic: {
+    labelTemplate: 'FEBRUARY LOVE STATIC • DAY {day}',
     href: '/about/',
-    messageTemplate: 'Day {day}: send a little extra glow to your favorite chaos gremlin.',
+    messageTemplate: '{weekdayName} {day}: send a little extra glow to your favorite chaos gremlin.',
     gifs: [BASE_GIFS.redField, BASE_GIFS.neonLoop, BASE_GIFS.staticWave]
   },
-  '03': {
-    label: 'MARCH GREEN RIOT',
+  marchGreenRiot: {
+    labelTemplate: 'MARCH GREEN RIOT • DAY {day}',
     href: '/games/',
-    messageTemplate: 'Day {day}: spring the traps, crack the haze, and let the green riot in.',
+    messageTemplate: '{weekdayName} {day}: spring the traps, crack the haze, and let the green riot in.',
     gifs: [BASE_GIFS.greenBurst, BASE_GIFS.smokeOrbit, BASE_GIFS.signalPulse]
   },
-  '04': {
-    label: 'APRIL CLOUD PARADE',
+  aprilCloudParade: {
+    labelTemplate: 'APRIL CLOUD PARADE • DAY {day}',
     href: '/games/',
-    messageTemplate: 'Day {day}: keep the celebration lit and let the cloud parade roll through.',
+    messageTemplate: '{weekdayName} {day}: keep the celebration lit and let the cloud parade roll through.',
     gifs: [BASE_GIFS.greenBurst, BASE_GIFS.arcadeBlink, BASE_GIFS.neonLoop]
   },
-  '05': {
-    label: 'MAY BLOOM BLITZ',
+  mayBloomBlitz: {
+    labelTemplate: 'MAY BLOOM BLITZ • DAY {day}',
     href: '/cartoons/',
-    messageTemplate: 'Day {day}: bloom loud, blink weird, and give the month a little extra color.',
+    messageTemplate: '{weekdayName} {day}: bloom loud, blink weird, and give the month a little extra color.',
     gifs: [BASE_GIFS.goldFlash, BASE_GIFS.greenBurst, BASE_GIFS.redField]
   },
-  '06': {
-    label: 'JUNE SUN STATIC',
+  juneSunStatic: {
+    labelTemplate: 'JUNE SUN STATIC • DAY {day}',
     href: '/movie-reviews/',
-    messageTemplate: 'Day {day}: stretch the daylight and keep the summer static humming.',
+    messageTemplate: '{weekdayName} {day}: stretch the daylight and keep the summer static humming.',
     gifs: [BASE_GIFS.goldFlash, BASE_GIFS.signalPulse, BASE_GIFS.neonLoop]
   },
-  '07': {
-    label: 'JULY HEAT WAVE',
+  julyHeatWave: {
+    labelTemplate: 'JULY HEAT WAVE • DAY {day}',
     href: '/games/',
-    messageTemplate: 'Day {day}: spark up the heat wave and let the arcade melt around you.',
+    messageTemplate: '{weekdayName} {day}: spark up the heat wave and let the arcade melt around you.',
     gifs: [BASE_GIFS.arcadeBlink, BASE_GIFS.redField, BASE_GIFS.goldFlash]
   },
-  '08': {
-    label: 'AUGUST AFTERGLOW',
+  augustAfterglow: {
+    labelTemplate: 'AUGUST AFTERGLOW • DAY {day}',
     href: '/movie-reviews/',
-    messageTemplate: 'Day {day}: ride the afterglow and keep the late-summer buzz alive.',
+    messageTemplate: '{weekdayName} {day}: ride the afterglow and keep the late-summer buzz alive.',
     gifs: [BASE_GIFS.smokeOrbit, BASE_GIFS.staticWave, BASE_GIFS.goldFlash]
   },
-  '09': {
-    label: 'SEPTEMBER RESET',
+  septemberReset: {
+    labelTemplate: 'SEPTEMBER RESET • DAY {day}',
     href: '/about/',
-    messageTemplate: 'Day {day}: reset the stack, sharpen the vibe, and drift into a cooler loop.',
+    messageTemplate: '{weekdayName} {day}: reset the stack, sharpen the vibe, and drift into a cooler loop.',
     gifs: [BASE_GIFS.signalPulse, BASE_GIFS.greenBurst, BASE_GIFS.staticWave]
   },
-  '10': {
-    label: 'OCTOBER SPOOK STATIC',
+  octoberSpookStatic: {
+    labelTemplate: 'OCTOBER SPOOK STATIC • DAY {day}',
     href: '/esoteric/',
-    messageTemplate: 'Day {day}: ghost the routine and let the spook static leak in.',
+    messageTemplate: '{weekdayName} {day}: ghost the routine and let the spook static leak in.',
     gifs: [BASE_GIFS.redField, BASE_GIFS.smokeOrbit, BASE_GIFS.neonLoop]
   },
-  '11': {
-    label: 'NOVEMBER HARVEST HAZE',
+  novemberHarvestHaze: {
+    labelTemplate: 'NOVEMBER HARVEST HAZE • DAY {day}',
     href: '/about/',
-    messageTemplate: 'Day {day}: harvest the good noise and keep the room warm with haze.',
+    messageTemplate: '{weekdayName} {day}: harvest the good noise and keep the room warm with haze.',
     gifs: [BASE_GIFS.goldFlash, BASE_GIFS.greenBurst, BASE_GIFS.signalPulse]
   },
-  '12': {
-    label: 'DECEMBER GLITCHMAS',
+  decemberGlitchmas: {
+    labelTemplate: 'DECEMBER GLITCHMAS • DAY {day}',
     href: '/games/',
-    messageTemplate: 'Day {day}: wrap the year in glittering static and keep the lights weird.',
+    messageTemplate: '{weekdayName} {day}: wrap the year in glittering static and keep the lights weird.',
     gifs: [BASE_GIFS.redField, BASE_GIFS.goldFlash, BASE_GIFS.arcadeBlink]
+  },
+  mondayMotivation: {
+    labelTemplate: 'MONDAY REBOOT',
+    href: '/about/',
+    messageTemplate: 'It is {weekdayName}. Pretend the timeline is fixable and reboot anyway.',
+    gifs: [BASE_GIFS.staticWave, BASE_GIFS.signalPulse]
+  },
+  fridayLiftOff: {
+    labelTemplate: 'FRIDAY LIFT-OFF',
+    href: '/games/',
+    messageTemplate: '{weekdayName} is here. Clock out of reality and boot the weird stuff.',
+    gifs: [BASE_GIFS.arcadeBlink, BASE_GIFS.greenBurst]
+  },
+  weekendStatic: {
+    labelTemplate: 'WEEKEND STATIC',
+    href: '/games/',
+    messageTemplate: '{weekdayName} unlocked. Stay up late and click on something irresponsible.',
+    gifs: [BASE_GIFS.neonLoop, BASE_GIFS.arcadeBlink, BASE_GIFS.smokeOrbit]
+  },
+  newYear: {
+    labelTemplate: 'HAPPY NEW YEAR!',
+    href: '/games/',
+    messageTemplate: 'Fresh orbit, fresh static, fresh excuses to keep clicking.',
+    gifs: [BASE_GIFS.goldFlash]
+  },
+  valentines: {
+    labelTemplate: 'LOVE & HAZE DAY',
+    href: '/about/',
+    messageTemplate: 'Send somebody a weird little heart-shaped puff of chaos.',
+    gifs: [BASE_GIFS.redField]
+  },
+  stPatricks: {
+    labelTemplate: 'LUCKY LEAF DAY',
+    href: '/games/',
+    messageTemplate: 'Wear the green, chase the glow, and hoard the lucky static.',
+    gifs: [BASE_GIFS.greenBurst]
+  },
+  aprilFools: {
+    labelTemplate: 'APRIL FOOLS STATIC',
+    href: '/cartoons/',
+    messageTemplate: 'Trust nothing. Laugh loudly. Click recklessly.',
+    gifs: [BASE_GIFS.neonLoop]
+  },
+  fourTwenty: {
+    labelTemplate: 'HAPPY 420!',
+    href: '/games/',
+    messageTemplate: 'This whole site was built for days like this. Stay lifted.',
+    gifs: [BASE_GIFS.greenBurst]
+  },
+  memorialDay: {
+    labelTemplate: 'LONG WEEKEND STATIC',
+    href: '/about/',
+    messageTemplate: 'Memorial Day drift is active. Keep it reflective, keep it hazy.',
+    gifs: [BASE_GIFS.goldFlash, BASE_GIFS.smokeOrbit]
+  },
+  summerSolstice: {
+    labelTemplate: 'SUMMER SOLSTICE SIGNAL',
+    href: '/movie-reviews/',
+    messageTemplate: 'Longest day, loudest glow. Let the sunshine glitch a little.',
+    gifs: [BASE_GIFS.goldFlash]
+  },
+  fireworkStatic: {
+    labelTemplate: 'FIREWORK STATIC',
+    href: '/games/',
+    messageTemplate: 'Explode the timeline and celebrate the sky-noise.',
+    gifs: [BASE_GIFS.arcadeBlink]
+  },
+  sevenTen: {
+    labelTemplate: 'HAPPY 710',
+    href: '/games/',
+    messageTemplate: 'Oil flipped is 710. You know the assignment.',
+    gifs: [BASE_GIFS.signalPulse]
+  },
+  laborDay: {
+    labelTemplate: 'LABOR DAY LAZE',
+    href: '/movie-reviews/',
+    messageTemplate: 'Drop the workload, pick up the glow, and coast through the static.',
+    gifs: [BASE_GIFS.goldFlash, BASE_GIFS.neonLoop]
+  },
+  autumnEquinox: {
+    labelTemplate: 'AUTUMN EQUINOX',
+    href: '/esoteric/',
+    messageTemplate: 'Equal light, equal dark, unequal levels of weird.',
+    gifs: [BASE_GIFS.smokeOrbit]
+  },
+  halloweed: {
+    labelTemplate: 'HALLOWEED',
+    href: '/esoteric/',
+    messageTemplate: 'Happy Halloweed. Haunted vibes only.',
+    gifs: [BASE_GIFS.redField]
+  },
+  electionStatic: {
+    labelTemplate: 'CIVIC STATIC TUESDAY',
+    href: '/about/',
+    messageTemplate: 'Deep breaths, weird thoughts, and one more lap through democracy.',
+    gifs: [BASE_GIFS.staticWave, BASE_GIFS.signalPulse]
+  },
+  thanksgiving: {
+    labelTemplate: 'THANKSGLOWING',
+    href: '/movie-reviews/',
+    messageTemplate: 'Eat well, drift slow, and keep the room full of grateful noise.',
+    gifs: [BASE_GIFS.goldFlash, BASE_GIFS.greenBurst]
+  },
+  leftovers: {
+    labelTemplate: 'LEFTOVER HAZE DAY',
+    href: '/movie-reviews/',
+    messageTemplate: 'Round two. More snacks, more static, less pretending.',
+    gifs: [BASE_GIFS.goldFlash]
+  },
+  xmasEve: {
+    labelTemplate: 'XMAS EVE STATIC',
+    href: '/games/',
+    messageTemplate: 'The lights are blinking. The cookies are gone. The weirdness is peaking.',
+    gifs: [BASE_GIFS.arcadeBlink]
+  },
+  xmas: {
+    labelTemplate: 'MERRY XMAS!',
+    href: '/games/',
+    messageTemplate: 'Merry Xmas from the smoke-filled arcade.',
+    gifs: [BASE_GIFS.redField]
+  },
+  twixmas: {
+    labelTemplate: 'TWIXMAS DRIFT',
+    href: '/movie-reviews/',
+    messageTemplate: 'Time is fake between Xmas and New Year. Lean into it.',
+    gifs: [BASE_GIFS.neonLoop, BASE_GIFS.smokeOrbit]
+  },
+  yearEnd: {
+    labelTemplate: 'YEAR-END MELTDOWN',
+    href: '/null-vesper/',
+    messageTemplate: 'Close the tabs you can. Keep the best glitches forever.',
+    gifs: [BASE_GIFS.neonLoop]
   }
 };
 
-export const CALENDAR_POPUP_SPECIAL_DATES = {
-  '01-01': {
-    label: 'HAPPY NEW YEAR!',
-    href: '/games/',
-    gif: BASE_GIFS.goldFlash,
-    message: 'Fresh orbit, fresh static, fresh excuses to keep clicking.'
-  },
-  '02-14': {
-    label: 'LOVE & HAZE DAY',
-    href: '/about/',
-    gif: BASE_GIFS.redField,
-    message: 'Send somebody a weird little heart-shaped puff of chaos.'
-  },
-  '03-17': {
-    label: 'LUCKY LEAF DAY',
-    href: '/games/',
-    gif: BASE_GIFS.greenBurst,
-    message: 'Wear the green, chase the glow, and hoard the lucky static.'
-  },
-  '04-01': {
-    label: 'APRIL FOOLS STATIC',
-    href: '/cartoons/',
-    gif: BASE_GIFS.neonLoop,
-    message: 'Trust nothing. Laugh loudly. Click recklessly.'
-  },
-  '04-20': {
-    label: 'HAPPY 420!',
-    href: '/games/',
-    gif: BASE_GIFS.greenBurst,
-    message: 'This whole site was built for days like this. Stay lifted.'
-  },
-  '06-21': {
-    label: 'SUMMER SOLSTICE SIGNAL',
-    href: '/movie-reviews/',
-    gif: BASE_GIFS.goldFlash,
-    message: 'Longest day, loudest glow. Let the sunshine glitch a little.'
-  },
-  '07-04': {
-    label: 'FIREWORK STATIC',
-    href: '/games/',
-    gif: BASE_GIFS.arcadeBlink,
-    message: 'Explode the timeline and celebrate the sky-noise.'
-  },
-  '07-10': {
-    label: 'HAPPY 710',
-    href: '/games/',
-    gif: BASE_GIFS.signalPulse,
-    message: 'Oil flipped is 710. You know the assignment.'
-  },
-  '09-22': {
-    label: 'AUTUMN EQUINOX',
-    href: '/esoteric/',
-    gif: BASE_GIFS.smokeOrbit,
-    message: 'Equal light, equal dark, unequal levels of weird.'
-  },
-  '10-31': {
-    label: 'HALLOWEED',
-    href: '/esoteric/',
-    gif: BASE_GIFS.redField,
-    message: 'Happy Halloweed. Haunted vibes only.'
-  },
-  '11-28': {
-    label: 'LEFTOVER HAZE DAY',
-    href: '/movie-reviews/',
-    gif: BASE_GIFS.goldFlash,
-    message: 'Round two. More snacks, more static, less pretending.'
-  },
-  '12-24': {
-    label: 'XMAS EVE STATIC',
-    href: '/games/',
-    gif: BASE_GIFS.arcadeBlink,
-    message: 'The lights are blinking. The cookies are gone. The weirdness is peaking.'
-  },
-  '12-25': {
-    label: 'MERRY XMAS!',
-    href: '/games/',
-    gif: BASE_GIFS.redField,
-    message: 'Merry Xmas from the smoke-filled arcade.'
-  },
-  '12-31': {
-    label: 'YEAR-END MELTDOWN',
-    href: '/null-vesper/',
-    gif: BASE_GIFS.neonLoop,
-    message: 'Close the tabs you can. Keep the best glitches forever.'
-  }
-};
+// Rules are evaluated top-to-bottom. Higher-priority celebrations should appear earlier.
+export const CALENDAR_POPUP_RULES = [
+  { type: 'fixed-date', month: 1, day: 1, themeId: 'newYear' },
+  { type: 'fixed-date', month: 2, day: 14, themeId: 'valentines' },
+  { type: 'fixed-date', month: 3, day: 17, themeId: 'stPatricks' },
+  { type: 'fixed-date', month: 4, day: 1, themeId: 'aprilFools' },
+  { type: 'fixed-date', month: 4, day: 20, themeId: 'fourTwenty' },
+  { type: 'last-weekday', month: 5, weekday: 1, themeId: 'memorialDay' },
+  { type: 'fixed-date', month: 6, day: 21, themeId: 'summerSolstice' },
+  { type: 'fixed-date', month: 7, day: 4, themeId: 'fireworkStatic' },
+  { type: 'fixed-date', month: 7, day: 10, themeId: 'sevenTen' },
+  { type: 'first-weekday', month: 9, weekday: 1, themeId: 'laborDay' },
+  { type: 'fixed-date', month: 9, day: 22, themeId: 'autumnEquinox' },
+  { type: 'fixed-date', month: 10, day: 31, themeId: 'halloweed' },
+  { type: 'nth-weekday', month: 11, weekday: 2, occurrence: 1, themeId: 'electionStatic' },
+  { type: 'nth-weekday', month: 11, weekday: 4, occurrence: 4, themeId: 'thanksgiving' },
+  { type: 'day-after-rule', sourceThemeId: 'thanksgiving', themeId: 'leftovers' },
+  { type: 'fixed-date', month: 12, day: 24, themeId: 'xmasEve' },
+  { type: 'fixed-date', month: 12, day: 25, themeId: 'xmas' },
+  { type: 'date-range', startMonth: 12, startDay: 26, endMonth: 12, endDay: 30, themeId: 'twixmas' },
+  { type: 'fixed-date', month: 12, day: 31, themeId: 'yearEnd' },
+  { type: 'weekday', weekday: 5, themeId: 'fridayLiftOff' },
+  { type: 'weekday', weekday: 6, themeId: 'weekendStatic' },
+  { type: 'weekday', weekday: 0, themeId: 'weekendStatic' },
+  { type: 'weekday', weekday: 1, themeId: 'mondayMotivation' },
+  { type: 'month', month: 1, themeId: 'januaryReboot' },
+  { type: 'month', month: 2, themeId: 'februaryLoveStatic' },
+  { type: 'month', month: 3, themeId: 'marchGreenRiot' },
+  { type: 'month', month: 4, themeId: 'aprilCloudParade' },
+  { type: 'month', month: 5, themeId: 'mayBloomBlitz' },
+  { type: 'month', month: 6, themeId: 'juneSunStatic' },
+  { type: 'month', month: 7, themeId: 'julyHeatWave' },
+  { type: 'month', month: 8, themeId: 'augustAfterglow' },
+  { type: 'month', month: 9, themeId: 'septemberReset' },
+  { type: 'month', month: 10, themeId: 'octoberSpookStatic' },
+  { type: 'month', month: 11, themeId: 'novemberHarvestHaze' },
+  { type: 'month', month: 12, themeId: 'decemberGlitchmas' }
+];

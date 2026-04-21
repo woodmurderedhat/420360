@@ -1,0 +1,130 @@
+/* ============================================
+   AMBIENT RADIO WIDGET
+   ============================================ */
+
+#ambient-radio-widget {
+  z-index: 6390;
+}
+
+#ambient-radio-widget[hidden] {
+  display: none;
+}
+
+#arw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: rgba(47, 217, 130, 0.08);
+  border-bottom: 1px solid rgba(47, 217, 130, 0.2);
+}
+
+#arw-title {
+  color: var(--secondary);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+#arw-close {
+  background: none;
+  border: 1px solid rgba(154,249,199,0.25);
+  color: var(--highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 2px 5px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+#arw-close:hover {
+  color: var(--secondary);
+  border-color: var(--secondary);
+}
+
+#arw-subline {
+  padding: 6px 10px 4px;
+  font-size: 7px;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(47, 217, 130, 0.1);
+  letter-spacing: 0.08em;
+}
+
+.arw-section {
+  padding: 8px 10px 6px;
+  border-bottom: 1px dashed rgba(47, 217, 130, 0.18);
+}
+
+.arw-section-label {
+  font-size: 7px;
+  color: var(--secondary);
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+
+#arw-current-channel {
+  color: var(--secondary);
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+
+#arw-channel-meta,
+#arw-unlock-count,
+#arw-status-line,
+#arw-source-line {
+  color: var(--highlight);
+  line-height: 1.7;
+}
+
+.arw-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+#arw-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px 10px 10px;
+}
+
+#arw-visualizer {
+  display: block;
+  width: calc(100% - 20px);
+  height: 28px;
+  margin: 0 10px 10px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background: #050f0b;
+  border: 1px solid rgba(47, 217, 130, 0.15);
+}
+
+#arw-controls button {
+  background: rgba(12, 31, 22, 0.92);
+  color: var(--highlight);
+  border: 1px solid rgba(154, 249, 199, 0.28);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 8px 6px;
+  cursor: pointer;
+}
+
+#arw-controls button:hover {
+  color: var(--secondary);
+  border-color: var(--secondary);
+  background: rgba(20, 47, 34, 0.94);
+}
+
+@media (max-width: 600px) {
+  #ambient-radio-widget {
+    width: min(290px, calc(100vw - 8px));
+    max-height: calc(100vh - 72px);
+  }
+}
+
+@media (max-height: 700px) {
+  #ambient-radio-widget {
+    max-height: calc(100vh - 78px);
+  }
+}

@@ -1,0 +1,175 @@
+/* ============================================
+   TASKBAR
+   ============================================ */
+
+#taskbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  z-index: 6500;
+  background: rgba(6, 18, 13, 0.97);
+  border-bottom: 2px solid var(--primary);
+  box-shadow:
+    inset 0 1px 0 rgba(154, 249, 199, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 2px 12px rgba(0, 0, 0, 0.55);
+  padding: 0 0 0 1px;
+  font-family: 'Press Start 2P', monospace;
+}
+
+#start-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 14px;
+  background: rgba(10, 32, 22, 0.95);
+  border: none;
+  border-right: 1px solid rgba(47, 217, 130, 0.3);
+  box-shadow:
+    inset 1px 1px 0 rgba(154, 249, 199, 0.35),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.7);
+  color: var(--secondary);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  transition: background 0.15s, box-shadow 0.1s;
+  flex-shrink: 0;
+}
+
+#start-btn:hover {
+  background: rgba(15, 42, 28, 0.98);
+  color: var(--highlight);
+}
+
+#start-btn:active,
+#start-btn.active {
+  background: rgba(6, 22, 15, 0.99);
+  box-shadow:
+    inset -1px -1px 0 rgba(154, 249, 199, 0.25),
+    inset 1px 1px 0 rgba(0, 0, 0, 0.7);
+  color: var(--secondary);
+}
+
+.start-btn-icon {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--primary);
+}
+
+.start-btn-label {
+  font-size: 10px;
+}
+
+#taskbar-tray {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  border-left: 1px solid rgba(47, 217, 130, 0.22);
+  padding: 0 4px;
+  gap: 2px;
+}
+
+#taskbar-tray .ctrl-btn {
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 9px;
+  gap: 4px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+#taskbar-tray .ctrl-btn:hover {
+  background: rgba(47, 217, 130, 0.1);
+  box-shadow: none;
+  transform: none;
+  border-color: rgba(154, 249, 199, 0.2);
+}
+
+#taskbar-tray .ctrl-btn:active {
+  background: rgba(47, 217, 130, 0.18);
+  box-shadow: inset 1px 1px 0 rgba(0,0,0,0.4);
+  transform: none;
+}
+
+#music-control.widget-open {
+  background: rgba(47, 217, 130, 0.15);
+  color: var(--secondary);
+  box-shadow: inset -1px -1px 0 rgba(0,0,0,0.5), inset 1px 1px 0 rgba(154,249,199,0.15);
+}
+
+#taskbar-clock {
+  border-left: 1px solid rgba(47, 217, 130, 0.18);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--highlight);
+  font-size: 9px;
+  user-select: none;
+  transition: background 0.15s, color 0.15s;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+#taskbar-clock {
+  padding: 0 12px 0 8px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+#micro-settings-taskbar-btn {
+  all: unset;
+  box-sizing: border-box;
+  height: 100%;
+  min-width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid rgba(47, 217, 130, 0.18);
+  background: transparent;
+  color: var(--highlight);
+  padding: 0 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+#micro-settings-taskbar-btn:hover {
+  background: rgba(47, 217, 130, 0.1);
+  color: var(--secondary);
+}
+
+#micro-settings-taskbar-btn.active {
+  background: rgba(47, 217, 130, 0.15);
+  color: var(--secondary);
+  box-shadow: inset -1px -1px 0 rgba(0,0,0,0.5), inset 1px 1px 0 rgba(154,249,199,0.15);
+}
+
+#taskbar-clock:hover {
+  background: rgba(47, 217, 130, 0.1);
+  color: var(--secondary);
+}
+
+#taskbar-clock.widget-open {
+  background: rgba(47, 217, 130, 0.15);
+  color: var(--secondary);
+  box-shadow: inset -1px -1px 0 rgba(0,0,0,0.5), inset 1px 1px 0 rgba(154,249,199,0.15);
+}

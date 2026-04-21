@@ -1,0 +1,33 @@
+/* ============================================
+   SHARED HOMEPAGE WIDGET FRAME
+   ============================================ */
+
+@keyframes cw-drop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+:is(#oracle-widget, #ambient-radio-widget) {
+  position: fixed;
+  top: 38px;
+  right: 0;
+  left: auto;
+  width: 290px;
+  background: rgba(5, 15, 11, 0.99);
+  border: 2px solid var(--primary);
+  border-top: none;
+  border-right: none;
+  box-shadow:
+    -3px 3px 0 0 var(--primary),
+    -6px 6px 0 0 rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(154,249,199,0.08);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--highlight);
+  padding: 0;
+  animation: cw-drop-in 0.12s steps(2) both;
+  max-height: calc(100vh - 42px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}

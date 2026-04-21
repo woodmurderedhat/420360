@@ -1,0 +1,241 @@
+/* ============================================
+   ORACLE WIDGET
+   ============================================ */
+
+#oracle-widget {
+  z-index: 6400;
+}
+
+#oracle-widget[hidden] { display: none; }
+
+#oracle-widget {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(154, 249, 199, 0.75) rgba(7, 20, 14, 0.88);
+}
+
+#oracle-widget::-webkit-scrollbar {
+  width: 10px;
+}
+
+#oracle-widget::-webkit-scrollbar-track {
+  background: rgba(7, 20, 14, 0.88);
+  border-left: 1px solid rgba(47, 217, 130, 0.2);
+}
+
+#oracle-widget::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(154, 249, 199, 0.78) 0%, rgba(47, 217, 130, 0.65) 100%);
+  border: 1px solid rgba(6, 18, 13, 0.8);
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(236, 255, 244, 0.15);
+}
+
+#oracle-widget::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(236, 255, 244, 0.9) 0%, rgba(47, 217, 130, 0.78) 100%);
+}
+
+#oracle-widget::-webkit-scrollbar-corner {
+  background: rgba(7, 20, 14, 0.88);
+}
+
+@media (max-width: 600px) {
+  #oracle-widget {
+    width: min(290px, calc(100vw - 8px));
+    max-height: calc(100vh - 72px);
+  }
+}
+
+@media (max-height: 700px) {
+  #oracle-widget {
+    max-height: calc(100vh - 78px);
+  }
+}
+
+#ow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: rgba(47, 217, 130, 0.08);
+  border-bottom: 1px solid rgba(47, 217, 130, 0.2);
+}
+
+#ow-title {
+  color: var(--secondary);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+#ow-close {
+  background: none;
+  border: 1px solid rgba(154,249,199,0.25);
+  color: var(--highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 2px 5px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+#ow-close:hover { color: var(--secondary); border-color: var(--secondary); }
+
+#ow-date {
+  padding: 6px 10px 4px;
+  font-size: 7px;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(47, 217, 130, 0.1);
+  letter-spacing: 0.08em;
+}
+
+#ow-section-moon {
+  padding: 8px 10px 6px;
+}
+
+.ow-section-label {
+  font-size: 7px;
+  color: var(--secondary);
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+
+.ow-moon-art {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.5;
+  color: var(--highlight);
+  margin: 0 0 6px 0;
+  background: rgba(47,217,130,0.04);
+  border: 1px solid rgba(47,217,130,0.12);
+  padding: 4px 8px;
+  letter-spacing: 0.05em;
+  white-space: pre;
+}
+
+.ow-moon-phase {
+  font-size: 9px;
+  color: var(--highlight);
+  margin-bottom: 4px;
+}
+
+.ow-moon-bar {
+  font-size: 7px;
+  color: var(--primary);
+  letter-spacing: 0;
+  margin-bottom: 3px;
+}
+
+.ow-moon-pct {
+  font-size: 6px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+#ow-divider {
+  padding: 0 10px;
+  font-size: 7px;
+  color: rgba(47,217,130,0.3);
+  letter-spacing: 0.05em;
+}
+
+#ow-section-tarot {
+  padding: 6px 10px 10px;
+}
+
+.ow-card-header {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.ow-card-num {
+  font-size: 7px;
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.ow-card-name {
+  font-size: 9px;
+  color: var(--highlight);
+}
+
+.ow-card-keyword {
+  font-size: 7px;
+  color: var(--muted);
+  margin-bottom: 5px;
+  letter-spacing: 0.08em;
+}
+
+.ow-card-reading {
+  font-size: 7px;
+  color: rgba(236,255,244,0.75);
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+}
+
+#ow-section-horoscope,
+#ow-section-omens {
+  padding: 6px 10px 10px;
+}
+
+.ow-horo-sign {
+  font-size: 8px;
+  color: var(--secondary);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+.ow-horo-reading,
+.ow-omen-line,
+.ow-ritual-line {
+  font-size: 7px;
+  color: rgba(236,255,244,0.78);
+  line-height: 1.75;
+  letter-spacing: 0.03em;
+}
+
+.ow-omen-line {
+  margin-bottom: 6px;
+}
+
+.ow-ritual-line {
+  color: var(--highlight);
+  margin-bottom: 8px;
+}
+
+.ow-signal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 6px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(47, 217, 130, 0.12);
+  background: rgba(47, 217, 130, 0.04);
+  padding: 6px 7px;
+}
+
+#ow-footer {
+  margin: 0 10px 8px;
+  font-size: 6px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+#ow-record {
+  margin: 0 10px 10px;
+  width: calc(100% - 20px);
+  border: 1px solid rgba(154, 249, 199, 0.25);
+  background: rgba(47, 217, 130, 0.08);
+  color: var(--highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+#ow-record:hover {
+  color: var(--secondary);
+  border-color: var(--secondary);
+  background: rgba(47, 217, 130, 0.15);
+}

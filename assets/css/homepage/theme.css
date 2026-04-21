@@ -1,0 +1,22 @@
+/* ============================================
+   420360 Homepage Theme
+   ============================================ */
+
+:root {
+  --bg: #07120f;
+  --bg-soft: #0e1f1a;
+  --surface: rgba(12, 31, 25, 0.72);
+  --primary: #2fd982;
+  --secondary: #f7a63f;
+  --highlight: #9af9c7;
+  --text: #ecfff4;
+  --muted: #9bcab1;
+  --popup-w: 250px;
+  --popup-h: 150px;
+
+  /* Timing constants (matching JS CONFIG) */
+  --popup-anim-duration: 0.25s;
+  --popup-glitch-speed: 1;
+  --glitch-duration: 0.12s;
+  --overlay-fade-duration: 0.18s;
+}

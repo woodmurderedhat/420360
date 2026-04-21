@@ -1,0 +1,58 @@
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.ctrl-btn:focus-visible,
+.integrated-overlay header button:focus-visible,
+.floating-window header button:focus-visible {
+  outline: 3px dashed var(--highlight);
+  outline-offset: 2px;
+}
+
+.skip-to-main {
+  position: absolute;
+  top: -100px;
+  left: 10px;
+  background: var(--primary);
+  color: #022114;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 10000;
+  font-size: 12px;
+}
+
+.skip-to-main:focus {
+  top: 10px;
+}
+
+.overlay-focus-trap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .popup {
+    animation: none;
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  .blurb .glitch {
+    animation: none;
+  }
+
+  .cursor {
+    animation: none;
+    opacity: 1;
+  }
+}

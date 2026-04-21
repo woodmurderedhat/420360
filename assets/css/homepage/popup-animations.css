@@ -1,0 +1,98 @@
+/* ============================================
+   POPUP ANIMATIONS
+   ============================================ */
+
+@keyframes popup-in {
+  to { opacity: 1; transform: scale(1) rotate(var(--rotation)); }
+}
+
+@keyframes popup-in-glitch-snap {
+  0% { opacity: 0; filter: contrast(2.5) saturate(1.3); transform: translate(-16px, 8px) scale(0.74) rotate(calc(var(--rotation) - 8deg)); }
+  35% { opacity: 0.9; filter: contrast(1.8) hue-rotate(35deg); transform: translate(10px, -6px) scale(1.08) rotate(calc(var(--rotation) + 4deg)); }
+  60% { opacity: 0.95; filter: contrast(1.3); transform: translate(-4px, 3px) scale(0.97) rotate(var(--rotation)); }
+  100% { opacity: 1; filter: none; transform: scale(1) rotate(var(--rotation)); }
+}
+
+@keyframes popup-in-glitch-warp {
+  0% { opacity: 0; filter: blur(3px) brightness(1.5); transform: translate(38px, -16px) scale(1.25) rotate(calc(var(--rotation) + 14deg)); }
+  45% { opacity: 0.84; filter: blur(1px) brightness(1.15); transform: translate(-18px, 6px) scale(0.92) rotate(calc(var(--rotation) - 8deg)); }
+  100% { opacity: 1; filter: none; transform: scale(1) rotate(var(--rotation)); }
+}
+
+@keyframes popup-in-glitch-scan {
+  0% { opacity: 0; clip-path: inset(0 0 100% 0); filter: brightness(2.2) contrast(2); transform: scale(0.9) rotate(var(--rotation)); }
+  30% { opacity: 0.7; clip-path: inset(30% 0 42% 0); filter: brightness(1.7) contrast(1.8); }
+  60% { opacity: 0.9; clip-path: inset(56% 0 16% 0); filter: brightness(1.4) contrast(1.4); }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); filter: none; transform: scale(1) rotate(var(--rotation)); }
+}
+
+@keyframes popup-in-glitch-ghost {
+  0% { opacity: 0; filter: hue-rotate(-45deg) blur(4px); transform: translateY(32px) scale(0.76) rotate(calc(var(--rotation) - 5deg)); }
+  40% { opacity: 0.65; filter: hue-rotate(30deg) blur(1.5px); transform: translateY(-8px) scale(1.04) rotate(calc(var(--rotation) + 3deg)); }
+  100% { opacity: 1; filter: none; transform: scale(1) rotate(var(--rotation)); }
+}
+
+@keyframes popup-glitch-out {
+  0% { opacity: 1; filter: none; transform: translate(0, 0) scale(1) rotate(var(--rotation)); }
+  20% { opacity: 1; filter: hue-rotate(45deg) contrast(2); transform: translate(-2px, 1px) scale(1.05) rotate(var(--rotation)); }
+  40% { opacity: 0.8; filter: hue-rotate(-45deg) contrast(3); transform: translate(2px, -1px) scale(0.95) rotate(var(--rotation)); }
+  60% { opacity: 0.6; filter: hue-rotate(90deg) contrast(4); transform: translate(-1px, 2px) scale(1.08) rotate(var(--rotation)); }
+  80% { opacity: 0.3; filter: hue-rotate(-90deg) contrast(0.5); transform: translate(1px, -2px) scale(0.9) rotate(var(--rotation)); }
+  100% { opacity: 0; filter: none; transform: translate(0, 0) scale(0.8) rotate(var(--rotation)); }
+}
+
+@keyframes popup-glitch-fade {
+  0% { opacity: 1; filter: none; }
+  30% { opacity: 0.7; filter: blur(1.5px) brightness(1.5); }
+  60% { opacity: 0.4; filter: blur(3px) brightness(2); }
+  100% { opacity: 0; filter: blur(6px) brightness(2.5); }
+}
+
+@keyframes popup-glitch-slide {
+  0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(var(--rotation)); }
+  40% { opacity: 0.7; transform: translate(-40px, 10px) scale(1.1) rotate(calc(var(--rotation) + 8deg)); }
+  80% { opacity: 0.3; transform: translate(60px, -20px) scale(0.9) rotate(calc(var(--rotation) - 12deg)); }
+  100% { opacity: 0; transform: translate(0, 80px) scale(0.7) rotate(var(--rotation)); }
+}
+
+@keyframes popup-glitch-scale {
+  0% { opacity: 1; transform: scale(1) rotate(var(--rotation)); filter: none; }
+  30% { opacity: 0.8; transform: scale(1.2) rotate(calc(var(--rotation) + 10deg)); filter: contrast(2); }
+  60% { opacity: 0.5; transform: scale(0.7) rotate(calc(var(--rotation) - 10deg)); filter: contrast(0.5); }
+  100% { opacity: 0; transform: scale(0.3) rotate(var(--rotation)); filter: none; }
+}
+
+@keyframes popup-glitch-scanout {
+  0% { opacity: 1; clip-path: inset(0 0 0 0); filter: contrast(1.1) brightness(1.05); transform: scale(1) rotate(var(--rotation)); }
+  30% { opacity: 0.9; clip-path: inset(12% 0 54% 0); filter: contrast(2.3) brightness(1.35); }
+  65% { opacity: 0.5; clip-path: inset(70% 0 9% 0); filter: contrast(2.7) brightness(1.5); transform: scale(0.95) rotate(calc(var(--rotation) + 5deg)); }
+  100% { opacity: 0; clip-path: inset(100% 0 0 0); filter: contrast(3) brightness(1.6); transform: scale(0.9) rotate(var(--rotation)); }
+}
+
+@keyframes popup-glitch-shatter {
+  0% { opacity: 1; filter: none; transform: scale(1) rotate(var(--rotation)); }
+  20% { opacity: 0.95; filter: contrast(2.2); transform: translate(-8px, 5px) scale(1.08) rotate(calc(var(--rotation) + 6deg)); }
+  45% { opacity: 0.72; filter: contrast(2.7) saturate(1.4); transform: translate(14px, -7px) scale(0.9) rotate(calc(var(--rotation) - 8deg)); }
+  75% { opacity: 0.42; filter: contrast(3.2) saturate(1.7); transform: translate(-24px, 16px) scale(0.84) rotate(calc(var(--rotation) + 11deg)); }
+  100% { opacity: 0; filter: contrast(4); transform: translate(26px, -20px) scale(0.72) rotate(calc(var(--rotation) - 16deg)); }
+}
+
+@keyframes popup-glitch-implode {
+  0% { opacity: 1; filter: none; transform: scale(1) rotate(var(--rotation)); }
+  35% { opacity: 0.84; filter: blur(1.3px) contrast(2); transform: scale(0.88) rotate(calc(var(--rotation) + 4deg)); }
+  65% { opacity: 0.56; filter: blur(2.1px) contrast(2.6); transform: scale(0.55) rotate(calc(var(--rotation) - 7deg)); }
+  100% { opacity: 0; filter: blur(3px) contrast(3.2); transform: scale(0.08) rotate(calc(var(--rotation) + 12deg)); }
+}
+
+.popup.spawn-glitch-snap { animation: popup-in-glitch-snap calc(0.31s * var(--popup-spawn-speed, 1)) steps(2, jump-none) forwards; }
+.popup.spawn-glitch-warp { animation: popup-in-glitch-warp calc(0.29s * var(--popup-spawn-speed, 1)) cubic-bezier(0.3, 1.4, 0.35, 1) forwards; }
+.popup.spawn-glitch-scan { animation: popup-in-glitch-scan calc(0.34s * var(--popup-spawn-speed, 1)) linear forwards; }
+.popup.spawn-glitch-ghost { animation: popup-in-glitch-ghost calc(0.37s * var(--popup-spawn-speed, 1)) cubic-bezier(0.2, 0.95, 0.35, 1.15) forwards; }
+
+.popup.glitch-out { animation: popup-glitch-out calc(0.35s * var(--popup-glitch-speed, 1)) steps(2, jump-none) forwards; }
+.popup.glitch-fade { animation: popup-glitch-fade calc(0.45s * var(--popup-glitch-speed, 1)) linear forwards; }
+.popup.glitch-slide { animation: popup-glitch-slide calc(0.38s * var(--popup-glitch-speed, 1)) cubic-bezier(0.7, -0.2, 0.6, 1.5) forwards; }
+.popup.glitch-scale { animation: popup-glitch-scale calc(0.32s * var(--popup-glitch-speed, 1)) cubic-bezier(0.5, 1.5, 0.7, 1) forwards; }
+.popup.glitch-scanout { animation: popup-glitch-scanout calc(0.44s * var(--popup-glitch-speed, 1)) linear forwards; }
+.popup.glitch-shatter { animation: popup-glitch-shatter calc(0.36s * var(--popup-glitch-speed, 1)) cubic-bezier(0.7, -0.1, 0.65, 1.3) forwards; }
+.popup.glitch-implode { animation: popup-glitch-implode calc(0.39s * var(--popup-glitch-speed, 1)) cubic-bezier(0.2, 1, 0.4, 1.35) forwards; }

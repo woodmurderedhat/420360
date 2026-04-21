@@ -1,0 +1,73 @@
+/* ============================================
+   SHARED CONTROLS
+   ============================================ */
+
+.ctrl-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: rgba(8, 27, 20, 0.82);
+  border: 1px solid rgba(154, 249, 199, 0.34);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.ctrl-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(10, 33, 24, 0.95);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(154, 249, 199, 0.3) inset;
+}
+
+.ctrl-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+}
+
+.ctrl-btn-label {
+  color: var(--highlight);
+  text-shadow: none;
+  transition: color 0.3s ease;
+}
+
+.ctrl-btn-icon {
+  color: var(--secondary);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0;
+  transition: color 0.5s ease;
+  white-space: nowrap;
+}
+
+.ctrl-btn.chill-active {
+  border-color: var(--highlight);
+  animation: chill-pulse 2s ease-in-out infinite;
+}
+
+@keyframes chill-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--primary), 4px 4px 0 0 var(--highlight), 0 0 0 6px #000; }
+  50% { box-shadow: 0 0 0 3px var(--highlight), 4px 4px 0 0 var(--primary), 0 0 8px var(--highlight); }
+}
+
+.ctrl-btn.popups-paused .ctrl-btn-icon {
+  opacity: 0.5;
+}
+
+@keyframes musicGlitch {
+  0% { filter: none; transform: translate(0, 0); }
+  25% { filter: hue-rotate(40deg) contrast(1.6); transform: translate(-2px, 1px); }
+  50% { filter: hue-rotate(-40deg) contrast(2); transform: translate(2px, -1px); }
+  75% { filter: hue-rotate(80deg) contrast(0.8); transform: translate(-1px, 2px); }
+  100% { filter: none; transform: translate(0, 0); }
+}
+
+.ctrl-btn.glitching {
+  animation: musicGlitch 0.18s steps(2) 3;
+}

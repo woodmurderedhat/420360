@@ -1,0 +1,95 @@
+/* ============================================
+   RESPONSIVE OVERRIDES
+   ============================================ */
+
+@media (max-width: 900px) {
+  .integrated-overlay {
+    width: 96vw;
+    height: 86vh;
+    top: 6%;
+  }
+}
+
+@media (max-width: 768px) {
+  .floating-window {
+    width: 90vw;
+    height: 50vh;
+    bottom: 10px;
+    right: 50%;
+    transform: translateX(50%);
+  }
+
+  #taskbar-tray .ctrl-btn-label {
+    display: none;
+  }
+
+  .ctrl-btn {
+    font-size: 10px;
+    padding: 7px 9px;
+  }
+
+  .blurb {
+    font-size: 15px;
+    padding: 14px 12px;
+  }
+
+  main {
+    padding: 52px 8px 40px;
+  }
+
+  .hero-shell {
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .ctrl-btn {
+    font-size: 9px;
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .blurb {
+    font-size: 14px;
+    padding: 12px 10px;
+  }
+
+  .hero-title {
+    font-size: clamp(26px, 8.4vw, 40px);
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+  }
+
+  :root {
+    --popup-w: 200px;
+    --popup-h: 120px;
+  }
+
+  #start-menu {
+    max-width: 100vw;
+    width: 100vw;
+    border-right: none;
+  }
+
+  #taskbar-tray .ctrl-btn-label,
+  #taskbar-clock {
+    display: none;
+  }
+}
+
+@media (max-width: 400px) {
+  .ctrl-btn {
+    font-size: 8px;
+    padding: 5px 6px;
+  }
+
+  .blurb {
+    font-size: 13px;
+  }
+
+  .hero-kicker {
+    font-size: 10px;
+  }
+}

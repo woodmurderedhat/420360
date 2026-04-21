@@ -1,0 +1,130 @@
+/* ============================================
+   OVERLAYS AND FLOATING WINDOWS
+   ============================================ */
+
+@keyframes overlayFade {
+  to { opacity: 0; transform: translateX(-50%) scale(0.96); }
+}
+
+.integrated-overlay.closing {
+  animation: overlayFade var(--overlay-fade-duration) ease forwards;
+}
+
+.integrated-overlay {
+  position: fixed;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 82vw;
+  height: 82vh;
+  background: var(--bg);
+  border: 4px solid var(--secondary);
+  box-shadow: 0 0 0 4px var(--primary), 8px 8px 0 0 var(--highlight), 0 0 0 8px #000;
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+}
+
+.integrated-overlay.hidden { display: none; }
+
+.integrated-overlay header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  font-size: 10px;
+  background: var(--secondary);
+  color: var(--bg);
+  border-bottom: 4px solid var(--primary);
+  cursor: move;
+}
+
+.integrated-overlay header span {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--highlight);
+  text-shadow: 2px 2px 0 var(--primary);
+}
+
+.integrated-overlay header button {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--highlight);
+  border: 2px solid var(--primary);
+  padding: 4px 6px;
+}
+
+.integrated-overlay header button:hover {
+  background: var(--primary);
+  color: #000;
+}
+
+.integrated-overlay iframe {
+  flex: 1;
+  border: 0;
+  background: #000;
+  image-rendering: pixelated;
+}
+
+.floating-window {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 420px;
+  height: 320px;
+  background: var(--bg);
+  border: 4px solid var(--secondary);
+  box-shadow: 0 0 0 4px var(--primary), 8px 8px 0 0 var(--highlight), 0 0 0 8px #000;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  transition: height 0.3s ease, width 0.3s ease;
+}
+
+.floating-window.minimized { height: auto; width: 320px; }
+.floating-window.minimized iframe { display: none; }
+.floating-window.hidden { display: none; }
+
+.floating-window header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  font-size: 9px;
+  background: var(--secondary);
+  color: var(--bg);
+  border-bottom: 4px solid var(--primary);
+  cursor: move;
+}
+
+.floating-window header span {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--highlight);
+  text-shadow: 2px 2px 0 var(--primary);
+}
+
+.floating-window header button {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--highlight);
+  border: 2px solid var(--primary);
+  padding: 3px 5px;
+  margin-left: 3px;
+}
+
+.floating-window header button:hover {
+  background: var(--primary);
+  color: #000;
+}
+
+.floating-window iframe {
+  flex: 1;
+  border: 0;
+  background: #000;
+  image-rendering: pixelated;
+}

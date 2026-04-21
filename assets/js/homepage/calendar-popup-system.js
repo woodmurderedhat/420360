@@ -201,6 +201,16 @@ export function createCalendarPopupSystem({
       bypassIntensity: true,
       centered: true,
       persistent: true,
+      avoidSelectors: [
+        '#taskbar',
+        '#start-menu:not([hidden])',
+        '#ambient-radio-widget:not([hidden])',
+        '#oracle-widget:not([hidden])',
+        '#commune-panel:not(.hidden)',
+        '#news-ticker.visible',
+        '.floating-window:not(.hidden)',
+        '.integrated-overlay:not(.hidden)'
+      ],
       zIndex: topLayerZIndex
     });
     if (popup) hasShownThisLoad = true;

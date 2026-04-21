@@ -236,8 +236,92 @@ export function createPopupSystem({
     };
   }
 
+  function isVisibleElement(el) {
+    if (!(el instanceof HTMLElement)) return false;
+    const style = window.getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden') return false;
+    const rect = el.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  }
+
+  function getAvoidedElements(options = {}) {
+    const selectors = Array.isArray(options.avoidSelectors) ? options.avoidSelectors : [];
+    if (!selectors.length) return [];
+
+    const seen = new Set();
+    return selectors.flatMap((selector) => {
+      try {
+        return Array.from(document.querySelectorAll(selector));
+      } catch (_error) {
+        return [];
+      }
+    }).filter((el) => {
+      if (seen.has(el)) return false;
+      seen.add(el);
+      return isVisibleElement(el);
+    });
+  }
+
+  function positionOverlapsElements(x, y, width, height, elements) {
+    return elements.some((el) => rectsOverlap(x, y, width, height, el));
+  }
+
+  function findCenteredAvoidingPosition(el, options = {}) {
+    const viewportMargin = Number.isFinite(options.viewportMargin) ? options.viewportMargin : 12;
+    const rect = el.getBoundingClientRect();
+    const fallbackWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-w')) || 250;
+    const fallbackHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-h')) || 150;
+    const width = Math.ceil(rect.width) || fallbackWidth;
+    const height = Math.ceil(rect.height) || fallbackHeight;
+    const maxX = Math.max(viewportMargin, window.innerWidth - width - viewportMargin);
+    const maxY = Math.max(viewportMargin, window.innerHeight - height - viewportMargin);
+    const center = findCenteredPosition(el, options);
+    const avoidedElements = getAvoidedElements(options);
+    if (!avoidedElements.length) return center;
+
+    const clampCandidate = (candidateX, candidateY) => ({
+      x: Math.max(viewportMargin, Math.min(candidateX, maxX)),
+      y: Math.max(viewportMargin, Math.min(candidateY, maxY))
+    });
+    const pushCandidate = (list, seen, candidateX, candidateY) => {
+      const { x, y } = clampCandidate(candidateX, candidateY);
+      const key = `${x}:${y}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      list.push({ x, y });
+    };
+
+    const candidates = [];
+    const seenCandidates = new Set();
+    pushCandidate(candidates, seenCandidates, center.x, center.y);
+
+    const step = 24;
+    const maxRadius = Math.max(window.innerWidth, window.innerHeight);
+    for (let radius = step; radius <= maxRadius; radius += step) {
+      pushCandidate(candidates, seenCandidates, center.x, center.y - radius);
+      pushCandidate(candidates, seenCandidates, center.x, center.y + radius);
+      pushCandidate(candidates, seenCandidates, center.x - radius, center.y);
+      pushCandidate(candidates, seenCandidates, center.x + radius, center.y);
+      pushCandidate(candidates, seenCandidates, center.x - radius, center.y - radius);
+      pushCandidate(candidates, seenCandidates, center.x + radius, center.y - radius);
+      pushCandidate(candidates, seenCandidates, center.x - radius, center.y + radius);
+      pushCandidate(candidates, seenCandidates, center.x + radius, center.y + radius);
+    }
+
+    for (const candidate of candidates) {
+      if (!positionOverlapsElements(candidate.x, candidate.y, width, height, avoidedElements)) {
+        return candidate;
+      }
+    }
+
+    return center;
+  }
+
   function resolvePopupPosition(el, options = {}) {
     if (options.centered) {
+      if (Array.isArray(options.avoidSelectors) && options.avoidSelectors.length) {
+        return findCenteredAvoidingPosition(el, options);
+      }
       return findCenteredPosition(el, options);
     }
     return findNonOverlappingPosition();
@@ -402,13 +486,37 @@ export function createPopupSystem({
     applyPosition();
     if (options.centered) {
       p.style.visibility = '';
+      let pendingRepositionFrame = null;
+      const queueApplyPosition = () => {
+        if (pendingRepositionFrame !== null) return;
+        pendingRepositionFrame = window.requestAnimationFrame(() => {
+          pendingRepositionFrame = null;
+          if (!p.parentNode || p.dataset.despawning === '1') return;
+          applyPosition();
+        });
+      };
       const handleViewportChange = () => {
-        if (!p.parentNode || p.dataset.despawning === '1') return;
-        applyPosition();
+        queueApplyPosition();
       };
       window.addEventListener('resize', handleViewportChange);
+      let layoutObserver = null;
+      if (Array.isArray(options.avoidSelectors) && options.avoidSelectors.length) {
+        layoutObserver = new MutationObserver(() => {
+          queueApplyPosition();
+        });
+        layoutObserver.observe(document.body, {
+          subtree: true,
+          childList: true,
+          attributes: true,
+          attributeFilter: ['hidden', 'class', 'style']
+        });
+      }
       p.__popupCleanup = () => {
+        if (pendingRepositionFrame !== null) {
+          window.cancelAnimationFrame(pendingRepositionFrame);
+        }
         window.removeEventListener('resize', handleViewportChange);
+        layoutObserver?.disconnect();
       };
     }
 
@@ -487,6 +595,7 @@ export function createPopupSystem({
     rectsOverlap,
     findNonOverlappingPosition,
     findCenteredPosition,
+    findCenteredAvoidingPosition,
     removePopupElement,
     makePopup,
     spawnPopupWithAd,

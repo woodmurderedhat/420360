@@ -28,6 +28,10 @@ export function createPopupSystem({
     { cls: 'glitch-implode', dur: 390, weight: 1 }
   ];
 
+  function isPersistentPopup(el) {
+    return el?.dataset?.persistent === '1';
+  }
+
   function rectsOverlap(x, y, w, h, el) {
     const r = el.getBoundingClientRect();
     return !(x + w < r.left || x > r.right || y + h < r.top || y > r.bottom);
@@ -216,8 +220,35 @@ export function createPopupSystem({
     };
   }
 
+  function findCenteredPosition(el, options = {}) {
+    const viewportMargin = Number.isFinite(options.viewportMargin) ? options.viewportMargin : 12;
+    const rect = el.getBoundingClientRect();
+    const fallbackWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-w')) || 250;
+    const fallbackHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--popup-h')) || 150;
+    const width = Math.ceil(rect.width) || fallbackWidth;
+    const height = Math.ceil(rect.height) || fallbackHeight;
+    const maxX = Math.max(viewportMargin, window.innerWidth - width - viewportMargin);
+    const maxY = Math.max(viewportMargin, window.innerHeight - height - viewportMargin);
+
+    return {
+      x: Math.max(viewportMargin, Math.min(Math.round((window.innerWidth - width) / 2), maxX)),
+      y: Math.max(viewportMargin, Math.min(Math.round((window.innerHeight - height) / 2), maxY))
+    };
+  }
+
+  function resolvePopupPosition(el, options = {}) {
+    if (options.centered) {
+      return findCenteredPosition(el, options);
+    }
+    return findNonOverlappingPosition();
+  }
+
   function removePopupElement(el) {
     if (!el) return;
+    if (typeof el.__popupCleanup === 'function') {
+      el.__popupCleanup();
+      delete el.__popupCleanup;
+    }
     const idx = state.activePopups.indexOf(el);
     if (idx !== -1) state.activePopups.splice(idx, 1);
     if (el.parentNode) el.parentNode.removeChild(el);
@@ -283,6 +314,12 @@ export function createPopupSystem({
     if (normalizedAd.variant === 'calendar-ascii') {
       p.classList.add('popup--calendar', 'popup--ascii');
     }
+    if (options.centered) {
+      p.classList.add('popup--centered');
+    }
+    if (options.persistent) {
+      p.dataset.persistent = '1';
+    }
 
     const spawn = pickSpawnGlitchEffect();
     p.classList.add(spawn.effect.cls);
@@ -301,10 +338,11 @@ export function createPopupSystem({
     if (Number.isFinite(options.zIndex)) {
       p.style.zIndex = String(options.zIndex);
     }
-
-    const pos = findNonOverlappingPosition();
-    p.style.left = pos.x + 'px';
-    p.style.top = pos.y + 'px';
+    p.style.left = '-9999px';
+    p.style.top = '-9999px';
+    if (options.centered) {
+      p.style.visibility = 'hidden';
+    }
 
     const popupMessage = normalizedAd.message
       ? `<p class="popup-copy">${escapeHtml(normalizedAd.message)}</p>`
@@ -355,6 +393,25 @@ export function createPopupSystem({
 
     document.body.appendChild(p);
 
+    const applyPosition = () => {
+      const pos = resolvePopupPosition(p, options);
+      p.style.left = pos.x + 'px';
+      p.style.top = pos.y + 'px';
+    };
+
+    applyPosition();
+    if (options.centered) {
+      p.style.visibility = '';
+      const handleViewportChange = () => {
+        if (!p.parentNode || p.dataset.despawning === '1') return;
+        applyPosition();
+      };
+      window.addEventListener('resize', handleViewportChange);
+      p.__popupCleanup = () => {
+        window.removeEventListener('resize', handleViewportChange);
+      };
+    }
+
     const link = p.querySelector('[data-ad-link]');
     if (normalizedAd.href === '__INTERNAL_ORACLE__' && link) {
       link.removeAttribute('target');
@@ -365,7 +422,9 @@ export function createPopupSystem({
     }
 
     state.activePopups.push(p);
-    setTimeout(() => despawnPopup(p, { force: true }), config.POPUP_LIFETIME_MS);
+    if (!options.persistent) {
+      setTimeout(() => despawnPopup(p, { force: true }), config.POPUP_LIFETIME_MS);
+    }
 
     // Clear spawn class after entrance to keep only one active animation phase.
     setTimeout(() => {
@@ -374,7 +433,9 @@ export function createPopupSystem({
     }, 700);
 
     while (state.activePopups.length > config.MAX_POPUPS) {
-      const old = state.activePopups.shift();
+      const removableIndex = state.activePopups.findIndex((popupEl) => !isPersistentPopup(popupEl));
+      if (removableIndex === -1) break;
+      const [old] = state.activePopups.splice(removableIndex, 1);
       if (old && old.parentNode) {
         despawnPopup(old, { force: true });
       }
@@ -414,7 +475,9 @@ export function createPopupSystem({
   function randomPopupGlitchOut() {
     if (!state.activePopups.length) return;
 
-    const popup = state.activePopups[Math.floor(Math.random() * state.activePopups.length)];
+    const candidates = state.activePopups.filter((popupEl) => !isPersistentPopup(popupEl));
+    if (!candidates.length) return;
+    const popup = candidates[Math.floor(Math.random() * candidates.length)];
     if (!popup) return;
 
     despawnPopup(popup, { respectCooldown: true });
@@ -423,6 +486,7 @@ export function createPopupSystem({
   return {
     rectsOverlap,
     findNonOverlappingPosition,
+    findCenteredPosition,
     removePopupElement,
     makePopup,
     spawnPopupWithAd,

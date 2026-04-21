@@ -199,6 +199,8 @@ export function createCalendarPopupSystem({
 
     const popup = popupSystem.spawnPopupWithAd(popupAd, {
       bypassIntensity: true,
+      centered: true,
+      persistent: true,
       zIndex: topLayerZIndex
     });
     if (popup) hasShownThisLoad = true;

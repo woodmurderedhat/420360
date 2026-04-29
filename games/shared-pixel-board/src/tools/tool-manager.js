@@ -235,6 +235,7 @@ class ToolManager {
     state.pushHistory(historyEntry);
     this.renderer.render();
     state.stats.placements++;
+    state.emit("statsChanged", { ...state.stats });
 
     // Write to Firebase if available (no cooldown - instant sync)
     if (this.firebaseWriter) {

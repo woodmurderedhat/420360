@@ -62,7 +62,7 @@
         <p class="subtitle">Realtime collaborative canvas</p>
       </div>
       <nav class="topbar-right">
-        <button id="togglePanels" class="icon-button mobile-only" title="Toggle Panels">⊞</button>
+        <button id="togglePanels" class="icon-button mobile-only" type="button" title="Toggle Panels" aria-label="Toggle board panels" aria-controls="sidePanels" aria-expanded="false">⊞</button>
         <button id="toggleHelp" class="icon-button" title="Help (?)">?</button>
         <a href="../index.html" class="back-link">Back to Games</a>
       </nav>
@@ -133,6 +133,66 @@
           </div>
         </div>
 
+        <div class="mobile-canvas-hud mobile-only" aria-label="Mobile canvas controls">
+          <div id="mobileCanvasHint" class="mobile-canvas-hint">Pixel · tap to place</div>
+          <button id="mobileColorAction" class="mobile-color-chip" type="button" title="Open color picker">
+            <span id="mobileColorSwatch" class="mobile-color-swatch" style="background-color:#FF4D4D"></span>
+            <span id="mobileColorLabel" class="mobile-color-label">#FF4D4D</span>
+          </button>
+          <div class="mobile-tool-shortcuts" aria-label="Quick mobile tools">
+            <button class="mobile-tool-shortcut active" type="button" data-tool="pixel" title="Pixel tool">
+              <span class="mobile-tool-shortcut-icon">●</span>
+              <span class="mobile-tool-shortcut-label">Pixel</span>
+            </button>
+            <button class="mobile-tool-shortcut" type="button" data-tool="brush" title="Brush tool">
+              <span class="mobile-tool-shortcut-icon">✎</span>
+              <span class="mobile-tool-shortcut-label">Brush</span>
+            </button>
+            <button class="mobile-tool-shortcut" type="button" data-tool="eraser" title="Eraser tool">
+              <span class="mobile-tool-shortcut-icon">⟲</span>
+              <span class="mobile-tool-shortcut-label">Erase</span>
+            </button>
+            <button class="mobile-tool-shortcut" type="button" data-tool="picker" title="Color picker tool">
+              <span class="mobile-tool-shortcut-icon">🔍</span>
+              <span class="mobile-tool-shortcut-label">Pick</span>
+            </button>
+          </div>
+          <div id="mobileSizeControls" class="mobile-size-controls" hidden aria-label="Mobile size controls">
+            <span class="mobile-size-label">Size</span>
+            <div class="mobile-size-pills">
+              <button class="mobile-size-pill" type="button" data-size="1">1</button>
+              <button class="mobile-size-pill active" type="button" data-size="2">2</button>
+              <button class="mobile-size-pill" type="button" data-size="3">3</button>
+              <button class="mobile-size-pill" type="button" data-size="4">4</button>
+              <button class="mobile-size-pill" type="button" data-size="5">5</button>
+            </div>
+          </div>
+          <div class="mobile-quickbar">
+            <button id="mobileUndoAction" class="mobile-quickbar-btn" type="button" title="Undo">↶</button>
+            <button id="mobileRedoAction" class="mobile-quickbar-btn" type="button" title="Redo">↷</button>
+            <button id="mobileZoomOutAction" class="mobile-quickbar-btn" type="button" title="Zoom out">−</button>
+            <button id="mobileResetViewAction" class="mobile-quickbar-btn mobile-quickbar-btn-wide" type="button" title="Reset and center view">100%</button>
+            <button id="mobileZoomInAction" class="mobile-quickbar-btn" type="button" title="Zoom in">+</button>
+            <button id="mobilePanelsAction" class="mobile-quickbar-btn" type="button" title="Open panels" aria-label="Open board panels" aria-controls="sidePanels" aria-expanded="false">⊞</button>
+          </div>
+          <div class="mobile-palette-wrap" aria-label="Quick mobile palette">
+            <span class="mobile-palette-label">Colors</span>
+            <div class="mobile-palette-scroll">
+              <button class="mobile-palette-btn" data-palette-slot="1" data-palette-color="#FF4D4D" style="background-color:#FF4D4D" title="Palette color 1 (long-press to edit)">1</button>
+              <button class="mobile-palette-btn" data-palette-slot="2" data-palette-color="#4DFF88" style="background-color:#4DFF88;color:#111827" title="Palette color 2 (long-press to edit)">2</button>
+              <button class="mobile-palette-btn" data-palette-slot="3" data-palette-color="#4DB8FF" style="background-color:#4DB8FF" title="Palette color 3 (long-press to edit)">3</button>
+              <button class="mobile-palette-btn" data-palette-slot="4" data-palette-color="#FFE14D" style="background-color:#FFE14D;color:#111827" title="Palette color 4 (long-press to edit)">4</button>
+              <button class="mobile-palette-btn" data-palette-slot="5" data-palette-color="#C24DFF" style="background-color:#C24DFF" title="Palette color 5 (long-press to edit)">5</button>
+              <button class="mobile-palette-btn" data-palette-slot="6" data-palette-color="#FF8C4D" style="background-color:#FF8C4D" title="Palette color 6 (long-press to edit)">6</button>
+              <button class="mobile-palette-btn" data-palette-slot="7" data-palette-color="#00D4AA" style="background-color:#00D4AA" title="Palette color 7 (long-press to edit)">7</button>
+              <button class="mobile-palette-btn" data-palette-slot="8" data-palette-color="#F5F5F5" style="background-color:#F5F5F5;color:#111827" title="Palette color 8 (long-press to edit)">8</button>
+              <button class="mobile-palette-btn" data-palette-slot="9" data-palette-color="#111827" style="background-color:#111827" title="Palette color 9 (long-press to edit)">9</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="noticeToast" class="notice-toast mobile-only" hidden aria-live="polite"></div>
+
         <!-- Bottom status bar -->
         <footer class="statusbar">
           <span id="connectionStatus" class="status-item offline">offline</span>
@@ -145,11 +205,25 @@
       </main>
 
       <!-- Right sidebar (panels) -->
-      <aside class="panels">
+      <aside class="panels" id="sidePanels" aria-hidden="false">
+        <div class="mobile-panels-header mobile-only">
+          <div class="mobile-panels-header-top">
+            <span>Board Panels</span>
+            <button id="closePanels" class="icon-button" type="button" title="Close Panels" aria-label="Close board panels">×</button>
+          </div>
+          <div class="mobile-panels-nav" aria-label="Board panel quick navigation">
+            <button class="mobile-panels-nav-btn" type="button" data-target-panel="colors">Colors</button>
+            <button class="mobile-panels-nav-btn" type="button" data-target-panel="tool-options">Tools</button>
+            <button class="mobile-panels-nav-btn" type="button" data-target-panel="layers">Layers</button>
+            <button class="mobile-panels-nav-btn" type="button" data-target-panel="history">History</button>
+            <button class="mobile-panels-nav-btn" type="button" data-target-panel="share">Share</button>
+          </div>
+        </div>
         <!-- Color panel -->
-        <div class="panel color-panel">
+        <div class="panel color-panel" data-panel-key="colors">
           <div class="panel-header">
             <span>Colors</span>
+            <button class="panel-toggle-btn mobile-only" type="button" aria-label="Toggle Colors panel" aria-expanded="true">▾</button>
           </div>
           <div class="panel-body">
             <div class="color-input-group">
@@ -160,15 +234,15 @@
             <div class="palette-section">
               <label>Quick Palette (1-9)</label>
               <div id="paletteGrid" class="palette-grid">
-                <button class="palette-btn active" data-palette-slot="1" data-palette-color="#FF4D4D" style="background-color:#FF4D4D" title="1 (dblclick to edit)">1</button>
-                <button class="palette-btn" data-palette-slot="2" data-palette-color="#4DFF88" style="background-color:#4DFF88;color:#111827" title="2 (dblclick to edit)">2</button>
-                <button class="palette-btn" data-palette-slot="3" data-palette-color="#4DB8FF" style="background-color:#4DB8FF" title="3 (dblclick to edit)">3</button>
-                <button class="palette-btn" data-palette-slot="4" data-palette-color="#FFE14D" style="background-color:#FFE14D;color:#111827" title="4 (dblclick to edit)">4</button>
-                <button class="palette-btn" data-palette-slot="5" data-palette-color="#C24DFF" style="background-color:#C24DFF" title="5 (dblclick to edit)">5</button>
-                <button class="palette-btn" data-palette-slot="6" data-palette-color="#FF8C4D" style="background-color:#FF8C4D" title="6 (dblclick to edit)">6</button>
-                <button class="palette-btn" data-palette-slot="7" data-palette-color="#00D4AA" style="background-color:#00D4AA" title="7 (dblclick to edit)">7</button>
-                <button class="palette-btn" data-palette-slot="8" data-palette-color="#F5F5F5" style="background-color:#F5F5F5;color:#111827" title="8 (dblclick to edit)">8</button>
-                <button class="palette-btn" data-palette-slot="9" data-palette-color="#111827" style="background-color:#111827" title="9 (dblclick to edit)">9</button>
+                <button class="palette-btn active" data-palette-slot="1" data-palette-color="#FF4D4D" style="background-color:#FF4D4D" title="1 (double-click / long-press to edit)">1</button>
+                <button class="palette-btn" data-palette-slot="2" data-palette-color="#4DFF88" style="background-color:#4DFF88;color:#111827" title="2 (double-click / long-press to edit)">2</button>
+                <button class="palette-btn" data-palette-slot="3" data-palette-color="#4DB8FF" style="background-color:#4DB8FF" title="3 (double-click / long-press to edit)">3</button>
+                <button class="palette-btn" data-palette-slot="4" data-palette-color="#FFE14D" style="background-color:#FFE14D;color:#111827" title="4 (double-click / long-press to edit)">4</button>
+                <button class="palette-btn" data-palette-slot="5" data-palette-color="#C24DFF" style="background-color:#C24DFF" title="5 (double-click / long-press to edit)">5</button>
+                <button class="palette-btn" data-palette-slot="6" data-palette-color="#FF8C4D" style="background-color:#FF8C4D" title="6 (double-click / long-press to edit)">6</button>
+                <button class="palette-btn" data-palette-slot="7" data-palette-color="#00D4AA" style="background-color:#00D4AA" title="7 (double-click / long-press to edit)">7</button>
+                <button class="palette-btn" data-palette-slot="8" data-palette-color="#F5F5F5" style="background-color:#F5F5F5;color:#111827" title="8 (double-click / long-press to edit)">8</button>
+                <button class="palette-btn" data-palette-slot="9" data-palette-color="#111827" style="background-color:#111827" title="9 (double-click / long-press to edit)">9</button>
                 <input type="color" id="paletteColorEdit" tabindex="-1" aria-hidden="true" />
               </div>
             </div>
@@ -176,9 +250,10 @@
         </div>
 
         <!-- Tool options panel -->
-        <div class="panel tool-options-panel">
+        <div class="panel tool-options-panel" data-panel-key="tool-options">
           <div class="panel-header">
             <span>Tool Options</span>
+            <button class="panel-toggle-btn mobile-only" type="button" aria-label="Toggle Tool Options panel" aria-expanded="true">▾</button>
           </div>
           <div class="panel-body">
             <div id="toolOptionsContainer">
@@ -190,9 +265,10 @@
         </div>
 
         <!-- Layers panel -->
-        <div class="panel layers-panel">
+        <div class="panel layers-panel" data-panel-key="layers">
           <div class="panel-header">
             <span>Layers</span>
+            <button class="panel-toggle-btn mobile-only" type="button" aria-label="Toggle Layers panel" aria-expanded="true">▾</button>
             <button id="addLayerBtn" class="panel-action-btn" title="Add Layer">+</button>
           </div>
           <div class="panel-body">
@@ -203,9 +279,10 @@
         </div>
 
         <!-- History panel -->
-        <div class="panel history-panel">
+        <div class="panel history-panel" data-panel-key="history">
           <div class="panel-header">
             <span>History</span>
+            <button class="panel-toggle-btn mobile-only" type="button" aria-label="Toggle History panel" aria-expanded="true">▾</button>
           </div>
           <div class="panel-body">
             <div class="history-stats">
@@ -221,16 +298,18 @@
         </div>
 
         <!-- Share panel -->
-        <div class="panel share-panel">
+        <div class="panel share-panel" data-panel-key="share">
           <div class="panel-header">
             <span>Share</span>
+            <button class="panel-toggle-btn mobile-only" type="button" aria-label="Toggle Share panel" aria-expanded="true">▾</button>
           </div>
           <div class="panel-body">
             <button id="copySpectatorLink" class="action-btn">Copy Spectator Link</button>
-            <div id="noticeBox" class="notice-box"></div>
+            <div id="noticeBox" class="notice-box" aria-live="polite"></div>
           </div>
         </div>
       </aside>
+      <button id="panelsBackdrop" class="panels-backdrop mobile-only" type="button" hidden aria-label="Close board panels"></button>
     </div>
 
     <!-- Help modal -->

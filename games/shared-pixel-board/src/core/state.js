@@ -133,6 +133,7 @@ class PixelBoardState {
   setColor(color) {
     if (SPECTATOR_MODE) return;
     this.selectedColor = color.toUpperCase();
+    this.savePreferences();
     this.emit("colorChanged", { color: this.selectedColor });
   }
 
@@ -142,6 +143,7 @@ class PixelBoardState {
   setTool(tool) {
     if (!Object.values(TOOLS).includes(tool)) return;
     this.activeTool = tool;
+    this.savePreferences();
     this.emit("toolChanged", { tool });
   }
 

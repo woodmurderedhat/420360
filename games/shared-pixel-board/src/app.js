@@ -58,13 +58,24 @@ async function writePixelsToFirebase(cells, color) {
   if (!firebaseDb) return;
 
   try {
+    state.writeInFlight = true;
+    state.pendingWriteStartedAt = Date.now();
+    state.emit("syncStateChanged", { label: "Sync: saving", ok: false });
+
     const updates = {};
     for (const cell of cells) {
       const key = `pixels/${cell.x}_${cell.y}`;
       updates[key] = color;
     }
     await update(ref(firebaseDb), updates);
+    state.writeInFlight = false;
+    state.lastAckMs = Date.now();
+    state.stats.successfulWrites += cells.length;
+    state.emit("statsChanged", { ...state.stats });
+    state.emit("syncStateChanged", { label: `Sync: live ${cells.length}`, ok: true });
   } catch (error) {
+    state.writeInFlight = false;
+    state.emit("syncStateChanged", { label: "Sync: retry needed", ok: false });
     console.error("Firebase write error:", error);
   }
 }
@@ -135,8 +146,19 @@ async function initializeApplication() {
     renderer.render();
     console.log("✓ Initial render complete");
     
-    // Set default tool
-    selectTool(toolManager, document.querySelector(`[data-tool="${TOOLS.PIXEL}"]`), TOOLS.PIXEL);
+    // Restore the saved tool if possible, otherwise fall back to pixel.
+    const initialTool = state.activeTool || TOOLS.PIXEL;
+    selectTool(
+      toolManager,
+      document.querySelector(`[data-tool="${initialTool}"]`) || document.querySelector(`[data-tool="${TOOLS.PIXEL}"]`),
+      initialTool
+    );
+    eventManager.resetView();
+    state.emit("statsChanged", { ...state.stats });
+    state.emit("syncStateChanged", {
+      label: isFirebaseConfigured() ? "Sync: connecting" : "Sync: local only",
+      ok: !isFirebaseConfigured()
+    });
 
     // Initialize Firebase if configured
     if (isFirebaseConfigured()) {
@@ -164,6 +186,235 @@ async function initializeApplication() {
 // ============================================================================
 
 function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeHelpBtn, helpPanel) {
+  const PALETTE_LONG_PRESS_MS = 450;
+  const DRAWER_SWIPE_CLOSE_PX = 72;
+  const canvasWrapEl = document.getElementById("canvasWrap");
+  const panelsEl = document.getElementById("sidePanels");
+  const togglePanelsBtn = document.getElementById("togglePanels");
+  const mobilePanelsBtn = document.getElementById("mobilePanelsAction");
+  const closePanelsBtn = document.getElementById("closePanels");
+  const panelsBackdrop = document.getElementById("panelsBackdrop");
+  const mobilePanelNavButtons = document.querySelectorAll(".mobile-panels-nav-btn");
+  const mobileCanvasHint = document.getElementById("mobileCanvasHint");
+  const noticeToast = document.getElementById("noticeToast");
+
+  const undoBtn = document.getElementById("undoAction");
+  const redoBtn = document.getElementById("redoAction");
+  const mobileUndoBtn = document.getElementById("mobileUndoAction");
+  const mobileRedoBtn = document.getElementById("mobileRedoAction");
+  const mobileZoomOutBtn = document.getElementById("mobileZoomOutAction");
+  const mobileResetViewBtn = document.getElementById("mobileResetViewAction");
+  const mobileZoomInBtn = document.getElementById("mobileZoomInAction");
+  const mobileColorActionBtn = document.getElementById("mobileColorAction");
+  const mobileSizeControls = document.getElementById("mobileSizeControls");
+
+  const TOOL_HINTS = {
+    pixel: "Pixel · tap to place",
+    brush: "Brush · drag to paint",
+    line: "Line · tap start, tap end",
+    fill: "Fill · tap a region",
+    eraser: "Eraser · drag to clear",
+    spray: "Spray · hold and move",
+    picker: "Picker · tap a color",
+    text: "Text · tap, type, commit",
+    stamp: "Stamp · tap to apply",
+    transform: "Transform · use panel actions"
+  };
+
+  let noticeToastTimer = null;
+  let transientHintTimer = null;
+  let suppressPaletteClickUntil = 0;
+  let drawerTouchStart = null;
+
+  function isMobileViewport() {
+    return window.innerWidth <= 768;
+  }
+
+  function getToolHint(toolName = state.activeTool) {
+    return TOOL_HINTS[toolName] || "Tap to paint";
+  }
+
+  function setMobileCanvasHint(message, transient = false) {
+    if (!mobileCanvasHint) return;
+
+    if (transientHintTimer) {
+      clearTimeout(transientHintTimer);
+      transientHintTimer = null;
+    }
+
+    mobileCanvasHint.textContent = message || getToolHint();
+
+    if (transient) {
+      transientHintTimer = setTimeout(() => {
+        mobileCanvasHint.textContent = getToolHint();
+        transientHintTimer = null;
+      }, 1600);
+    }
+  }
+
+  function setPanelsOpen(open) {
+    if (!panelsEl) return;
+
+    const nextOpen = Boolean(open) && isMobileViewport();
+    panelsEl.classList.toggle("open", nextOpen);
+    panelsEl.setAttribute("aria-hidden", String(isMobileViewport() ? !nextOpen : false));
+
+    [togglePanelsBtn, mobilePanelsBtn].forEach((button) => {
+      if (button) button.setAttribute("aria-expanded", String(nextOpen));
+    });
+
+    if (panelsBackdrop) {
+      panelsBackdrop.hidden = !nextOpen;
+      panelsBackdrop.classList.toggle("open", nextOpen);
+    }
+  }
+
+  function setPanelCollapsed(panelEl, collapsed) {
+    if (!panelEl) return;
+
+    panelEl.classList.toggle("collapsed", collapsed);
+    const toggleBtn = panelEl.querySelector(".panel-toggle-btn");
+    if (toggleBtn) {
+      toggleBtn.setAttribute("aria-expanded", String(!collapsed));
+    }
+  }
+
+  function applyMobilePanelLayout(forceMobileDefaults = false) {
+    if (!panelsEl) return;
+
+    const mobileDefaults = {
+      colors: false,
+      "tool-options": false,
+      layers: true,
+      history: true,
+      share: true
+    };
+
+    panelsEl.querySelectorAll(".panel").forEach((panelEl) => {
+      if (!isMobileViewport()) {
+        setPanelCollapsed(panelEl, false);
+        return;
+      }
+
+      if (forceMobileDefaults) {
+        const key = panelEl.dataset.panelKey;
+        setPanelCollapsed(panelEl, Boolean(mobileDefaults[key]));
+      }
+    });
+  }
+
+  function scrollToPanel(panelKey) {
+    if (!panelsEl || !panelKey) return;
+
+    const panelEl = panelsEl.querySelector(`.panel[data-panel-key="${panelKey}"]`);
+    if (!panelEl) return;
+
+    setPanelCollapsed(panelEl, false);
+    panelEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    mobilePanelNavButtons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.targetPanel === panelKey);
+    });
+  }
+
+  function updateHistoryButtons() {
+    const canUndo = state.canUndo();
+    const canRedo = state.canRedo();
+
+    [undoBtn, mobileUndoBtn].forEach((button) => {
+      if (button) button.disabled = !canUndo;
+    });
+    [redoBtn, mobileRedoBtn].forEach((button) => {
+      if (button) button.disabled = !canRedo;
+    });
+  }
+
+  function updateZoomControls(zoom = state.zoomLevel) {
+    if (mobileResetViewBtn) {
+      mobileResetViewBtn.textContent = `${Math.round(zoom * 100)}%`;
+    }
+  }
+
+  function updateMobileSizeControls() {
+    if (!mobileSizeControls) return;
+
+    const showSizeControls = state.activeTool === "brush" || state.activeTool === "eraser";
+    mobileSizeControls.hidden = !showSizeControls;
+
+    mobileSizeControls.querySelectorAll(".mobile-size-pill").forEach((button) => {
+      button.classList.toggle("active", Number(button.dataset.size) === state.brushSize);
+    });
+  }
+
+  function updateSessionStats() {
+    const sessionStats = document.getElementById("sessionStats");
+    if (sessionStats) {
+      sessionStats.textContent = `Session: ${state.stats.placements} px`;
+    }
+  }
+
+  function showNoticeToastMessage(message, ok = false) {
+    if (!noticeToast || !isMobileViewport() || !message) return;
+
+    if (noticeToastTimer) {
+      clearTimeout(noticeToastTimer);
+    }
+
+    noticeToast.hidden = false;
+    noticeToast.textContent = message;
+    noticeToast.classList.toggle("ok", Boolean(ok));
+
+    noticeToastTimer = setTimeout(() => {
+      noticeToast.hidden = true;
+      noticeToastTimer = null;
+    }, 2200);
+  }
+
+  function closeMobileDrawerAfterColorAction() {
+    if (isMobileViewport() && panelsEl?.classList.contains("open")) {
+      setPanelsOpen(false);
+      setMobileCanvasHint("Color ready · tap to paint", true);
+    }
+  }
+
+  function shouldSuppressPaletteClick() {
+    return Date.now() < suppressPaletteClickUntil;
+  }
+
+  function openPaletteEditor(button, paletteEditInput) {
+    if (!button || !paletteEditInput) return;
+
+    paletteEditInput.value = button.dataset.paletteColor || "#ffffff";
+    paletteEditInput.click();
+    suppressPaletteClickUntil = Date.now() + 700;
+  }
+
+  function registerPaletteLongPress(button, paletteEditInput, editingButtonRef) {
+    let timerId = null;
+
+    function clearLongPressTimer() {
+      if (timerId) {
+        clearTimeout(timerId);
+        timerId = null;
+      }
+    }
+
+    button.addEventListener("pointerdown", (event) => {
+      if (event.pointerType !== "touch" || !paletteEditInput) return;
+
+      clearLongPressTimer();
+      timerId = setTimeout(() => {
+        editingButtonRef.set(button);
+        openPaletteEditor(button, paletteEditInput);
+        timerId = null;
+      }, PALETTE_LONG_PRESS_MS);
+    });
+
+    ["pointerup", "pointercancel", "pointerleave"].forEach((eventName) => {
+      button.addEventListener(eventName, clearLongPressTimer);
+    });
+  }
+
   // Tool buttons
   document.querySelectorAll(".tool-button").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -174,14 +425,49 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     });
   });
 
+  document.querySelectorAll(".mobile-tool-shortcut").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tool = btn.dataset.tool;
+      if (tool && !SPECTATOR_MODE) {
+        selectTool(toolManager, document.querySelector(`.tool-button[data-tool="${tool}"]`), tool);
+      }
+    });
+  });
+
+  document.querySelectorAll(".mobile-size-pill").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const size = Number(btn.dataset.size);
+      if (!SPECTATOR_MODE && Number.isFinite(size)) {
+        state.brushSize = size;
+        state.savePreferences();
+        state.emit("brushSizeChanged", { size });
+      }
+    });
+  });
+
   // Palette buttons
   document.querySelectorAll(".palette-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (shouldSuppressPaletteClick()) return;
       if (!SPECTATOR_MODE) {
         const color = btn.dataset.paletteColor;
         if (color) {
           state.setColor(color);
           updateColorUI(btn);
+          closeMobileDrawerAfterColorAction();
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll(".mobile-palette-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (shouldSuppressPaletteClick()) return;
+      if (!SPECTATOR_MODE) {
+        const color = btn.dataset.paletteColor;
+        if (color) {
+          state.setColor(color);
+          updateColorUI();
         }
       }
     });
@@ -193,6 +479,15 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     colorPicker.addEventListener("change", (e) => {
       if (!SPECTATOR_MODE) {
         state.setColor(e.target.value);
+        closeMobileDrawerAfterColorAction();
+      }
+    });
+  }
+
+  if (mobileColorActionBtn && colorPicker) {
+    mobileColorActionBtn.addEventListener("click", () => {
+      if (!SPECTATOR_MODE) {
+        colorPicker.click();
       }
     });
   }
@@ -201,10 +496,13 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
   // (see renderToolOptions)
 
   // History actions
-  const undoBtn = document.getElementById("undoAction");
-  const redoBtn = document.getElementById("redoAction");
   if (undoBtn) undoBtn.addEventListener("click", () => toolManager.performUndo());
   if (redoBtn) redoBtn.addEventListener("click", () => toolManager.performRedo());
+  if (mobileUndoBtn) mobileUndoBtn.addEventListener("click", () => toolManager.performUndo());
+  if (mobileRedoBtn) mobileRedoBtn.addEventListener("click", () => toolManager.performRedo());
+  if (mobileZoomOutBtn) mobileZoomOutBtn.addEventListener("click", () => eventManager.zoomOut());
+  if (mobileZoomInBtn) mobileZoomInBtn.addEventListener("click", () => eventManager.zoomIn());
+  if (mobileResetViewBtn) mobileResetViewBtn.addEventListener("click", () => eventManager.resetView());
 
   // Export
   const exportBtn = document.getElementById("exportPng");
@@ -248,8 +546,109 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     });
   }
 
+  if (togglePanelsBtn) {
+    togglePanelsBtn.addEventListener("click", () => {
+      setPanelsOpen(!panelsEl?.classList.contains("open"));
+    });
+  }
+
+  if (mobilePanelsBtn) {
+    mobilePanelsBtn.addEventListener("click", () => {
+      setPanelsOpen(true);
+    });
+  }
+
+  if (closePanelsBtn) {
+    closePanelsBtn.addEventListener("click", () => setPanelsOpen(false));
+  }
+
+  if (panelsBackdrop) {
+    panelsBackdrop.addEventListener("click", () => setPanelsOpen(false));
+  }
+
+  if (panelsEl) {
+    panelsEl.addEventListener("touchstart", (event) => {
+      if (!isMobileViewport() || !panelsEl.classList.contains("open") || event.touches.length !== 1) {
+        drawerTouchStart = null;
+        return;
+      }
+
+      const touch = event.touches[0];
+      drawerTouchStart = { x: touch.clientX, y: touch.clientY };
+    }, { passive: true });
+
+    panelsEl.addEventListener("touchend", (event) => {
+      if (!drawerTouchStart || !isMobileViewport() || !panelsEl.classList.contains("open")) {
+        drawerTouchStart = null;
+        return;
+      }
+
+      const touch = event.changedTouches[0];
+      if (!touch) {
+        drawerTouchStart = null;
+        return;
+      }
+
+      const deltaX = touch.clientX - drawerTouchStart.x;
+      const deltaY = Math.abs(touch.clientY - drawerTouchStart.y);
+
+      if (deltaX > DRAWER_SWIPE_CLOSE_PX && deltaX > deltaY * 1.2) {
+        setPanelsOpen(false);
+        setMobileCanvasHint("Panels closed", true);
+      }
+
+      drawerTouchStart = null;
+    }, { passive: true });
+
+    panelsEl.addEventListener("touchcancel", () => {
+      drawerTouchStart = null;
+    }, { passive: true });
+  }
+
+  mobilePanelNavButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!isMobileViewport()) return;
+      scrollToPanel(button.dataset.targetPanel);
+    });
+  });
+
+  if (canvasWrapEl) {
+    canvasWrapEl.addEventListener("click", () => {
+      if (isMobileViewport()) {
+        setPanelsOpen(false);
+      }
+    });
+  }
+
+  panelsEl?.querySelectorAll(".panel-header").forEach((headerEl) => {
+    headerEl.addEventListener("click", (event) => {
+      if (!isMobileViewport()) return;
+      if (event.target.closest(".panel-action-btn") && !event.target.closest(".panel-toggle-btn")) return;
+
+      const panelEl = headerEl.closest(".panel");
+      if (!panelEl) return;
+      setPanelCollapsed(panelEl, !panelEl.classList.contains("collapsed"));
+      const key = panelEl.dataset.panelKey;
+      if (key) {
+        mobilePanelNavButtons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.targetPanel === key && !panelEl.classList.contains("collapsed"));
+        });
+      }
+    });
+  });
+
+  window.addEventListener("resize", () => {
+    if (!isMobileViewport()) {
+      setPanelsOpen(false);
+      applyMobilePanelLayout(false);
+    } else if (noticeToast) {
+      noticeToast.hidden = true;
+      applyMobilePanelLayout(false);
+    }
+  });
+
   // Listen to state events
-  state.on("colorChanged", (data) => {
+  state.on("colorChanged", () => {
     updateColorUI();
   });
 
@@ -261,6 +660,7 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
         noticeBox.textContent = data.message || "";
         noticeBox.classList.toggle("ok", Boolean(data.ok));
       }
+      showNoticeToastMessage(data.message || "", Boolean(data.ok));
     } catch (err) {
       console.error("Notice update failed:", err);
     }
@@ -283,6 +683,7 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
       if (zoomStatus && data && data.zoom) {
         zoomStatus.textContent = `Zoom: ${Math.round(data.zoom * 100)}%`;
       }
+      updateZoomControls(data?.zoom || state.zoomLevel);
     } catch (err) {
       console.error("Zoom update failed:", err);
     }
@@ -293,15 +694,26 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     if (modeStatus) {
       modeStatus.textContent = `Tool: ${data.tool}`;
     }
+
+    document.querySelectorAll(".tool-button").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.tool === data.tool);
+    });
+
+    document.querySelectorAll(".mobile-tool-shortcut").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.tool === data.tool);
+    });
+
     // Update cursor via data attribute
-    const canvasWrap = document.getElementById("canvasWrap");
-    if (canvasWrap) canvasWrap.dataset.activeTool = data.tool;
+    if (canvasWrapEl) canvasWrapEl.dataset.activeTool = data.tool;
     // Re-render dynamic tool options panel
     renderToolOptions(data.tool, renderer, toolManager);
+    updateMobileSizeControls();
+    setMobileCanvasHint(getToolHint(data.tool));
   });
 
-  state.on("brushSizeChanged", (data) => {
+  state.on("brushSizeChanged", () => {
     renderToolOptions(state.activeTool, renderer, toolManager);
+    updateMobileSizeControls();
   });
 
   state.on("historyChanged", (data) => {
@@ -312,9 +724,27 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
         const redoCount = (data.redoHistory && data.redoHistory.length) || 0;
         historyStatus.textContent = `History: ${histCount} | Redo: ${redoCount}`;
       }
+      updateHistoryButtons();
     } catch (err) {
       console.error("History update failed:", err);
     }
+  });
+
+  state.on("statsChanged", () => {
+    updateSessionStats();
+  });
+
+  state.on("syncStateChanged", (data) => {
+    const syncStatus = document.getElementById("syncStatus");
+    if (syncStatus) {
+      syncStatus.textContent = data?.label || "Sync: -";
+      syncStatus.classList.toggle("online", Boolean(data?.ok));
+      syncStatus.classList.toggle("offline", Boolean(data && !data.ok));
+    }
+  });
+
+  state.on("interactionHint", (data) => {
+    setMobileCanvasHint(data?.message || getToolHint(), Boolean(data?.transient));
   });
 
   // ── Palette editor (double-click to edit slot color) ──────────────────────
@@ -323,12 +753,20 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
 
   const paletteEditInput = document.getElementById("paletteColorEdit");
   let editingBtn = null;
+  const editingButtonRef = {
+    set(button) {
+      editingBtn = button;
+    },
+    get() {
+      return editingBtn;
+    }
+  };
 
   if (paletteEditInput) {
     paletteEditInput.addEventListener("change", () => {
-      if (!editingBtn) return;
+      if (!editingButtonRef.get()) return;
       const newColor = paletteEditInput.value.toUpperCase();
-      applyPaletteButtonColor(editingBtn, newColor);
+      setPaletteSlotColor(editingButtonRef.get().dataset.paletteSlot, newColor);
       persistPalette();
       editingBtn = null;
     });
@@ -338,29 +776,31 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     btn.addEventListener("dblclick", (e) => {
       e.stopPropagation();
       if (!paletteEditInput) return;
-      editingBtn = btn;
-      paletteEditInput.value = btn.dataset.paletteColor || "#ffffff";
-      paletteEditInput.click();
+      editingButtonRef.set(btn);
+      openPaletteEditor(btn, paletteEditInput);
     });
+
+    registerPaletteLongPress(btn, paletteEditInput, editingButtonRef);
   });
 
-  // ── Mobile panel toggle ────────────────────────────────────────────────────
-  const togglePanelsBtn = document.getElementById("togglePanels");
-  const panelsEl = document.querySelector(".panels");
-  if (togglePanelsBtn && panelsEl) {
-    togglePanelsBtn.addEventListener("click", () => {
-      panelsEl.classList.toggle("open");
-    });
-    document.getElementById("canvasWrap")?.addEventListener("click", () => {
-      if (window.innerWidth <= 768) panelsEl.classList.remove("open");
-    });
-  }
+  document.querySelectorAll(".mobile-palette-btn").forEach((btn) => {
+    registerPaletteLongPress(btn, paletteEditInput, editingButtonRef);
+  });
 
   // ── Initial tool options render ────────────────────────────────────────────
   renderToolOptions(state.activeTool, renderer, toolManager);
+  updateHistoryButtons();
+  updateZoomControls();
+  updateMobileSizeControls();
+  updateSessionStats();
+  setPanelsOpen(false);
+  applyMobilePanelLayout(true);
+  mobilePanelNavButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.targetPanel === "colors");
+  });
+  setMobileCanvasHint(getToolHint(state.activeTool));
 
   // ── Set initial cursor data attribute ─────────────────────────────────────
-  const canvasWrapEl = document.getElementById("canvasWrap");
   if (canvasWrapEl) canvasWrapEl.dataset.activeTool = state.activeTool;
 }
 
@@ -370,7 +810,9 @@ function selectTool(toolManager, button, toolName) {
     btn.classList.remove("active");
   });
   // Add active class to clicked button
-  button.classList.add("active");
+  if (button) {
+    button.classList.add("active");
+  }
   // Set tool
   toolManager.setActiveTool(toolName);
 }
@@ -386,6 +828,8 @@ function colorBrightness(hex) {
 function updateColorUI() {
   const colorPicker = document.getElementById("colorPicker");
   const colorSwatch = document.getElementById("currentColorSwatch");
+  const mobileColorSwatch = document.getElementById("mobileColorSwatch");
+  const mobileColorLabel = document.getElementById("mobileColorLabel");
 
   if (colorPicker) colorPicker.value = state.selectedColor;
   if (colorSwatch) {
@@ -393,14 +837,26 @@ function updateColorUI() {
     colorSwatch.style.backgroundColor = state.selectedColor;
     colorSwatch.style.color = colorBrightness(state.selectedColor) > 145 ? "#111827" : "#e7cfb5";
   }
+  if (mobileColorSwatch) {
+    mobileColorSwatch.style.backgroundColor = state.selectedColor;
+  }
+  if (mobileColorLabel) {
+    mobileColorLabel.textContent = state.selectedColor;
+  }
 
   // Update palette button active states and text contrast
-  document.querySelectorAll(".palette-btn").forEach((btn) => {
+  document.querySelectorAll(".palette-btn, .mobile-palette-btn").forEach((btn) => {
     const btnColor = (btn.dataset.paletteColor || "").toUpperCase();
     btn.classList.toggle("active", btnColor === state.selectedColor.toUpperCase());
     if (btnColor) {
       btn.style.color = colorBrightness(btnColor) > 145 ? "#111827" : "#e7cfb5";
     }
+  });
+}
+
+function setPaletteSlotColor(slot, color) {
+  document.querySelectorAll(`[data-palette-slot="${slot}"]`).forEach((btn) => {
+    applyPaletteButtonColor(btn, color);
   });
 }
 
@@ -804,7 +1260,7 @@ function loadPersistedPalette() {
   // Always apply data-palette-color first so colors show even with empty localStorage
   document.querySelectorAll(".palette-btn").forEach((btn) => {
     if (btn.dataset.paletteColor) {
-      applyPaletteButtonColor(btn, btn.dataset.paletteColor);
+      setPaletteSlotColor(btn.dataset.paletteSlot, btn.dataset.paletteColor);
     }
   });
   try {
@@ -816,7 +1272,7 @@ function loadPersistedPalette() {
     btns.forEach((btn, i) => {
       const color = (colors[i] || "").toUpperCase();
       if (/^#[0-9A-F]{6}$/.test(color)) {
-        applyPaletteButtonColor(btn, color);
+        setPaletteSlotColor(btn.dataset.paletteSlot, color);
       }
     });
   } catch {
@@ -852,6 +1308,10 @@ async function initializeFirebase(toolManager, renderer) {
         statusEl.classList.toggle("online", connected);
         statusEl.classList.toggle("offline", !connected);
       }
+      state.emit("syncStateChanged", {
+        label: connected ? (state.writeInFlight ? "Sync: saving" : "Sync: live") : "Sync: offline",
+        ok: connected
+      });
     });
 
     // Debounced render to batch rapid incoming pixel updates (e.g. initial load)

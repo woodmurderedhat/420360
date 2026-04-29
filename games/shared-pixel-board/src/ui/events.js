@@ -134,6 +134,7 @@ class EventManager {
         drawStarted: false
       };
       state.touchGestureMode = "pendingTouchDraw";
+      state.emit("interactionHint", { message: "Tap to place · double-tap picks color" });
       return;
     }
 
@@ -199,6 +200,7 @@ class EventManager {
         this.toolManager.handleToolPointerDown(startPoint.x, startPoint.y, startEvent);
         state.touchTapCandidate.drawStarted = true;
         state.touchGestureMode = "drawing";
+        state.emit("interactionHint", { message: "Painting stroke", transient: true });
       }
     }
 
@@ -260,6 +262,7 @@ class EventManager {
       state.pinchMidpointLast = null;
       if (event.pointerType === "touch" && state.touchGestureMode === "twoFingerNav") {
         state.touchGestureMode = "idle";
+        state.emit("interactionHint", { message: null });
       }
     }
 
@@ -270,11 +273,13 @@ class EventManager {
     }
 
     if (event.pointerType === "touch" && state.touchGestureMode !== "drawing") {
+      state.emit("interactionHint", { message: null });
       return;
     }
 
     if (event.pointerType === "touch") {
       state.touchGestureMode = "idle";
+      state.emit("interactionHint", { message: null });
     }
 
     // Delegate to tool manager
@@ -295,6 +300,7 @@ class EventManager {
       state.touchTapCandidate = null;
       state.touchGestureMode = "idle";
       this.clearPendingSingleTapCommit();
+      state.emit("interactionHint", { message: null });
     }
 
     if (state.dragPanActive) {
@@ -345,6 +351,7 @@ class EventManager {
     state.pinchDistanceStart = getPointDistance(pointers[0], pointers[1]);
     state.pinchZoomStart = state.zoomLevel;
     state.pinchMidpointLast = getPointMidpoint(pointers[0], pointers[1]);
+    state.emit("interactionHint", { message: "Pan + pinch to navigate" });
   }
 
   /**
@@ -420,6 +427,7 @@ class EventManager {
       await this.toolManager.handleToolPointerDown(x, y, downEvent);
       await this.toolManager.handleToolPointerUp(x, y, upEvent);
       this.pendingSingleTapCommit = null;
+      state.emit("interactionHint", { message: "Pixel placed", transient: true });
     }, TOUCH_TAP_MAX_MS);
 
     this.pendingSingleTapCommit = {
@@ -633,6 +641,39 @@ class EventManager {
     const centerX = this.canvasWrap.clientWidth / 2;
     const centerY = this.canvasWrap.clientHeight / 2;
     this.applyZoom(newZoom, centerX, centerY);
+  }
+
+  /**
+   * Center the board within the current viewport.
+   */
+  centerBoard() {
+    requestAnimationFrame(() => {
+      this.canvasWrap.scrollLeft = Math.max(0, (this.canvasWrap.scrollWidth - this.canvasWrap.clientWidth) / 2);
+      this.canvasWrap.scrollTop = Math.max(0, (this.canvasWrap.scrollHeight - this.canvasWrap.clientHeight) / 2);
+      this.clampScrollBounds();
+    });
+  }
+
+  /**
+   * Reset zoom to 100% and re-center the board.
+   */
+  resetView() {
+    state.zoomLevel = 1;
+    this.renderer.applyZoom(1);
+    state.emit("zoomChanged", { zoom: 1 });
+    this.centerBoard();
+    state.emit("interactionHint", { message: "View reset", transient: true });
+  }
+
+  /**
+   * Public zoom helpers for mobile quick actions.
+   */
+  zoomIn() {
+    this.zoomFromCenter(state.zoomLevel * ZOOM_CONFIG.STEP_MULTIPLIER);
+  }
+
+  zoomOut() {
+    this.zoomFromCenter(state.zoomLevel * ZOOM_CONFIG.ZOOM_OUT_MULTIPLIER);
   }
 
   /**

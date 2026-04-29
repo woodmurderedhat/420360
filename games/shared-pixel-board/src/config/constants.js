@@ -59,7 +59,8 @@ export const STORAGE_KEYS = {
   layerVisibility: "sharedPixelLayerVisibility",
   sessionId: "sharedPixelSessionId",
   canvasDraft: "sharedPixelCanvasDraft",
-  paletteColors: "sharedPixelPaletteColors"
+  paletteColors: "sharedPixelPaletteColors",
+  uiLayout: "sharedPixelUILayout"
 };
 
 // Spectator mode flag
@@ -150,5 +151,4 @@ export const TOOL_OPTIONS_DEFAULTS = {
   picker: {},
   transform: {}
 };
-
 

@@ -537,7 +537,7 @@ class EventManager {
 
       if (key === "0") {
         event.preventDefault();
-        this.zoomFromCenter(1);
+        this.resetView();
         return;
       }
 
@@ -655,13 +655,44 @@ class EventManager {
   }
 
   /**
-   * Reset zoom to 100% and re-center the board.
+   * Fit the board to the current workspace without shrinking below native scale.
+   */
+  fitBoardToViewport() {
+    const canvasStyles = window.getComputedStyle(this.canvasWrap);
+    const availableWidth = Math.max(
+      1,
+      this.canvasWrap.clientWidth -
+      parseFloat(canvasStyles.paddingLeft || "0") -
+      parseFloat(canvasStyles.paddingRight || "0")
+    );
+    const availableHeight = Math.max(
+      1,
+      this.canvasWrap.clientHeight -
+      parseFloat(canvasStyles.paddingTop || "0") -
+      parseFloat(canvasStyles.paddingBottom || "0")
+    );
+
+    const rawZoom = Math.min(
+      availableWidth / this.canvas.width,
+      availableHeight / this.canvas.height
+    );
+    const fittedZoom = clamp(
+      Math.max(1, Number.isFinite(rawZoom) ? rawZoom : 1),
+      1,
+      ZOOM_CONFIG.MAX
+    );
+
+    state.zoomLevel = fittedZoom;
+    this.renderer.applyZoom(fittedZoom);
+    state.emit("zoomChanged", { zoom: fittedZoom });
+    this.centerBoard();
+  }
+
+  /**
+   * Reset to the fitted workspace view.
    */
   resetView() {
-    state.zoomLevel = 1;
-    this.renderer.applyZoom(1);
-    state.emit("zoomChanged", { zoom: 1 });
-    this.centerBoard();
+    this.fitBoardToViewport();
     state.emit("interactionHint", { message: "View reset", transient: true });
   }
 

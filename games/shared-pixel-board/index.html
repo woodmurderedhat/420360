@@ -56,7 +56,7 @@
 <body>
   <div class="app-container">
     <!-- Top bar with header -->
-    <header class="topbar">
+    <header class="topbar" id="topbar">
       <div class="topbar-left">
         <h1>Shared Pixel Board</h1>
         <p class="subtitle">Realtime collaborative canvas</p>
@@ -71,7 +71,7 @@
     <!-- Main application layout -->
     <div class="app-layout">
       <!-- Left toolbar (vertical) -->
-      <aside class="toolbar">
+      <aside class="toolbar" id="toolbar">
         <div class="toolbar-title">Tools</div>
         
         <div class="tool-group">
@@ -120,6 +120,16 @@
 
       <!-- Center canvas area -->
       <main class="canvas-container">
+        <div class="workspace-bar" aria-label="Workspace visibility controls">
+          <button id="toggleFocusMode" class="workspace-toggle-btn workspace-focus-btn" type="button" aria-pressed="false">Focus</button>
+          <button class="workspace-toggle-btn" type="button" data-region="topbar">Header</button>
+          <button class="workspace-toggle-btn" type="button" data-region="toolbar">Tools</button>
+          <button class="workspace-toggle-btn" type="button" data-region="panels">Panels</button>
+          <button class="workspace-toggle-btn" type="button" data-region="statusbar">Stats</button>
+          <button class="workspace-toggle-btn mobile-only" type="button" data-region="mobileHud">HUD</button>
+        </div>
+        <button id="focusRestoreFab" class="focus-restore-fab" type="button" hidden aria-label="Restore workspace controls">Restore UI</button>
+
         <!-- Inline text tool input overlay -->
         <div id="textInputOverlay" hidden>
           <input type="text" id="textInputField" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" maxlength="30" placeholder="type here…" />
@@ -133,7 +143,7 @@
           </div>
         </div>
 
-        <div class="mobile-canvas-hud mobile-only" aria-label="Mobile canvas controls">
+        <div class="mobile-canvas-hud mobile-only" id="mobileCanvasHud" aria-label="Mobile canvas controls">
           <div id="mobileCanvasHint" class="mobile-canvas-hint">Pixel · tap to place</div>
           <button id="mobileColorAction" class="mobile-color-chip" type="button" title="Open color picker">
             <span id="mobileColorSwatch" class="mobile-color-swatch" style="background-color:#FF4D4D"></span>
@@ -194,7 +204,7 @@
         <div id="noticeToast" class="notice-toast mobile-only" hidden aria-live="polite"></div>
 
         <!-- Bottom status bar -->
-        <footer class="statusbar">
+        <footer class="statusbar" id="statusbar">
           <span id="connectionStatus" class="status-item offline">offline</span>
           <span id="syncStatus" class="status-item">sync: -</span>
           <span id="hoverStatus" class="status-item">hover: -</span>

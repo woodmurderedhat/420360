@@ -189,7 +189,11 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
   const PALETTE_LONG_PRESS_MS = 450;
   const DRAWER_SWIPE_CLOSE_PX = 72;
   const canvasWrapEl = document.getElementById("canvasWrap");
+  const topbarEl = document.getElementById("topbar");
+  const toolbarEl = document.getElementById("toolbar");
   const panelsEl = document.getElementById("sidePanels");
+  const statusbarEl = document.getElementById("statusbar");
+  const mobileCanvasHudEl = document.getElementById("mobileCanvasHud");
   const togglePanelsBtn = document.getElementById("togglePanels");
   const mobilePanelsBtn = document.getElementById("mobilePanelsAction");
   const closePanelsBtn = document.getElementById("closePanels");
@@ -197,6 +201,10 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
   const mobilePanelNavButtons = document.querySelectorAll(".mobile-panels-nav-btn");
   const mobileCanvasHint = document.getElementById("mobileCanvasHint");
   const noticeToast = document.getElementById("noticeToast");
+  const workspaceBarEl = document.querySelector(".workspace-bar");
+  const workspaceToggleButtons = document.querySelectorAll(".workspace-toggle-btn");
+  const focusModeBtn = document.getElementById("toggleFocusMode");
+  const focusRestoreFab = document.getElementById("focusRestoreFab");
 
   const undoBtn = document.getElementById("undoAction");
   const redoBtn = document.getElementById("redoAction");
@@ -225,9 +233,79 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
   let transientHintTimer = null;
   let suppressPaletteClickUntil = 0;
   let drawerTouchStart = null;
+  let lastViewportWasMobile = isMobileViewport();
+  let layoutSnapshotBeforeFocus = null;
 
   function isMobileViewport() {
     return window.innerWidth <= 768;
+  }
+
+  function getDefaultLayoutVisibility() {
+    return {
+      topbar: true,
+      toolbar: true,
+      panels: false,
+      statusbar: !isMobileViewport(),
+      mobileHud: true
+    };
+  }
+
+  function loadLayoutVisibility() {
+    const defaults = getDefaultLayoutVisibility();
+    const saved = localStorage.getItem(STORAGE_KEYS.uiLayout);
+
+    if (!saved) {
+      return defaults;
+    }
+
+    try {
+      const parsed = JSON.parse(saved);
+      return {
+        topbar: typeof parsed.topbar === "boolean" ? parsed.topbar : defaults.topbar,
+        toolbar: typeof parsed.toolbar === "boolean" ? parsed.toolbar : defaults.toolbar,
+        panels: typeof parsed.panels === "boolean" ? parsed.panels : defaults.panels,
+        statusbar: typeof parsed.statusbar === "boolean" ? parsed.statusbar : defaults.statusbar,
+        mobileHud: typeof parsed.mobileHud === "boolean" ? parsed.mobileHud : defaults.mobileHud
+      };
+    } catch (error) {
+      console.error("Failed to parse saved UI layout:", error);
+      return defaults;
+    }
+  }
+
+  let layoutVisibility = loadLayoutVisibility();
+
+  function persistLayoutVisibility() {
+    localStorage.setItem(STORAGE_KEYS.uiLayout, JSON.stringify(layoutVisibility));
+  }
+
+  function updateWorkspaceToggleButtons() {
+    workspaceToggleButtons.forEach((button) => {
+      if (!button.dataset.region) return;
+      const region = button.dataset.region;
+      const isVisible = Boolean(layoutVisibility[region]);
+      button.classList.toggle("active", isVisible);
+      button.setAttribute("aria-pressed", String(isVisible));
+      button.textContent = `${button.dataset.regionLabel || button.textContent.split(":")[0].replace("Hide ", "").replace("Show ", "")}: ${isVisible ? "On" : "Off"}`;
+    });
+  }
+
+  function isFocusModeActive() {
+    const regions = ["topbar", "toolbar", "panels", "statusbar"];
+    if (isMobileViewport()) {
+      regions.push("mobileHud");
+    }
+
+    return regions.every((region) => !layoutVisibility[region]);
+  }
+
+  function updateFocusModeButton() {
+    if (!focusModeBtn) return;
+
+    const active = isFocusModeActive();
+    focusModeBtn.classList.toggle("active", active);
+    focusModeBtn.setAttribute("aria-pressed", String(active));
+    focusModeBtn.textContent = active ? "Restore" : "Focus";
   }
 
   function getToolHint(toolName = state.activeTool) {
@@ -267,6 +345,12 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
       panelsBackdrop.hidden = !nextOpen;
       panelsBackdrop.classList.toggle("open", nextOpen);
     }
+
+    if (isMobileViewport()) {
+      layoutVisibility.panels = nextOpen;
+      persistLayoutVisibility();
+      updateWorkspaceToggleButtons();
+    }
   }
 
   function setPanelCollapsed(panelEl, collapsed) {
@@ -301,6 +385,86 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
         setPanelCollapsed(panelEl, Boolean(mobileDefaults[key]));
       }
     });
+  }
+
+  function syncCanvasLayout() {
+    const mobileViewport = isMobileViewport();
+    const focusModeActive = isFocusModeActive();
+
+    if (topbarEl) {
+      topbarEl.classList.toggle("collapsed", !layoutVisibility.topbar);
+    }
+    if (toolbarEl) {
+      toolbarEl.classList.toggle("collapsed", !layoutVisibility.toolbar);
+    }
+    if (statusbarEl) {
+      statusbarEl.classList.toggle("collapsed", !layoutVisibility.statusbar);
+    }
+    if (mobileCanvasHudEl) {
+      mobileCanvasHudEl.classList.toggle("collapsed", mobileViewport && !layoutVisibility.mobileHud);
+      mobileCanvasHudEl.hidden = !mobileViewport;
+    }
+    if (panelsEl) {
+      if (mobileViewport) {
+        panelsEl.classList.remove("collapsed-shell");
+        setPanelsOpen(layoutVisibility.panels);
+      } else {
+        panelsEl.classList.toggle("collapsed-shell", !layoutVisibility.panels);
+        panelsEl.classList.remove("open");
+        panelsEl.setAttribute("aria-hidden", "false");
+        if (panelsBackdrop) {
+          panelsBackdrop.hidden = true;
+          panelsBackdrop.classList.remove("open");
+        }
+      }
+    }
+    if (workspaceBarEl) {
+      workspaceBarEl.classList.toggle("focus-hidden", focusModeActive);
+    }
+    if (focusRestoreFab) {
+      focusRestoreFab.hidden = !focusModeActive;
+    }
+
+    updateWorkspaceToggleButtons();
+    updateFocusModeButton();
+    requestAnimationFrame(() => eventManager.centerBoard());
+  }
+
+  function toggleLayoutRegion(region) {
+    if (!Object.prototype.hasOwnProperty.call(layoutVisibility, region)) return;
+
+    layoutVisibility[region] = !layoutVisibility[region];
+    layoutSnapshotBeforeFocus = null;
+    persistLayoutVisibility();
+    syncCanvasLayout();
+  }
+
+  function toggleFocusMode() {
+    if (isFocusModeActive()) {
+      if (layoutSnapshotBeforeFocus) {
+        layoutVisibility = { ...layoutSnapshotBeforeFocus };
+      } else {
+        layoutVisibility = getDefaultLayoutVisibility();
+      }
+      layoutSnapshotBeforeFocus = null;
+      persistLayoutVisibility();
+      syncCanvasLayout();
+      state.emit("notice", { message: "Workspace restored", ok: true });
+      return;
+    }
+
+    layoutSnapshotBeforeFocus = { ...layoutVisibility };
+    layoutVisibility = {
+      ...layoutVisibility,
+      topbar: false,
+      toolbar: false,
+      panels: false,
+      statusbar: false,
+      mobileHud: false
+    };
+    persistLayoutVisibility();
+    syncCanvasLayout();
+    state.emit("notice", { message: "Focus mode on", ok: true });
   }
 
   function scrollToPanel(panelKey) {
@@ -548,7 +712,12 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
 
   if (togglePanelsBtn) {
     togglePanelsBtn.addEventListener("click", () => {
-      setPanelsOpen(!panelsEl?.classList.contains("open"));
+      if (isMobileViewport()) {
+        setPanelsOpen(!panelsEl?.classList.contains("open"));
+        return;
+      }
+
+      toggleLayoutRegion("panels");
     });
   }
 
@@ -612,6 +781,27 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     });
   });
 
+  workspaceToggleButtons.forEach((button) => {
+    if (!button.dataset.region) return;
+    const region = button.dataset.region;
+    button.dataset.regionLabel = button.textContent.trim();
+    button.addEventListener("click", () => {
+      toggleLayoutRegion(region);
+    });
+  });
+
+  if (focusModeBtn) {
+    focusModeBtn.addEventListener("click", () => {
+      toggleFocusMode();
+    });
+  }
+
+  if (focusRestoreFab) {
+    focusRestoreFab.addEventListener("click", () => {
+      toggleFocusMode();
+    });
+  }
+
   if (canvasWrapEl) {
     canvasWrapEl.addEventListener("click", () => {
       if (isMobileViewport()) {
@@ -638,13 +828,24 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
   });
 
   window.addEventListener("resize", () => {
-    if (!isMobileViewport()) {
+    const mobileViewport = isMobileViewport();
+
+    if (!mobileViewport) {
       setPanelsOpen(false);
       applyMobilePanelLayout(false);
     } else if (noticeToast) {
       noticeToast.hidden = true;
       applyMobilePanelLayout(false);
     }
+
+    if (mobileViewport !== lastViewportWasMobile) {
+      lastViewportWasMobile = mobileViewport;
+      if (mobileViewport && !layoutVisibility.panels) {
+        setPanelsOpen(false);
+      }
+    }
+
+    syncCanvasLayout();
   });
 
   // Listen to state events
@@ -799,6 +1000,7 @@ function bindUIEvents(toolManager, eventManager, renderer, toggleHelpBtn, closeH
     button.classList.toggle("active", button.dataset.targetPanel === "colors");
   });
   setMobileCanvasHint(getToolHint(state.activeTool));
+  syncCanvasLayout();
 
   // ── Set initial cursor data attribute ─────────────────────────────────────
   if (canvasWrapEl) canvasWrapEl.dataset.activeTool = state.activeTool;

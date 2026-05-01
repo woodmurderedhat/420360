@@ -1,14 +1,6 @@
-export function createHomepageActions({ overlaySystem }) {
+export function createHomepageActions() {
   function toggleVideoWindow() {
-    const el = document.getElementById('videoThreadWindow');
-    if (!el) {
-      overlaySystem.createFloatingWindow('videoThreadWindow', 'VIDEOS • SCHWEPE', 'https://schwepe.247420.xyz/videos-thread.html', false);
-      overlaySystem.showFloatingWindow('videoThreadWindow');
-    } else if (el.classList.contains('hidden')) {
-      overlaySystem.showFloatingWindow('videoThreadWindow');
-    } else {
-      overlaySystem.closeFloatingWindow('videoThreadWindow');
-    }
+    window.open('https://www.youtube.com/@woodenhat/videos', '_blank', 'noopener');
   }
 
   function openIssues() {

@@ -21,7 +21,7 @@ Live site: https://420360.xyz/
 
 Keyboard shortcuts on the landing page:
 - `A` About • `G` Games index • `B` Shared Pixel Board • `E` Esoteric • `R` Movie Reviews • `O` Oracle • `N` Commune • `Esc` close overlays
-- `V` toggle videos • `C` toggle chill mode • `P` toggle popups
+- `V` open videos • `C` toggle chill mode • `P` toggle popups
 - `M` toggle music • `S` toggle SFX • `I` open Issues link
 
 ## Movie reviews feed

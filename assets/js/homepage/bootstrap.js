@@ -50,8 +50,6 @@ export function startHomepageBootstrap({
     ambientRadioSystem.init();
     sfxSystem.init();
 
-    overlaySystem.createFloatingWindow('videoThreadWindow', 'VIDEOS • SCHWEPE', 'https://schwepe.247420.xyz/videos-thread.html', false);
-
     randomizeColors();
     calendarPopupSystem?.showToday();
     startIntervals();

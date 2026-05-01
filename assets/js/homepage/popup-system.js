@@ -363,9 +363,14 @@ export function createPopupSystem({
     const label = typeof ad.label === 'string' && ad.label.trim()
       ? ad.label.trim()
       : 'POPUP';
-    const href = typeof ad.href === 'string' && ad.href.trim()
+    const rawHref = typeof ad.href === 'string' && ad.href.trim()
       ? ad.href.trim()
       : '#';
+    const href = rawHref === '__INTERNAL_ORACLE__'
+      ? rawHref
+      : rawHref === '#'
+        ? '/'
+        : rawHref;
     const gif = typeof ad.gif === 'string' && ad.gif.trim()
       ? ad.gif.trim()
       : '';

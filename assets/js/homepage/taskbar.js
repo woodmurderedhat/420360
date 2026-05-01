@@ -262,8 +262,9 @@ export function createTaskbar() {
     itemsContainer.appendChild(groupLabel);
 
     groupItems.forEach(item => {
-      if (item.group === 'social') {
-        // Render as anchor
+      if (item.href) {
+        // Render items with a real destination as anchors so mouse clicks
+        // and keyboard navigation both behave like links.
         const link = document.createElement('a');
         link.id = item.id;
         link.className = 'start-menu-item start-menu-link';
@@ -277,6 +278,15 @@ export function createTaskbar() {
           <span class="start-menu-item-icon" aria-hidden="true">${escapeHtml(item.icon)}</span>
           <span class="start-menu-item-label">${escapeHtml(item.label)}</span>
         `;
+
+        if (item.shortcut) {
+          const badge = document.createElement('span');
+          badge.className = 'start-menu-shortcut';
+          badge.setAttribute('aria-label', `keyboard shortcut ${item.shortcut}`);
+          badge.textContent = item.shortcut;
+          link.appendChild(badge);
+        }
+
         link.addEventListener('click', () => closeMenu());
         itemsContainer.appendChild(link);
       } else {

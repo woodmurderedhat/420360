@@ -27,6 +27,7 @@ const MENU_ITEMS = [
   { group: 'nav', id: 'board-control',    label: 'BOARD',    icon: '[#]',   shortcut: 'B' },
   { group: 'nav', id: 'esoteric-control', label: 'ESOTERIC', icon: '*_*',   shortcut: 'E' },
   { group: 'nav', id: 'reviews-control',  label: 'REVIEWS',  icon: '[>]',   shortcut: 'R' },
+  { group: 'nav', id: 'blog-control',     label: 'BLOG',     icon: '[~]',   shortcut: 'L' },
   { group: 'nav', id: 'oracle-control',   label: 'ORACLE',   icon: '(?)',   shortcut: 'O' },
   { group: 'nav', id: 'commune-control',  label: 'COMMUNE',  icon: '@_@',   shortcut: 'N' },
   // --- Meta / Utilities ---
@@ -36,7 +37,6 @@ const MENU_ITEMS = [
   // --- Social Links (rendered as <a> elements) ---
   { group: 'social', id: 'social-yt',    label: 'YOUTUBE',  icon: '(>)',   href: 'https://www.youtube.com/@woodenhat',    external: true },
   { group: 'social', id: 'social-gh',    label: 'GITHUB',   icon: '[#]',   href: 'https://github.com/woodmurderedhat',    external: true },
-  { group: 'social', id: 'social-blog',  label: 'BLOG',     icon: '[~]',   href: 'https://blog.420360.xyz',               external: true },
   { group: 'social', id: 'social-art',   label: 'ART',      icon: '[*]',   href: '/cartoons/' },
 ];
 

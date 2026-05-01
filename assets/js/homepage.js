@@ -180,6 +180,7 @@ const interactionSystem = createInteractionSystem({
   openBoardIndex: overlaySystem.openBoardIndex,
   openEsotericHub: overlaySystem.openEsotericHub,
   openMovieReviews: overlaySystem.openMovieReviews,
+  openBlog: overlaySystem.openBlog,
   openDaughtersIndex: overlaySystem.openDaughtersIndex,
   openOracle: overlaySystem.openOracle,
   openIssues: actions.openIssues,

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog • 420360</title>
+  <meta name="description" content="Short community blog posts from the 420360 homepage." />
+  <link rel="canonical" href="https://420360.xyz/blog/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="420360.xyz" />
+  <meta property="og:title" content="420360.xyz Blog" />
+  <meta property="og:description" content="Short dated posts from the 420360 community." />
+  <meta property="og:url" content="https://420360.xyz/blog/" />
+  <meta property="og:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="420360.xyz Blog" />
+  <meta name="twitter:description" content="Short dated posts from the 420360 community." />
+  <meta name="twitter:image" content="https://420360.xyz/assets/images/420360arcadebanner.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="blog-app">
+    <header class="hero">
+      <p class="kicker">COMMUNITY LOG</p>
+      <h1>BLOG</h1>
+      <p class="subhead">Short posts from the 420360 homepage, newest first.</p>
+      <p id="blog-meta" class="blog-meta">Connecting to realtime archive...</p>
+    </header>
+
+    <section class="composer-card" aria-labelledby="composer-title">
+      <div class="section-heading">
+        <h2 id="composer-title">Write a post</h2>
+        <p>Keep it short. Posts publish immediately and display by date.</p>
+      </div>
+
+      <form id="post-form" class="post-form" autocomplete="off">
+        <label class="field">
+          <span>Title</span>
+          <input id="post-title" name="title" type="text" maxlength="120" required placeholder="Tiny headline" />
+        </label>
+
+        <label class="field">
+          <span>Post</span>
+          <textarea id="post-text" name="text" maxlength="500" required placeholder="Write something short..." rows="6"></textarea>
+        </label>
+
+        <div class="composer-footer">
+          <p id="composer-status" class="composer-status" role="status">Ready to post.</p>
+          <button id="post-submit" type="submit">Publish</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="feed-card" aria-labelledby="feed-title">
+      <div class="section-heading">
+        <h2 id="feed-title">Latest posts</h2>
+        <p id="feed-status">Loading posts...</p>
+      </div>
+      <div id="post-feed" class="post-feed" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <template id="post-card-template">
+    <article class="post-card">
+      <div class="post-card-head">
+        <p class="post-date"></p>
+        <p class="post-author">anonymous transmission</p>
+      </div>
+      <h3 class="post-title"></h3>
+      <p class="post-body"></p>
+    </article>
+  </template>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

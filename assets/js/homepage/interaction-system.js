@@ -6,6 +6,7 @@ export function createInteractionSystem({
   openBoardIndex,
   openEsotericHub,
   openMovieReviews,
+  openBlog,
   openDaughtersIndex,
   openOracle,
   openIssues,
@@ -53,6 +54,7 @@ export function createInteractionSystem({
       { id: 'hero-games-action', label: 'GAMES', shortcut: 'G', emote: '(^_^)' },
       { id: 'hero-board-action', label: 'BOARD', shortcut: 'B', emote: '[#_#]' },
       { id: 'hero-reviews-action', label: 'REVIEWS', shortcut: 'R', emote: '(>_<)' },
+      { id: 'hero-blog-action', label: 'BLOG', shortcut: 'L', emote: '[~_~]' },
       { id: 'hero-oracle-action', label: 'ORACLE', shortcut: 'O', emote: '(?_?)' },
       { id: 'hero-commune-action', label: 'COMMUNE', shortcut: 'N', emote: '(@_@)' }
     ];
@@ -239,6 +241,7 @@ export function createInteractionSystem({
         case 'b': openBoardIndex(); break;
         case 'e': openEsotericHub(); break;
         case 'r': openMovieReviews(); break;
+        case 'l': openBlog(); break;
         case 'd': openDaughtersIndex(); break;
         case 'o': openOracle(); break;
         case 'i': openIssues(); break;
@@ -332,6 +335,8 @@ export function createInteractionSystem({
     bindActivatable('esoteric-control', openEsotericHub);
     bindActivatable('reviews-control', openMovieReviews);
     bindActivatable('hero-reviews-action', openMovieReviews);
+    bindActivatable('blog-control', openBlog);
+    bindActivatable('hero-blog-action', openBlog);
     bindActivatable('oracle-control', openOracle);
     bindActivatable('hero-oracle-action', openOracle);
     bindActivatable('issue-report', openIssues);

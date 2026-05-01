@@ -181,6 +181,11 @@ export function createOverlaySystem({
     showOverlay('movieReviewsOverlay');
   }
 
+  function openBlog() {
+    createOverlay('blogOverlay', 'BLOG • 420360', 'blog/index.html');
+    showOverlay('blogOverlay');
+  }
+
   function openDaughtersIndex() {
     openEsotericHub();
   }
@@ -340,6 +345,7 @@ export function createOverlaySystem({
     openBoardIndex,
     openEsotericHub,
     openMovieReviews,
+    openBlog,
     openDaughtersIndex,
     openGameOverlay,
     openContentOverlay,

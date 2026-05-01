@@ -14,13 +14,14 @@ Live site: https://420360.xyz/
 	- Experimental: Tarot Tetromino (arcana-fused falling blocks), Glitch Maze, Generative Art, TIM • The Dialogue Oracle, Noctis Reverie
 - Integrated overlays from the landing page for a seamless “windowed” feel (About, Games, Oracle)
 - Movie Reviews overlay powered by a daily Letterboxd RSS sync
+- Blog overlay backed by Firebase Realtime Database for short community posts
 - Local scores/progress via `localStorage` surfaced in the Games index
 - Toggleable music and SFX with a tiny glitch animation
 - Region-based age gate for cannabis-themed content access (21+ US/Canada, 18+ selected legal regions)
 - Zero build tooling — vanilla HTML/CSS/JS
 
 Keyboard shortcuts on the landing page:
-- `A` About • `G` Games index • `B` Shared Pixel Board • `E` Esoteric • `R` Movie Reviews • `O` Oracle • `N` Commune • `Esc` close overlays
+- `A` About • `G` Games index • `B` Shared Pixel Board • `E` Esoteric • `R` Movie Reviews • `L` Blog • `O` Oracle • `N` Commune • `Esc` close overlays
 - `V` open videos • `C` toggle chill mode • `P` toggle popups
 - `M` toggle music • `S` toggle SFX • `I` open Issues link
 

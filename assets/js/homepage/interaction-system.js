@@ -11,6 +11,7 @@ export function createInteractionSystem({
   openIssues,
   toggleVideoWindow,
   toggleCommunePanel,
+  isCommuneAvailable,
   toggleChillMode,
   togglePopupPause,
   closeOverlay,
@@ -24,7 +25,111 @@ export function createInteractionSystem({
   stopButtonChaos,
   triggerControlChaosPulse
 }) {
+  function bindActivatable(id, handler) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const activate = event => {
+      if (el.getAttribute('aria-disabled') === 'true' || el.disabled) return;
+      event?.stopPropagation?.();
+      handler();
+    };
+
+    el.addEventListener('click', activate);
+    el.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        activate(event);
+      }
+    });
+  }
+
+  function renderHeroActions() {
+    const container = document.querySelector('.hero-actions');
+    if (!container) return;
+
+    const actions = [
+      { id: 'hero-about-action', label: 'ABOUT', shortcut: 'A' },
+      { id: 'hero-games-action', label: 'GAMES', shortcut: 'G' },
+      { id: 'hero-board-action', label: 'BOARD', shortcut: 'B' },
+      { id: 'hero-reviews-action', label: 'REVIEWS', shortcut: 'R' },
+      { id: 'hero-oracle-action', label: 'ORACLE', shortcut: 'O' },
+      { id: 'hero-commune-action', label: 'COMMUNE', shortcut: 'N' }
+    ];
+
+    container.innerHTML = actions.map(action => `
+      <button id="${action.id}" class="hero-action-link" type="button">
+        <span class="hero-action-copy">${action.label}</span>
+        <span class="hero-action-key" aria-hidden="true">${action.shortcut}</span>
+      </button>
+    `).join('');
+  }
+
+  function setInteractiveDisabledState(id, disabled, title) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    if (title) el.setAttribute('title', title);
+    else el.removeAttribute('title');
+
+    el.classList.toggle('control-disabled', disabled);
+    el.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+
+    if ('disabled' in el) {
+      el.disabled = disabled;
+    }
+
+    if (disabled) {
+      if (el.hasAttribute('tabindex')) {
+        el.dataset.restoreTabindex = el.getAttribute('tabindex');
+        el.setAttribute('tabindex', '-1');
+      }
+    } else if (Object.prototype.hasOwnProperty.call(el.dataset, 'restoreTabindex')) {
+      el.setAttribute('tabindex', el.dataset.restoreTabindex);
+      delete el.dataset.restoreTabindex;
+    }
+  }
+
+  function setInteractiveLabel(id, label) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const controlLabel = el.querySelector('.ctrl-btn-label');
+    if (controlLabel) controlLabel.textContent = label;
+
+    const heroLabel = el.querySelector('.hero-action-copy');
+    if (heroLabel) heroLabel.textContent = label;
+  }
+
+  function syncCommuneAvailability(status = 'loading') {
+    const isReady = status === 'ready';
+    const label = isReady ? 'COMMUNE' : status === 'unavailable' ? 'COMMUNE: OFF' : 'COMMUNE ...';
+    const title = isReady
+      ? 'Open commune panel (N)'
+      : status === 'unavailable'
+        ? 'Commune is unavailable right now'
+        : 'Commune is connecting...';
+
+    ['commune-control', 'hero-commune-action'].forEach(id => {
+      setInteractiveLabel(id, label);
+      setInteractiveDisabledState(id, !isReady, title);
+    });
+  }
+
+  function openCommune() {
+    if (typeof isCommuneAvailable === 'function' && !isCommuneAvailable()) return;
+    toggleCommunePanel?.();
+  }
+
   function setupEventHandlers() {
+    syncCommuneAvailability(
+      typeof isCommuneAvailable === 'function' && isCommuneAvailable() ? 'ready' : 'loading'
+    );
+
+    window.addEventListener('homepage:addons-status', event => {
+      syncCommuneAvailability(event?.detail?.status || 'loading');
+    });
+
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) stopIntervals();
       else if (state.mouseActive) startIntervals();
@@ -116,6 +221,7 @@ export function createInteractionSystem({
 
       if (ev.target.closest('.integrated-overlay')) return;
       if (ev.target.closest('.ctrl-btn')) return;
+      if (ev.target.closest('.hero-action-link')) return;
       if (ev.target.closest('.floating-window')) return;
       if (now - lastClick > 120) {
         spawnPopup();
@@ -136,7 +242,7 @@ export function createInteractionSystem({
         case 'o': openOracle(); break;
         case 'i': openIssues(); break;
         case 'v': toggleVideoWindow(); break;
-        case 'n': toggleCommunePanel?.(); break;
+        case 'n': openCommune(); break;
         case 'c': toggleChillMode(); break;
         case 'p': togglePopupPause(); break;
         case 'x': triggerControlChaosPulse(); break;
@@ -209,53 +315,25 @@ export function createInteractionSystem({
   }
 
   function setupControlButtons() {
-    const aboutBtn = document.getElementById('about-control');
-    if (aboutBtn) {
-      aboutBtn.addEventListener('click', e => { e.stopPropagation(); openAbout(); });
-      aboutBtn.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAbout(); }
-      });
-    }
+    renderHeroActions();
 
-    const applyBtn = document.getElementById('apply-control');
-    if (applyBtn) {
-      const openApplyForm = () => {
-        window.open('https://forms.gle/Tv4JTcSPm2yUBrWv7', '_blank', 'noopener');
-      };
-      applyBtn.addEventListener('click', e => { e.stopPropagation(); openApplyForm(); });
-      applyBtn.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openApplyForm(); }
-      });
-    }
+    const openApplyForm = () => {
+      window.open('https://forms.gle/Tv4JTcSPm2yUBrWv7', '_blank', 'noopener');
+    };
 
-    const gamesBtn = document.getElementById('games-control');
-    if (gamesBtn) {
-      gamesBtn.addEventListener('click', e => { e.stopPropagation(); openGamesIndex(); });
-      gamesBtn.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openGamesIndex(); }
-      });
-    }
-
-    const esotericBtn = document.getElementById('esoteric-control');
-    if (esotericBtn) {
-      esotericBtn.addEventListener('click', e => { e.stopPropagation(); openEsotericHub(); });
-      esotericBtn.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEsotericHub(); }
-      });
-    }
-
-    const reviewsBtn = document.getElementById('reviews-control');
-    if (reviewsBtn) {
-      reviewsBtn.addEventListener('click', e => { e.stopPropagation(); openMovieReviews(); });
-      reviewsBtn.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMovieReviews(); }
-      });
-    }
-
-    const issueBtn = document.getElementById('issue-report');
-    if (issueBtn) {
-      issueBtn.addEventListener('click', e => { e.stopPropagation(); openIssues(); });
-    }
+    bindActivatable('about-control', openAbout);
+    bindActivatable('hero-about-action', openAbout);
+    bindActivatable('apply-control', openApplyForm);
+    bindActivatable('games-control', openGamesIndex);
+    bindActivatable('hero-games-action', openGamesIndex);
+    bindActivatable('board-control', openBoardIndex);
+    bindActivatable('hero-board-action', openBoardIndex);
+    bindActivatable('esoteric-control', openEsotericHub);
+    bindActivatable('reviews-control', openMovieReviews);
+    bindActivatable('hero-reviews-action', openMovieReviews);
+    bindActivatable('oracle-control', openOracle);
+    bindActivatable('hero-oracle-action', openOracle);
+    bindActivatable('issue-report', openIssues);
 
     const legalBtn = document.getElementById('legal-control');
     if (legalBtn) {
@@ -289,20 +367,15 @@ export function createInteractionSystem({
     }
 
     const videoBtn = document.getElementById('video-control');
-    if (videoBtn) {
-      videoBtn.addEventListener('click', e => { e.stopPropagation(); toggleVideoWindow(); });
-      videoBtn.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleVideoWindow(); }
-      });
-    }
+    if (videoBtn) bindActivatable('video-control', toggleVideoWindow);
 
     const communeBtn = document.getElementById('commune-control');
-    if (communeBtn) {
-      communeBtn.addEventListener('click', e => { e.stopPropagation(); toggleCommunePanel?.(); });
-      communeBtn.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCommunePanel?.(); }
-      });
-    }
+    if (communeBtn) bindActivatable('commune-control', openCommune);
+    bindActivatable('hero-commune-action', openCommune);
+
+    syncCommuneAvailability(
+      typeof isCommuneAvailable === 'function' && isCommuneAvailable() ? 'ready' : 'loading'
+    );
   }
 
   return {

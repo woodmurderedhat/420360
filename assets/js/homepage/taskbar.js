@@ -24,10 +24,13 @@ const MENU_ITEMS = [
   { group: 'nav', id: 'about-control',    label: 'ABOUT',    icon: '(i)',   shortcut: 'A' },
   { group: 'nav', id: 'apply-control',    label: 'APPLY',    icon: '[+]',   shortcut: null },
   { group: 'nav', id: 'games-control',    label: 'GAMES',    icon: '>_<',   shortcut: 'G' },
+  { group: 'nav', id: 'board-control',    label: 'BOARD',    icon: '[#]',   shortcut: 'B' },
   { group: 'nav', id: 'esoteric-control', label: 'ESOTERIC', icon: '*_*',   shortcut: 'E' },
   { group: 'nav', id: 'reviews-control',  label: 'REVIEWS',  icon: '[>]',   shortcut: 'R' },
+  { group: 'nav', id: 'oracle-control',   label: 'ORACLE',   icon: '(?)',   shortcut: 'O' },
   { group: 'nav', id: 'commune-control',  label: 'COMMUNE',  icon: '@_@',   shortcut: 'N' },
   // --- Meta / Utilities ---
+  { group: 'meta', id: 'video-control',   label: 'VIDEOS',   icon: '[V]',   shortcut: 'V' },
   { group: 'meta', id: 'issue-report',    label: 'ISSUES',   icon: '[!]',   shortcut: 'I' },
   { group: 'meta', id: 'legal-control',   label: 'LEGAL',    icon: '[=]',   shortcut: null, href: '/legal.html' },
   // --- Social Links (rendered as <a> elements) ---

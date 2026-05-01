@@ -167,7 +167,7 @@ export function createOverlaySystem({
   }
 
   function openBoardIndex() {
-    createOverlay('boardIndexOverlay', 'BOARD • 420360', 'board/index.html');
+    createOverlay('boardIndexOverlay', 'BOARD • 420360', 'games/shared-pixel-board/index.html');
     showOverlay('boardIndexOverlay');
   }
 

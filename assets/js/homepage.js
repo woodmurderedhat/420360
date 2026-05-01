@@ -185,6 +185,7 @@ const interactionSystem = createInteractionSystem({
   openIssues: actions.openIssues,
   toggleVideoWindow: actions.toggleVideoWindow,
   toggleCommunePanel: () => window._toggleCommunePanel?.(),
+  isCommuneAvailable: () => typeof window._toggleCommunePanel === 'function',
   toggleChillMode: modeControls.toggleChillMode,
   togglePopupPause: modeControls.togglePopupPause,
   closeOverlay: overlaySystem.closeOverlay,

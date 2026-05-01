@@ -6,7 +6,7 @@
 import { getDb } from './rtdb.js';
 import { initShoutbox } from './shoutbox.js';
 import { initDecisions } from './collective-decisions.js';
-import { createAddonPanel } from './panel.js';
+import { createAddonPanel, togglePanel } from './panel.js';
 import { initNewsTicker } from './news-ticker.js';
 
 const FB_VERSION = "12.11.0";
@@ -14,6 +14,12 @@ const FB_BASE = `https://www.gstatic.com/firebasejs/${FB_VERSION}`;
 
 export async function initAddons({ blurb }) {
   let panel;
+
+  window._toggleCommunePanel = null;
+  window.dispatchEvent(new CustomEvent('homepage:addons-status', {
+    detail: { status: 'loading' }
+  }));
+
   try {
     const [db, rtdbModule] = await Promise.all([
       getDb(),
@@ -32,12 +38,16 @@ export async function initAddons({ blurb }) {
       panel.setDecision(decision);
     });
 
+    window._toggleCommunePanel = togglePanel;
+    window.dispatchEvent(new CustomEvent('homepage:addons-status', {
+      detail: { status: 'ready' }
+    }));
+
   } catch (err) {
     console.warn('[addons] Failed to initialise:', err);
+    window._toggleCommunePanel = null;
+    window.dispatchEvent(new CustomEvent('homepage:addons-status', {
+      detail: { status: 'unavailable' }
+    }));
   }
-
-  // Expose togglePanel globally so the COMMUNE button can reach it
-  // without a circular import chain through interaction-system
-  const { togglePanel } = await import('./panel.js');
-  window._toggleCommunePanel = togglePanel;
 }

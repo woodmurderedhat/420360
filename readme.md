@@ -20,8 +20,8 @@ Live site: https://420360.xyz/
 - Zero build tooling — vanilla HTML/CSS/JS
 
 Keyboard shortcuts on the landing page:
-- `A` About • `G` Games index • `O` Oracle • `B` Board (if present) • `Esc` close overlays
-- `R` Movie Reviews
+- `A` About • `G` Games index • `B` Shared Pixel Board • `E` Esoteric • `R` Movie Reviews • `O` Oracle • `N` Commune • `Esc` close overlays
+- `V` toggle videos • `C` toggle chill mode • `P` toggle popups
 - `M` toggle music • `S` toggle SFX • `I` open Issues link
 
 ## Movie reviews feed
@@ -97,4 +97,3 @@ Issues and small PRs are welcome. Keep additions self‑contained and light on d
 ## License / assets
 
 This repository includes both code and creative assets. Unless a file or folder explicitly states otherwise, all rights are reserved by the project owner. Do not redistribute third‑party assets without permission.
-

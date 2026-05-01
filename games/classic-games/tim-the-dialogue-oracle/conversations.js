@@ -228,5 +228,64 @@ window.PACKS = {
     s_end1:{ speaker:'Tim', end:true, text:'Amplified landscape: saturated, flattened nuance.' },
     s_end2:{ speaker:'Tim', end:true, text:'Silence embraced; perception re-sensitized.' },
     s_end3:{ speaker:'Tim', end:true, text:'Balanced contrast: discernment sharpened.' }
+  } },
+  // Story Pack 8: Smoke Signals
+  smoke_signals: { meta:{ title:'Smoke Signals', author:'oracle', version:1, description: 'Haze, ritual, and the difference between drifting away and tuning in.' }, startsWith:'ss_intro', nodes:{
+    ss_intro:{ speaker:'Tim', text:'The room clouds slightly. Smoke can blur edges or reveal beam paths in the dark. Which reading do you trust?', choices:[ { text:'Trust the blur', to:'ss_blur' }, { text:'Follow the beam', to:'ss_beam' }, { text:'Open a window', to:'ss_window' } ] },
+    ss_blur:{ speaker:'Tim', text:'Blur softens hard categories. Some truths only speak when resolution drops.', choices:[ { text:'Stay diffused', to:'ss_end1' }, { text:'Seek shape inside fog', to:'ss_shape' }, { text:'Vent the room', to:'ss_window' } ] },
+    ss_beam:{ speaker:'Tim', text:'You watch a thin light cut the haze. Attention becomes visible when the air is crowded enough.', choices:[ { text:'Trace the source', to:'ss_source' }, { text:'Stand in the beam', to:'ss_end2' }, { text:'Let it pass through', to:'ss_shape' } ] },
+    ss_window:{ speaker:'Tim', text:'Fresh air arrives. The haze thins, but so does the spell. Clarity always evicts a few ghosts.', choices:[ { text:'Keep the window open', to:'ss_end3' }, { text:'Close it halfway', to:'ss_balance' }, { text:'Invite the fog back', to:'ss_blur' } ] },
+    ss_shape:{ speaker:'Tim', text:'Inside the fog you find outlines, not answers. Outlines are kinder; they leave room for becoming.', choices:[ { text:'Accept outlines', to:'ss_end4' }, { text:'Demand certainty', to:'ss_source' }, { text:'Balance haze and air', to:'ss_balance' } ] },
+    ss_source:{ speaker:'Tim', text:'At the source is only a small ember, dutiful and patient. Big atmospheres often come from tiny burns.', choices:[ { text:'Tend the ember', to:'ss_end5' }, { text:'Extinguish it', to:'ss_end6' }, { text:'Return to the room', to:'ss_balance' } ] },
+    ss_balance:{ speaker:'Tim', text:'A cracked window, a low ember, a visible beam: enough atmosphere to dream, enough air to stay awake.', choices:[ { text:'Hold the balance', to:'ss_end7' }, { text:'Lean deeper into haze', to:'ss_blur' }, { text:'Clear everything', to:'ss_window' } ] },
+    ss_end1:{ speaker:'Tim', end:true, text:'You drift pleasantly; meaning arrives in softened silhouettes.' },
+    ss_end2:{ speaker:'Tim', end:true, text:'You stand in the signal and let the haze make it visible.' },
+    ss_end3:{ speaker:'Tim', end:true, text:'The room clears. What remains is honest, if less enchanted.' },
+    ss_end4:{ speaker:'Tim', end:true, text:'You keep the outline and refuse the prison of over-definition.' },
+    ss_end5:{ speaker:'Tim', end:true, text:'You protect the ember; atmosphere becomes an intentional craft.' },
+    ss_end6:{ speaker:'Tim', end:true, text:'You choose clean air over ritual smoke and accept the sharper edges.' },
+    ss_end7:{ speaker:'Tim', end:true, text:'Balanced haze: lucid drift, breathable wonder.' }
+  } },
+  // Story Pack 9: Window Ghosts
+  window_ghosts: { meta:{ title:'Window Ghosts', author:'oracle', version:1, description: 'Desktop hauntings, nested windows, and the selves you leave open in the background.' }, startsWith:'wg_intro', nodes:{
+    wg_intro:{ speaker:'Tim', text:'A desktop is a graveyard of still-open windows. Which ghost keeps calling from the taskbar?', choices:[ { text:'An unfinished project', to:'wg_project' }, { text:'An old version of me', to:'wg_self' }, { text:'A message never sent', to:'wg_message' } ] },
+    wg_project:{ speaker:'Tim', text:'The unfinished project glows faintly. It does not want completion as much as renewed attention.', choices:[ { text:'Reopen it gently', to:'wg_end1' }, { text:'Archive it with respect', to:'wg_end2' }, { text:'Ask what stalled it', to:'wg_stall' } ] },
+    wg_self:{ speaker:'Tim', text:'An older self is still running in the background, using memory you forgot to reclaim.', choices:[ { text:'Force quit', to:'wg_end3' }, { text:'Merge carefully', to:'wg_merge' }, { text:'Let it idle', to:'wg_end4' } ] },
+    wg_message:{ speaker:'Tim', text:'The unsent message still edits you because it was never allowed to leave your system.', choices:[ { text:'Send a quieter version', to:'wg_end5' }, { text:'Delete it and learn', to:'wg_end6' }, { text:'Read it back to myself', to:'wg_reflect' } ] },
+    wg_stall:{ speaker:'Tim', text:'It stalled because you wanted the future version finished, not the present version moving.', choices:[ { text:'Make an ugly first step', to:'wg_end7' }, { text:'Wait for ideal energy', to:'wg_end8' }, { text:'Return to the desktop', to:'wg_intro' } ] },
+    wg_merge:{ speaker:'Tim', text:'Merging with an old self creates interface conflicts. Some defaults must be retired for the update to hold.', choices:[ { text:'Retire old defaults', to:'wg_end9' }, { text:'Keep both profiles active', to:'wg_end10' }, { text:'Back away', to:'wg_intro' } ] },
+    wg_reflect:{ speaker:'Tim', text:'Reading it back, you realize the message was mostly an attempt to hear yourself clearly.', choices:[ { text:'Keep it as a private record', to:'wg_end11' }, { text:'Rewrite and send', to:'wg_end5' }, { text:'Close the draft forever', to:'wg_end6' } ] },
+    wg_end1:{ speaker:'Tim', end:true, text:'You reopen the window and discover momentum hides in gentle resumes.' },
+    wg_end2:{ speaker:'Tim', end:true, text:'You archive the project with ceremony; unfinished does not mean unloved.' },
+    wg_end3:{ speaker:'Tim', end:true, text:'Old processes close. The system grows quieter and strangely lighter.' },
+    wg_end4:{ speaker:'Tim', end:true, text:'The ghost remains open in the background, costing memory but offering company.' },
+    wg_end5:{ speaker:'Tim', end:true, text:'A smaller truer message leaves the draft folder and enters the world.' },
+    wg_end6:{ speaker:'Tim', end:true, text:'You delete the draft and keep only the lesson that wrote it.' },
+    wg_end7:{ speaker:'Tim', end:true, text:'The ugly first step opens a path the polished fantasy never could.' },
+    wg_end8:{ speaker:'Tim', end:true, text:'You wait for ideal conditions and the cursor keeps blinking in the dark.' },
+    wg_end9:{ speaker:'Tim', end:true, text:'A cleaner merge succeeds. You remain yourself, only less haunted by defaults.' },
+    wg_end10:{ speaker:'Tim', end:true, text:'Two profiles persist: one for memory, one for motion.' },
+    wg_end11:{ speaker:'Tim', end:true, text:'The unsent note becomes a mirror instead of a burden.' }
+  } },
+  // Story Pack 10: Soft Machine
+  soft_machine: { meta:{ title:'Soft Machine', author:'oracle', version:1, description: 'Tenderness inside systems: maintenance, burnout, and the body as a living interface.' }, startsWith:'sm_intro', nodes:{
+    sm_intro:{ speaker:'Tim', text:'You are not a broken machine, but you are a soft one. What kind of maintenance have you been postponing?', choices:[ { text:'Rest', to:'sm_rest' }, { text:'Boundaries', to:'sm_boundaries' }, { text:'Repair through expression', to:'sm_expression' } ] },
+    sm_rest:{ speaker:'Tim', text:'Rest is not a shutdown error. It is scheduled recovery for an organism mistaken as infrastructure.', choices:[ { text:'Take full rest', to:'sm_end1' }, { text:'Micro-rest only', to:'sm_end2' }, { text:'Ask why rest feels guilty', to:'sm_guilt' } ] },
+    sm_boundaries:{ speaker:'Tim', text:'Every interface needs edges. Without them, every request arrives looking urgent.', choices:[ { text:'Harden the border', to:'sm_end3' }, { text:'Make the border permeable', to:'sm_permeable' }, { text:'Let everything through', to:'sm_end4' } ] },
+    sm_expression:{ speaker:'Tim', text:'Expression vents pressure before it becomes structural damage. What form does it take?', choices:[ { text:'Make something ugly but alive', to:'sm_end5' }, { text:'Translate feeling into words', to:'sm_words' }, { text:'Stay quiet a little longer', to:'sm_end6' } ] },
+    sm_guilt:{ speaker:'Tim', text:'Because some system taught you output was proof of worth. Systems love harvestable myths.', choices:[ { text:'Reject the myth', to:'sm_end7' }, { text:'Negotiate with it', to:'sm_end8' }, { text:'Return to rest', to:'sm_rest' } ] },
+    sm_permeable:{ speaker:'Tim', text:'A permeable boundary lets warmth in without giving every demand root access.', choices:[ { text:'Practice selective openness', to:'sm_end9' }, { text:'Seal completely', to:'sm_end3' }, { text:'Drop the filter', to:'sm_end4' } ] },
+    sm_words:{ speaker:'Tim', text:'Naming the feeling does not solve it, but it keeps it from masquerading as fate.', choices:[ { text:'Name it plainly', to:'sm_end10' }, { text:'Turn it into poetry', to:'sm_end11' }, { text:'Return to silence', to:'sm_end6' } ] },
+    sm_end1:{ speaker:'Tim', end:true, text:'Full rest restores hidden systems you forgot were failing.' },
+    sm_end2:{ speaker:'Tim', end:true, text:'Micro-rest keeps the lights on, but the deeper repairs remain pending.' },
+    sm_end3:{ speaker:'Tim', end:true, text:'Your edges hold. Not everyone receives admin access to your spirit.' },
+    sm_end4:{ speaker:'Tim', end:true, text:'Everything gets through. The machine stays soft, but the overload grows loud.' },
+    sm_end5:{ speaker:'Tim', end:true, text:'You make something imperfect and living, and the pressure leaves through color.' },
+    sm_end6:{ speaker:'Tim', end:true, text:'Silence buys time, but it also stores unspoken voltage.' },
+    sm_end7:{ speaker:'Tim', end:true, text:'You reject the output myth and recover the right to exist off-cycle.' },
+    sm_end8:{ speaker:'Tim', end:true, text:'You bargain with the old system and carve out a survivable rhythm.' },
+    sm_end9:{ speaker:'Tim', end:true, text:'Selective openness becomes a humane interface: guarded, but not numb.' },
+    sm_end10:{ speaker:'Tim', end:true, text:'Plain naming turns dread into something you can actually carry.' },
+    sm_end11:{ speaker:'Tim', end:true, text:'Poetry converts strain into signal and lets the body unclench.' }
   } }
 };

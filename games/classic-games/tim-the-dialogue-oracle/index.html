@@ -12,14 +12,21 @@
   <header class="arcade-header">
     <a class="back-link" href="../../../index.html">⬅ HOME</a>
     <h1 class="title pixel-font">TIM • THE DIALOGUE ORACLE</h1>
-    <p class="subtitle">Branching pixel prophecy</p>
+    <p class="subtitle">Phosphor prophecy for the 420360 desktop</p>
   </header>
 
   <main id="app" class="app-shell">
     <section class="oracle-panel metal-frame" aria-live="polite">
+      <div class="oracle-status pixel-font">
+        <span class="status-led" aria-hidden="true"></span>
+        <span id="oracleStatusLabel">ARCHIVE ONLINE</span>
+      </div>
       <div class="npc-wrap">
         <canvas id="npcCanvas" width="64" height="64" aria-hidden="true"></canvas>
-        <div class="npc-name pixel-font" id="npcName">Oracle</div>
+        <div class="npc-meta">
+          <div class="npc-name pixel-font" id="npcName">Oracle</div>
+          <div class="npc-tagline pixel-font tiny" id="npcTagline">Choose a thread and let the static answer back.</div>
+        </div>
       </div>
       <div class="dialogue-box metal-panel" id="dialogueBox">
         <div id="text" class="dialogue-text" role="text"></div>
@@ -30,7 +37,14 @@
 
     <aside class="side-panel metal-panel" id="metaPanel">
       <h2 class="pixel-font small">Oracle Archives</h2>
-      <p class="pixel-font tiny" style="line-height:1.4; opacity:.8;">Select a philosophical thread. Each archive fractures into branching mirrors of thought.</p>
+      <p class="pixel-font tiny archive-copy">Select a philosophical thread. Each archive fractures into branching mirrors of thought, smoke, memory, and machine feeling.</p>
+      <section class="archive-card" aria-label="Current archive">
+        <div class="archive-card-label pixel-font tiny">CURRENT THREAD</div>
+        <h3 class="pixel-font small archive-title" id="packTitle">Intro Prophecy</h3>
+        <p class="pixel-font tiny archive-description" id="packDescription">Foundational branching seed introducing core philosophical axes.</p>
+        <div class="archive-progress pixel-font tiny" id="packProgress">ENDINGS DISCOVERED 0/0</div>
+      </section>
+      <div class="archive-stats pixel-font tiny" id="archiveStats">0 archives • 0 endings total</div>
       <div id="packsList" class="packs"></div>
       <div class="pack-actions">
         <button class="neon-btn small" id="randomPackBtn" title="Load a random archive">Random Pack</button>

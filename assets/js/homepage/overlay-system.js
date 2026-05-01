@@ -157,7 +157,7 @@ export function createOverlaySystem({
   }
 
   function openOracle() {
-    createOverlay('oracleOverlay', 'TIM • DIALOGUE ORACLE', 'games/tim-the-dialogue-oracle/index.html');
+    createOverlay('oracleOverlay', 'TIM • DIALOGUE ORACLE', 'games/classic-games/tim-the-dialogue-oracle/index.html');
     showOverlay('oracleOverlay');
   }
 

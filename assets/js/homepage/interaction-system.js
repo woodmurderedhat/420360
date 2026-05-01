@@ -49,16 +49,17 @@ export function createInteractionSystem({
     if (!container) return;
 
     const actions = [
-      { id: 'hero-about-action', label: 'ABOUT', shortcut: 'A' },
-      { id: 'hero-games-action', label: 'GAMES', shortcut: 'G' },
-      { id: 'hero-board-action', label: 'BOARD', shortcut: 'B' },
-      { id: 'hero-reviews-action', label: 'REVIEWS', shortcut: 'R' },
-      { id: 'hero-oracle-action', label: 'ORACLE', shortcut: 'O' },
-      { id: 'hero-commune-action', label: 'COMMUNE', shortcut: 'N' }
+      { id: 'hero-about-action', label: 'ABOUT', shortcut: 'A', emote: '(i_i)' },
+      { id: 'hero-games-action', label: 'GAMES', shortcut: 'G', emote: '(^_^)' },
+      { id: 'hero-board-action', label: 'BOARD', shortcut: 'B', emote: '[#_#]' },
+      { id: 'hero-reviews-action', label: 'REVIEWS', shortcut: 'R', emote: '(>_<)' },
+      { id: 'hero-oracle-action', label: 'ORACLE', shortcut: 'O', emote: '(?_?)' },
+      { id: 'hero-commune-action', label: 'COMMUNE', shortcut: 'N', emote: '(@_@)' }
     ];
 
     container.innerHTML = actions.map(action => `
-      <button id="${action.id}" class="hero-action-link" type="button">
+      <button id="${action.id}" class="hero-action-link" type="button" aria-label="${action.label} shortcut ${action.shortcut}">
+        <span class="hero-action-icon" aria-hidden="true">${action.emote}</span>
         <span class="hero-action-copy">${action.label}</span>
         <span class="hero-action-key" aria-hidden="true">${action.shortcut}</span>
       </button>

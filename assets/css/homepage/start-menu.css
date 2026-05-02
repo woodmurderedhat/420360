@@ -4,7 +4,7 @@
 
 #start-menu {
   position: fixed;
-  top: 38px;
+  top: var(--taskbar-height);
   left: 0;
   z-index: 6400;
   display: flex;
@@ -53,7 +53,7 @@
   flex-direction: column;
   overflow-y: auto;
   padding: 6px 0;
-  max-height: calc(100vh - 38px);
+  max-height: calc(var(--viewport-height) - var(--taskbar-height));
 }
 
 .start-menu-group-label {

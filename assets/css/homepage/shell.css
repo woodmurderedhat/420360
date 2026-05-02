@@ -4,8 +4,12 @@
 
 * { box-sizing: border-box; }
 
+html {
+  min-height: 100%;
+}
+
 html, body {
-  height: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
   background: radial-gradient(circle at 12% 8%, #214936 0%, transparent 42%),
@@ -14,11 +18,15 @@ html, body {
   color: var(--text);
   font-family: 'Space Grotesk', sans-serif;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
   transition: background 1s ease, color 1s ease;
+}
+
+body {
+  min-height: var(--viewport-height);
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-direction: column;
   position: relative;
 }
 
@@ -64,8 +72,33 @@ body::after {
 
 main {
   width: min(1000px, 94vw);
+  max-width: 100%;
+  min-height: calc(var(--viewport-height) - var(--shell-top-clearance) - var(--shell-bottom-clearance));
   z-index: 2;
-  padding: 58px 12px 60px;
+  margin: 0 auto;
+  padding: var(--shell-top-clearance) 12px var(--shell-bottom-clearance);
+  display: flex;
+  align-items: stretch;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body:not(.homepage-ready) main {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+body.homepage-ready main {
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  main,
+  body:not(.homepage-ready) main,
+  body.homepage-ready main {
+    transition: none;
+  }
 }
 
 @keyframes driftA {

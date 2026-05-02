@@ -19,8 +19,15 @@ export function startHomepageBootstrap({
   startIntervals,
   onStarted
 }) {
+  function setHomepageReadyState(ready) {
+    if (!document.body) return;
+    document.body.classList.toggle('homepage-ready', !!ready);
+  }
+
   function init() {
     if (state.initialized) return;
+
+    setHomepageReadyState(false);
 
     const gateResult = ensureAgeGateAccess({
       storageKey: config.STORAGE_KEYS.AGE_GATE_PROFILE,
@@ -40,6 +47,7 @@ export function startHomepageBootstrap({
 
     if (!blurb || typeof blurb.start !== 'function') {
       console.warn('[blurb] Missing start() implementation on injected blurb API.');
+      setHomepageReadyState(true);
       return;
     }
     blurb.start();
@@ -59,6 +67,12 @@ export function startHomepageBootstrap({
     }, 4500 + Math.random() * 6000);
 
     if (typeof onStarted === 'function') onStarted();
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setHomepageReadyState(true);
+      });
+    });
   }
 
   if (document.readyState === 'loading') {

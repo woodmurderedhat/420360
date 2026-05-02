@@ -18,7 +18,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 30px;
+  height: var(--news-ticker-height);
   z-index: 8500;
   align-items: stretch;
   background: var(--bg);
@@ -101,7 +101,7 @@
   white-space: nowrap;
   padding-left: 40px;
   color: var(--primary);
-  line-height: 30px;
+  line-height: var(--news-ticker-height);
   will-change: transform;
   animation: ticker-scroll linear infinite;
 }

@@ -9,7 +9,7 @@
 
 :is(#oracle-widget, #ambient-radio-widget) {
   position: fixed;
-  top: 38px;
+  top: var(--taskbar-height);
   right: 0;
   left: auto;
   width: 290px;
@@ -26,7 +26,7 @@
   color: var(--highlight);
   padding: 0;
   animation: cw-drop-in 0.12s steps(2) both;
-  max-height: calc(100vh - 42px);
+  max-height: calc(var(--viewport-height) - var(--taskbar-height) - 4px);
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;

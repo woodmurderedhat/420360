@@ -13,10 +13,22 @@
   --muted: #9bcab1;
   --popup-w: 250px;
   --popup-h: 150px;
+  --viewport-height: 100vh;
+  --taskbar-height: 38px;
+  --news-ticker-height: 30px;
+  --shell-gutter: clamp(14px, 2.4vw, 24px);
+  --shell-top-clearance: calc(var(--taskbar-height) + var(--shell-gutter));
+  --shell-bottom-clearance: calc(var(--news-ticker-height) + var(--shell-gutter));
 
   /* Timing constants (matching JS CONFIG) */
   --popup-anim-duration: 0.25s;
   --popup-glitch-speed: 1;
   --glitch-duration: 0.12s;
   --overlay-fade-duration: 0.18s;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --viewport-height: 100dvh;
+  }
 }

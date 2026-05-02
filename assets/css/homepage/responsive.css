@@ -34,15 +34,25 @@
   }
 
   main {
-    padding: 52px 8px 40px;
+    width: min(100%, 100vw);
+    padding: calc(var(--taskbar-height) + 14px) 8px calc(var(--news-ticker-height) + 16px);
   }
 
   .hero-shell {
     border-radius: 20px;
   }
+
+  .blurb-stage {
+    align-items: flex-start;
+    padding: clamp(8px, 3vh, 18px) 0 0;
+  }
 }
 
 @media (max-width: 600px) {
+  main {
+    padding: calc(var(--taskbar-height) + 10px) 8px calc(var(--news-ticker-height) + 14px);
+  }
+
   .ctrl-btn {
     font-size: 9px;
     padding: 6px 8px;

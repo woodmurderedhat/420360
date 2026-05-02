@@ -48,65 +48,199 @@
 }
 </script>
 
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/content-page.css" />
 <style>
-	:root{
-		--bg:#0b110c;--primary:#3f8a44;--secondary:#e4a432;--highlight:#b9f2a5;--text:#f3ffe9;--dim:#7ab87e;
+	:root {
+		--page-content-width: min(900px, calc(100% - 2rem));
 	}
-	html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Press Start 2P','Courier New',monospace;image-rendering:pixelated;}
-	body{padding:20px 10px 60px 10px;display:flex;flex-direction:column;align-items:center;}
 
-	.breadcrumb{width:100%;max-width:900px;font-size:8px;color:var(--dim);display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:24px;}
-	.breadcrumb a{color:var(--secondary);text-decoration:none;}
-	.breadcrumb a:hover{color:var(--highlight);}
+	body.games-page {
+		display: grid;
+		gap: 1rem;
+	}
 
-	/* ── Hero ── */
-	.hero{text-align:center;max-width:700px;margin:0 0 48px 0;}
-	.hero h1{font-size:20px;letter-spacing:3px;margin:0 0 14px 0;color:var(--highlight);text-shadow:3px 3px 0 var(--primary),5px 5px 0 #000;}
-	.hero p{font-size:9px;color:var(--secondary);line-height:1.9;margin:0 0 24px 0;}
+	.breadcrumb,
+	.hero,
+	main,
+	footer {
+		width: var(--page-content-width);
+		margin: 0 auto;
+	}
 
-	/* ── Featured card ── */
-	.featured{width:100%;max-width:640px;background:var(--bg);border:4px solid var(--secondary);box-shadow:0 0 0 4px var(--primary),8px 8px 0 0 var(--highlight),0 0 0 10px #000;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer;transition:transform .18s,filter .18s;}
-	.featured:hover{transform:translate(-4px,-4px);filter:brightness(1.15);}
-	.featured:active{transform:translate(1px,1px);}
-	.featured .live-dot{width:10px;height:10px;background:#4dff6e;border-radius:0;box-shadow:0 0 8px #4dff6e;animation:blink .9s step-start infinite;flex-shrink:0;}
-	@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-	.featured .live-label{display:flex;align-items:center;gap:8px;font-size:8px;color:#4dff6e;letter-spacing:2px;}
-	.featured h2{font-size:14px;letter-spacing:2px;margin:0;color:var(--highlight);text-shadow:2px 2px 0 var(--primary),4px 4px 0 #000;text-align:center;}
-	.featured .desc{font-size:9px;color:var(--secondary);line-height:1.8;text-align:center;max-width:480px;}
-	.featured .play-btn{font-family:'Press Start 2P',monospace;font-size:10px;padding:12px 24px;background:var(--secondary);color:#000;border:none;box-shadow:0 0 0 4px var(--primary),5px 5px 0 0 var(--highlight),0 0 0 8px #000;cursor:pointer;letter-spacing:1px;transition:transform .1s,filter .1s;margin-top:6px;}
-	.featured .play-btn:hover{filter:brightness(1.2);}
-	.featured .play-btn:active{transform:translate(2px,2px);box-shadow:0 0 0 4px var(--primary),3px 3px 0 0 var(--highlight),0 0 0 8px #000;}
-	.featured .tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
-	.featured .tag{font-size:7px;padding:3px 6px;background:var(--primary);color:#000;letter-spacing:1px;}
+	.breadcrumb {
+		display: flex;
+		gap: 0.55rem;
+		align-items: center;
+		flex-wrap: wrap;
+		color: var(--page-muted);
+		font-size: 0.82rem;
+	}
 
-	/* ── Archive link ── */
-	.archive-section{margin-top:52px;text-align:center;max-width:640px;width:100%;}
-	.archive-section h3{font-size:11px;color:var(--dim);letter-spacing:2px;margin:0 0 14px 0;text-shadow:1px 1px 0 #000;}
-	.archive-link{display:inline-block;font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 18px;background:var(--bg);color:var(--dim);border:3px solid var(--dim);box-shadow:0 0 0 3px #1a2e1a,4px 4px 0 0 var(--dim),0 0 0 6px #000;text-decoration:none;letter-spacing:1px;transition:color .15s,border-color .15s,filter .15s;}
-	.archive-link:hover{color:var(--highlight);border-color:var(--secondary);filter:brightness(1.2);}
-	.archive-sub{font-size:8px;color:#555;margin-top:10px;line-height:1.6;}
+	.breadcrumb a {
+		text-decoration: none;
+	}
 
-	footer{margin-top:60px;text-align:center;font-size:8px;letter-spacing:1px;color:var(--highlight);opacity:.6;}
-	footer a{color:var(--secondary);text-decoration:none;}
-	footer a:hover{color:var(--highlight);}
-	@media (max-width:600px){.hero h1{font-size:14px;} .featured h2{font-size:11px;} .featured{padding:14px;}}
+	.hero {
+		text-align: center;
+	}
+
+	.hero h1 {
+		margin: 0;
+		font-size: clamp(2.2rem, 7vw, 3.4rem);
+		line-height: 0.98;
+	}
+
+	.hero p {
+		margin: 0.85rem auto 0;
+		max-width: 38rem;
+		color: var(--page-muted);
+	}
+
+	main {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.featured,
+	.archive-section {
+		text-align: center;
+	}
+
+	.featured {
+		display: grid;
+		justify-items: center;
+		gap: 1rem;
+		cursor: pointer;
+		transition: transform 180ms ease, border-color 180ms ease;
+	}
+
+	.featured:hover {
+		transform: translateY(-2px);
+		border-color: rgba(154, 249, 199, 0.35);
+	}
+
+	.featured:active {
+		transform: translateY(0);
+	}
+
+	.featured .live-dot {
+		width: 0.62rem;
+		height: 0.62rem;
+		background: var(--page-accent);
+		border-radius: 999px;
+		box-shadow: 0 0 10px rgba(47, 217, 130, 0.6);
+		animation: blink 0.9s step-start infinite;
+		flex-shrink: 0;
+	}
+
+	@keyframes blink {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0; }
+	}
+
+	.featured .live-label,
+	.archive-section h3,
+	.featured .tag {
+		font-family: 'Press Start 2P', monospace;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	.featured .live-label {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		font-size: 0.64rem;
+		color: var(--page-accent);
+	}
+
+	.featured h2 {
+		margin: 0;
+		font-size: clamp(1.35rem, 4vw, 2rem);
+		line-height: 1.05;
+	}
+
+	.featured .desc,
+	.archive-sub {
+		margin: 0;
+		max-width: 34rem;
+		color: var(--page-muted);
+	}
+
+	.featured .play-btn,
+	.archive-link {
+		min-height: 2.9rem;
+	}
+
+	.featured .tags {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.featured .tag {
+		padding: 0.4rem 0.7rem;
+		border: 1px solid var(--page-line);
+		border-radius: 999px;
+		background: rgba(47, 217, 130, 0.08);
+		color: var(--page-accent-soft);
+		font-size: 0.6rem;
+	}
+
+	.archive-section {
+		display: grid;
+		justify-items: center;
+		gap: 0.85rem;
+	}
+
+	.archive-section h3 {
+		margin: 0;
+		font-size: 0.72rem;
+		color: var(--page-accent-soft);
+	}
+
+	.archive-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	footer {
+		text-align: center;
+		font-size: 0.82rem;
+		color: var(--page-muted);
+	}
+
+	footer a {
+		text-decoration: none;
+	}
+
+	@media (max-width: 600px) {
+		.featured .play-btn,
+		.archive-link {
+			width: 100%;
+		}
+	}
 </style>
 </head>
-<body>
+<body class="content-page games-page">
 	<nav class="breadcrumb" aria-label="Breadcrumb">
 		<a href="../index.html">HOME</a>
 		<span>›</span>
 		<span>GAMES</span>
 	</nav>
 
-	<header class="hero">
+	<header class="hero content-hero">
 		<h1>GAMES</h1>
 		<p>One canvas. Everyone painting. Nobody agrees on anything.</p>
 	</header>
 
 	<main>
-		<section class="featured" id="pixelBoardCard" aria-label="Shared Pixel Board — featured game" tabindex="0">
+		<section class="featured content-section" id="pixelBoardCard" aria-label="Shared Pixel Board — featured game" tabindex="0">
 			<div class="live-label"><div class="live-dot"></div> LIVE NOW</div>
 			<h2>SHARED PIXEL BOARD</h2>
 			<p class="desc">A realtime collaborative canvas. Place a pixel, watch someone overwrite it, paint it back. Every pixel is contested. Built on Firebase — changes propagate to every visitor instantly.</p>
@@ -115,11 +249,11 @@
 				<span class="tag">COLLABORATIVE</span>
 				<span class="tag">EXPERIMENTAL</span>
 			</div>
-			<button class="play-btn" id="playBtn">► OPEN BOARD</button>
+			<button class="play-btn" id="playBtn">Open Board</button>
 		</section>
 
-		<section class="archive-section" aria-label="Classic Games Archive">
-			<h3>◆ CLASSIC GAMES ARCHIVE ◆</h3>
+		<section class="archive-section content-section" aria-label="Classic Games Archive">
+			<h3>Classic Games Archive</h3>
 			<a class="archive-link" href="classic-games/" id="archiveLink">BROWSE THE VAULT</a>
 			<p class="archive-sub">17 archived titles — arcade, puzzle, memory & experimental</p>
 		</section>

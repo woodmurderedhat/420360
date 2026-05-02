@@ -25,23 +25,23 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <main class="reviews-app" aria-live="polite">
-    <header class="hero">
-      <p class="kicker">LETTERBOXD LOG</p>
-      <h1>MOVIE REVIEWS</h1>
-      <p class="subhead">Latest entries from woodmurderedhat</p>
+<body class="content-page reviews-page">
+  <main class="reviews-app content-shell" aria-live="polite">
+    <header class="hero content-hero">
+      <p class="kicker eyebrow">LETTERBOXD LOG</p>
+      <h1 class="page-title">MOVIE REVIEWS</h1>
+      <p class="subhead page-lead">Latest entries from woodmurderedhat</p>
       <div class="hero-actions">
-        <a class="btn" href="https://letterboxd.com/woodmurderedhat/" target="_blank" rel="noopener noreferrer">Open Profile</a>
-        <a class="btn btn-alt" href="https://letterboxd.com/woodmurderedhat/rss/" target="_blank" rel="noopener noreferrer">View RSS</a>
+        <a class="btn button-link" href="https://letterboxd.com/woodmurderedhat/" target="_blank" rel="noopener noreferrer">Open Profile</a>
+        <a class="btn btn-alt button-link" href="https://letterboxd.com/woodmurderedhat/rss/" target="_blank" rel="noopener noreferrer">View RSS</a>
       </div>
-      <p id="sync-meta" class="sync-meta">Sync status: loading</p>
+      <p id="sync-meta" class="sync-meta meta-text">Sync status: loading</p>
     </header>
 
-    <section id="status" class="status" role="status">Loading reviews...</section>
+    <section id="status" class="status content-panel status-text" role="status">Loading reviews...</section>
     <section id="reviews-grid" class="reviews-grid" aria-label="Movie reviews"></section>
   </main>
 

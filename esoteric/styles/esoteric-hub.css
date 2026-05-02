@@ -1,41 +1,39 @@
-/* Esoteric Hub Styles */
-/* Mystical gateway for all esoteric content on 420360 */
+@import url("../../assets/css/content-page.css");
 
-/* Import pixel font */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-/* Color Variables */
 :root {
-    --bg: #1a1f1a;
-    --primary: #4a8c3a;
-    --secondary: #7b5e8b;
-    --highlight: #d4af37;
-    --text: #e8f5e8;
-    --mystical-dark: #2d1b4e;
-    --mystical-purple: #6b4c9a;
-    --mystical-gold: #c9a961;
-    --mystical-green: #5a8c6f;
+    --page-content-width: min(1160px, calc(100% - 2rem));
+    --bg: #0f1714;
+    --primary: #2fd982;
+    --secondary: #5f6fd6;
+    --highlight: #f7a63f;
+    --text: #ecfff4;
+    --mystical-dark: #16211d;
+    --mystical-purple: #24364b;
+    --mystical-gold: #d4ba7b;
+    --mystical-green: #6ab089;
 }
 
 * {
-    image-rendering: pixelated;
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
-    background: var(--bg);
+}
+
+body.esoteric-page {
     color: var(--text);
-    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-family: "Space Grotesk", system-ui, sans-serif;
     line-height: 1.6;
-    font-size: 10px;
+    font-size: 16px;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1160px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 1rem;
 }
 
 /* Skip to main content link */
@@ -44,7 +42,7 @@ html, body {
     top: -40px;
     left: 0;
     background: var(--primary);
-    color: var(--text);
+    color: #04100b;
     padding: 8px;
     text-decoration: none;
     z-index: 100;
@@ -56,20 +54,19 @@ html, body {
 
 /* Navigation */
 .nav-hub {
-    background: var(--bg);
-    border-bottom: 4px solid var(--secondary);
-    box-shadow: 
-        0 0 0 4px var(--primary),
-        0 4px 0 0 var(--highlight);
+    background: rgba(8, 20, 17, 0.86);
+    border-bottom: 1px solid rgba(154, 249, 199, 0.14);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
     position: sticky;
     top: 0;
     z-index: 50;
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: 1160px;
     margin: 0 auto;
-    padding: 12px 20px;
+    padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -78,19 +75,17 @@ html, body {
 }
 
 .logo {
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--highlight);
-    text-shadow: 
-        2px 2px 0 var(--primary),
-        0 0 10px var(--secondary);
+    font-family: "Syne", "Press Start 2P", system-ui, sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--page-text);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .logo .symbol {
-    color: var(--secondary);
+    color: var(--highlight);
     animation: pulse 2s ease-in-out infinite;
 }
 
@@ -104,13 +99,14 @@ html, body {
 }
 
 .nav-links a {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
-    color: var(--text);
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    font-size: 0.9rem;
+    color: var(--page-text);
     text-decoration: none;
-    padding: 6px 12px;
-    border: 2px solid var(--primary);
-    background: var(--bg);
+    padding: 0.7rem 1rem;
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 999px;
+    background: rgba(12, 31, 25, 0.78);
     transition: all 0.2s;
     display: inline-block;
     user-select: none;
@@ -118,11 +114,10 @@ html, body {
 
 .nav-links a:hover,
 .nav-links a.active {
-    color: var(--bg);
-    background: var(--highlight);
-    border-color: var(--secondary);
-    box-shadow: 2px 2px 0 0 var(--primary);
-    text-shadow: none;
+    color: var(--page-accent-soft);
+    background: rgba(12, 31, 25, 0.96);
+    border-color: rgba(154, 249, 199, 0.34);
+    box-shadow: none;
 }
 
 .nav-home {
@@ -147,56 +142,54 @@ html, body {
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Press Start 2P', monospace;
-    color: var(--highlight);
-    text-shadow: 
-        2px 2px 0 var(--primary),
-        0 0 10px var(--secondary);
-    letter-spacing: 2px;
+    font-family: "Syne", "Press Start 2P", system-ui, sans-serif;
+    color: var(--page-text);
+    text-shadow: none;
+    letter-spacing: -0.02em;
     margin-top: 1.5rem;
     margin-bottom: 1rem;
-    line-height: 1.4;
+    line-height: 1.1;
 }
 
-h1 { font-size: 28px; }
-h2 { font-size: 18px; }
-h3 { font-size: 14px; }
-h4 { font-size: 12px; }
+h1 { font-size: clamp(2.25rem, 6vw, 4rem); }
+h2 { font-size: clamp(1.5rem, 3vw, 2.3rem); }
+h3 { font-size: clamp(1.15rem, 2vw, 1.55rem); }
+h4 { font-size: 1rem; }
 
 p {
-    font-size: 10px;
-    line-height: 1.8;
+    font-size: 1rem;
+    line-height: 1.7;
     margin-bottom: 1rem;
 }
 
 .lead {
-    font-size: 12px;
-    color: var(--highlight);
-    font-weight: bold;
+    font-size: 1.05rem;
+    color: var(--page-text);
+    font-weight: 500;
 }
 
 .section-intro {
-    font-size: 11px;
+    font-size: 1rem;
     color: var(--mystical-gold);
     margin-bottom: 2rem;
-    font-style: italic;
 }
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, var(--mystical-dark) 0%, var(--mystical-purple) 50%, var(--bg) 100%);
-    border: 4px solid var(--secondary);
-    box-shadow: 
-        0 0 0 4px var(--primary),
-        8px 8px 0 0 var(--highlight),
-        0 0 0 8px #000;
+    background:
+        radial-gradient(circle at top, rgba(247, 166, 63, 0.12), transparent 28%),
+        linear-gradient(135deg, rgba(12, 31, 25, 0.92) 0%, rgba(36, 54, 75, 0.88) 55%, rgba(15, 23, 20, 0.94) 100%);
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 32px;
+    box-shadow: var(--page-shadow);
     position: relative;
-    min-height: 500px;
+    max-width: 1160px;
+    min-height: 460px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    margin: 20px;
+    margin: 1rem auto 0;
 }
 
 .hero-overlay {
@@ -219,7 +212,7 @@ p {
     text-align: center;
     z-index: 10;
     position: relative;
-    padding: 40px 20px;
+    padding: 2.5rem 1.5rem;
 }
 
 .hero-symbols-top,
@@ -233,7 +226,7 @@ p {
 .mystical-symbol {
     font-size: 32px;
     color: var(--highlight);
-    filter: drop-shadow(0 0 8px var(--secondary));
+    filter: drop-shadow(0 0 8px rgba(95, 111, 214, 0.35));
 }
 
 @keyframes animate-float {
@@ -261,39 +254,40 @@ p {
 }
 
 .hero-title {
-    font-size: 36px;
-    color: var(--highlight);
-    text-shadow: 
-        3px 3px 0 var(--primary),
-        0 0 20px var(--secondary);
+    font-size: clamp(2.5rem, 7vw, 4.6rem);
+    color: var(--page-text);
+    text-shadow: none;
     margin: 0;
-    letter-spacing: 3px;
+    letter-spacing: -0.03em;
 }
 
 .hero-subtitle {
-    font-size: 14px;
+    font-size: 1.15rem;
     color: var(--mystical-gold);
     margin: 12px 0 8px;
-    font-style: italic;
 }
 
 .hero-description {
-    font-size: 12px;
-    color: var(--text);
+    font-size: 1rem;
+    color: var(--page-muted);
     margin: 0;
 }
 
 /* Main Content */
 main {
-    padding: 40px 0;
+    padding: 1rem 0 4rem;
 }
 
 section {
-    margin: 40px 0;
-    padding: 40px 20px;
-    background: var(--bg);
-    border: 3px solid var(--primary);
-    box-shadow: 4px 4px 0 0 var(--secondary);
+    margin: 1rem auto 0;
+    max-width: 1160px;
+    padding: 2rem 1.25rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+        rgba(12, 31, 25, 0.72);
+    border: 1px solid rgba(154, 249, 199, 0.14);
+    border-radius: 26px;
+    box-shadow: var(--page-shadow);
 }
 
 /* Stats Section */
@@ -314,11 +308,10 @@ section {
 }
 
 .stat-card {
-    background: var(--bg);
-    border: 2px solid var(--primary);
-    box-shadow: 
-        0 0 0 2px var(--secondary),
-        4px 4px 0 0 var(--highlight);
+    background: rgba(8, 20, 17, 0.66);
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 20px;
+    box-shadow: none;
     padding: 20px;
     display: flex;
     gap: 15px;
@@ -335,23 +328,24 @@ section {
 }
 
 .stat-label {
-    font-size: 9px;
+    font-size: 0.82rem;
     color: var(--mystical-gold);
     text-transform: uppercase;
     margin-bottom: 4px;
 }
 
 .stat-value {
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--highlight);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--page-text);
     margin-bottom: 8px;
 }
 
 .stat-progress {
     height: 12px;
-    background: var(--bg);
-    border: 2px solid var(--primary);
+    background: rgba(5, 14, 12, 0.84);
+    border: 1px solid rgba(154, 249, 199, 0.14);
+    border-radius: 999px;
     overflow: hidden;
 }
 
@@ -370,11 +364,7 @@ section {
 
 /* Featured Project Section */
 .featured-project {
-    background: linear-gradient(135deg, rgba(107, 76, 154, 0.15) 0%, rgba(201, 169, 97, 0.05) 100%);
-    border: 4px solid var(--secondary);
-    box-shadow: 
-        0 0 0 4px var(--primary),
-        8px 8px 0 0 var(--highlight);
+    background: linear-gradient(135deg, rgba(95, 111, 214, 0.12) 0%, rgba(247, 166, 63, 0.05) 100%);
 }
 
 .featured-project h2 {
@@ -395,11 +385,10 @@ section {
 }
 
 .project-subtitle {
-    font-size: 12px;
+    font-size: 1rem;
     color: var(--mystical-gold);
     text-align: center;
     margin-bottom: 2rem;
-    font-style: italic;
 }
 
 .project-grid {
@@ -410,9 +399,10 @@ section {
 }
 
 .project-card {
-    background: var(--bg);
-    border: 3px solid var(--primary);
-    box-shadow: 4px 4px 0 0 var(--secondary);
+    background: rgba(8, 20, 17, 0.66);
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 22px;
+    box-shadow: none;
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -421,9 +411,8 @@ section {
 }
 
 .project-card:hover {
-    box-shadow: 
-        4px 4px 0 0 var(--secondary),
-        0 0 16px rgba(212, 175, 55, 0.5);
+    border-color: rgba(154, 249, 199, 0.3);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 }
 
 .card-icon {
@@ -435,15 +424,15 @@ section {
 
 .project-card h3 {
     margin: 0;
-    font-size: 14px;
-    color: var(--highlight);
+    font-size: 1.22rem;
+    color: var(--page-text);
 }
 
 .project-card p {
     margin: 0;
-    font-size: 10px;
+    font-size: 1rem;
     flex-grow: 1;
-    color: var(--text);
+    color: var(--page-muted);
 }
 
 .card-stats {
@@ -454,13 +443,14 @@ section {
 }
 
 .stat-badge {
-    font-size: 8px;
-    background: var(--primary);
-    color: var(--bg);
-    padding: 4px 8px;
-    border: 1px solid var(--secondary);
+    font-size: 0.72rem;
+    background: rgba(47, 217, 130, 0.08);
+    color: var(--page-accent-soft);
+    padding: 0.35rem 0.55rem;
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 999px;
     display: inline-block;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .card-status {
@@ -470,11 +460,12 @@ section {
 }
 
 .status-badge {
-    font-size: 8px;
-    padding: 4px 8px;
-    border: 2px solid;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.55rem;
+    border: 1px solid;
+    border-radius: 999px;
     display: inline-block;
-    font-weight: bold;
+    font-weight: 600;
     text-transform: uppercase;
 }
 
@@ -485,11 +476,12 @@ section {
 
 /* Buttons */
 .btn {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
-    padding: 8px 16px;
-    border: 2px solid var(--primary);
-    background: var(--bg);
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    font-size: 0.95rem;
+    padding: 0.8rem 1.15rem;
+    border: 1px solid rgba(154, 249, 199, 0.26);
+    border-radius: 999px;
+    background: rgba(8, 20, 17, 0.84);
     color: var(--text);
     cursor: pointer;
     text-decoration: none;
@@ -501,9 +493,9 @@ section {
 
 .btn:hover,
 .btn:focus {
-    background: var(--primary);
-    color: var(--bg);
-    box-shadow: 2px 2px 0 0 var(--highlight);
+    background: rgba(12, 31, 25, 0.96);
+    color: var(--page-accent-soft);
+    box-shadow: none;
 }
 
 .btn-primary {
@@ -516,25 +508,23 @@ section {
 }
 
 .btn-large {
-    font-size: 14px;
-    padding: 12px 24px;
-    border: 3px solid var(--secondary);
-    background: var(--mystical-dark);
-    color: var(--highlight);
-    box-shadow: 
-        0 0 0 3px var(--primary),
-        4px 4px 0 0 var(--highlight);
+    font-size: 1rem;
+    padding: 0.95rem 1.4rem;
+    border: 1px solid rgba(154, 249, 199, 0.26);
+    background: rgba(8, 20, 17, 0.84);
+    color: var(--page-text);
+    box-shadow: none;
 }
 
 .btn-large:hover {
-    background: var(--secondary);
-    color: var(--bg);
+    background: rgba(12, 31, 25, 0.96);
+    color: var(--page-accent-soft);
 }
 
 .project-cta {
     text-align: center;
     padding: 40px 0;
-    border-top: 3px dashed var(--secondary);
+    border-top: 1px solid rgba(154, 249, 199, 0.14);
     margin-top: 2rem;
 }
 
@@ -545,7 +535,6 @@ section {
 /* Future Projects Section */
 .future-projects {
     background: linear-gradient(135deg, rgba(45, 27, 78, 0.15) 0%, rgba(90, 140, 111, 0.1) 100%);
-    border: 3px dashed var(--secondary);
 }
 
 .future-grid {
@@ -555,8 +544,9 @@ section {
 }
 
 .future-card {
-    background: var(--bg);
-    border: 3px solid var(--primary);
+    background: rgba(8, 20, 17, 0.66);
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 22px;
     padding: 24px;
     text-align: center;
     position: relative;
@@ -597,8 +587,9 @@ section {
 }
 
 .achievement-card {
-    background: var(--bg);
-    border: 2px solid var(--primary);
+    background: rgba(8, 20, 17, 0.66);
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 20px;
     padding: 16px;
     text-align: center;
     transition: all 0.3s;
@@ -611,10 +602,8 @@ section {
 }
 
 .achievement-card.unlocked {
-    border-color: var(--highlight);
-    box-shadow: 
-        0 0 0 2px var(--secondary),
-        0 0 16px rgba(212, 175, 55, 0.4);
+    border-color: rgba(247, 166, 63, 0.44);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 }
 
 .achievement-card.locked {
@@ -629,15 +618,15 @@ section {
 }
 
 .achievement-name {
-    font-size: 9px;
-    font-weight: bold;
+    font-size: 0.8rem;
+    font-weight: 600;
     color: var(--highlight);
     margin-bottom: 4px;
 }
 
 .achievement-desc {
-    font-size: 8px;
-    color: var(--text);
+    font-size: 0.74rem;
+    color: var(--page-muted);
     line-height: 1.4;
 }
 
@@ -661,8 +650,9 @@ section {
 }
 
 .info-card {
-    background: var(--mystical-dark);
-    border: 2px solid var(--secondary);
+    background: rgba(8, 20, 17, 0.66);
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 22px;
     padding: 20px;
     text-align: center;
 }
@@ -675,31 +665,30 @@ section {
 
 .info-card h3 {
     margin-top: 0;
-    color: var(--highlight);
-    font-size: 12px;
+    color: var(--page-text);
+    font-size: 1.1rem;
 }
 
 .info-card p {
     margin-bottom: 0;
-    font-size: 9px;
+    font-size: 0.95rem;
+    color: var(--page-muted);
 }
 
 /* Quote Section */
 .quote-section {
     text-align: center;
-    background: var(--mystical-dark);
-    border: 4px double var(--secondary);
 }
 
 .featured-quote {
-    font-size: 14px;
+    font-size: 1.2rem;
     font-style: italic;
     color: var(--mystical-gold);
     margin: 2rem 0;
     padding: 2rem;
-    border-left: 4px solid var(--highlight);
-    border-right: 4px solid var(--highlight);
-    text-shadow: 2px 2px 0 var(--primary);
+    border-left: 1px solid rgba(247, 166, 63, 0.35);
+    border-right: 1px solid rgba(247, 166, 63, 0.35);
+    text-shadow: none;
 }
 
 .featured-quote p {
@@ -709,16 +698,16 @@ section {
 .featured-quote cite {
     display: block;
     margin-top: 1rem;
-    font-size: 10px;
+    font-size: 0.88rem;
     color: var(--highlight);
     font-style: normal;
 }
 
 /* Footer */
 .footer-hub {
-    background: var(--mystical-dark);
-    border-top: 4px solid var(--secondary);
-    box-shadow: 0 -4px 0 0 var(--primary);
+    background: rgba(8, 20, 17, 0.72);
+    border-top: 1px solid rgba(154, 249, 199, 0.14);
+    box-shadow: none;
     padding: 40px 20px;
     text-align: center;
     margin-top: 60px;
@@ -726,7 +715,7 @@ section {
 
 .footer-hub p {
     margin: 8px 0;
-    font-size: 9px;
+    font-size: 0.9rem;
 }
 
 .footer-link {
@@ -756,15 +745,14 @@ section {
 }
 
 .toast {
-    background: var(--mystical-dark);
-    border: 3px solid var(--secondary);
-    box-shadow: 
-        0 0 0 3px var(--primary),
-        4px 4px 0 0 var(--highlight);
+    background: rgba(8, 20, 17, 0.92);
+    border: 1px solid rgba(154, 249, 199, 0.2);
+    border-radius: 18px;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.22);
     padding: 16px 20px;
     margin-bottom: 12px;
     color: var(--text);
-    font-size: 10px;
+    font-size: 0.95rem;
     display: flex;
     gap: 12px;
     align-items: center;
@@ -789,7 +777,7 @@ section {
 }
 
 .toast-desc {
-    font-size: 9px;
+    font-size: 0.85rem;
     color: var(--mystical-gold);
 }
 
@@ -805,14 +793,14 @@ section {
 }
 
 .section-header h2 {
-    font-size: 20px;
-    color: var(--highlight);
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    color: var(--page-text);
     margin-bottom: 12px;
-    text-shadow: 2px 2px 0 var(--primary);
+    text-shadow: none;
 }
 
 .section-intro {
-    font-size: 11px;
+    font-size: 1rem;
     color: var(--mystical-gold);
     max-width: 600px;
     margin: 0 auto;
@@ -821,20 +809,17 @@ section {
 
 /* Tradition Showcase Cards */
 .tradition-showcase {
-    background: var(--bg);
-    border: 3px solid var(--secondary);
+    background: rgba(8, 20, 17, 0.66);
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 24px;
     margin-bottom: 40px;
-    box-shadow: 
-        0 0 0 3px var(--primary),
-        0 6px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--page-shadow);
     overflow: hidden;
     transition: all 0.4s ease;
 }
 
 .tradition-showcase:hover {
-    box-shadow: 
-        0 0 0 3px var(--highlight),
-        0 6px 16px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
     transform: translateY(-2px);
 }
 
@@ -862,7 +847,7 @@ section {
 
 .showcase-content {
     padding: 32px;
-    border-right: 3px solid var(--secondary);
+    border-right: 1px solid rgba(154, 249, 199, 0.14);
 }
 
 .showcase-preview {
@@ -907,34 +892,34 @@ section {
 
 .project-header h3 {
     margin: 0;
-    font-size: 18px;
-    color: var(--highlight);
+    font-size: 1.45rem;
+    color: var(--page-text);
 }
 
 .tradition-subtitle {
-    font-size: 11px;
+    font-size: 0.98rem;
     color: var(--mystical-gold);
     margin: 8px 0 16px 0;
-    font-style: italic;
 }
 
 .tradition-description {
-    font-size: 10px;
+    font-size: 1rem;
     line-height: 1.6;
-    color: var(--text);
+    color: var(--page-muted);
     margin-bottom: 20px;
 }
 
 .tradition-features {
     background: rgba(45, 27, 78, 0.3);
-    border: 2px solid var(--secondary);
+    border: 1px solid rgba(154, 249, 199, 0.14);
+    border-radius: 18px;
     padding: 16px;
     margin: 20px 0;
 }
 
 .tradition-features h4 {
-    font-size: 12px;
-    color: var(--highlight);
+    font-size: 1rem;
+    color: var(--page-text);
     margin: 0 0 12px 0;
 }
 
@@ -945,7 +930,7 @@ section {
 }
 
 .feature-list li {
-    font-size: 9px;
+    font-size: 0.95rem;
     line-height: 1.6;
     margin-bottom: 8px;
     padding-left: 16px;
@@ -970,7 +955,8 @@ section {
     margin: 24px 0;
     padding: 16px;
     background: rgba(212, 175, 55, 0.05);
-    border: 2px solid var(--primary);
+    border: 1px solid rgba(154, 249, 199, 0.14);
+    border-radius: 18px;
 }
 
 .progress-item {
@@ -980,15 +966,15 @@ section {
 
 .progress-label {
     display: block;
-    font-size: 9px;
-    color: var(--text);
+    font-size: 0.82rem;
+    color: var(--page-muted);
     margin-bottom: 6px;
 }
 
 .progress-value {
     display: block;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 1.1rem;
+    font-weight: 700;
     color: var(--highlight);
 }
 
@@ -1023,8 +1009,9 @@ section {
 }
 
 .cross-achievement-card {
-    background: var(--bg);
-    border: 3px solid var(--secondary);
+    background: rgba(8, 20, 17, 0.66);
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 24px;
     padding: 24px;
     display: flex;
     gap: 16px;
@@ -1052,10 +1039,8 @@ section {
 }
 
 .cross-achievement-card.unlocked {
-    border-color: var(--highlight);
-    box-shadow: 
-        0 0 0 3px var(--primary),
-        0 0 20px rgba(212, 175, 55, 0.4);
+    border-color: rgba(247, 166, 63, 0.42);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
 }
 
 .cross-achievement-card.locked {
@@ -1065,9 +1050,7 @@ section {
 
 .cross-achievement-card:hover {
     transform: translateY(-4px);
-    box-shadow: 
-        0 0 0 3px var(--highlight),
-        0 8px 20px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
 }
 
 .cross-ach-icon {
@@ -1083,47 +1066,49 @@ section {
 }
 
 .cross-ach-name {
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 1rem;
+    font-weight: 700;
     color: var(--highlight);
     margin-bottom: 6px;
 }
 
 .cross-ach-desc {
-    font-size: 9px;
-    color: var(--text);
+    font-size: 0.9rem;
+    color: var(--page-muted);
     line-height: 1.4;
 }
 
 .cross-ach-status {
-    font-size: 8px;
-    font-weight: bold;
+    font-size: 0.72rem;
+    font-weight: 600;
     color: var(--mystical-gold);
     text-transform: uppercase;
-    padding: 6px 12px;
+    padding: 0.45rem 0.75rem;
     background: rgba(212, 175, 55, 0.1);
-    border: 1px solid var(--primary);
+    border: 1px solid rgba(154, 249, 199, 0.14);
+    border-radius: 999px;
     flex-shrink: 0;
     text-align: center;
     min-width: 60px;
 }
 
 .trinity-insight {
-    background: var(--mystical-dark);
-    border: 3px double var(--secondary);
+    background: rgba(8, 20, 17, 0.66);
+    border: 1px solid rgba(154, 249, 199, 0.16);
+    border-radius: 24px;
     padding: 24px;
     text-align: center;
 }
 
 .trinity-insight h3 {
-    font-size: 14px;
-    color: var(--highlight);
+    font-size: 1.3rem;
+    color: var(--page-text);
     margin-top: 0;
 }
 
 .trinity-insight p {
-    font-size: 10px;
-    color: var(--text);
+    font-size: 1rem;
+    color: var(--page-muted);
     line-height: 1.6;
     max-width: 800px;
     margin: 0 auto;
@@ -1169,7 +1154,7 @@ section {
 
     .showcase-content {
         border-right: none;
-        border-bottom: 3px solid var(--secondary);
+        border-bottom: 1px solid rgba(154, 249, 199, 0.14);
     }
 
     .showcase-preview {
@@ -1178,21 +1163,9 @@ section {
 }
 
 @media (max-width: 768px) {
-    h1 { font-size: 20px; }
-    h2 { font-size: 14px; }
-    h3 { font-size: 12px; }
-    
     .hero {
         min-height: 350px;
-        margin: 10px;
-    }
-    
-    .hero-title {
-        font-size: 24px;
-    }
-    
-    .hero-subtitle {
-        font-size: 12px;
+        margin: 0.5rem auto 0;
     }
     
     .hero-symbols-top,
@@ -1209,8 +1182,8 @@ section {
     }
     
     .nav-links a {
-        font-size: 8px;
-        padding: 4px 8px;
+        font-size: 0.82rem;
+        padding: 0.55rem 0.8rem;
     }
     
     .stats-grid {
@@ -1227,7 +1200,7 @@ section {
 
     .showcase-content {
         border-right: none;
-        border-bottom: 3px solid var(--secondary);
+        border-bottom: 1px solid rgba(154, 249, 199, 0.14);
     }
 
     .showcase-preview {
@@ -1241,7 +1214,7 @@ section {
     }
 
     .project-header h3 {
-        font-size: 14px;
+        font-size: 1.2rem;
     }
 
     .progress-showcase {

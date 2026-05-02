@@ -87,28 +87,31 @@
 	</script>
 
 	<link rel="icon" type="image/png" href="../assets/images/favicon.ico" />
-	<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-	<header class="arcade-header">
-		<a class="back-link" href="../index.html">⬅ HOME</a>
-		<h1 class="title pixel-font">ABOUT 420360</h1>
-		<p class="subtitle">Cannabis arcade lore archive</p>
+<body class="content-page about-page">
+	<header class="arcade-header content-hero content-shell">
+		<a class="back-link button-link" href="../index.html">Home</a>
+		<p class="eyebrow">Lore archive</p>
+		<h1 class="title page-title">ABOUT 420360</h1>
+		<p class="subtitle page-lead">Cannabis arcade lore archive</p>
 	</header>
-	<main class="app-shell">
-		<section class="oracle-panel metal-frame" aria-live="polite">
+	<main class="app-shell content-shell">
+		<section class="oracle-panel content-panel" aria-live="polite">
 			<div class="npc-wrap">
 				<canvas id="npcCanvas" width="64" height="64" aria-hidden="true"></canvas>
 				<div class="npc-name pixel-font" id="npcName">Archivist</div>
 			</div>
-			<div class="dialogue-box metal-panel" id="dialogueBox">
+			<div class="dialogue-box" id="dialogueBox">
 				<div id="text" class="dialogue-text" role="text"></div>
 				<ul id="choices" class="choices" aria-label="Responses"></ul>
 			</div>
 			<div class="footer-hint pixel-font" id="hint">Press 1 • 2 • 3 (4) or click. [R] restart current pack.</div>
 		</section>
-		<aside class="side-panel metal-panel">
+		<aside class="side-panel content-panel">
 			<h2 class="pixel-font small">About Packs</h2>
 			<p class="pixel-font tiny" style="line-height:1.4; opacity:.75;">Explore the project mission, cannabis-first vibe, tech stack, and scene credits.</p>
 			<div id="packsList" class="packs"></div>

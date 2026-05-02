@@ -1,0 +1,222 @@
+:root {
+  color-scheme: dark;
+  --page-bg: #07120f;
+  --page-bg-soft: #0e1f1a;
+  --page-surface: rgba(12, 31, 25, 0.72);
+  --page-surface-strong: rgba(8, 20, 17, 0.84);
+  --page-line: rgba(155, 202, 177, 0.18);
+  --page-line-strong: rgba(47, 217, 130, 0.38);
+  --page-accent: #2fd982;
+  --page-accent-soft: #9af9c7;
+  --page-secondary: #f7a63f;
+  --page-text: #ecfff4;
+  --page-muted: #9bcab1;
+  --page-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+  --page-radius: 24px;
+  --page-content-width: min(1040px, calc(100% - 2rem));
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(47, 217, 130, 0.16), transparent 32%),
+    radial-gradient(circle at 82% 14%, rgba(247, 166, 63, 0.12), transparent 28%),
+    linear-gradient(180deg, var(--page-bg-soft) 0%, var(--page-bg) 100%);
+  color: var(--page-text);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  line-height: 1.6;
+  padding: clamp(18px, 3vw, 32px) 0 clamp(40px, 6vw, 72px);
+}
+
+body.content-page {
+  letter-spacing: 0.01em;
+}
+
+main,
+.content-shell {
+  width: var(--page-content-width);
+  margin: 0 auto;
+}
+
+a {
+  color: var(--page-accent-soft);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--page-secondary);
+}
+
+h1,
+h2,
+h3,
+.display-font {
+  font-family: "Syne", "Press Start 2P", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.pixel-font {
+  font-family: "Press Start 2P", monospace;
+}
+
+.content-hero,
+.content-section,
+.content-panel {
+  border: 1px solid var(--page-line);
+  border-radius: var(--page-radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+    var(--page-surface);
+  box-shadow: var(--page-shadow);
+  backdrop-filter: blur(12px);
+}
+
+.content-hero {
+  padding: clamp(1.35rem, 3vw, 2.25rem);
+}
+
+.content-section,
+.content-panel {
+  padding: clamp(1.15rem, 2.4vw, 1.75rem);
+}
+
+.eyebrow {
+  margin: 0 0 0.65rem;
+  color: var(--page-accent);
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(0.56rem, 1.25vw, 0.7rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.page-title {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 0.98;
+}
+
+.page-lead {
+  margin: 0.85rem 0 0;
+  max-width: 44rem;
+  color: var(--page-muted);
+  font-size: clamp(1rem, 1.8vw, 1.12rem);
+}
+
+.meta-text,
+.section-copy,
+.status-text {
+  color: var(--page-muted);
+}
+
+.section-heading {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.section-heading h2,
+.section-heading h3 {
+  margin: 0;
+  font-size: clamp(1.1rem, 2.1vw, 1.45rem);
+  line-height: 1.1;
+}
+
+.section-heading p {
+  margin: 0;
+  color: var(--page-muted);
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid var(--page-line);
+  border-radius: 16px;
+  background: rgba(5, 14, 12, 0.76);
+  color: var(--page-text);
+  padding: 0.9rem 1rem;
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(155, 202, 177, 0.72);
+}
+
+button,
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid var(--page-line-strong);
+  border-radius: 999px;
+  background: rgba(8, 20, 17, 0.84);
+  color: var(--page-text);
+  padding: 0.8rem 1.15rem;
+  text-decoration: none;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease,
+    color 140ms ease;
+}
+
+button:hover,
+button:focus-visible,
+.button-link:hover,
+.button-link:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(154, 249, 199, 0.48);
+  background: rgba(12, 31, 25, 0.96);
+  color: var(--page-accent-soft);
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(154, 249, 199, 0.7);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: 0.72;
+  cursor: wait;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --page-content-width: calc(100% - 1rem);
+    --page-radius: 20px;
+  }
+
+  body {
+    padding-top: 0.5rem;
+  }
+
+  .page-title {
+    font-size: clamp(1.75rem, 10vw, 2.4rem);
+  }
+}

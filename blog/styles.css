@@ -128,6 +128,18 @@ textarea {
   gap: 14px;
 }
 
+.composer-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.feed-toolbar {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .field {
   display: grid;
   gap: 8px;
@@ -139,15 +151,22 @@ textarea {
   color: var(--accent);
 }
 
+.field-counter {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
 input,
 textarea,
+select,
 button {
   border: 1px solid rgba(255, 191, 95, 0.4);
   border-radius: 12px;
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 12px 14px;
   background: rgba(9, 7, 6, 0.92);
@@ -157,6 +176,7 @@ textarea {
 
 input:focus,
 textarea:focus,
+select:focus,
 button:focus {
   outline: 2px solid var(--accent-strong);
   outline-offset: 2px;
@@ -201,6 +221,12 @@ button:disabled {
   border-radius: 16px;
   padding: 18px;
   animation: rise-in 220ms ease both;
+  scroll-margin-top: 24px;
+}
+
+.post-card.is-highlighted {
+  border-color: rgba(255, 224, 140, 0.75);
+  box-shadow: 0 0 0 1px rgba(255, 224, 140, 0.35), var(--shadow);
 }
 
 .post-card-head {
@@ -208,7 +234,7 @@ button:disabled {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .post-date,
@@ -224,9 +250,66 @@ button:disabled {
   color: var(--accent-strong);
 }
 
+.post-card-tags,
+.post-card-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.post-card-tags {
+  margin-bottom: 12px;
+}
+
+.post-mood {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 191, 95, 0.32);
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: var(--accent-strong);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .post-body {
   margin: 0;
   white-space: pre-wrap;
+}
+
+.post-card-actions {
+  margin-top: 16px;
+}
+
+.like-button,
+.load-more-btn {
+  width: auto;
+}
+
+.post-link {
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+.post-link:hover,
+.post-link:focus {
+  text-decoration: underline;
+}
+
+.like-button.is-liked {
+  background: linear-gradient(180deg, #ffe08c 0%, #ffbf5f 100%);
+}
+
+.like-count {
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+.load-more-btn {
+  margin-top: 16px;
 }
 
 .empty-state {
@@ -263,11 +346,22 @@ button:disabled {
   .post-body,
   .empty-state,
   input,
-  textarea {
+  textarea,
+  select {
     font-size: 1.35rem;
   }
 
+  .composer-grid,
+  .feed-toolbar {
+    grid-template-columns: 1fr;
+  }
+
   button {
+    width: 100%;
+  }
+
+  .like-button,
+  .load-more-btn {
     width: 100%;
   }
 }

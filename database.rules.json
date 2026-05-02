@@ -74,8 +74,23 @@
         "uid": {
           ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 64"
         },
+        "alias": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+        },
+        "mood": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24"
+        },
         "$other": {
           ".validate": false
+        }
+      }
+    },
+    "blog-post-likes": {
+      ".read": true,
+      "$postId": {
+        "$uid": {
+          ".write": "!data.exists()",
+          ".validate": "newData.isBoolean() && newData.val() == true && $uid.matches(/^anon_[a-z0-9]+_[a-z0-9]+$/)"
         }
       }
     },

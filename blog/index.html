@@ -40,14 +40,35 @@
       </div>
 
       <form id="post-form" class="post-form" autocomplete="off">
+        <div class="composer-grid">
+          <label class="field">
+            <span>Alias</span>
+            <input id="post-alias" name="alias" type="text" maxlength="24" placeholder="anonymous" />
+          </label>
+
+          <label class="field">
+            <span>Mood</span>
+            <select id="post-mood" name="mood">
+              <option value="smoke signal">Smoke Signal</option>
+              <option value="cosmic">Cosmic</option>
+              <option value="wired">Wired</option>
+              <option value="chill">Chill</option>
+              <option value="dreaming">Dreaming</option>
+              <option value="feral">Feral</option>
+            </select>
+          </label>
+        </div>
+
         <label class="field">
           <span>Title</span>
           <input id="post-title" name="title" type="text" maxlength="120" required placeholder="Tiny headline" />
+          <small id="title-counter" class="field-counter">0 / 120</small>
         </label>
 
         <label class="field">
           <span>Post</span>
           <textarea id="post-text" name="text" maxlength="500" required placeholder="Write something short..." rows="6"></textarea>
+          <small id="text-counter" class="field-counter">0 / 500</small>
         </label>
 
         <div class="composer-footer">
@@ -62,7 +83,29 @@
         <h2 id="feed-title">Latest posts</h2>
         <p id="feed-status">Loading posts...</p>
       </div>
+      <div class="feed-toolbar">
+        <label class="field feed-search">
+          <span>Search</span>
+          <input id="feed-search" type="search" placeholder="Search titles and posts..." />
+        </label>
+
+        <label class="field feed-filter">
+          <span>Mood</span>
+          <select id="feed-mood-filter">
+            <option value="">All moods</option>
+          </select>
+        </label>
+
+        <label class="field feed-filter">
+          <span>Sort</span>
+          <select id="feed-sort">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
+        </label>
+      </div>
       <div id="post-feed" class="post-feed" aria-live="polite"></div>
+      <button id="load-more-posts" class="load-more-btn" type="button" hidden>Load more</button>
     </section>
   </main>
 
@@ -70,10 +113,18 @@
     <article class="post-card">
       <div class="post-card-head">
         <p class="post-date"></p>
-        <p class="post-author">anonymous transmission</p>
+        <p class="post-author"></p>
+      </div>
+      <div class="post-card-tags">
+        <span class="post-mood"></span>
       </div>
       <h3 class="post-title"></h3>
       <p class="post-body"></p>
+      <div class="post-card-actions">
+        <button class="like-button" type="button">Like</button>
+        <span class="like-count">0 likes</span>
+        <a class="post-link" href="#">Permalink</a>
+      </div>
     </article>
   </template>
 

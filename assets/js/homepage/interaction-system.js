@@ -62,8 +62,6 @@ export function createInteractionSystem({
     container.innerHTML = actions.map(action => `
       <button id="${action.id}" class="hero-action-link" type="button" aria-label="${action.label} shortcut ${action.shortcut}">
         <span class="hero-action-icon" aria-hidden="true">${action.emote}</span>
-        <span class="hero-action-copy">${action.label}</span>
-        <span class="hero-action-key" aria-hidden="true">${action.shortcut}</span>
       </button>
     `).join('');
   }

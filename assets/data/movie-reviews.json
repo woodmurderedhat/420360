@@ -2,10 +2,19 @@
   "meta": {
     "source": "https://letterboxd.com/woodmurderedhat/rss/",
     "profile": "https://letterboxd.com/woodmurderedhat/",
-    "lastSynced": "2026-09-18T05:31:47.890Z",
-    "total": 28
+    "lastSynced": "2026-09-25T05:46:29.592Z",
+    "total": 29
   },
   "items": [
+    {
+      "title": "The Weed Eaters, 2025 - ★★★",
+      "link": "https://letterboxd.com/woodmurderedhat/film/the-weed-eaters/",
+      "rating": 3,
+      "watchedDate": "2026-09-24T00:00:00.000Z",
+      "publishedAt": "2026-09-24T17:34:35.000Z",
+      "summary": "Hilariously disturbing.",
+      "posterUrl": "https://a.ltrbxd.com/resized/film-poster/1/3/5/1/6/6/4/1351664-the-weed-eaters-0-600-0-900-crop.jpg?v=873c67faa0"
+    },
     {
       "title": "Awesome Aesthetic",
       "link": "https://letterboxd.com/woodmurderedhat/list/awesome-aesthetic/",
